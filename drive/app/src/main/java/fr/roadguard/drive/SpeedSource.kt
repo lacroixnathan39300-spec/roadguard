@@ -45,10 +45,10 @@ object SpeedMath {
     const val STANDSTILL_KMH = 3
 
     fun toFix(hasSpeed: Boolean, metersPerSecond: Float, accuracy: Float, time: Long): SpeedFix {
-        val kmh = if (hasSpeed && metersPerSecond.isFinite() && metersPerSecond > 0f) {
-            Math.round(metersPerSecond * 3.6f)
-        } else 0
-        return SpeedFix(if (kmh < STANDSTILL_KMH) 0 else kmh, accuracy, time)
+        val raw = if (hasSpeed && metersPerSecond.isFinite() && metersPerSecond > 0f) metersPerSecond * 3.6f else 0f
+        // Seuil appliqué avant l'arrondi : 2,5 km/h de bruit ne doit pas s'afficher « 3 ».
+        val kmh = if (raw < STANDSTILL_KMH) 0 else Math.round(raw)
+        return SpeedFix(kmh, accuracy, time)
     }
 
     /** Angle de l'aiguille du compteur : arc de 240° de -210° à +30°, plein à [maxKmh]. */
