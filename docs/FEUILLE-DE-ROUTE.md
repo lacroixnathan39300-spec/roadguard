@@ -27,12 +27,18 @@ et essai sur l'appareil réel.
 - [ ] Un seul exemplaire du code utilisé par GPS et DRIVE (fin de la copie `DRIVE/roadguard`).
 - [ ] Découper `MainActivity.java` (460 Ko) en écrans et services lisibles, avec tests.
 
-## Phase 3 — Liaison téléphone ↔ autoradio (dans l'appli GPS)
-- [ ] Découverte sur le Wi-Fi / partage de connexion, association par QR code.
-- [ ] Canal chiffré et authentifié, reconnexion automatique.
-- [ ] Envoi : position, trajet, prochaine manœuvre, alertes, musique, appels/notifications.
-- [ ] Bluetooth en secours ; USB si le poste le permet.
-
+## Phase 3 — ROADGUARD Link : l'écran du téléphone sur l'autoradio (type CarbitLink)
+Pas d'Android Auto : le téléphone fait tourner les applis (Waze, GPS ROADGUARD, musique…),
+le poste affiche et renvoie le tactile.
+- [ ] Téléphone (appli GPS) : capture d'écran autorisée (MediaProjection), encodage vidéo H.264
+      matériel, débit et images/s adaptés au Wi-Fi.
+- [ ] Autoradio (DRIVE) : réception et décodage matériel plein écran, faible latence.
+- [ ] Tactile inverse : les appuis et glissés sur le poste pilotent le téléphone
+      (service d'accessibilité du téléphone, avec accord explicite).
+- [ ] Connexion : partage de connexion du téléphone ou Wi-Fi du poste, association par QR,
+      canal chiffré, reconnexion automatique au démarrage de la voiture.
+- [ ] Son par le Bluetooth du poste ; orientation paysage forcée pendant la projection.
+- [ ] Alertes radars ROADGUARD superposées par-dessus Waze projeté.
 ## Phase 4 — Navigation de haut niveau
 - [ ] Calcul d'itinéraire hors ligne (moteur embarqué) au lieu du serveur de démonstration OSRM.
 - [ ] Recherche d'adresses hors ligne, Maison/Travail, favoris.
