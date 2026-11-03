@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 // Keep the phone build independent of AndroidX Car when CodeAssist cannot resolve it.
 def roadguardAndroidAuto = project.findProperty('roadguardAndroidAuto') == 'true'
 android { lint { if (project.hasProperty('roadguardApiLint')) checkOnly 'NewApi', 'InlinedApi' }; buildFeatures { aidl true }; namespace 'fr.roadguard.app'; compileSdk 36
- defaultConfig { applicationId 'fr.roadguard.gps'; minSdk 26; targetSdk 36; versionCode 600; versionName '11.15.0-roadguard' }
+ defaultConfig { applicationId 'fr.roadguard.gps'; minSdk 26; targetSdk 36; versionCode 600+(System.getenv('VERSION_CODE')?:'0').toInteger(); versionName '11.15.'+(System.getenv('VERSION_CODE')?:'0') }
  signingConfigs { debug { if (System.getenv('ROADGUARD_GPS_DEBUG_KEYSTORE')) storeFile file(System.getenv('ROADGUARD_GPS_DEBUG_KEYSTORE')); v1SigningEnabled true; v2SigningEnabled true } }
  // Clé ROADGUARD : fournie par la CI (déchiffrée depuis keys/), jamais versionnée en clair.
  def rgKeystore = System.getenv('RG_KEYSTORE_FILE') ? file(System.getenv('RG_KEYSTORE_FILE')) : null
