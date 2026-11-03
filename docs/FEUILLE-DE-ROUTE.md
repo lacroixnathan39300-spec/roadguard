@@ -17,7 +17,9 @@ et essai sur l'appareil réel.
 ## Phase 1 — DRIVE 2, base du launcher (écrit de zéro)
 - [x] Accueil paysage : zone carte, horloge, compteur rond (GPS du poste), musique, lanceur d'applis.
 - [x] Carte native MapLibre Android (pas de WebView) avec radars et position (build 9).
-- [ ] Alertes radars à l’approche (son + bandeau), vitesse moyenne, carte hors ligne (packs du GPS).
+- [x] Alertes radars à l’approche (bip + voix + bandeau), dans l’axe et dans le bon sens (build 14).
+- [x] Vitesse moyenne reconnue en roulant, verdict OK / trop vite en fin de tronçon (build 14). Corrigé aussi dans le GPS : 0 tronçon français n’était reconnu.
+- [ ] Carte hors ligne (packs du GPS).
 - [ ] Musique : lecteur en cours (MediaSession), pochette, commandes, égaliseur.
 - [ ] Waze ou autre appli dans une fenêtre à côté de la carte (écran partagé / superposition).
 - [ ] Réglages, thèmes jour/nuit automatiques, couleurs, taille des boutons.
