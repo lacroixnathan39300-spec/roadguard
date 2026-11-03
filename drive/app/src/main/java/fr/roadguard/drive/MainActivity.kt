@@ -45,6 +45,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import fr.roadguard.drive.map.DriveMap
 import fr.roadguard.drive.ui.DriveColors
 import fr.roadguard.drive.ui.Speedometer
 import kotlinx.coroutines.Dispatchers
@@ -80,9 +81,8 @@ private fun DriveHome() {
 
     Box(Modifier.fillMaxSize().background(DriveColors.Background)) {
         Row(Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            // Emplacement de la carte ROADGUARD (module partagé avec le GPS, étape suivante).
             Panel(Modifier.weight(0.62f).fillMaxHeight()) {
-                Text(stringResource(R.string.map_placeholder), color = DriveColors.TextSecondary, fontSize = 22.sp)
+                DriveMap(hasLocation = hasLocation, modifier = Modifier.fillMaxSize())
             }
             Column(Modifier.weight(0.38f).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Clock()
