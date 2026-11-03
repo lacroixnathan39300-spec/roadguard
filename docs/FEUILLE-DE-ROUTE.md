@@ -20,7 +20,7 @@ et essai sur l'appareil réel.
 - [x] Alertes radars à l’approche (bip + voix + bandeau), dans l’axe et dans le bon sens (build 14).
 - [x] Vitesse moyenne reconnue en roulant, verdict OK / trop vite en fin de tronçon (build 14). Corrigé aussi dans le GPS : 0 tronçon français n’était reconnu.
 - [ ] Carte hors ligne (packs du GPS).
-- [ ] Musique : lecteur en cours (MediaSession), pochette, commandes, égaliseur.
+- [x] Musique : lecteur en cours (MediaSession), pochette, commandes, égaliseur mémorisé (build 15).
 - [ ] Waze ou autre appli dans une fenêtre à côté de la carte (écran partagé / superposition).
 - [ ] Réglages, thèmes jour/nuit automatiques, couleurs, taille des boutons.
 - [ ] Démarrage automatique avec le poste, retour à l'accueil.
