@@ -20,7 +20,7 @@ jobs:
             tasks: ":app:testDebugUnitTest :app:lintDebug :app:assembleDebug"
             release: ":app:assembleRelease"
           - app: gps
-            tasks: ":app:assembleDebug"
+            tasks: ":app:testDebugUnitTest --tests fr.roadguard.app.AverageSpeedZoneMonitorTest :app:assembleDebug"
             release: ":app:assembleRelease"
     defaults:
       run:

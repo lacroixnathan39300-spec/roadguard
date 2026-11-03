@@ -21,10 +21,15 @@ final class AverageSpeedZoneUi {
   static void load(MainActivity a){
     try{
       ArrayList<AverageSpeedZoneMonitor.Zone> zones=new ArrayList<>();
-      for(String country:new String[]{"ch","fr","be","lu","de","it","es"})
+      ArrayList<AverageSpeedZoneMonitor.Point> points=new ArrayList<>();
+      for(String country:new String[]{"ch","fr","be","lu","de","it","es"}){
         zones.addAll(AverageSpeedZoneMonitor.parse(new InputStreamReader(
             a.getAssets().open("radars_embedded_"+country+".csv"),StandardCharsets.UTF_8)));
-      a.averageZoneMonitor=new AverageSpeedZoneMonitor(zones);
+        // Tronçons français : début et fin ne sont pas reliés, ils sont reconnus en roulant.
+        points.addAll(AverageSpeedZoneMonitor.parsePoints(new InputStreamReader(
+            a.getAssets().open("radars_embedded_"+country+".csv"),StandardCharsets.UTF_8)));
+      }
+      a.averageZoneMonitor=new AverageSpeedZoneMonitor(zones,points);
     }catch(Exception error){
       android.util.Log.w("ROADGUARD","Zones de vitesse moyenne indisponibles",error);
       a.averageZoneMonitor=new AverageSpeedZoneMonitor(new ArrayList<>());

@@ -33,15 +33,64 @@ public final class AverageSpeedZoneMonitor {
   private static final class Pair {
     double startLat,startLon,endLat,endLon;boolean start,end;int limit;
   }
+  /** Point brut d'une base (début, fin ou radar de tronçon), pour les tronçons non appariés. */
+  public static final class Point {
+    public final double lat,lon;public final String category;public final int limitKmh,directionDeg;
+    public Point(double lat,double lon,String category,int limitKmh,int directionDeg){
+      this.lat=lat;this.lon=lon;this.category=category;this.limitKmh=limitKmh;this.directionDeg=directionDeg;
+    }
+  }
   private final ArrayList<Zone> zones=new ArrayList<>();
+  private final ArrayList<Point> points=new ArrayList<>();
   private Zone active;
+  // Tronçon reconnu en roulant (bases françaises : début et fin non reliés entre eux).
+  private boolean dynamic;private int dynamicLimit;
   private double previousLat,previousLon,meters;
   private long startedAt,lastAt;
   private long finishedAt;
   private Status finishedStatus;
-  public AverageSpeedZoneMonitor(ArrayList<Zone> known){if(known!=null)zones.addAll(known);}
-  public int zoneCount(){return zones.size();}
-  public void reset(){active=null;meters=0;startedAt=lastAt=finishedAt=0;finishedStatus=null;}
+  public AverageSpeedZoneMonitor(ArrayList<Zone> known){this(known,null);}
+  public AverageSpeedZoneMonitor(ArrayList<Zone> known,ArrayList<Point> rawPoints){
+    if(known!=null)zones.addAll(known);if(rawPoints!=null)points.addAll(rawPoints);
+  }
+  public int zoneCount(){int starts=0;for(Point p:points)if(p.category.equals("average_start"))starts++;return zones.size()+starts;}
+  public void reset(){active=null;dynamic=false;dynamicLimit=0;meters=0;startedAt=lastAt=finishedAt=0;finishedStatus=null;}
+  /** Lit les points de début/fin/radar de tronçon, même sans identifiant de relation OSM. */
+  public static ArrayList<Point> parsePoints(Reader input)throws IOException {
+    ArrayList<Point> out=new ArrayList<>();
+    try(BufferedReader reader=new BufferedReader(input)){
+      String row;while((row=reader.readLine())!=null){
+        String[] f=row.split(";",-1);if(f.length<9)continue;
+        String category=f[5];
+        if(!category.equals("average_start")&&!category.equals("average_end")&&!category.equals("average"))continue;
+        if(f[8].equals("historical"))continue;
+        try{
+          double lat=Double.parseDouble(f[2]),lon=Double.parseDouble(f[3]);
+          if(!RouteRequestPolicy.coordinate(lat,lon))continue;
+          int limit=f[6].isEmpty()?0:Integer.parseInt(f[6]);
+          int dir=f[7].isEmpty()?-1:Integer.parseInt(f[7]);
+          out.add(new Point(lat,lon,category,limit>=20&&limit<=150?limit:0,dir>=0&&dir<=360?dir:-1));
+        }catch(NumberFormatException ignored){}
+      }
+    }
+    return out;
+  }
+  private Point nearestPoint(double lat,double lon,String category,double radius){
+    Point best=null;double bestD=radius;
+    for(Point p:points){if(!p.category.equals(category))continue;double d=distance(lat,lon,p.lat,p.lon);if(d<=bestD){bestD=d;best=p;}}
+    return best;
+  }
+  private Status tryDynamicStart(double lat,double lon,double bearingDeg,long elapsedMs){
+    Point start=nearestPoint(lat,lon,"average_start",55);if(start==null)return null;
+    int limit=0,dir=-1;
+    for(Point p:points){
+      if(!p.category.equals("average")||distance(start.lat,start.lon,p.lat,p.lon)>400)continue;
+      if(limit==0&&p.limitKmh>0)limit=p.limitKmh;if(dir<0&&p.directionDeg>=0)dir=p.directionDeg;
+    }
+    if(dir>=0&&headingDifference(bearingDeg,dir)>60)return null;
+    dynamic=true;dynamicLimit=limit;startedAt=lastAt=elapsedMs;previousLat=lat;previousLon=lon;meters=0;
+    return new Status(limit>0?"Zone moyenne "+limit+" km/h · calcul en cours":"Zone moyenne · calcul en cours",true,false,false);
+  }
   public static ArrayList<Zone> parse(Reader input)throws IOException {
     ArrayList<Zone> zones=new ArrayList<>();
     Map<String,Pair> pairs=new HashMap<>();
@@ -78,7 +127,7 @@ public final class AverageSpeedZoneMonitor {
   }
   public Status update(double lat,double lon,double speedKmh,double accuracyMeters,double bearingDeg,long elapsedMs){
     if(!RouteRequestPolicy.coordinate(lat,lon)||!Double.isFinite(accuracyMeters)||accuracyMeters>35){
-      if(active!=null)reset();return null;
+      if(active!=null||dynamic)reset();return null;
     }
     if(active==null){
       if(finishedStatus!=null&&elapsedMs-finishedAt>=0&&elapsedMs-finishedAt<9000)return finishedStatus;
@@ -90,7 +139,7 @@ public final class AverageSpeedZoneMonitor {
         active=z;startedAt=lastAt=elapsedMs;previousLat=lat;previousLon=lon;meters=0;
         return new Status("Zone moyenne "+z.limitKmh+" km/h · calcul en cours",true,false,false);
       }
-      return null;
+      if(!dynamic)return tryDynamicStart(lat,lon,bearingDeg,elapsedMs);
     }
     long delta=elapsedMs-lastAt;
     if(delta<=0||delta>20000){reset();return null;}
@@ -99,6 +148,18 @@ public final class AverageSpeedZoneMonitor {
     meters+=segment;previousLat=lat;previousLon=lon;lastAt=elapsedMs;
     double seconds=(elapsedMs-startedAt)/1000.0;
     int average=(int)Math.round(meters*3.6/Math.max(seconds,1));
+    if(dynamic){
+      if(meters>30000){reset();return null;}
+      boolean over=dynamicLimit>0&&average>dynamicLimit;
+      String verdict=dynamicLimit==0?"":(over?" · au-dessus":" · OK");
+      String shown=dynamicLimit>0?average+"/"+dynamicLimit:String.valueOf(average);
+      if(meters>=300&&seconds>=10&&nearestPoint(lat,lon,"average_end",70)!=null){
+        String result="Zone terminée · moyenne "+shown+" km/h"+verdict;
+        dynamic=false;meters=0;startedAt=lastAt=0;finishedAt=elapsedMs;
+        finishedStatus=new Status(result,false,true,over);return finishedStatus;
+      }
+      return new Status("Moyenne "+shown+" km/h"+verdict,true,false,over);
+    }
     boolean over=average>active.limitKmh;
     if(distance(lat,lon,active.endLat,active.endLon)<=70&&seconds>=10){
       String result=String.format(Locale.FRANCE,"Zone terminée · moyenne %d km/h · %s",average,over?"au-dessus":"OK");
