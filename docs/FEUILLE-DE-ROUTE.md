@@ -16,7 +16,8 @@ et essai sur l'appareil réel.
 
 ## Phase 1 — DRIVE 2, base du launcher (écrit de zéro)
 - [x] Accueil paysage : zone carte, horloge, compteur rond (GPS du poste), musique, lanceur d'applis.
-- [ ] Carte native MapLibre Android (pas de WebView) avec radars et position.
+- [x] Carte native MapLibre Android (pas de WebView) avec radars et position (build 9).
+- [ ] Alertes radars à l’approche (son + bandeau), vitesse moyenne, carte hors ligne (packs du GPS).
 - [ ] Musique : lecteur en cours (MediaSession), pochette, commandes, égaliseur.
 - [ ] Waze ou autre appli dans une fenêtre à côté de la carte (écran partagé / superposition).
 - [ ] Réglages, thèmes jour/nuit automatiques, couleurs, taille des boutons.
