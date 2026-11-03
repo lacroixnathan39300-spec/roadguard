@@ -38,4 +38,28 @@ public class AverageSpeedZoneMonitorTest {
     assertNull(monitor.update(46.0,6.0,90,80,0,2000));
     assertEquals(1,monitor.zoneCount());
   }
+  @Test public void recognisesFrenchSectionWithoutRelationIds()throws Exception {
+    // Format des bases françaises : début/fin Lufop sans relation OSM, limite et sens sur un radar voisin.
+    String csv="id;type;lat;lon;country;category;speed_kmh;direction_deg;status;sources;source_ids;speed_conflicts\n"
+      +"s;Radar tronçon début;46.0;6.0;FR;average_start;;;inventory;lufop;lufop:FRTronconDebutFR:1;\n"
+      +"m;Radar vitesse moyenne · 80 km/h;46.0005;6.0;FR;average;80;0;inventory;mapatlas;mapatlas:X;\n"
+      +"e;Radar tronçon fin;46.02;6.0;FR;average_end;;;inventory;lufop;lufop:FRTronconFinFR:1;\n";
+    assertEquals(0,AverageSpeedZoneMonitor.parse(new StringReader(csv)).size());
+    ArrayList<AverageSpeedZoneMonitor.Point> points=AverageSpeedZoneMonitor.parsePoints(new StringReader(csv));
+    assertEquals(3,points.size());
+    AverageSpeedZoneMonitor monitor=new AverageSpeedZoneMonitor(new ArrayList<>(),points);
+    assertEquals(1,monitor.zoneCount());
+    assertNull("sens opposé",monitor.update(46.0,6.0,90,5,180,0));
+    AverageSpeedZoneMonitor.Status status=monitor.update(46.0,6.0,100,5,0,1000);
+    assertNotNull(status);assertTrue(status.active);
+    long at=1000;
+    for(int i=1;i<=45&&!status.finished;i++){
+      at+=2000;
+      status=monitor.update(46.0+i*0.0005,6.0,100,5,0,at);
+      assertNotNull(status);
+    }
+    assertTrue(status.finished);
+    assertTrue(status.overLimit);
+    assertTrue(status.text,status.text.contains("/80 km/h"));
+  }
 }
