@@ -86,6 +86,8 @@ jobs:
             f=$(find art/$app-apk-$RUN -path '*release*' -name '*.apk' | head -1)
             [ -z "$f" ] && f=$(find art/$app-apk-$RUN -path '*debug*' -name '*.apk' | head -1)
             [ -n "$f" ] && cp "$f" "dist/ROADGUARD-$U-build$RUN.apk"
+            d=$(find art/$app-apk-$RUN -path '*debug*' -name '*.apk' | head -1)
+            [ -n "$d" ] && cp "$d" "dist/ROADGUARD-$U-build$RUN-TEST.apk"
           done
           ls -la dist
           (cd dist && sha256sum *.apk > SHA256SUMS.txt)
