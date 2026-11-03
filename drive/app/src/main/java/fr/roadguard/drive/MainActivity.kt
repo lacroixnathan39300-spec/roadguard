@@ -47,6 +47,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import fr.roadguard.drive.map.DriveMap
+import fr.roadguard.drive.media.DriveEqualizer
+import fr.roadguard.drive.media.MediaHub
+import fr.roadguard.drive.ui.EqualizerPanel
+import fr.roadguard.drive.ui.MusicCard
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import kotlinx.coroutines.flow.flowOf
 import fr.roadguard.drive.radar.AlertEngine
 import fr.roadguard.drive.radar.AlertVoice
 import fr.roadguard.drive.radar.AverageSpeedTracker
@@ -86,6 +95,20 @@ private fun DriveHome() {
     var alert by remember { mutableStateOf<RadarAlert?>(null) }
     var average by remember { mutableStateOf<AverageStatus?>(null) }
     var showApps by remember { mutableStateOf(false) }
+    var showEqualizer by remember { mutableStateOf(false) }
+    val media = remember { MediaHub(context) }
+    var hasMediaAccess by remember { mutableStateOf(media.hasAccess()) }
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    DisposableEffect(lifecycle) {
+        // L'accès se donne dans les réglages Android : on revérifie au retour sur l'accueil.
+        val observer = LifecycleEventObserver { _, e -> if (e == Lifecycle.Event.ON_RESUME) hasMediaAccess = media.hasAccess() }
+        lifecycle.addObserver(observer)
+        onDispose { lifecycle.removeObserver(observer) }
+    }
+    val nowPlayingFlow = remember(hasMediaAccess) { if (hasMediaAccess) media.nowPlaying() else flowOf(null) }
+    val nowPlaying by nowPlayingFlow.collectAsState(initial = null)
+    val equalizer = remember { DriveEqualizer(context) }
+    DisposableEffect(Unit) { onDispose { equalizer.release() } }
     val voice = remember { AlertVoice(context) }
     DisposableEffect(Unit) { onDispose { voice.release() } }
 
@@ -123,8 +146,16 @@ private fun DriveHome() {
                         modifier = Modifier.padding(16.dp),
                     )
                 }
-                Panel(Modifier.fillMaxWidth().height(72.dp)) {
-                    Text(stringResource(R.string.music_placeholder), color = DriveColors.TextSecondary)
+                Panel(Modifier.fillMaxWidth().height(84.dp)) {
+                    MusicCard(
+                        nowPlaying = nowPlaying,
+                        hasAccess = hasMediaAccess,
+                        onPrevious = media::previous,
+                        onPlayPause = media::playPause,
+                        onNext = media::next,
+                        onEqualizer = { showEqualizer = true },
+                        modifier = Modifier.fillMaxSize(),
+                    )
                 }
                 Panel(Modifier.fillMaxWidth().height(64.dp).clickable { showApps = true }) {
                     Text(stringResource(R.string.apps), color = Color.White, fontSize = 20.sp)
@@ -132,6 +163,10 @@ private fun DriveHome() {
             }
         }
         if (showApps) AppDrawer(onClose = { showApps = false })
+        if (showEqualizer) {
+            BackHandler { showEqualizer = false }
+            EqualizerPanel(equalizer, onClose = { showEqualizer = false })
+        }
     }
 }
 
