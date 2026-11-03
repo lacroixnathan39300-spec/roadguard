@@ -4,6 +4,12 @@ def roadguardAndroidAuto = project.findProperty('roadguardAndroidAuto') == 'true
 android { lint { if (project.hasProperty('roadguardApiLint')) checkOnly 'NewApi', 'InlinedApi' }; buildFeatures { aidl true }; namespace 'fr.roadguard.app'; compileSdk 36
  defaultConfig { applicationId 'fr.roadguard.app'; minSdk 26; targetSdk 36; versionCode 505; versionName '11.14.305-cartes-liees' }
  signingConfigs { debug { if (System.getenv('ROADGUARD_GPS_DEBUG_KEYSTORE')) storeFile file(System.getenv('ROADGUARD_GPS_DEBUG_KEYSTORE')); v1SigningEnabled true; v2SigningEnabled true } }
+ // Clé ROADGUARD : fournie par la CI (déchiffrée depuis keys/), jamais versionnée en clair.
+ def rgKeystore = System.getenv('RG_KEYSTORE_FILE') ? file(System.getenv('RG_KEYSTORE_FILE')) : null
+ if (rgKeystore != null && rgKeystore.exists()) {
+   signingConfigs { release { storeFile rgKeystore; storePassword System.getenv('RG_KEYSTORE_PASSWORD'); keyAlias System.getenv('RG_KEY_ALIAS'); keyPassword System.getenv('RG_KEY_PASSWORD'); v1SigningEnabled true; v2SigningEnabled true } }
+ }
+ buildTypes { release { minifyEnabled false; signingConfig signingConfigs.findByName('release') ?: signingConfigs.debug } }
  sourceSets {
    test { if (!roadguardAndroidAuto) java.exclude '**/AndroidRuntimeTest.java', '**/CarSearchRuntimeTest.java', '**/CarSurfaceRuntimeTest.java' }
    main {

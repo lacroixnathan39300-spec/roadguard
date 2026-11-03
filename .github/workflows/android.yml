@@ -28,24 +28,28 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
-      - uses: android-actions/setup-android@v3
       - uses: gradle/actions/setup-gradle@v4
       - name: Compiler et tester
         run: |
           chmod +x gradlew
           ./gradlew --stacktrace ${{ matrix.tasks }}
-      - name: Version finale signée (si la clé est configurée)
+      - name: Version finale signée (si la phrase de déchiffrement est configurée)
         if: ${{ github.event_name != 'pull_request' }}
         env:
-          KEYSTORE_B64: ${{ secrets[format('{0}_KEYSTORE_BASE64', matrix.app == 'gps' && 'GPS' || 'DRIVE')] }}
-          RG_KEYSTORE_PASSWORD: ${{ secrets[format('{0}_KEYSTORE_PASSWORD', matrix.app == 'gps' && 'GPS' || 'DRIVE')] }}
-          RG_KEY_ALIAS: ${{ secrets[format('{0}_KEY_ALIAS', matrix.app == 'gps' && 'GPS' || 'DRIVE')] }}
-          RG_KEY_PASSWORD: ${{ secrets[format('{0}_KEY_PASSWORD', matrix.app == 'gps' && 'GPS' || 'DRIVE')] }}
+          RG_KEYS_PASSPHRASE: ${{ secrets.RG_KEYS_PASSPHRASE }}
+          APP: ${{ matrix.app }}
         run: |
-          if [ -z "$KEYSTORE_B64" ]; then echo "Pas de clé configurée : version finale ignorée."; exit 0; fi
-          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
-          export RG_KEYSTORE_FILE="$RUNNER_TEMP/release.jks"
+          if [ -z "$RG_KEYS_PASSPHRASE" ]; then echo "::warning::Secret RG_KEYS_PASSPHRASE absent : version finale non signée ignorée."; exit 0; fi
+          K="$RUNNER_TEMP/keys"; mkdir -p "$K"
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in ../keys/keys.tgz.enc -pass env:RG_KEYS_PASSPHRASE | tar -xzf - -C "$K"
+          set -a; . "$K/keys.env"; set +a
+          U=$(echo "$APP" | tr a-z A-Z)
+          export RG_KEYSTORE_FILE="$K/roadguard-$APP.jks"
+          export RG_KEYSTORE_PASSWORD="$(eval echo \$${U}_KEYSTORE_PASSWORD)"
+          export RG_KEY_PASSWORD="$(eval echo \$${U}_KEY_PASSWORD)"
+          export RG_KEY_ALIAS="$(eval echo \$${U}_KEY_ALIAS)"
           ./gradlew --stacktrace ${{ matrix.release }}
+          rm -rf "$K"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -25,6 +25,6 @@ cd gps   && ./gradlew :app:assembleDebug
 
 ## Signature
 
-Les clés ne sont jamais dans le dépôt. Elles sont stockées dans les **secrets** GitHub du dépôt :
-`DRIVE_KEYSTORE_BASE64`, `DRIVE_KEYSTORE_PASSWORD`, `DRIVE_KEY_ALIAS`, `DRIVE_KEY_PASSWORD`
-et les mêmes avec le préfixe `GPS_`. Sans secret, seules les versions de test sont produites.
+Les clés de DRIVE et du GPS sont dans `keys/keys.tgz.enc`, **chiffrées** (AES-256). La CI les
+déchiffre avec un seul secret GitHub, `RG_KEYS_PASSPHRASE`. Sans ce secret, seules les versions
+de test sont produites. Les clés en clair et la phrase sont gardées par Nathan, hors du dépôt.
