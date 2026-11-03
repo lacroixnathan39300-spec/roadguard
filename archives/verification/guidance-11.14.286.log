@@ -1,0 +1,38 @@
+compile-java8
+
+exit=0
+
+TestGuidanceAudio
+PASS audio ownership: 21 checks; real broker, injected focus/clock, no Android sound
+
+exit=0
+
+TestSpeechPriority
+PASS speech priorities: 28 checks; real tracker/gate/ledger/broker, injected speech and Android preferences
+
+exit=0
+
+TestSpeechMilestones
+PASS 31 speech/milestone checks; real ledger and tracker, injected preferences/speech boundaries
+
+exit=0
+
+TestRerouteConfirmation
+PASS reroute confirmation: 26 checks, distinct fixes/time/hysteresis/cooldown/units; no external route request
+
+exit=0
+
+TestBubbleTransitions
+PASS bubble transitions: 702 assertions, activity ownership/grace, screen/lock/permission and 312 report placements; no Android window rendering
+
+exit=0
+
+TestMotion
+PASS motion: GNSS/network, missing speed/course, true stop, stale/quality guards, compensation, heading reset, navigation intents and projection
+
+exit=0
+
+TestRouteContinuity
+PASS route continuity: 22 checks, real projection/tracker/corridor classes; no GPS hardware
+
+exit=0

@@ -1,0 +1,28 @@
+compile-java8
+
+exit=0
+
+TestRouteContinuity
+PASS route continuity: 22 checks, real projection/tracker/corridor classes; no GPS hardware
+
+exit=0
+
+TestMapInteraction
+PASS interaction: 400 assertions, 150 rectangle scenarios / 124 floating placements, French coordinates; no Android rendering
+
+exit=0
+
+TestLatestSearchHttp
+PASS latest search HTTP: 16 checks; injected HTTP boundary, no external request
+
+exit=0
+
+TestTileArchiveInstaller
+PASS tile archive installer: 28 checks; actual ZIP/files, header fixtures, injected rename failure; no Android image decoding
+
+exit=0
+
+RadarApproachFilterProbe
+Radar approach geometry OK: forward/behind/parallel roads, diagonal routes at three latitudes, antimeridian and invalid projections
+
+exit=0

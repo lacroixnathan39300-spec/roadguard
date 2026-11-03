@@ -1,0 +1,17 @@
+{
+  "name": "ROADGUARD Premium Day V1",
+  "version": 1,
+  "requires": "MapLibre vector tiles with OpenMapTiles or Protomaps layers",
+  "palette": {
+    "background": "#e8edf0",
+    "water": "#b0d7e7",
+    "landcover": "#d6e4dd",
+    "building": "#c3ccd3",
+    "road": "#ffffff",
+    "roadOutline": "#9aaab7",
+    "motorway": "#c7525b",
+    "rail": "#a6aeb5",
+    "text": "#243342",
+    "halo": "#ffffff"
+  }
+}

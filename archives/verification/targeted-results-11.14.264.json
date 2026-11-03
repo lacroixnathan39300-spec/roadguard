@@ -1,0 +1,77 @@
+[
+  {
+    "name": "compile-core-java8",
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "name": "fail-build-without-7z-runtime",
+    "exit_code": 0,
+    "output": "PASS the build refuses to compile when the 7z runtime is omitted\n"
+  },
+  {
+    "name": "real-7z-sqlite-import",
+    "exit_code": 0,
+    "output": "PASS real 7z/SQLite pipeline: 25 scenarios / 8890 assertions; FR=3824 CH=593; newly consumed after dedup={CH=86, FR=2197}; real libraries and files, JVM Android SQLite adapters, no Android native execution\n"
+  },
+  {
+    "name": "visible-tile-cache",
+    "exit_code": 0,
+    "output": "PASS 17 real-file tile-cache scenarios; HTTP transport injected; no Android runtime\n"
+  },
+  {
+    "name": "radar-supplements",
+    "exit_code": 0,
+    "output": "PASS 10 radar supplement scenarios / 24440 assertions; originals preserved, real files, no Android runtime\n"
+  },
+  {
+    "name": "tile-recovery-and-pack",
+    "exit_code": 0,
+    "output": "PASS 11 tile recovery / local pack / rendered UI scenarios; actual shipped JS executed; no WebView or device claim\n"
+  },
+  {
+    "name": "sqlite-fixtures",
+    "exit_code": 0,
+    "output": "Created 14 synthetic SQLite fixtures using real sqlite3\n"
+  },
+  {
+    "name": "canonical-sqlite-store",
+    "exit_code": 0,
+    "output": "PASS canonical/SQLite: 35 scenarios, 43 assertions; real SQLite read-only via JVM adapter, atomic files/backups, additive engine catalog and activation receipts; Android native runtime NOT executed\n"
+  },
+  {
+    "name": "download-errors-queue",
+    "exit_code": 0,
+    "output": "PASS downloads/queue: 27 scenarios, 59 assertions; mocked HTTP, real temporary files and atomic rename; no live network or 7z extraction\n"
+  },
+  {
+    "name": "catalog-additive-rollback",
+    "exit_code": 0,
+    "output": "PASS catalog/policy core: 15 scenarios, 430305 assertions; real bundled files (Europe=80021, FR=24429, CH=1777, active=104838); JVM Android adapters, NOT Android runtime\n"
+  },
+  {
+    "name": "alert-distance-types",
+    "exit_code": 0,
+    "output": "PASS alert policies: matching voice/text distances, invalid values, red lights, crossings, limits, hysteresis and distinct point types\n"
+  },
+  {
+    "name": "gps-motion",
+    "exit_code": 0,
+    "output": "PASS motion: GNSS/network, missing speed/course, true stop, stale/quality guards, compensation, heading reset, navigation intents and projection\n"
+  },
+  {
+    "name": "compile-parser",
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "name": "java-syntax",
+    "exit_code": 0,
+    "output": "PASS Java syntax: 92 files parsed; Android symbols NOT resolved; APK NOT built\n"
+  },
+  {
+    "name": "map-inline-syntax",
+    "exit_code": 0,
+    "output": "app/src/main/assets/map.html: 2 inline script(s) parse OK\napp/src/main/assets/map_maplibre.html: 1 inline script(s) parse OK\n"
+  }
+]

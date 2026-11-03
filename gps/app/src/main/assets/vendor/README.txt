@@ -1,0 +1,1 @@
+MapLibre GL JS 4.7.1 JS and CSS are fetched automatically by the Gradle prepareBundledMapLibre task on the first online build. Assets are bundled into the APK. Offline rebuilds use cached files. If network is unavailable on first build, build fails explicitly. No CDN calls at runtime for the MapLibre engine. Review third-party license notices.

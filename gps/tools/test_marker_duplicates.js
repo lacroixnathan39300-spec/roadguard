@@ -1,0 +1,16 @@
+const assert=require('node:assert/strict'),fs=require('fs'),vm=require('vm'),path=require('path');
+const ctx={};vm.createContext(ctx);vm.runInContext(fs.readFileSync(path.join(__dirname,'../app/src/main/assets/radar_cluster.js'),'utf8'),ctx);
+const {deduplicate,group}=ctx.RoadguardRadarClusters;
+const p=(lat=46.748,lon=5.922,label='Zone dangereuse',id='',bearing=null,speed=0,catalog=false)=>[lat,lon,label,0,id,'',bearing,speed,catalog];
+const a=p();assert.equal(deduplicate([a,p(46.748,5.922,'Zone de danger')]).length,1);assert.equal(deduplicate([a,a,a]).length,1);
+assert.equal(deduplicate([a,p(46.74801,5.922,'Zone dangereuse · communauté','x')]).length,1);
+assert.equal(deduplicate([a,p(46.749,5.922)]).length,2);
+assert.equal(deduplicate([a,p(46.748,5.922,'Accident')]).length,2);
+assert.equal(deduplicate([p(46,5,'Radar fixe','',0,80,true),p(46,5,'Radar fixe','',180,80,true)]).length,2);
+assert.equal(deduplicate([p(46,5,'Radar fixe','',null,80),p(46,5,'Radar fixe','',null,50)]).length,2);
+assert.equal(deduplicate([p(46,5,'Accident','a'),p(46,5,'Accident','b')]).length,2);
+assert.equal(deduplicate([p(46,5,'Radar fixe','',null,80,true),p(46.00005,5,'Radar fixe','',null,80,true)]).length,2);
+assert.equal(deduplicate([p(46,5),p(46.00008,5),p(46.00016,5)]).length,2,'no transitive merge');
+assert.equal(group([a,a],()=>({x:50,y:50}),100,100,96)[0].count,1);
+assert.equal(group([a,p(46.749,5.922)],()=>({x:50,y:50}),100,100,96)[0].count,2,'true cluster counts remain');
+console.log('PASS 12 marker scenarios: duplicates/local+community, distance/type/direction/speed protection, independent reports, catalog sites, no chain, true cluster counts.');

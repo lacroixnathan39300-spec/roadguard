@@ -1,0 +1,107 @@
+{
+  "downloads": [
+    {
+      "name": "ch-camera.sqlite.7z",
+      "url": "https://github.com/hvdwolf/SpeedAlert_Databases/releases/download/europe-202606/ch-camera.sqlite.7z",
+      "bytes": 16391,
+      "sha256": "1ad92d13d8e7282db196c45f53b179af0f7578806c529e8029e27650385e5098",
+      "integrity": "previously pinned SHA256"
+    },
+    {
+      "name": "fr-camera.sqlite.7z",
+      "url": "https://github.com/hvdwolf/SpeedAlert_Databases/releases/download/europe-202606/fr-camera.sqlite.7z",
+      "bytes": 101736,
+      "sha256": "5d38478a92d488668818232495bbd1ae690952ced5e409e2e69cbd3bfd6d63d1",
+      "integrity": "previously pinned SHA256"
+    },
+    {
+      "name": "xz-1.12.jar",
+      "url": "https://repo.maven.apache.org/maven2/org/tukaani/xz/1.12/xz-1.12.jar",
+      "bytes": 168792,
+      "sha256": "3e158a87bd73d8afb4b6e8239c013b7d049c48563f45860ce99cd2e448cf4a6b",
+      "integrity": "previously pinned SHA256 + Maven SHA512"
+    },
+    {
+      "name": "commons-compress-1.28.0.jar",
+      "url": "https://repo.maven.apache.org/maven2/org/apache/commons/commons-compress/1.28.0/commons-compress-1.28.0.jar",
+      "bytes": 1117221,
+      "sha256": "e1522945218456f3649a39bc4afd70ce4bd466221519dba7d378f2141a4642ca",
+      "integrity": "Maven Central SHA1"
+    },
+    {
+      "name": "commons-lang3-3.18.0.jar",
+      "url": "https://repo.maven.apache.org/maven2/org/apache/commons/commons-lang3/3.18.0/commons-lang3-3.18.0.jar",
+      "bytes": 702952,
+      "sha256": "4eeeae8d20c078abb64b015ec158add383ac581571cddc45c68f0c9ae0230720",
+      "integrity": "Maven Central SHA1"
+    },
+    {
+      "name": "commons-io-2.20.0.jar",
+      "url": "https://repo.maven.apache.org/maven2/commons-io/commons-io/2.20.0/commons-io-2.20.0.jar",
+      "bytes": 563971,
+      "sha256": "df90bba0fe3cb586b7f164e78fe8f8f4da3f2dd5c27fa645f888100ccc25dd72",
+      "integrity": "Maven Central SHA1"
+    },
+    {
+      "name": "commons-codec-1.19.0.jar",
+      "url": "https://repo.maven.apache.org/maven2/commons-codec/commons-codec/1.19.0/commons-codec-1.19.0.jar",
+      "bytes": 374716,
+      "sha256": "5c3881e4f556855e9c532927ee0c9dfde94cc66760d5805c031a59887070af5f",
+      "integrity": "Maven Central SHA1"
+    }
+  ],
+  "jars": [
+    {
+      "file": "commons-codec-1.19.0.jar",
+      "class_versions": [
+        52
+      ],
+      "license_entries": [
+        "META-INF/LICENSE.txt",
+        "META-INF/NOTICE.txt"
+      ],
+      "zip_integrity": null
+    },
+    {
+      "file": "commons-compress-1.28.0.jar",
+      "class_versions": [
+        52
+      ],
+      "license_entries": [
+        "META-INF/LICENSE.txt",
+        "META-INF/NOTICE.txt"
+      ],
+      "zip_integrity": null
+    },
+    {
+      "file": "commons-io-2.20.0.jar",
+      "class_versions": [
+        52
+      ],
+      "license_entries": [
+        "META-INF/LICENSE.txt",
+        "META-INF/NOTICE.txt"
+      ],
+      "zip_integrity": null
+    },
+    {
+      "file": "commons-lang3-3.18.0.jar",
+      "class_versions": [
+        52
+      ],
+      "license_entries": [
+        "META-INF/LICENSE.txt",
+        "META-INF/NOTICE.txt"
+      ],
+      "zip_integrity": null
+    },
+    {
+      "file": "xz-1.12.jar",
+      "class_versions": [
+        52
+      ],
+      "license_entries": [],
+      "zip_integrity": null
+    }
+  ]
+}

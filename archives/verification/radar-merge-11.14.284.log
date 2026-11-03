@@ -1,0 +1,6 @@
+
+PASS radar metadata merge / 28 checks plus retention of all FR originals; real assets, JVM boundaries only
+
+PASS 12 radar supplement scenarios / 24442 assertions; originals preserved, real files, no Android runtime
+
+PASS catalog/policy core: 15 scenarios, 430305 assertions; real bundled files (Europe=80021, FR=24429, CH=1777, active=104838); JVM Android adapters, NOT Android runtime

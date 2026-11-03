@@ -1,0 +1,38 @@
+ROADGUARD 11.14.167 — BASES INCLUSES
+Assemblage : 16/10/2026. Cette date n’est pas une validation terrain.
+
+FRANCE : 24429 points dédoublonnés
+7325 points d’inventaire de dispositifs permanents.
+17104 lieux temporaires/chantiers signalés : option désactivée par défaut, présence actuelle non confirmée.
+Toutes les 3309 identités du fichier officiel sont conservées.
+
+SUISSE : 1777 points dédoublonnés
+1583 points d’inventaire, 194 lieux mobiles signalés.
+Les 1777 points CH sont chargés par défaut pour la carte et les alertes GPS. Les 194 lieux mobiles restent non confirmés et disposent d’un réglage CH séparé, activé par défaut. Les réglages globaux des marqueurs, sons, voix et du service GPS restent applicables.
+
+SOURCES ET DATES
+Ministère de l’Intérieur / data.gouv.fr : publication 30/12/2025, Licence Ouverte 2.0.
+Lufop et contributeurs : fichiers exportés le 01/10/2026, ODbL 1.0. ASC/CSV/POI-Warner comparés sans tenir compte de l’ordre des lignes; aucune multiplication artificielle des points.
+MapAtlas Camera Index, https://mapatlas.eu : snapshot 21/05/2024; catalogue publié le 27/08/2026; CC BY 4.0. Données communautaires anciennes.
+© OpenStreetMap contributors via SpeedCams.world, https://speedcams.world : snapshot sans date fiable; ODbL 1.0.
+© OpenStreetMap contributors via Overpass Suisse, https://overpass.osm.ch : extraction du 16/10/2026; le serveur ne fournit pas de date ISO interprétable; ODbL 1.0.
+Référence séparée : Données SITG, État de Genève, extraction 16/10/2026, niveau A libre. 41 socles matériels, hors total radar; un socle ne confirme pas la présence d’une caméra.
+Frontière : swisstopo via geoBoundaries, année représentée 2022, pour isoler les étiquettes pays ambiguës.
+
+DÉDOUBLONNAGE
+25 m entre sources de catégories compatibles; 2 m au sein d’une même famille d’exports. Catégories, extrémités de tronçons, appareils officiels distincts et directions opposées connues préservés. Les coordonnées issues des anciennes sources peuvent laisser subsister des doublons ou des points supprimés depuis.
+
+LIMITES
+Inventaire maximal récupéré dans les sources décrites, pas une liste exhaustive ni un flux en direct. Les limitations de vitesse sont celles des sources; elles peuvent être anciennes ou diverger. Les panneaux sur place restent la référence. Les données, identifiants, sources et divergences sont fournis avec le projet.
+
+DROITS
+Base dérivée proposée sous ODbL 1.0; droits et attributions des composants conservés. Les données peuvent être extraites librement des CSV du projet.
+https://opendatacommons.org/licenses/odbl/1-0/
+https://www.openstreetmap.org/copyright
+https://creativecommons.org/licenses/by/4.0/
+https://www.etalab.gouv.fr/licence-ouverte-open-licence/
+https://sitg.ge.ch/ressources/conditions-utilisation-donnees
+
+USAGE EN SUISSE
+L’OFROU indique que les avertisseurs de contrôles routiers sont interdits dans un véhicule en Suisse. L’activation technique de cette version ne constitue pas une autorisation d’usage.
+https://www.astra.admin.ch/fr/appareils-gps

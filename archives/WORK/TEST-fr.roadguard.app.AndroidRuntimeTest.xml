@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="fr.roadguard.app.AndroidRuntimeTest" tests="45" skipped="0" failures="0" errors="0" timestamp="2026-10-17T15:00:35" hostname="6fe67805e263" time="7.809">
+  <properties/>
+  <testcase name="navigationTemplateAndClusterTripAreValid[26]" classname="fr.roadguard.app.AndroidRuntimeTest" time="2.089"/>
+  <testcase name="navigationTemplateAndClusterTripAreValid[28]" classname="fr.roadguard.app.AndroidRuntimeTest" time="1.775"/>
+  <testcase name="navigationTemplateAndClusterTripAreValid" classname="fr.roadguard.app.AndroidRuntimeTest" time="2.144"/>
+  <testcase name="offRouteStopsPublishingMisleadingTurnInstructions[26]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.036"/>
+  <testcase name="offRouteStopsPublishingMisleadingTurnInstructions[28]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.034"/>
+  <testcase name="offRouteStopsPublishingMisleadingTurnInstructions" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.034"/>
+  <testcase name="closeReleasesCarResourcesEvenAfterPermissionRevocation[26]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.034"/>
+  <testcase name="closeReleasesCarResourcesEvenAfterPermissionRevocation[28]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.031"/>
+  <testcase name="closeReleasesCarResourcesEvenAfterPermissionRevocation" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.033"/>
+  <testcase name="arrivalEndsNavigationOnce[26]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.034"/>
+  <testcase name="arrivalEndsNavigationOnce[28]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.033"/>
+  <testcase name="arrivalEndsNavigationOnce" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.032"/>
+  <testcase name="permissionScreenBuildsWithActualCarLibrary[26]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.029"/>
+  <testcase name="permissionScreenBuildsWithActualCarLibrary[28]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.028"/>
+  <testcase name="permissionScreenBuildsWithActualCarLibrary" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.044"/>
+  <testcase name="everyFavoriteIsReachableAndTemplatesStayValid[26]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.049"/>
+  <testcase name="everyFavoriteIsReachableAndTemplatesStayValid[28]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.041"/>
+  <testcase name="everyFavoriteIsReachableAndTemplatesStayValid" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.036"/>
+  <testcase name="fullFranceMigrationRunsOnlyOnce[26]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.028"/>
+  <testcase name="fullFranceMigrationRunsOnlyOnce[28]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.032"/>
+  <testcase name="fullFranceMigrationRunsOnlyOnce" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.028"/>
+  <testcase name="corruptRouteNeverLeavesPartialPoints[26]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.029"/>
+  <testcase name="corruptRouteNeverLeavesPartialPoints[28]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.049"/>
+  <testcase name="corruptRouteNeverLeavesPartialPoints" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.035"/>
+  <testcase name="rerouteNeedsDistinctReliableFixesAndCooldown[26]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.022"/>
+  <testcase name="rerouteNeedsDistinctReliableFixesAndCooldown[28]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.032"/>
+  <testcase name="rerouteNeedsDistinctReliableFixesAndCooldown" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.027"/>
+  <testcase name="stopCannotRestartFromLateSnapshot[26]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.029"/>
+  <testcase name="stopCannotRestartFromLateSnapshot[28]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.03"/>
+  <testcase name="stopCannotRestartFromLateSnapshot" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.038"/>
+  <testcase name="staleFixDoesNotPublishNewTrip[26]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.032"/>
+  <testcase name="staleFixDoesNotPublishNewTrip[28]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.028"/>
+  <testcase name="staleFixDoesNotPublishNewTrip" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.046"/>
+  <testcase name="clusterManeuversContainDirectionAndArrival[26]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.025"/>
+  <testcase name="clusterManeuversContainDirectionAndArrival[28]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.022"/>
+  <testcase name="clusterManeuversContainDirectionAndArrival" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.021"/>
+  <testcase name="routeForAnotherDestinationIsRejected[26]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.027"/>
+  <testcase name="routeForAnotherDestinationIsRejected[28]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.027"/>
+  <testcase name="routeForAnotherDestinationIsRejected" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.03"/>
+  <testcase name="concurrentCommunityCacheReadsStayComplete[26]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.165"/>
+  <testcase name="concurrentCommunityCacheReadsStayComplete[28]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.174"/>
+  <testcase name="concurrentCommunityCacheReadsStayComplete" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.179"/>
+  <testcase name="guidanceNotReadyIsRetriedInsteadOfMarkedSpoken[26]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.029"/>
+  <testcase name="guidanceNotReadyIsRetriedInsteadOfMarkedSpoken[28]" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.036"/>
+  <testcase name="guidanceNotReadyIsRetriedInsteadOfMarkedSpoken" classname="fr.roadguard.app.AndroidRuntimeTest" time="0.043"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

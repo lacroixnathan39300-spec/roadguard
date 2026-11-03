@@ -1,0 +1,2 @@
+EXPECTED baseline 289 failure: the HTTPS map page returns 404 (no packaged asset route).
+PASS 98 actual-handler checks: three HTTPS map pages, packaged scripts/styles, mosaic/direct vector bytes, origin consistency, offline network guard, asset protections and counters. URI/WebView response adapters; no Android renderer.

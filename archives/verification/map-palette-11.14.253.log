@@ -1,0 +1,4 @@
+2026-10-21 ROADGUARD 11.14.253
+node tools/test_map_pack_runtime.js: PASS six MapLibre raster/vector and local canvas styles are distinct; online backdrop opacity .24/.48/.9; antialias requested.
+node --check inline map_maplibre.html: PASS.
+Android Gradle build and physical GPU/pixel test: unavailable, no pass claimed.

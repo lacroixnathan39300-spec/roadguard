@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="fr.roadguard.app.MapAppearanceRuntimeTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-10-21T13:35:03" hostname="0b421b2e7c9b" time="18.961">
+  <properties/>
+  <testcase name="everyMapEngineReceivesTheSelectedPack[26]" classname="fr.roadguard.app.MapAppearanceRuntimeTest" time="4.858"/>
+  <testcase name="eachLocalPackIsSavedAndSentToTheMapWithoutResettingTheChoice[26]" classname="fr.roadguard.app.MapAppearanceRuntimeTest" time="1.695"/>
+  <testcase name="mapPickerSelectsAVisiblePackWithoutLeavingTheMap[26]" classname="fr.roadguard.app.MapAppearanceRuntimeTest" time="1.368"/>
+  <testcase name="largeCatalogSendsOnlyOneBoundedMapSlice[26]" classname="fr.roadguard.app.MapAppearanceRuntimeTest" time="1.193"/>
+  <testcase name="everyMapEngineReceivesTheSelectedPack" classname="fr.roadguard.app.MapAppearanceRuntimeTest" time="5.782"/>
+  <testcase name="eachLocalPackIsSavedAndSentToTheMapWithoutResettingTheChoice" classname="fr.roadguard.app.MapAppearanceRuntimeTest" time="1.556"/>
+  <testcase name="mapPickerSelectsAVisiblePackWithoutLeavingTheMap" classname="fr.roadguard.app.MapAppearanceRuntimeTest" time="1.287"/>
+  <testcase name="largeCatalogSendsOnlyOneBoundedMapSlice" classname="fr.roadguard.app.MapAppearanceRuntimeTest" time="1.194"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+]]></system-err>
+</testsuite>

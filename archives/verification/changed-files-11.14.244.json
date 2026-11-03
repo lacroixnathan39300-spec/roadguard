@@ -1,0 +1,182 @@
+[
+  {
+    "path": "AVANCEMENT-11.14.244.md",
+    "new": true,
+    "sha256": "d878913bb46edb7d295e610044625d8992834f97653d3661bedf801d123bd462",
+    "bytes": 13858
+  },
+  {
+    "path": "LIRE-11.14.244.md",
+    "new": true,
+    "sha256": "7476f7eabe7459d0237b5c509e9d92e36a9bdbfd33d6d87e7bd84a78d18c73db",
+    "bytes": 1453
+  },
+  {
+    "path": "WORK-11.14.244.md",
+    "new": true,
+    "sha256": "3ea1ef728a39f22821d46075d3df422c83074697de30c3eb218da17a0e17af2a",
+    "bytes": 12220
+  },
+  {
+    "path": "app/build.gradle",
+    "new": false,
+    "sha256": "e2155486e327867c77e107988809e30609e5e23599732c77216c4dfa69d3cf2d",
+    "bytes": 6667
+  },
+  {
+    "path": "app/src/main/assets/map.html",
+    "new": false,
+    "sha256": "27291e4182d2a03ab6aab81c0bc98a57057ed1b70c79dbdbe374fe77ba352fcb",
+    "bytes": 49877
+  },
+  {
+    "path": "app/src/main/assets/map_packs/appearance.js",
+    "new": true,
+    "sha256": "84d18f753f5fcd5bb0b8f2406ef36f121acb2147187d0965c9ee8f958a8a1beb",
+    "bytes": 518
+  },
+  {
+    "path": "app/src/main/assets/map_packs/roadguard.css",
+    "new": true,
+    "sha256": "047d3676de7ea6ef56ba8676e1a03c0db170c6d465e603de72181d3a9ed5eee4",
+    "bytes": 593
+  },
+  {
+    "path": "app/src/main/assets/reference_ui.html",
+    "new": false,
+    "sha256": "aaeff9f474033a7c01b8ed168608236bbccf161d3559f1de7ac50c106684b0d4",
+    "bytes": 46251
+  },
+  {
+    "path": "app/src/main/assets/roadguard_progress_11_14_244.json",
+    "new": true,
+    "sha256": "dbaae09afe73d2abbd0788627f03425ee9fe3424d437c81d768dcc362d0959bb",
+    "bytes": 39536
+  },
+  {
+    "path": "app/src/main/assets/tile_recovery.js",
+    "new": true,
+    "sha256": "78b1143bd9348f13647b1bd57228c6bfc9a8879981709b7e19df4812dbb97390",
+    "bytes": 1851
+  },
+  {
+    "path": "app/src/main/java/fr/roadguard/app/CommunitySync.java",
+    "new": false,
+    "sha256": "3be4f172244d73eefb02199bf880daa31ccae58f920a03198b665686a97764d4",
+    "bytes": 35017
+  },
+  {
+    "path": "app/src/main/java/fr/roadguard/app/ControlMemoryUi.java",
+    "new": false,
+    "sha256": "2f3cdc55013dcdd6a4c721cd50540fa69a5acf573e24222ebaa3fe5270323437",
+    "bytes": 10801
+  },
+  {
+    "path": "app/src/main/java/fr/roadguard/app/MainActivity.java",
+    "new": false,
+    "sha256": "c2b13edc4c38d1c5acc8790439d8c677d2fbebc7b3bf9820b9bac0c30f8cc712",
+    "bytes": 406661
+  },
+  {
+    "path": "app/src/main/java/fr/roadguard/app/RadarDownloadActivity.java",
+    "new": false,
+    "sha256": "3fc134641553ab880a5256a25aa8b7579cef66d7d5e7447538d8cbaf358dd90b",
+    "bytes": 37368
+  },
+  {
+    "path": "app/src/main/java/fr/roadguard/app/RadarSupplementCatalog.java",
+    "new": true,
+    "sha256": "8e283733bec5c4aa344b94943b4d390e09509a6581a80acaf7a8a8957d701367",
+    "bytes": 4259
+  },
+  {
+    "path": "app/src/main/java/fr/roadguard/app/ReferenceUi.java",
+    "new": false,
+    "sha256": "d6ff4b570f15d837c7ed5514f42a27e392c25c3018a107c5d29d2a84692436bb",
+    "bytes": 21039
+  },
+  {
+    "path": "app/src/main/java/fr/roadguard/app/VisibleTileCache.java",
+    "new": false,
+    "sha256": "8e0ef1fce05c8a6083b6ad9f4c5064a52e8927af576db71af1efec77df54fe16",
+    "bytes": 14916
+  },
+  {
+    "path": "app/src/test/java/fr/roadguard/app/StartupRuntimeTest.java",
+    "new": false,
+    "sha256": "60a3f9ce5b1fe5d0a513770c08f532b098882053784edf077e8d420f92a261e8",
+    "bytes": 2184
+  },
+  {
+    "path": "tools/TestRadarSupplements.java",
+    "new": true,
+    "sha256": "b707a090d5412213ffef7af56e65b7109d6135d677d1f7f4954640d324691644",
+    "bytes": 4476
+  },
+  {
+    "path": "tools/TestTileCacheStandalone.java",
+    "new": true,
+    "sha256": "9411ba045c5d2af62d0747dedceb4288b7aac1c73263b468f41fd59e2bc3c3d7",
+    "bytes": 13134
+  },
+  {
+    "path": "tools/render_progress_report.py",
+    "new": false,
+    "sha256": "b9fa8bbc213852e6ceeed9580242efd0f386490cfbcc4f773ad1914770b2176d",
+    "bytes": 4112
+  },
+  {
+    "path": "tools/render_progress_report_11_14_243.py",
+    "new": true,
+    "sha256": "ef09c4c8f657711a0529d82c047cb79eb6ee8a9b9c760da42db55caf5f119699",
+    "bytes": 3737
+  },
+  {
+    "path": "tools/run_targeted_checks.py",
+    "new": false,
+    "sha256": "5fcf33efabbb413c2e8b0b233c5a7d7322c21a82e48a82cd6dc583c359b9bd27",
+    "bytes": 3869
+  },
+  {
+    "path": "tools/run_targeted_checks_11_14_243.py",
+    "new": true,
+    "sha256": "8289ca71f521da0a13ffebe4251d9c2e31f447f349754124bce02cb8e6642330",
+    "bytes": 3340
+  },
+  {
+    "path": "tools/test_tile_recovery_pack.js",
+    "new": true,
+    "sha256": "623f786a696ae9beae6b9ad4de08cbf9d936a01666588b9fea09602eb9876def",
+    "bytes": 5720
+  },
+  {
+    "path": "tools/update_progress_11_14_244.py",
+    "new": true,
+    "sha256": "7dff429412b59ed49c4d007512b685913068ee02173a3f0870d543eedc4abc11",
+    "bytes": 6675
+  },
+  {
+    "path": "verification/data-integrity-11.14.244.json",
+    "new": true,
+    "sha256": "f5a4553043c869d2bc47c4acd9f890ff7b279a81d8e9ffe02f4435f9ac34d956",
+    "bytes": 100
+  },
+  {
+    "path": "verification/release-contract-11.14.244.json",
+    "new": true,
+    "sha256": "425f169165576b1da292f3e752006da33d11ef2c219873462debcbea947f58f3",
+    "bytes": 889
+  },
+  {
+    "path": "verification/targeted-checks-11.14.244.log",
+    "new": true,
+    "sha256": "5f1fb2d0c0949f1ba98eb9e6b2b3af9ac2ac53be535d5cbdf30962a80463d91b",
+    "bytes": 1710
+  },
+  {
+    "path": "verification/targeted-results-11.14.244.json",
+    "new": true,
+    "sha256": "d0dcb867e0ebc9eea9345140fffa61a200f5ad2b487b141e5de3ff81752d8349",
+    "bytes": 2402
+  }
+]

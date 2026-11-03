@@ -1,0 +1,804 @@
+{
+  "baseline": "11.14.287",
+  "version": "11.14.288",
+  "asset_count": 146,
+  "unchanged": 139,
+  "changed": [
+    "app/src/main/assets/map.html",
+    "app/src/main/assets/map_maplibre.html",
+    "app/src/main/assets/map_view_state.js",
+    "app/src/main/assets/radar-icons/control.svg",
+    "app/src/main/assets/radar_icons.js",
+    "app/src/main/assets/reference_ui.html",
+    "app/src/main/assets/roadguard_progress.json"
+  ],
+  "data_files": [
+    {
+      "file": "app/src/main/assets/lufop_europe_asc_overlay.csv",
+      "unchanged": true,
+      "sha256": "ed3005a5d1f34a66d0260d4acc123f0e551ec21299307c9649ee94dcff490e27"
+    },
+    {
+      "file": "app/src/main/assets/radar_sqlite/ch-camera.sqlite",
+      "unchanged": true,
+      "sha256": "d72c64463a8bde8edf25ec60d9821c802af6b468840894cb7470b70263047a4f"
+    },
+    {
+      "file": "app/src/main/assets/radar_sqlite/fr-camera.sqlite",
+      "unchanged": true,
+      "sha256": "005f06a40f6a22c849fbfe44bd5106b3d2b2f498a91aff0552789b788b87073c"
+    },
+    {
+      "file": "app/src/main/assets/radars_embedded_be.csv",
+      "unchanged": true,
+      "sha256": "049cb77a096a2f7dc5157c8d0d03370bbaec7b79f86537f411165e18d64901ef"
+    },
+    {
+      "file": "app/src/main/assets/radars_embedded_ch.csv",
+      "unchanged": true,
+      "sha256": "6ae499183f4f4b69191384da5060cf0bc1b065124b93f37cd5806b9aea126da1"
+    },
+    {
+      "file": "app/src/main/assets/radars_embedded_de.csv",
+      "unchanged": true,
+      "sha256": "57dc6a697550a0b0fa6f57b1d9ad586b3e3de718e1f814d9fa952ab38bdd1fa7"
+    },
+    {
+      "file": "app/src/main/assets/radars_embedded_es.csv",
+      "unchanged": true,
+      "sha256": "caf1747e2019249e953c6258c197bff86a9d82f2541d6733b23dac5d6bb87a61"
+    },
+    {
+      "file": "app/src/main/assets/radars_embedded_fr.csv",
+      "unchanged": true,
+      "sha256": "79e3e8e9b18ef1e22c6ed9e74a69884f0cffdd2cd580b993edb9f781208015d0"
+    },
+    {
+      "file": "app/src/main/assets/radars_embedded_it.csv",
+      "unchanged": true,
+      "sha256": "a57df8bc41a5d9deeddc343d8a59941842a774d2ff7b13c0339d0101aca347c3"
+    },
+    {
+      "file": "app/src/main/assets/radars_embedded_lu.csv",
+      "unchanged": true,
+      "sha256": "2335d477d69a9e1cec47213a5c17fc8f0912127066fa3c326b3f314a956db5b4"
+    },
+    {
+      "file": "app/src/main/assets/radars_france_20251230.csv",
+      "unchanged": true,
+      "sha256": "f6c6114080473bf3e5b15fc522dd75dd3fafaf0f45d82a6cceef93fed7d02c26"
+    }
+  ],
+  "assets": [
+    {
+      "file": "app/src/main/assets/camera_geometry.js",
+      "unchanged": true,
+      "sha256": "07e955584fa6386a0837325247018f7d91facda342b7890928a8ec64402fae49"
+    },
+    {
+      "file": "app/src/main/assets/camera_motion.js",
+      "unchanged": true,
+      "sha256": "2826577e3210c3c425f5720fb782973e5d19c8049603c8e2ec09e273a17d2883"
+    },
+    {
+      "file": "app/src/main/assets/community/manifest.json",
+      "unchanged": true,
+      "sha256": "e7cf336a2ea2b44da16cbba2ba997622cfab6b074727bbf9db7279318daebda3"
+    },
+    {
+      "file": "app/src/main/assets/community/radars-7678e9c8f901.json",
+      "unchanged": true,
+      "sha256": "7678e9c8f9016375ce17f4112268644f4cf106df875a8db849291d578b726842"
+    },
+    {
+      "file": "app/src/main/assets/community_map.js",
+      "unchanged": true,
+      "sha256": "3dd37cd9845c964236a1cc9f28853a3451e748b4818aa96b349061f538da5861"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Bold/0-255.pbf",
+      "unchanged": true,
+      "sha256": "6de0f01294aabd74f73e964aaa18b16e1aec0f1d662f5462c1eba9dbbc0332c9"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Bold/1024-1279.pbf",
+      "unchanged": true,
+      "sha256": "7741656e62041db4a31e151523e448ddda65aeadf866ac5f94201d8d3f8535d9"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Bold/1280-1535.pbf",
+      "unchanged": true,
+      "sha256": "dc2e67826d9c5164c8c20434f1f6585fa1079109e97da968e895dc8658eca810"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Bold/1536-1791.pbf",
+      "unchanged": true,
+      "sha256": "e6d2e9468f913c498b744c3e2a353305811ae2bf3876cb124390ee6cf144a67e"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Bold/1792-2047.pbf",
+      "unchanged": true,
+      "sha256": "15f11864747fa7ef7a823320122f93f41376b2dc0f53679b1c7629a5cf6ba6c8"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Bold/2048-2303.pbf",
+      "unchanged": true,
+      "sha256": "367a43fc452cc59bc374789687cc0ff08130396c363ac048c2c1059bfa177914"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Bold/2304-2559.pbf",
+      "unchanged": true,
+      "sha256": "3e48087fe005ea9502f8d5995ee9104dbc4d7ccf99a7f6f9726e32327166c8fe"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Bold/256-511.pbf",
+      "unchanged": true,
+      "sha256": "9ca46166ea23b155d2efae9c82f5c2cc276e26925f94866504bf3ce4bf4140a7"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Bold/2560-2815.pbf",
+      "unchanged": true,
+      "sha256": "519974e5f5ba547ede1271993fc50fc5fad865c3e9927accd49f542011eabdb7"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Bold/2816-3071.pbf",
+      "unchanged": true,
+      "sha256": "d71530653f5a3e7ad7a46b8a8db4fad5b02c1f6944702452cb26974f6f27226b"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Bold/3072-3327.pbf",
+      "unchanged": true,
+      "sha256": "aa1c4a031dcddfa711ec8853c1d7a9e6a81691c39b8ff628ec684ec4f44eace5"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Bold/3328-3583.pbf",
+      "unchanged": true,
+      "sha256": "63393aac373608126497264232823034ff9b18adf6205641a8b674db2d44055e"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Bold/3584-3839.pbf",
+      "unchanged": true,
+      "sha256": "fe34f1e0f0abd7b8fcf9d408e9dccbfe5a4b93e237bf943ae3293f80e31e2be3"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Bold/3840-4095.pbf",
+      "unchanged": true,
+      "sha256": "732dba9a03803d106204f247812e5304fc7a41294028fdf93a4895e629d8b9f4"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Bold/512-767.pbf",
+      "unchanged": true,
+      "sha256": "a1909b091e449c6ba0b012eca8d37642f2b934144d5e5cc9124f264b07447dde"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Bold/768-1023.pbf",
+      "unchanged": true,
+      "sha256": "1e12293379125563c4b686cf8181354b083b6bc9258f9c7fcc6362b87ad68971"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Bold/8192-8447.pbf",
+      "unchanged": true,
+      "sha256": "328c1b92171d1ba0a9168f38cd501a11b3d30245ea4b69a5a59edfdd9d682a6a"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Italic/0-255.pbf",
+      "unchanged": true,
+      "sha256": "cd5771fe5d1f182376239ab6cf1b5b31bf5431fb47a9de74d7cfce49ba0b008d"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Italic/1024-1279.pbf",
+      "unchanged": true,
+      "sha256": "895ca265fb4628eb7b6c78da56a51aa1b605750944fb0904fd3a8827c6f619e0"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Italic/1280-1535.pbf",
+      "unchanged": true,
+      "sha256": "d13d93d18eda986c00c2dc40c7ac7a292179174ee193ec2d4bd5beaebd4d86e8"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Italic/1536-1791.pbf",
+      "unchanged": true,
+      "sha256": "76db3bac540b612ec30b7ddda25ae6520c6d431beb383e008bf9ccdbb1c35204"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Italic/1792-2047.pbf",
+      "unchanged": true,
+      "sha256": "791989b52f4f87eecae3f8b8105d9f5b7cf473f2cd68638411210029df39febf"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Italic/2048-2303.pbf",
+      "unchanged": true,
+      "sha256": "5458a93937002281304a65f0ee1873adfd5d070c2addb89ce45b972f52ecb090"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Italic/2304-2559.pbf",
+      "unchanged": true,
+      "sha256": "6a9e9748154b690050e0c07986a21e47872da6c3673f66979fd091c79b35b01f"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Italic/256-511.pbf",
+      "unchanged": true,
+      "sha256": "be60481ac10af3662309bcc107406ad79d9be4a176309b0ff59e870898b8ba70"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Italic/2560-2815.pbf",
+      "unchanged": true,
+      "sha256": "2a1929003b755da085ba5ba32fd47610fd87f1b0f6062e3b8ad23757882dd665"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Italic/2816-3071.pbf",
+      "unchanged": true,
+      "sha256": "a7d9de0d5cc2fe0144472853676861d8b25916ceadb483d5ae825b239281808f"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Italic/3072-3327.pbf",
+      "unchanged": true,
+      "sha256": "a9cee560c1011092bcc9e264eec598766ec65fda91c19e3d337a320bfab975d3"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Italic/3328-3583.pbf",
+      "unchanged": true,
+      "sha256": "d382c7ff8ab928e5814b0d0689acb32eff06b2db8ec8968d62174f17d499c0f9"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Italic/3584-3839.pbf",
+      "unchanged": true,
+      "sha256": "3bd37a39c50cd2252514fe4e6701305e0f952d2afe161154f0f639149cb045a7"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Italic/3840-4095.pbf",
+      "unchanged": true,
+      "sha256": "c8ed6ad7a743528f56df2d991940a01184b5414575780382d1b268194860da4e"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Italic/512-767.pbf",
+      "unchanged": true,
+      "sha256": "b53a132c955ab0424140969f63d099dea24ed25693e5e42337848b5ac158be0f"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Italic/768-1023.pbf",
+      "unchanged": true,
+      "sha256": "24afe87922968abef50b2fbd22a9e38bb6cc44c2e58a56c291b9fdf12e852983"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Italic/8192-8447.pbf",
+      "unchanged": true,
+      "sha256": "c7f80f177a5bcdb7c41a984eae2e9ab01246fe92e422e00f44ff7b6876da6c4f"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Regular/0-255.pbf",
+      "unchanged": true,
+      "sha256": "ef1f38a3f1978591e846e9eaddf8a54f7047f546fc6aaed7872cc53151a5de78"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Regular/1024-1279.pbf",
+      "unchanged": true,
+      "sha256": "e3ecd30a8a530beb7f777c6f52a6b922c24232bf5271b6ff61e4093141ad880b"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Regular/1280-1535.pbf",
+      "unchanged": true,
+      "sha256": "abaee0484c5a34e6446ab5cb1e0a8794dfb82536e58bd1961f1f33f945bb8e3a"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Regular/1536-1791.pbf",
+      "unchanged": true,
+      "sha256": "fbe4aa9dac253801ec69493c265f22c5c0ba0b5db84959ffb51e77f5af9bcd3d"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Regular/1792-2047.pbf",
+      "unchanged": true,
+      "sha256": "31ee279292913a8c0610a0b9025d23171dbe93c1b073add305934cb0c809c9c0"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Regular/2048-2303.pbf",
+      "unchanged": true,
+      "sha256": "44fadfd52b27c0fc734b9bab2474af00ab021f5fd021d977eccb0a0437388c58"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Regular/2304-2559.pbf",
+      "unchanged": true,
+      "sha256": "5d027eb8de38e93bae1920b581eac63bf7d2e11d2e2c12d7954a9e4957fd5b17"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Regular/256-511.pbf",
+      "unchanged": true,
+      "sha256": "3254b0ff2b134a77bd533b346734ffeeb12a04e3e7b85bdd88ce569c511d833d"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Regular/2560-2815.pbf",
+      "unchanged": true,
+      "sha256": "d41805156aab21974dddbb002cfae3b4a5a60e3b0d4a5e5c5fd1bb8eda57cfef"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Regular/2816-3071.pbf",
+      "unchanged": true,
+      "sha256": "7d272a1eb18986692332552a4483ccb89b391a35ac32d8bc1f4bc222b46158ce"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Regular/3072-3327.pbf",
+      "unchanged": true,
+      "sha256": "82a25249417aec6f08505dfe976eed7822dc838a81b98f08694703b2c9711aab"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Regular/3328-3583.pbf",
+      "unchanged": true,
+      "sha256": "2876999427ae7e3b4cb2c8c42250754a2e6c842081abef26531c0c25b7776729"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Regular/3584-3839.pbf",
+      "unchanged": true,
+      "sha256": "687fbe40be87c8afc11e0a19da3b21d434a84291bc528905762b0b246a71e46d"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Regular/3840-4095.pbf",
+      "unchanged": true,
+      "sha256": "04ed73204941b071363e42a993778277918c1a5ee57f7d3ee25961ddd9f69ddc"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Regular/512-767.pbf",
+      "unchanged": true,
+      "sha256": "75bc90be4c892e2ed93ffba7b86b1f57c1ff136d6122283500fb1d91e90f9d18"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Regular/768-1023.pbf",
+      "unchanged": true,
+      "sha256": "6dab32381aaf29b6d4e8dd608f8318355b0c74ef06eceb58e8d58a50b7242767"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/Noto Sans Regular/8192-8447.pbf",
+      "unchanged": true,
+      "sha256": "d4bb9ab9121997863595280e1054705c741cc4713f1cb85fbbc046679d670cf3"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/OFL-Noto-Sans.txt",
+      "unchanged": true,
+      "sha256": "cee9892f9f0cc8fe882c9e9537ee6a89621d86ee7ceaf70b02e2b2b1c25c061a"
+    },
+    {
+      "file": "app/src/main/assets/glyphs/README.txt",
+      "unchanged": true,
+      "sha256": "4c91800cb818153b77730bcca56d2e6718781869d1d78a043b352857758b5b93"
+    },
+    {
+      "file": "app/src/main/assets/lufop_europe_asc_overlay.csv",
+      "unchanged": true,
+      "sha256": "ed3005a5d1f34a66d0260d4acc123f0e551ec21299307c9649ee94dcff490e27"
+    },
+    {
+      "file": "app/src/main/assets/map.html",
+      "unchanged": false,
+      "sha256": "1b44b117e7bfb2fd181c9eb07343fa81cbd90d340cfb739f69c347586c54c5e8"
+    },
+    {
+      "file": "app/src/main/assets/map_lifecycle.js",
+      "unchanged": true,
+      "sha256": "882c7bd7f98c527e08a2783844a9bd1e5b44f816cf8b22a2406bf4131e95a587"
+    },
+    {
+      "file": "app/src/main/assets/map_maplibre.html",
+      "unchanged": false,
+      "sha256": "158e9467c42fa2b90e13d7c80eac7083c57bd98e37c63bac67128fffa09a2771"
+    },
+    {
+      "file": "app/src/main/assets/map_offline.html",
+      "unchanged": true,
+      "sha256": "91a15eee2c4283cea68867c180d50fcd7d73c11de649884a12567633e99f771a"
+    },
+    {
+      "file": "app/src/main/assets/map_packs/appearance.js",
+      "unchanged": true,
+      "sha256": "d29eb2b5457b59d16d6510e6f3b02f86cfd51b6c6650f7a6bebee9a08143c3f5"
+    },
+    {
+      "file": "app/src/main/assets/map_packs/roadguard.css",
+      "unchanged": true,
+      "sha256": "111564064ee9aa952b50f4799b14d55f07108efd4293957e2ce95ee5cd3495fd"
+    },
+    {
+      "file": "app/src/main/assets/map_view_state.js",
+      "unchanged": false,
+      "sha256": "0833f1b982154573957facddd3295abae8339847a1eccacd6071aa75d6cb85f6"
+    },
+    {
+      "file": "app/src/main/assets/maps/README.txt",
+      "unchanged": true,
+      "sha256": "4213bfd271e534c575550a5aa4b012fed3b06800a320b4f68de038cef8abdf72"
+    },
+    {
+      "file": "app/src/main/assets/offline_map_catalog.json",
+      "unchanged": true,
+      "sha256": "cefeaaa2785bde31461673594e4971bc8aad54ae7532cecd1f4fbce35959446b"
+    },
+    {
+      "file": "app/src/main/assets/osm-sectors/README.txt",
+      "unchanged": true,
+      "sha256": "06fa32c77ca62116fa160216660a0c29a0567b3a42fa211d7d2d2a396d449b21"
+    },
+    {
+      "file": "app/src/main/assets/radar-icons/average.svg",
+      "unchanged": true,
+      "sha256": "1d8ab432227ebdf6e02011d5894c136582428a63916d979af7e7f6ccf23b9480"
+    },
+    {
+      "file": "app/src/main/assets/radar-icons/carpool.svg",
+      "unchanged": true,
+      "sha256": "9053f9c390437aab403b86401017675937dcba4df777935c76ea48b5f714264b"
+    },
+    {
+      "file": "app/src/main/assets/radar-icons/control.svg",
+      "unchanged": false,
+      "sha256": "dd87d3fe591b779ead03713d873e454cbc3f2f043f43d65731cfeaeb779a7b08"
+    },
+    {
+      "file": "app/src/main/assets/radar-icons/crossing.svg",
+      "unchanged": true,
+      "sha256": "d2fac9ee3adeb6dae76066ec337a9d4ee92ae19a0c0848190febd06ca0ed4a06"
+    },
+    {
+      "file": "app/src/main/assets/radar-icons/danger.svg",
+      "unchanged": true,
+      "sha256": "4c05b5964a7efb75f564ee1469287faa0968ac92e6b3a1f3b01b098a3ae8a9c2"
+    },
+    {
+      "file": "app/src/main/assets/radar-icons/discriminant.svg",
+      "unchanged": true,
+      "sha256": "988477cb6f8c065e55475bffeaa84e3f5f9121c4f86ddca3a03da1083ce67142"
+    },
+    {
+      "file": "app/src/main/assets/radar-icons/fixed.svg",
+      "unchanged": true,
+      "sha256": "619242dab6680d312462b33198a75ed15bf15b8243e720b3200be8b5d3923710"
+    },
+    {
+      "file": "app/src/main/assets/radar-icons/hazard.svg",
+      "unchanged": true,
+      "sha256": "68a424342c702457a49acac2e981069d439d91e2378b5dfe71cef756a3eaa020"
+    },
+    {
+      "file": "app/src/main/assets/radar-icons/mobile.svg",
+      "unchanged": true,
+      "sha256": "49d751f2898e4ea960c25184c47df8a4e644b61ea2c92d41a8424610b6f7bc07"
+    },
+    {
+      "file": "app/src/main/assets/radar-icons/redlight.svg",
+      "unchanged": true,
+      "sha256": "d55576f37ee54e5411a7ef61737af4473d2fa378be54d36bec9c7abbd91ea8b1"
+    },
+    {
+      "file": "app/src/main/assets/radar-icons/tunnel.svg",
+      "unchanged": true,
+      "sha256": "88873ee3cd69e7ad5c526c86ba0b914921a49047e88675643dba64d277a531d2"
+    },
+    {
+      "file": "app/src/main/assets/radar-icons/turret.svg",
+      "unchanged": true,
+      "sha256": "f50d7ebaf246334a875cf89340380435e4eb14843c33de7a934103c887a4d6cb"
+    },
+    {
+      "file": "app/src/main/assets/radar-icons/urban.svg",
+      "unchanged": true,
+      "sha256": "3acea1b7d1e27083d2ab1cec8a7df1c63fd39f32e4b595b9c4e2728c220c4df7"
+    },
+    {
+      "file": "app/src/main/assets/radar-icons/variable.svg",
+      "unchanged": true,
+      "sha256": "4aad03185ae401c2a72f93b99b95b76120bef0d819ef890b273dafa74ec41649"
+    },
+    {
+      "file": "app/src/main/assets/radar-icons/works.svg",
+      "unchanged": true,
+      "sha256": "5262eaafac2b2596ee586e28f6825f46e8dd0117713d2f72d27596cbbf1333e2"
+    },
+    {
+      "file": "app/src/main/assets/radar_archives/ch-camera.sqlite.7z",
+      "unchanged": true,
+      "sha256": "1ad92d13d8e7282db196c45f53b179af0f7578806c529e8029e27650385e5098"
+    },
+    {
+      "file": "app/src/main/assets/radar_archives/fr-camera.sqlite.7z",
+      "unchanged": true,
+      "sha256": "5d38478a92d488668818232495bbd1ae690952ced5e409e2e69cbd3bfd6d63d1"
+    },
+    {
+      "file": "app/src/main/assets/radar_bundle_manifest.json",
+      "unchanged": true,
+      "sha256": "c508f6d3c3357e5f6ff74222030be2084dbfedb19a323a4ae7756c4a4b8a1b45"
+    },
+    {
+      "file": "app/src/main/assets/radar_cluster.js",
+      "unchanged": true,
+      "sha256": "30774a3486840cf74699072ab4ca373dfd5f7a421d63a2a83240a1937dda5197"
+    },
+    {
+      "file": "app/src/main/assets/radar_icons.js",
+      "unchanged": false,
+      "sha256": "a7f0dfe5af4d3555f84ef91a992a0f3c38bf6e56442465f2a4f90510d64fdc57"
+    },
+    {
+      "file": "app/src/main/assets/radar_licences/CC-BY-4.0.txt",
+      "unchanged": true,
+      "sha256": "d557539df68e771cc1eedcc91d13f70fca930e508d11eedcafa4b15db49e3744"
+    },
+    {
+      "file": "app/src/main/assets/radar_licences/ODbL-1.0.txt",
+      "unchanged": true,
+      "sha256": "77d2692c3d64efdd4db18dce2407699baf62930e2b50d6e5ed90b48acf16b7c1"
+    },
+    {
+      "file": "app/src/main/assets/radar_neighbors_manifest.json",
+      "unchanged": true,
+      "sha256": "f53cb1e771aa10381fcef1f690de636fb804520e35d9e4c1ccd13ccba20da540"
+    },
+    {
+      "file": "app/src/main/assets/radar_neighbors_notice.txt",
+      "unchanged": true,
+      "sha256": "004b284624b42280769b1a12dba4844d66d9b3329003028f1b7dc00525a0c610"
+    },
+    {
+      "file": "app/src/main/assets/radar_reference_geneva.geojson",
+      "unchanged": true,
+      "sha256": "5aa58b7eed9d9bee24283064cd688d5ed55c6b24f4dad72a924e6990b42f556e"
+    },
+    {
+      "file": "app/src/main/assets/radar_sources_notice.txt",
+      "unchanged": true,
+      "sha256": "24e1548c23c935e1ba009388d00cc0d525084a8cdce5450a1700a27794b33af6"
+    },
+    {
+      "file": "app/src/main/assets/radar_sqlite/ch-camera.sqlite",
+      "unchanged": true,
+      "sha256": "d72c64463a8bde8edf25ec60d9821c802af6b468840894cb7470b70263047a4f"
+    },
+    {
+      "file": "app/src/main/assets/radar_sqlite/fr-camera.sqlite",
+      "unchanged": true,
+      "sha256": "005f06a40f6a22c849fbfe44bd5106b3d2b2f498a91aff0552789b788b87073c"
+    },
+    {
+      "file": "app/src/main/assets/radars_embedded_be.csv",
+      "unchanged": true,
+      "sha256": "049cb77a096a2f7dc5157c8d0d03370bbaec7b79f86537f411165e18d64901ef"
+    },
+    {
+      "file": "app/src/main/assets/radars_embedded_ch.csv",
+      "unchanged": true,
+      "sha256": "6ae499183f4f4b69191384da5060cf0bc1b065124b93f37cd5806b9aea126da1"
+    },
+    {
+      "file": "app/src/main/assets/radars_embedded_de.csv",
+      "unchanged": true,
+      "sha256": "57dc6a697550a0b0fa6f57b1d9ad586b3e3de718e1f814d9fa952ab38bdd1fa7"
+    },
+    {
+      "file": "app/src/main/assets/radars_embedded_es.csv",
+      "unchanged": true,
+      "sha256": "caf1747e2019249e953c6258c197bff86a9d82f2541d6733b23dac5d6bb87a61"
+    },
+    {
+      "file": "app/src/main/assets/radars_embedded_fr.csv",
+      "unchanged": true,
+      "sha256": "79e3e8e9b18ef1e22c6ed9e74a69884f0cffdd2cd580b993edb9f781208015d0"
+    },
+    {
+      "file": "app/src/main/assets/radars_embedded_it.csv",
+      "unchanged": true,
+      "sha256": "a57df8bc41a5d9deeddc343d8a59941842a774d2ff7b13c0339d0101aca347c3"
+    },
+    {
+      "file": "app/src/main/assets/radars_embedded_lu.csv",
+      "unchanged": true,
+      "sha256": "2335d477d69a9e1cec47213a5c17fc8f0912127066fa3c326b3f314a956db5b4"
+    },
+    {
+      "file": "app/src/main/assets/radars_france_20251230.csv",
+      "unchanged": true,
+      "sha256": "f6c6114080473bf3e5b15fc522dd75dd3fafaf0f45d82a6cceef93fed7d02c26"
+    },
+    {
+      "file": "app/src/main/assets/reference_ui.html",
+      "unchanged": false,
+      "sha256": "262414485e593e0b11a84a49e9c9d606713597c58febead9760b0c2e5ae9dbd9"
+    },
+    {
+      "file": "app/src/main/assets/roadguard-styles/premium-day.json",
+      "unchanged": true,
+      "sha256": "bd3857583fc4260fcc997c6e0afe4bc599044efa52640fb8454ef2e54315a421"
+    },
+    {
+      "file": "app/src/main/assets/roadguard-styles/premium-night.json",
+      "unchanged": true,
+      "sha256": "64326d7b8efcc1a76d51743b884cd6075e83fa1d4c2ff48c8a23c333fd0c5ca6"
+    },
+    {
+      "file": "app/src/main/assets/roadguard_home_scene.png",
+      "unchanged": true,
+      "sha256": "5c0da2149cac5e32ab27ae7ff42dd5b9094f34e94645ddffd7b2f692f6fb0a74"
+    },
+    {
+      "file": "app/src/main/assets/roadguard_maquette.png",
+      "unchanged": true,
+      "sha256": "6810ba0db7922e7b7d209c9a20a82f1449bcf09af0118e3fb6dd206ad7dd4a53"
+    },
+    {
+      "file": "app/src/main/assets/roadguard_progress.json",
+      "unchanged": false,
+      "sha256": "231dd6d09389d7f43351ef7331a384656f8404baa51c0eefb974c2ed318388be"
+    },
+    {
+      "file": "app/src/main/assets/roadguard_progress_11_14_241.json",
+      "unchanged": true,
+      "sha256": "75024a4dfccca48e4f960195cbcda9ee9cd820abded190000b272e8cb35d2a12"
+    },
+    {
+      "file": "app/src/main/assets/roadguard_progress_11_14_242.json",
+      "unchanged": true,
+      "sha256": "73f76c26080b66adc64872b8c60b37407af0237cbc90497119737acb0d93e076"
+    },
+    {
+      "file": "app/src/main/assets/roadguard_progress_11_14_243.json",
+      "unchanged": true,
+      "sha256": "3b1884b17a41e8bf79877d9fb3248c799697878f42b975dece4a46bc436d077f"
+    },
+    {
+      "file": "app/src/main/assets/roadguard_progress_11_14_244.json",
+      "unchanged": true,
+      "sha256": "dbaae09afe73d2abbd0788627f03425ee9fe3424d437c81d768dcc362d0959bb"
+    },
+    {
+      "file": "app/src/main/assets/roadguard_progress_11_14_245.json",
+      "unchanged": true,
+      "sha256": "b772dddc1f7b7b30bf6580a18075d5b262c001069362bc2cf6a53177429396c4"
+    },
+    {
+      "file": "app/src/main/assets/roadguard_progress_11_14_246.json",
+      "unchanged": true,
+      "sha256": "c309124854d31499e92247136104014972d6be6d561b22634ab02f36f98c431d"
+    },
+    {
+      "file": "app/src/main/assets/roadguard_progress_11_14_247.json",
+      "unchanged": true,
+      "sha256": "6bc221b54c680a113dd7e39bc9e75fa1b6d0176c82014c0c9996cdaa074ca04b"
+    },
+    {
+      "file": "app/src/main/assets/roadguard_progress_11_14_248.json",
+      "unchanged": true,
+      "sha256": "de8dcada7812c94943bcf8e66dc356d0203816062f5498682a3aa2b259889db0"
+    },
+    {
+      "file": "app/src/main/assets/roadguard_progress_11_14_249.json",
+      "unchanged": true,
+      "sha256": "d101544b56cdc2b1c0777039e0a42e858ddbcd7b8fbd9714fd7b313e8c2ddff1"
+    },
+    {
+      "file": "app/src/main/assets/roadguard_progress_11_14_250.json",
+      "unchanged": true,
+      "sha256": "75807af99643f7cbfebf42f217d98aa5986b5be07c887f4605d129cc62201a3a"
+    },
+    {
+      "file": "app/src/main/assets/tile_recovery.js",
+      "unchanged": true,
+      "sha256": "78b1143bd9348f13647b1bd57228c6bfc9a8879981709b7e19df4812dbb97390"
+    },
+    {
+      "file": "app/src/main/assets/vendor/LICENSE-SpeedAlert-Databases-CC-BY-4.0.txt",
+      "unchanged": true,
+      "sha256": "81ad0d3087a42b58e41d90452e62d87593160db09b51fb2dc5278adc7f8c7954"
+    },
+    {
+      "file": "app/src/main/assets/vendor/LICENSE-commons-codec-1.19.0-LICENSE.txt",
+      "unchanged": true,
+      "sha256": "b1d2870f1a00e4d7f56576e5f0870cba109e041f8af66866cf5b499478e654e7"
+    },
+    {
+      "file": "app/src/main/assets/vendor/LICENSE-commons-codec-1.19.0-NOTICE.txt",
+      "unchanged": true,
+      "sha256": "b64933ee1d36d14659156223a2604edadb60bffdd465d5368ff422d7689db5fb"
+    },
+    {
+      "file": "app/src/main/assets/vendor/LICENSE-commons-compress-1.28.0-LICENSE.txt",
+      "unchanged": true,
+      "sha256": "51b88fd3e9e24edcdce1dd145a4fca2dcd12911407f00b06dfa6ff600f9733c1"
+    },
+    {
+      "file": "app/src/main/assets/vendor/LICENSE-commons-compress-1.28.0-NOTICE.txt",
+      "unchanged": true,
+      "sha256": "0d98967f0ab328af8d9d536aa9a5c684b5dd665657245f6ee6b5915affe811c0"
+    },
+    {
+      "file": "app/src/main/assets/vendor/LICENSE-commons-io-2.20.0-LICENSE.txt",
+      "unchanged": true,
+      "sha256": "c1d1a38c99c48ccad170890ade6066e2e240bb6ce59861d4eb7f672eddd2a4c6"
+    },
+    {
+      "file": "app/src/main/assets/vendor/LICENSE-commons-io-2.20.0-NOTICE.txt",
+      "unchanged": true,
+      "sha256": "b54b0db6c617273efff79ba193bb01b05eadcddfff55c24063b38b2acef714c3"
+    },
+    {
+      "file": "app/src/main/assets/vendor/LICENSE-commons-lang3-3.18.0-LICENSE.txt",
+      "unchanged": true,
+      "sha256": "b1d2870f1a00e4d7f56576e5f0870cba109e041f8af66866cf5b499478e654e7"
+    },
+    {
+      "file": "app/src/main/assets/vendor/LICENSE-commons-lang3-3.18.0-NOTICE.txt",
+      "unchanged": true,
+      "sha256": "64bc8696af3f6c770521412b85d3a733fa44b2ef5b0f4bd739e0c4d02eca492a"
+    },
+    {
+      "file": "app/src/main/assets/vendor/LICENSE-google-brotli.txt",
+      "unchanged": true,
+      "sha256": "3d180008e36922a4e8daec11c34c7af264fed5962d07924aea928c38e8663c94"
+    },
+    {
+      "file": "app/src/main/assets/vendor/LICENSE-maplibre-gl.txt",
+      "unchanged": true,
+      "sha256": "ee5fc05a0677eaf69601d2c7db0d9ecd6cc27c3abc1d0733bc9ed34707cf8ef2"
+    },
+    {
+      "file": "app/src/main/assets/vendor/LICENSE-xz-1.12.txt",
+      "unchanged": true,
+      "sha256": "1e77ef26cee5216d6531e49cbf2f6111a0270dc7b322fc65477063c5aff88766"
+    },
+    {
+      "file": "app/src/main/assets/vendor/README.txt",
+      "unchanged": true,
+      "sha256": "467150821d26b855eeb49e3d2e6da256987ceba15b626cc25d02942d092fc0be"
+    },
+    {
+      "file": "app/src/main/assets/vendor/leaflet/LICENSE",
+      "unchanged": true,
+      "sha256": "53e8dc25862014e4324741ca18fbe3611e11d42ef69f59f86ea8c5389647d4cb"
+    },
+    {
+      "file": "app/src/main/assets/vendor/leaflet/images/layers-2x.png",
+      "unchanged": true,
+      "sha256": "066daca850d8ffbef007af00b06eac0015728dee279c51f3cb6c716df7c42edf"
+    },
+    {
+      "file": "app/src/main/assets/vendor/leaflet/images/layers.png",
+      "unchanged": true,
+      "sha256": "1dbbe9d028e292f36fcba8f8b3a28d5e8932754fc2215b9ac69e4cdecf5107c6"
+    },
+    {
+      "file": "app/src/main/assets/vendor/leaflet/images/marker-icon-2x.png",
+      "unchanged": true,
+      "sha256": "00179c4c1ee830d3a108412ae0d294f55776cfeb085c60129a39aa6fc4ae2528"
+    },
+    {
+      "file": "app/src/main/assets/vendor/leaflet/images/marker-icon.png",
+      "unchanged": true,
+      "sha256": "574c3a5cca85f4114085b6841596d62f00d7c892c7b03f28cbfa301deb1dc437"
+    },
+    {
+      "file": "app/src/main/assets/vendor/leaflet/images/marker-shadow.png",
+      "unchanged": true,
+      "sha256": "264f5c640339f042dd729062cfc04c17f8ea0f29882b538e3848ed8f10edb4da"
+    },
+    {
+      "file": "app/src/main/assets/vendor/leaflet/leaflet.css",
+      "unchanged": true,
+      "sha256": "a7837102824184820dfa198d1ebcd109ff6d0ff9a2672a074b9a1b4d147d04c6"
+    },
+    {
+      "file": "app/src/main/assets/vendor/leaflet/leaflet.js",
+      "unchanged": true,
+      "sha256": "db49d009c841f5ca34a888c96511ae936fd9f5533e90d8b2c4d57596f4e5641a"
+    },
+    {
+      "file": "app/src/main/assets/vendor/leaflet/manifest.json",
+      "unchanged": true,
+      "sha256": "9e5b5399e41ebd29fbee43dbbd2e7b946cb8cbd0c8b962a2bc9ef822d768f817"
+    },
+    {
+      "file": "app/src/main/assets/vendor/maplibre-gl.css",
+      "unchanged": true,
+      "sha256": "576b085fdd9487a65a19215328c1e086c07ce5bf6da09b666b3806d3d008dae9"
+    },
+    {
+      "file": "app/src/main/assets/vendor/maplibre-gl.js",
+      "unchanged": true,
+      "sha256": "be9633c4d870e26fb37f1cfe5c5a77181667114003ea16207ac7850d8da8add1"
+    }
+  ]
+}

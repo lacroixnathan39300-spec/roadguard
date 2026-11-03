@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="fr.roadguard.app.LocalFirstBootstrapRuntimeTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-27T07:39:22.865Z" hostname="2895238405b8" time="6.021">
+  <properties/>
+  <testcase name="downloadedMapIsTheInitialSourceEvenOnlineAndNetworkChangesKeepTheView[27]" classname="fr.roadguard.app.LocalFirstBootstrapRuntimeTest" time="2.855"/>
+  <testcase name="downloadedMapIsTheInitialSourceEvenOnlineAndNetworkChangesKeepTheView" classname="fr.roadguard.app.LocalFirstBootstrapRuntimeTest" time="3.136"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,20 @@
+{
+  "baseline": "11.14.289",
+  "identical_files": [
+    "app/src/main/assets/lufop_europe_asc_overlay.csv",
+    "app/src/main/assets/radar_sqlite/ch-camera.sqlite",
+    "app/src/main/assets/radar_sqlite/fr-camera.sqlite",
+    "app/src/main/assets/radars_embedded_be.csv",
+    "app/src/main/assets/radars_embedded_ch.csv",
+    "app/src/main/assets/radars_embedded_de.csv",
+    "app/src/main/assets/radars_embedded_es.csv",
+    "app/src/main/assets/radars_embedded_fr.csv",
+    "app/src/main/assets/radars_embedded_it.csv",
+    "app/src/main/assets/radars_embedded_lu.csv",
+    "app/src/main/assets/radars_france_20251230.csv",
+    "radar_sources/2026-10-16/official_fr.csv",
+    "radar_sources/2026-10-16/speedcams_ch.csv",
+    "radar_sources/2026-10-16/speedcams_fr.csv"
+  ],
+  "count": 14
+}

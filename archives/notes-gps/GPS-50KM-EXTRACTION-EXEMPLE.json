@@ -1,0 +1,18 @@
+{
+  "status": "PLANNED_NOT_DOWNLOADED",
+  "jobs": [
+    {
+      "id": "jura_demo",
+      "bbox": [
+        5.238944,
+        46.300844,
+        6.561056,
+        47.199156
+      ],
+      "output": "jura_demo.pmtiles",
+      "command": "versatiles convert --bbox-border 3 --bbox 5.238944,46.300844,6.561056,47.199156 --min-zoom 0 --max-zoom 14 https://download.versatiles.org/osm.versatiles jura_demo.pmtiles",
+      "status": "NOT_DOWNLOADED",
+      "source": "https://download.versatiles.org/osm.versatiles"
+    }
+  ]
+}

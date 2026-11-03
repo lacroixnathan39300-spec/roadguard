@@ -1,0 +1,17 @@
+{
+  "name": "ROADGUARD Premium Night V1",
+  "version": 1,
+  "requires": "MapLibre vector tiles with OpenMapTiles or Protomaps layers",
+  "palette": {
+    "background": "#111923",
+    "water": "#203c50",
+    "landcover": "#1c292b",
+    "building": "#34414b",
+    "road": "#8d9ba9",
+    "roadOutline": "#26303b",
+    "motorway": "#d54a59",
+    "rail": "#53606a",
+    "text": "#f2f5f8",
+    "halo": "#0c1420"
+  }
+}

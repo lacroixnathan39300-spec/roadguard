@@ -1,0 +1,32 @@
+{
+  "version": "11.14.243",
+  "version_code": 443,
+  "application_id": "fr.roadguard.app",
+  "baseline": "11.14.242",
+  "task_count": 39,
+  "weight": 100,
+  "totals": {
+    "development": 78,
+    "validation": 27.5,
+    "previous_development": 75,
+    "previous_validation": 25
+  },
+  "new_coded_tasks": [
+    "D6"
+  ],
+  "new_validation_tasks": {
+    "D6": 2,
+    "S2": 0.5
+  },
+  "android_native_runtime_executed": false,
+  "apk_produced": false,
+  "sevenzip_extraction_executed": false,
+  "automatic_camera_reaudit": false,
+  "original_data": {
+    "reference": "11.14.240",
+    "checked_original_files": 59,
+    "unchanged": 59,
+    "failures": []
+  },
+  "new_test_scope": "35 scénarios canonique/SQLite avec vraies bases synthétiques et adaptateurs de frontière Android JVM ; fichiers et sauvegardes réels."
+}

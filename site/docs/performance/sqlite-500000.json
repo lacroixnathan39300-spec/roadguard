@@ -1,0 +1,312 @@
+{
+  "context": "Local in-memory SQLite only; not D1 throughput, network, concurrent users or production load. Five warmed sequential samples are insufficient for p95/p99 inference.",
+  "node": "v24.19.0",
+  "sqlite": "3.53.3",
+  "migrationFiles": [
+    "0000_chemical_thunderbolt_ross.sql",
+    "0001_concerned_senator_kelly.sql"
+  ],
+  "fixtures": {
+    "seed": 444,
+    "now": 1792219200000,
+    "presence": 500000,
+    "reports": 100000,
+    "events": 100000,
+    "densePresence": 250000,
+    "coordinates": "Unrounded deterministic floating-point fixture, same distribution as initial exploratory test; real service rounds positions to .003 degrees."
+  },
+  "queries": {
+    "presenceDense": {
+      "sql": "SELECT public_id id,alias,lat,lng,updated,expires FROM presence WHERE lat BETWEEN ? AND ? AND lng BETWEEN ? AND ? AND expires>? ORDER BY public_id LIMIT 201",
+      "params": [
+        46.6,
+        46.9,
+        5.8,
+        6,
+        1792219200000
+      ],
+      "returned": 201,
+      "medianMs": 302.157,
+      "maxMs": 357.049,
+      "samplesMs": [
+        243.052,
+        290.92,
+        302.157,
+        337.881,
+        357.049
+      ],
+      "plan": [
+        "SEARCH presence USING INDEX presence_area (lat>? AND lat<?)",
+        "USE TEMP B-TREE FOR ORDER BY"
+      ]
+    },
+    "presenceSparse": {
+      "sql": "SELECT public_id id,alias,lat,lng,updated,expires FROM presence WHERE lat BETWEEN ? AND ? AND lng BETWEEN ? AND ? AND expires>? ORDER BY public_id LIMIT 201",
+      "params": [
+        47,
+        47.1,
+        3,
+        3.1,
+        1792219200000
+      ],
+      "returned": 17,
+      "medianMs": 0.828,
+      "maxMs": 1.222,
+      "samplesMs": [
+        0.326,
+        0.533,
+        0.828,
+        0.985,
+        1.222
+      ],
+      "plan": [
+        "SEARCH presence USING INDEX presence_area (lat>? AND lat<?)",
+        "USE TEMP B-TREE FOR ORDER BY"
+      ]
+    },
+    "clusterDense": {
+      "sql": "SELECT round(lat/?) * ? lat,round(lng/?) * ? lng,count(*) count,min(expires) expires FROM presence WHERE lat BETWEEN ? AND ? AND lng BETWEEN ? AND ? AND expires>? GROUP BY round(lat/?),round(lng/?) LIMIT 201",
+      "params": [
+        0.03,
+        0.03,
+        0.03,
+        0.03,
+        46.6,
+        46.9,
+        5.8,
+        6,
+        1792219200000,
+        0.03,
+        0.03
+      ],
+      "returned": 54,
+      "medianMs": 236.743,
+      "maxMs": 275.582,
+      "samplesMs": [
+        220.26,
+        233.51,
+        236.743,
+        238.202,
+        275.582
+      ],
+      "plan": [
+        "SEARCH presence USING COVERING INDEX presence_area (lat>? AND lat<?)",
+        "USE TEMP B-TREE FOR GROUP BY"
+      ]
+    },
+    "reportsDense": {
+      "sql": "SELECT r.id,r.kind,r.lat,r.lng,r.note,r.created,r.updated,r.expires,r.status,(SELECT count(*) FROM votes v WHERE v.report_id=r.id AND v.value='seen') confirmations,(SELECT count(*) FROM votes v WHERE v.report_id=r.id AND v.value='gone') cleared FROM reports r WHERE r.lat BETWEEN ? AND ? AND r.lng BETWEEN ? AND ? AND r.status='active' AND r.expires>? AND r.id>? ORDER BY r.id LIMIT 201",
+      "params": [
+        46.6,
+        46.9,
+        5.8,
+        6,
+        1792219200000,
+        ""
+      ],
+      "returned": 201,
+      "medianMs": 200.217,
+      "maxMs": 281.855,
+      "samplesMs": [
+        136.668,
+        138.975,
+        200.217,
+        246.216,
+        281.855
+      ],
+      "plan": [
+        "SEARCH r USING INDEX reports_area (lat>? AND lat<?)",
+        "CORRELATED SCALAR SUBQUERY 1",
+        "SEARCH v USING INDEX sqlite_autoindex_votes_1 (report_id=?)",
+        "CORRELATED SCALAR SUBQUERY 2",
+        "SEARCH v USING INDEX sqlite_autoindex_votes_1 (report_id=?)",
+        "USE TEMP B-TREE FOR ORDER BY"
+      ]
+    },
+    "revisionBounds": {
+      "sql": "SELECT MIN(revision) min,MAX(revision) max FROM events",
+      "params": [],
+      "returned": 1,
+      "medianMs": 10.766,
+      "maxMs": 14.678,
+      "samplesMs": [
+        9.936,
+        10.598,
+        10.766,
+        13.648,
+        14.678
+      ],
+      "plan": [
+        "SCAN events USING COVERING INDEX events_created"
+      ]
+    },
+    "syncCatchup": {
+      "sql": "SELECT revision,payload FROM events WHERE revision>? AND revision<=? AND lat BETWEEN ? AND ? AND lng BETWEEN ? AND ? ORDER BY revision LIMIT 201",
+      "params": [
+        0,
+        100000,
+        47,
+        47.1,
+        3,
+        3.1
+      ],
+      "returned": 0,
+      "medianMs": 11.954,
+      "maxMs": 13.879,
+      "samplesMs": [
+        9.579,
+        10.016,
+        11.954,
+        12.607,
+        13.879
+      ],
+      "plan": [
+        "SEARCH events USING INTEGER PRIMARY KEY (rowid>? AND rowid<?)"
+      ]
+    },
+    "presenceDenseNoSort": {
+      "sql": "SELECT public_id id,alias,lat,lng,updated,expires FROM presence WHERE lat BETWEEN ? AND ? AND lng BETWEEN ? AND ? AND expires>? LIMIT 201",
+      "params": [
+        46.6,
+        46.9,
+        5.8,
+        6,
+        1792219200000
+      ],
+      "returned": 201,
+      "medianMs": 0.8,
+      "maxMs": 1.705,
+      "samplesMs": [
+        0.551,
+        0.761,
+        0.8,
+        1.461,
+        1.705
+      ],
+      "plan": [
+        "SEARCH presence USING INDEX presence_area (lat>? AND lat<?)"
+      ]
+    },
+    "presenceDenseIndexOrder": {
+      "sql": "SELECT public_id id,alias,lat,lng,updated,expires FROM presence WHERE lat BETWEEN ? AND ? AND lng BETWEEN ? AND ? AND expires>? ORDER BY lat,lng,expires LIMIT 201",
+      "params": [
+        46.6,
+        46.9,
+        5.8,
+        6,
+        1792219200000
+      ],
+      "returned": 201,
+      "medianMs": 0.509,
+      "maxMs": 1.658,
+      "samplesMs": [
+        0.359,
+        0.387,
+        0.509,
+        1.649,
+        1.658
+      ],
+      "plan": [
+        "SEARCH presence USING INDEX presence_area (lat>? AND lat<?)"
+      ]
+    },
+    "presenceSparseIndexOrder": {
+      "sql": "SELECT public_id id,alias,lat,lng,updated,expires FROM presence WHERE lat BETWEEN ? AND ? AND lng BETWEEN ? AND ? AND expires>? ORDER BY lat,lng,expires LIMIT 201",
+      "params": [
+        47,
+        47.1,
+        3,
+        3.1,
+        1792219200000
+      ],
+      "returned": 17,
+      "medianMs": 0.268,
+      "maxMs": 0.43,
+      "samplesMs": [
+        0.15,
+        0.161,
+        0.268,
+        0.307,
+        0.43
+      ],
+      "plan": [
+        "SEARCH presence USING INDEX presence_area (lat>? AND lat<?)"
+      ]
+    },
+    "revisionBoundsIndependent": {
+      "sql": "SELECT (SELECT MIN(revision) FROM events) min,(SELECT MAX(revision) FROM events) max",
+      "params": [],
+      "returned": 1,
+      "medianMs": 0.004,
+      "maxMs": 0.199,
+      "samplesMs": [
+        0.002,
+        0.003,
+        0.004,
+        0.006,
+        0.199
+      ],
+      "plan": [
+        "SCAN CONSTANT ROW",
+        "SCALAR SUBQUERY 1",
+        "SEARCH events",
+        "SCALAR SUBQUERY 2",
+        "SEARCH events"
+      ]
+    }
+  },
+  "optionalIndex": {
+    "sql": "CREATE INDEX presence_page ON presence(lat,lng,expires,public_id)",
+    "firstPage": {
+      "sql": "SELECT public_id id,alias,lat,lng,updated,expires FROM presence WHERE lat BETWEEN ? AND ? AND lng BETWEEN ? AND ? AND expires>? ORDER BY lat,lng,expires,public_id LIMIT 201",
+      "params": [
+        46.6,
+        46.9,
+        5.8,
+        6,
+        1792219200000
+      ],
+      "returned": 201,
+      "medianMs": 1.871,
+      "maxMs": 2.59,
+      "samplesMs": [
+        0.705,
+        1.776,
+        1.871,
+        2.423,
+        2.59
+      ],
+      "plan": [
+        "SEARCH presence USING INDEX benchmark_presence_page (lat>? AND lat<?)"
+      ]
+    },
+    "nextPage": {
+      "sql": "SELECT public_id id,alias,lat,lng,updated,expires FROM presence WHERE lat BETWEEN ? AND ? AND lng BETWEEN ? AND ? AND expires>? AND (lat,lng,expires,public_id)>(?,?,?,?) ORDER BY lat,lng,expires,public_id LIMIT 201",
+      "params": [
+        46.6,
+        46.9,
+        5.8,
+        6,
+        1792219200000,
+        46.700056541035885,
+        5.887574550649151,
+        1792220400000,
+        "p12556"
+      ],
+      "returned": 201,
+      "medianMs": 1.513,
+      "maxMs": 2.126,
+      "samplesMs": [
+        0.559,
+        0.935,
+        1.513,
+        2.125,
+        2.126
+      ],
+      "plan": [
+        "SEARCH presence USING INDEX benchmark_presence_page (lat>? AND lat<?)"
+      ]
+    },
+    "pageOverlap": 0
+  }
+}

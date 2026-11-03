@@ -1,0 +1,32 @@
+PASS anonymous reads and session boundary
+PASS every user-owned write rejects missing identity
+PASS bounded validated geographic reads
+PASS cross-origin writes are rejected
+PASS GPS precision, category, coordinates and text validation
+PASS atomic shared write and idempotent retry
+PASS public projection excludes owner; conditional revalidation
+PASS unique external confirmation, owner cannot self-confirm
+PASS history and removal respect ownership
+PASS conditional SQL rate limit leaves no phantom change events
+PASS presence requires consent, rounds coordinates and throttles position changes
+PASS lower zoom aggregates members
+PASS ten-minute update rotates pseudonym and retains only latest position
+PASS expired members disappear from public reads
+PASS immediate opt-out
+PASS preferences validated and isolated per account
+PASS monotonic deltas include owner deletions
+PASS temporary reports expire from every snapshot
+PASS bounded cursor pagination has no overlap
+PASS three distinct abuse flags quarantine a report and emit a tombstone
+PASS native enrollment stores only a hash; pending credentials confer no identity
+PASS only a signed-in browser identity with explicit matching consent can approve
+PASS approved device contributes as its owner, without gaining approval authority
+PASS cross-account revoke rejected; self-revocation immediately invalidates token
+PASS native authorization expires after thirty days
+PASS five-device cap and ten-minute approval deadline
+PASS enrollment rate limit is shared in the database
+PASS remote visibility opt-out invalidates renewal lease and cannot be undone by a stale phone
+PASS geocoder shared cache and database-wide upstream interval
+PASS public map configuration exposes no account credentials
+PASS real permanent inventory, provenance files and byte integrity
+31 API/data groups passed.

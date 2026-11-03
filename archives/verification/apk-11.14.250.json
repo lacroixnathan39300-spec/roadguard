@@ -1,0 +1,25 @@
+[
+  {
+    "variant": "TELEPHONE",
+    "file": "LIVRAISON/ROADGUARD-11.14.250-TELEPHONE-debug.apk",
+    "bytes": 9037948,
+    "sha256": "ea3644af8c651bf86fd130dc09b75e68bc904a30a20faf4325050ac450e72943",
+    "signature_exit": 0,
+    "signature": "Verifies\nVerified using v1 scheme (JAR signing): false\nVerified using v2 scheme (APK Signature Scheme v2): true\nVerified using v3 scheme (APK Signature Scheme v3): false\nVerified using v3.1 scheme (APK Signature Scheme v3.1): false\nVerified using v4 scheme (APK Signature Scheme v4): false\nVerified for SourceStamp: false\nNumber of signers: 1\nSigner #1 certificate DN: C=US, O=Android, CN=Android Debug\nSigner #1 certificate SHA-256 digest: 3d01a0fe64637b46d27ed5a502a4b48371ddf851f4c11ef3506d0b51109a3794\nSigner #1 certificate SHA-1 digest: 98f8fa5989b3e854d825cdba096361c2c895b5d8\nSigner #1 certificate MD5 digest: 402099f147e7f135c9a23b911e7293ec\nSigner #1 key algorithm: RSA\nSigner #1 key size (bits): 2048\nSigner #1 public key SHA-256 digest: acda0e55f0741627719f2beeb80ccd77beb8f91960bbba214015ded2a5b4d87b\nSigner #1 public key SHA-1 digest: bec3d16b96c17ff70ad90edbd0eb204e7fd1c55b\nSigner #1 public key MD5 digest: 38a71f928fa38c12cbf4c82a6eb67b9f\n",
+    "badging": "package: name='fr.roadguard.app' versionCode='450' versionName='11.14.250' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'\nminSdkVersion:'26'\ntargetSdkVersion:'36'\nuses-permission: name='android.permission.SYSTEM_ALERT_WINDOW'\nuses-permission: name='android.permission.INTERNET'\nuses-permission: name='android.permission.ACCESS_NETWORK_STATE'\nuses-permission: name='android.permission.ACCESS_FINE_LOCATION'\nuses-permission: name='android.permission.ACCESS_COARSE_LOCATION'\nuses-permission: name='android.permission.FOREGROUND_SERVICE'\nuses-permission: name='android.permission.FOREGROUND_SERVICE_LOCATION'\nuses-permission: name='android.permission.POST_NOTIFICATIONS'\napplication-label:'ROADGUARD'\napplication-icon-160:'res/mipmap-anydpi-v21/ic_launcher.xml'\napplication-icon-65534:'res/mipmap-anydpi-v21/ic_launcher.xml'\napplication: label='ROADGUARD' icon='res/mipmap-anydpi-v21/ic_launcher.xml'\napplication-debuggable\nlaunchable-activity: name='fr.roadguard.app.MainActivity'  label='' icon=''\nfeature-group: label=''\n  uses-feature: name='android.hardware.faketouch'\n  uses-implied-feature: name='android.hardware.faketouch' reason='default feature for all apps'\n  uses-feature: name='android.hardware.location'\n  uses-implied-feature: name='android.hardware.location' reason='requested android.permission.ACCESS_COARSE_LOCATION permission, and requested android.permission.ACCESS_FINE_LOCATION permission'\nprovides-component:'notification-listener'\nmain\nother-activities\nother-services\nsupports-screens: 'small' 'normal' 'large' 'xlarge'\nsupports-any-density: 'true'\nlocales: '--_--'\ndensities: '160' '65534'\n",
+    "car_manifest": false,
+    "assets_verified": [
+      "map.html",
+      "map_maplibre.html",
+      "map_offline.html",
+      "reference_ui.html",
+      "tile_recovery.js",
+      "map_packs/appearance.js",
+      "map_packs/roadguard.css",
+      "roadguard_progress_11_14_248.json",
+      "radar_archives/fr-camera.sqlite.7z",
+      "radar_archives/ch-camera.sqlite.7z"
+    ],
+    "isolated_radar_classes_present": true
+  }
+]

@@ -1,0 +1,24 @@
+{
+  "variant": "phone-only, roadguardAndroidAuto=false",
+  "test_count": 10,
+  "tests": [
+    {
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "fr.roadguard.app.RuntimeManifestContractTest",
+      "timestamp": "2026-10-27T16:59:40.354Z"
+    },
+    {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "fr.roadguard.app.RadarDownloadEntryTest",
+      "timestamp": "2026-10-27T16:59:32.423Z"
+    }
+  ],
+  "apk_not_reassembled": true,
+  "selection": "Only selected suites counted; unrelated XML may remain from the previous auto build."
+}

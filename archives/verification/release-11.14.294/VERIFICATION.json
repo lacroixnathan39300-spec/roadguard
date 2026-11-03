@@ -1,0 +1,59 @@
+{
+  "version": "11.14.294",
+  "code": 494,
+  "filename": "ROADGUARD-GPS-11.14.294.apk",
+  "package": "fr.roadguard.app",
+  "minSdk": 26,
+  "size": 12489863,
+  "sha256": "34f1feaec553538999424832ae750678a818ea8c37003dc19d0557c87ed4fc0b",
+  "certificate_sha256": "a78735412fc59bdaf681e43459b559be35d96228d181227d1b8500ea23334bdf",
+  "v1": true,
+  "v2": true,
+  "zip_crc": true,
+  "seven_embedded_radar_databases_identical": true,
+  "map_engine_assets_identical": true,
+  "native_abi_required": false,
+  "dex": [
+    "dex\n038\u0000"
+  ],
+  "tests": [
+    {
+      "suite": "fr.roadguard.app.SpotifyRuntimeTest",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "fr.roadguard.app.ProgressiveRadarRuntimeTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "fr.roadguard.app.LocalFirstBootstrapRuntimeTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "fr.roadguard.app.MobileAudioRuntimeTest",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "fr.roadguard.app.MapPaletteRuntimeTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "api_lint": "No issues found.",
+  "real_audio_hardware": "not tested",
+  "phone_installation": "not tested"
+}

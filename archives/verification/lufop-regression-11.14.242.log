@@ -1,0 +1,8 @@
+Regression reproduction against original LufopEuropeCatalog from 11.14.240 (unchanged by checkpoint 241).
+Expected failure before fix:
+Exception in thread "main" java.lang.AssertionError: original removed: lufop-982314bbc8edde2b951a
+	at fr.roadguard.app.TestCatalogCore.check(TestCatalogCore.java:14)
+	at fr.roadguard.app.TestCatalogCore.retained(TestCatalogCore.java:40)
+	at fr.roadguard.app.TestCatalogCore.main(TestCatalogCore.java:54)
+
+After fix: see targeted-checks-11.14.242.log, catalog-additive-rollback PASS.

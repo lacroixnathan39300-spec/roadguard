@@ -1,0 +1,76 @@
+{
+  "dataset": "MapAtlas Camera Index",
+  "licence": "CC BY 4.0",
+  "attribution": "© MapAtlas · https://mapatlas.eu/tools/speed-camera-map",
+  "modified": "Conversion de GeoJSON en CSV, colonnes inutilisées retirées, doublons identiques supprimés.",
+  "countries": {
+    "BE": {
+      "file": "radars_embedded_be.csv",
+      "count": 2701,
+      "type_counts": {
+        "spot": 1151,
+        "corridor": 498,
+        "signal": 1042,
+        "adaptive": 10
+      },
+      "snapshot": "2024-05-21",
+      "source_url": "https://mapatlas.eu/data/camera-index/BE.geojson",
+      "source_sha256": "c2375f35b41ba8367660496086cabe7a998f2c1719faac9845fcfb0b8c0e36b3",
+      "csv_sha256": "049cb77a096a2f7dc5157c8d0d03370bbaec7b79f86537f411165e18d64901ef"
+    },
+    "DE": {
+      "file": "radars_embedded_de.csv",
+      "count": 4714,
+      "type_counts": {
+        "spot": 3585,
+        "corridor": 1,
+        "signal": 856,
+        "adaptive": 272
+      },
+      "snapshot": "2024-05-21",
+      "source_url": "https://mapatlas.eu/data/camera-index/DE.geojson",
+      "source_sha256": "b591b70d219f7e460fb085d520f524c43b34204e73d12ffe77139e237d1bf1ee",
+      "csv_sha256": "57dc6a697550a0b0fa6f57b1d9ad586b3e3de718e1f814d9fa952ab38bdd1fa7"
+    },
+    "ES": {
+      "file": "radars_embedded_es.csv",
+      "count": 2104,
+      "type_counts": {
+        "spot": 1532,
+        "corridor": 121,
+        "signal": 407,
+        "adaptive": 44
+      },
+      "snapshot": "2024-05-21",
+      "source_url": "https://mapatlas.eu/data/camera-index/ES.geojson",
+      "source_sha256": "01136d1b13325cd1eabbebd0160f1b6757879e1c954c36c302705de17c0d2fba",
+      "csv_sha256": "caf1747e2019249e953c6258c197bff86a9d82f2541d6733b23dac5d6bb87a61"
+    },
+    "IT": {
+      "file": "radars_embedded_it.csv",
+      "count": 10707,
+      "type_counts": {
+        "spot": 8043,
+        "corridor": 152,
+        "signal": 2512
+      },
+      "snapshot": "2024-05-21",
+      "source_url": "https://mapatlas.eu/data/camera-index/IT.geojson",
+      "source_sha256": "d33ee50c81fe9a5621cc8661d7b84ab925ce324a52a11496286336f983f80218",
+      "csv_sha256": "a57df8bc41a5d9deeddc343d8a59941842a774d2ff7b13c0339d0101aca347c3"
+    },
+    "LU": {
+      "file": "radars_embedded_lu.csv",
+      "count": 37,
+      "type_counts": {
+        "spot": 29,
+        "corridor": 4,
+        "signal": 4
+      },
+      "snapshot": "2024-05-21",
+      "source_url": "https://mapatlas.eu/data/camera-index/LU.geojson",
+      "source_sha256": "9e6fd8a88c8f9ead51625c49f5480caf1eba5615cca94e46dcac8b96d9c70035",
+      "csv_sha256": "2335d477d69a9e1cec47213a5c17fc8f0912127066fa3c326b3f314a956db5b4"
+    }
+  }
+}

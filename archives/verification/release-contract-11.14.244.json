@@ -1,0 +1,30 @@
+{
+  "version": "11.14.244",
+  "version_code": 444,
+  "application_id": "fr.roadguard.app",
+  "baseline": "11.14.243",
+  "task_count": 39,
+  "weight": 100,
+  "totals": {
+    "development": 78,
+    "validation": 29.0,
+    "previous_development": 78,
+    "previous_validation": 27.5
+  },
+  "new_coded_tasks": [],
+  "new_validation_tasks": {
+    "M6": 1.5
+  },
+  "android_native_runtime_executed": false,
+  "apk_produced": false,
+  "sevenzip_extraction_executed": false,
+  "automatic_camera_reaudit": false,
+  "browser_render_executed": false,
+  "original_data": {
+    "reference": "11.14.240",
+    "checked_original_files": 59,
+    "unchanged": 59,
+    "failures": []
+  },
+  "scope": "17 tests cache fichiers réels/HTTP injecté ; 10 tests fusion surcouches ; 11 tests JS exécuté, adaptateurs DOM/Leaflet. Régressions 243 réexécutées. Aucun Android natif ni vrai serveur de tuiles."
+}

@@ -1,0 +1,1 @@
+CREATE INDEX `reports_page` ON `reports` (`lat`,`lng`,`id`);

@@ -1,0 +1,1 @@
+PASS secure HTTP: original late-header failure reproduced; corrected MapAtlas request readable; timeout/header order, HTTP errors, TLS failure, close and HTTPS guards verified.

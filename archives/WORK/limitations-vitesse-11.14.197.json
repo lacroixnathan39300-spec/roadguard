@@ -1,0 +1,12 @@
+{
+  "fr": {
+    "inventory": 24429,
+    "known_unambiguous_limits": 6835,
+    "active_nonhistorical_known_limits": 5441
+  },
+  "ch": {
+    "inventory": 1777,
+    "known_unambiguous_limits": 1171,
+    "active_nonhistorical_known_limits": 1171
+  }
+}

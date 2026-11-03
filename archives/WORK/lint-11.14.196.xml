@@ -1,0 +1,984 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.10.1">
+
+    <issue
+        id="UnusedAttribute"
+        severity="Warning"
+        message="Attribute `enableOnBackInvokedCallback` is only used in API level 33 and higher (current min is 26)"
+        category="Correctness"
+        priority="6"
+        summary="Attribute unused on older versions"
+        explanation="This check finds attributes set in XML files that were introduced in a version newer than the oldest version targeted by your application (with the `minSdkVersion` attribute).&#xA;&#xA;This is not an error; the application will simply ignore the attribute. However, if the attribute is important to the appearance or functionality of your application, you should consider finding an alternative way to achieve the same result with only available attributes, and then you can optionally create a copy of the layout in a layout-vNN folder which will be used on API NN or higher where you can take advantage of the newer attribute.&#xA;&#xA;Note: This check does not only apply to attributes. For example, some tags can be unused too, such as the new `&lt;tag>` element in layouts introduced in API 21."
+        errorLine1="  &lt;application android:enableOnBackInvokedCallback=&quot;true&quot; android:label=&quot;ROADGUARD&quot; android:icon=&quot;@mipmap/ic_launcher&quot; android:roundIcon=&quot;@mipmap/ic_launcher&quot; android:theme=&quot;@style/RoadguardTheme&quot; android:usesCleartextTraffic=&quot;false&quot;>&lt;meta-data android:name=&quot;com.google.android.gms.car.application&quot; android:resource=&quot;@xml/automotive_app_desc&quot;/>&lt;meta-data android:name=&quot;androidx.car.app.minCarApiLevel&quot; android:value=&quot;1&quot;/>&lt;service android:name=&quot;.RoadguardCarAppService&quot; android:exported=&quot;true&quot;>&lt;intent-filter>&lt;action android:name=&quot;androidx.car.app.CarAppService&quot;/>&lt;category android:name=&quot;androidx.car.app.category.NAVIGATION&quot;/>&lt;/intent-filter>&lt;/service>&lt;service android:name=&quot;.CarLocationService&quot; android:exported=&quot;false&quot; android:foregroundServiceType=&quot;location&quot;/>&lt;service android:name=&quot;.SpotifySessionListener&quot; android:permission=&quot;android.permission.BIND_NOTIFICATION_LISTENER_SERVICE&quot; android:exported=&quot;true&quot;>&lt;intent-filter>&lt;action android:name=&quot;android.service.notification.NotificationListenerService&quot;/>&lt;/intent-filter>&lt;/service>"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/auto/AndroidManifest.xml"
+            line="2"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="SetJavaScriptEnabled"
+        severity="Warning"
+        message="Using `setJavaScriptEnabled` can introduce XSS vulnerabilities into your application, review carefully"
+        category="Security"
+        priority="6"
+        summary="Using `setJavaScriptEnabled`"
+        explanation="Your code should not invoke `setJavaScriptEnabled` if you are not sure that your app really requires JavaScript support."
+        url="https://goo.gle/SetJavaScriptEnabled"
+        urls="https://goo.gle/SetJavaScriptEnabled,https://developer.android.com/training/articles/security-tips"
+        errorLine1="    WebSettings s=view.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(storage);"
+        errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/LocalPagePolicy.java"
+            line="15"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="ExportedService"
+        severity="Warning"
+        message="Exported service does not require permission"
+        category="Security"
+        priority="5"
+        summary="Exported service does not require permission"
+        explanation="Exported services (services which either set `exported=true` or contain an intent-filter and do not specify `exported=false`) should define a permission that an entity must have in order to launch the service or bind to it. Without this, any application can use this service."
+        url="https://goo.gle/ExportedService"
+        urls="https://goo.gle/ExportedService"
+        errorLine1="  &lt;application android:enableOnBackInvokedCallback=&quot;true&quot; android:label=&quot;ROADGUARD&quot; android:icon=&quot;@mipmap/ic_launcher&quot; android:roundIcon=&quot;@mipmap/ic_launcher&quot; android:theme=&quot;@style/RoadguardTheme&quot; android:usesCleartextTraffic=&quot;false&quot;>&lt;meta-data android:name=&quot;com.google.android.gms.car.application&quot; android:resource=&quot;@xml/automotive_app_desc&quot;/>&lt;meta-data android:name=&quot;androidx.car.app.minCarApiLevel&quot; android:value=&quot;1&quot;/>&lt;service android:name=&quot;.RoadguardCarAppService&quot; android:exported=&quot;true&quot;>&lt;intent-filter>&lt;action android:name=&quot;androidx.car.app.CarAppService&quot;/>&lt;category android:name=&quot;androidx.car.app.category.NAVIGATION&quot;/>&lt;/intent-filter>&lt;/service>&lt;service android:name=&quot;.CarLocationService&quot; android:exported=&quot;false&quot; android:foregroundServiceType=&quot;location&quot;/>&lt;service android:name=&quot;.SpotifySessionListener&quot; android:permission=&quot;android.permission.BIND_NOTIFICATION_LISTENER_SERVICE&quot; android:exported=&quot;true&quot;>&lt;intent-filter>&lt;action android:name=&quot;android.service.notification.NotificationListenerService&quot;/>&lt;/intent-filter>&lt;/service>"
+        errorLine2="                                                                                                                                                                                                                                                                                                                                                                                                                                      ~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/auto/AndroidManifest.xml"
+            line="2"
+            column="423"/>
+    </issue>
+
+    <issue
+        id="UsableSpace"
+        severity="Warning"
+        message="Consider also using `StorageManager#getAllocatableBytes` and `allocateBytes` which will consider clearable cached data"
+        category="Performance"
+        priority="3"
+        summary="Using getUsableSpace()"
+        explanation="When you need to allocate disk space for large files, consider using the new `allocateBytes(FileDescriptor, long)` API, which will automatically clear cached files belonging to other apps (as needed) to meet your request.&#xA;&#xA;When deciding if the device has enough disk space to hold your new data, call `getAllocatableBytes(UUID)` instead of using `getUsableSpace()`, since the former will consider any cached data that the system is willing to clear on your behalf.&#xA;&#xA;Note that these methods require API level 26. If your app is running on older devices, you will probably need to use both APIs, conditionally switching on `Build.VERSION.SDK_INT`. Lint only looks in the same compilation unit to see if you are already using both APIs, so if it warns even though you are already using the new API, consider moving the calls to the same file or suppressing the warning."
+        errorLine1="        if(size+128L*1024*1024>getFilesDir().getUsableSpace())throw new IOException(&quot;Espace libre insuffisant pour le pack et 128 Mio de réserve&quot;);"
+        errorLine2="                                             ~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="1300"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="UsableSpace"
+        severity="Warning"
+        message="Consider also using `StorageManager#getAllocatableBytes` and `allocateBytes` which will consider clearable cached data"
+        category="Performance"
+        priority="3"
+        summary="Using getUsableSpace()"
+        explanation="When you need to allocate disk space for large files, consider using the new `allocateBytes(FileDescriptor, long)` API, which will automatically clear cached files belonging to other apps (as needed) to meet your request.&#xA;&#xA;When deciding if the device has enough disk space to hold your new data, call `getAllocatableBytes(UUID)` instead of using `getUsableSpace()`, since the former will consider any cached data that the system is willing to clear on your behalf.&#xA;&#xA;Note that these methods require API level 26. If your app is running on older devices, you will probably need to use both APIs, conditionally switching on `Build.VERSION.SDK_INT`. Lint only looks in the same compilation unit to see if you are already using both APIs, so if it warns even though you are already using the new API, consider moving the calls to the same file or suppressing the warning."
+        errorLine1="        if(expected>0&amp;&amp;getFilesDir().getUsableSpace()&lt;expected+64L*1024*1024)throw new IOException(&quot;Espace libre insuffisant pour importer cette archive sans toucher à l’originale&quot;);"
+        errorLine2="                                     ~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="1519"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="UsableSpace"
+        severity="Warning"
+        message="Consider also using `StorageManager#getAllocatableBytes` and `allocateBytes` which will consider clearable cached data"
+        category="Performance"
+        priority="3"
+        summary="Using getUsableSpace()"
+        explanation="When you need to allocate disk space for large files, consider using the new `allocateBytes(FileDescriptor, long)` API, which will automatically clear cached files belonging to other apps (as needed) to meet your request.&#xA;&#xA;When deciding if the device has enough disk space to hold your new data, call `getAllocatableBytes(UUID)` instead of using `getUsableSpace()`, since the former will consider any cached data that the system is willing to clear on your behalf.&#xA;&#xA;Note that these methods require API level 26. If your app is running on older devices, you will probably need to use both APIs, conditionally switching on `Build.VERSION.SDK_INT`. Lint only looks in the same compilation unit to see if you are already using both APIs, so if it warns even though you are already using the new API, consider moving the calls to the same file or suppressing the warning."
+        errorLine1="          while((n=in.read(buffer))!=-1){if(pmtilesImportCancel)throw new IOException(&quot;Import annulé&quot;);copied+=n;if(copied>MAX_PMTILES_DOWNLOAD_BYTES||(expected>0&amp;&amp;copied>expected))throw new IOException(&quot;Taille du fichier incohérente&quot;);if(getFilesDir().getUsableSpace()&lt;n+64L*1024*1024)throw new IOException(&quot;Espace libre insuffisant pour terminer l’import sans saturer le stockage&quot;);out.write(buffer,0,n);sha.update(buffer,0,n);"
+        errorLine2="                                                                                                                                                                                                                                                             ~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="1523"
+            column="254"/>
+    </issue>
+
+    <issue
+        id="UsableSpace"
+        severity="Warning"
+        message="Consider also using `StorageManager#getAllocatableBytes` and `allocateBytes` which will consider clearable cached data"
+        category="Performance"
+        priority="3"
+        summary="Using getUsableSpace()"
+        explanation="When you need to allocate disk space for large files, consider using the new `allocateBytes(FileDescriptor, long)` API, which will automatically clear cached files belonging to other apps (as needed) to meet your request.&#xA;&#xA;When deciding if the device has enough disk space to hold your new data, call `getAllocatableBytes(UUID)` instead of using `getUsableSpace()`, since the former will consider any cached data that the system is willing to clear on your behalf.&#xA;&#xA;Note that these methods require API level 26. If your app is running on older devices, you will probably need to use both APIs, conditionally switching on `Build.VERSION.SDK_INT`. Lint only looks in the same compilation unit to see if you are already using both APIs, so if it warns even though you are already using the new API, consider moving the calls to the same file or suppressing the warning."
+        errorLine1="    long bytes=pack.optLong(&quot;size&quot;,0),free=getFilesDir().getUsableSpace();"
+        errorLine2="                                                         ~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="1759"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="   try{ui(()->label.setText(&quot;Vérification de l’inventaire radar…&quot;));downloadInventory(deadline);try{JSONObject config=request(&quot;config&quot;,&quot;GET&quot;,null,null,deadline);p.edit().putString(&quot;map_config&quot;,config.toString()).apply();}catch(Exception ignored){}"
+        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/CommunitySync.java"
+            line="75"
+            column="29"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    if(CommunityPolicy.coordinate(lat,lon)){ui(()->label.setText(&quot;Téléchargement des signalements de votre secteur…&quot;));JSONObject snapshot=downloadReports(lat,lon,deadline);installSnapshot(snapshot,false);status=&quot;Données communautaires prêtes&quot;;}else status=&quot;Inventaire prêt · signalements dès réception du GPS&quot;;"
+        errorLine2="                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/CommunitySync.java"
+            line="78"
+            column="66"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    TextView intro=new TextView(a);intro.setText(&quot;Trois observations distinctes au même endroit conservent le lieu. Un lieu mémorisé ne confirme pas une présence actuelle. Les relectures d’un signalement ne comptent pas à nouveau. Seuls les contrôles police/gendarmerie et radars mobiles alimentent cette mémoire.&quot;);box.addView(intro);"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/ControlMemoryUi.java"
+            line="14"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    Switch enabled=new Switch(a);enabled.setText(&quot;Collecte externe pendant le suivi GPS&quot;);enabled.setChecked(p.getBoolean(&quot;enabled&quot;,false));box.addView(enabled);enabled.setOnCheckedChangeListener((v,on)->{if(on&amp;&amp;!ControlFeed.configured(a)){v.setChecked(false);Toast.makeText(a,&quot;Configurez d’abord une clé pour ce fournisseur&quot;,Toast.LENGTH_LONG).show();return;}p.edit().putBoolean(&quot;enabled&quot;,on).apply();ControlFeed.status=on?&quot;Collecte activée · en attente d’un GPS récent&quot;:&quot;Collecte externe désactivée&quot;;});"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/ControlMemoryUi.java"
+            line="21"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    TextView network=new TextView(a);network.setText(&quot;Une zone autour de votre GPS est envoyée au fournisseur choisi. Son quota et ses éventuels frais s’appliquent. Les accidents et bouchons reçus ne sont pas conservés.&quot;);box.addView(network);"
+        errorLine2="                                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/ControlMemoryUi.java"
+            line="22"
+            column="54"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="      TextView count=new TextView(a);count.setText(snapshot.length()+&quot; lieux · &quot;+permanent+&quot; permanents · &quot;+(snapshot.length()-permanent)+&quot; temporaires\nLes 50 premiers sont affichés, triés par proximité si le GPS est disponible.&quot;);count.setPadding(0,pad,0,pad);box.addView(count);"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/ControlMemoryUi.java"
+            line="28"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="      TextView count=new TextView(a);count.setText(snapshot.length()+&quot; lieux · &quot;+permanent+&quot; permanents · &quot;+(snapshot.length()-permanent)+&quot; temporaires\nLes 50 premiers sont affichés, triés par proximité si le GPS est disponible.&quot;);count.setPadding(0,pad,0,pad);box.addView(count);"
+        errorLine2="                                                                     ~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/ControlMemoryUi.java"
+            line="28"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="      TextView count=new TextView(a);count.setText(snapshot.length()+&quot; lieux · &quot;+permanent+&quot; permanents · &quot;+(snapshot.length()-permanent)+&quot; temporaires\nLes 50 premiers sont affichés, triés par proximité si le GPS est disponible.&quot;);count.setPadding(0,pad,0,pad);box.addView(count);"
+        errorLine2="                                                                                           ~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/ControlMemoryUi.java"
+            line="28"
+            column="92"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    }catch(Exception e){TextView error=new TextView(a);error.setText(&quot;Lecture impossible · fichier local conservé. Aucun remplacement automatique.&quot;);box.addView(error);}"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/ControlMemoryUi.java"
+            line="31"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    AlertDialog dialog=new AlertDialog.Builder(a).setTitle(&quot;Contrôles mémorisés&quot;).setView(scroll).setNeutralButton(&quot;Recharger la liste&quot;,(d,w)->show(a)).setPositiveButton(&quot;Fermer&quot;,null).create();android.os.Handler handler=new android.os.Handler(android.os.Looper.getMainLooper());Runnable pulse=new Runnable(){public void run(){if(!dialog.isShowing())return;sourceButton.setText(&quot;Fournisseur : &quot;+(&quot;wazeapi&quot;.equals(p.getString(&quot;provider&quot;,&quot;openweb&quot;))?&quot;WazeAPI&quot;:&quot;OpenWeb Ninja&quot;));enabled.setChecked(p.getBoolean(&quot;enabled&quot;,false));status.setText((p.getBoolean(&quot;enabled&quot;,false)?ControlFeed.status:&quot;Collecte externe désactivée&quot;)+(ControlFeed.remaining>=0?&quot;\nQuota restant : &quot;+ControlFeed.remaining:&quot;&quot;)+&quot;\nDernière réception : &quot;+(p.getLong(&quot;last_success&quot;,0)>0?android.text.format.DateFormat.format(&quot;dd/MM HH:mm&quot;,p.getLong(&quot;last_success&quot;,0)):&quot;aucune&quot;));a.reloadControlMemory(false);handler.postDelayed(this,2000);}};dialog.setOnDismissListener(d->handler.removeCallbacksAndMessages(null));dialog.show();handler.post(pulse);"
+        errorLine2="                                                                                                                                                                                                                                                                                                                                                                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/ControlMemoryUi.java"
+            line="32"
+            column="379"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    AlertDialog dialog=new AlertDialog.Builder(a).setTitle(&quot;Contrôles mémorisés&quot;).setView(scroll).setNeutralButton(&quot;Recharger la liste&quot;,(d,w)->show(a)).setPositiveButton(&quot;Fermer&quot;,null).create();android.os.Handler handler=new android.os.Handler(android.os.Looper.getMainLooper());Runnable pulse=new Runnable(){public void run(){if(!dialog.isShowing())return;sourceButton.setText(&quot;Fournisseur : &quot;+(&quot;wazeapi&quot;.equals(p.getString(&quot;provider&quot;,&quot;openweb&quot;))?&quot;WazeAPI&quot;:&quot;OpenWeb Ninja&quot;));enabled.setChecked(p.getBoolean(&quot;enabled&quot;,false));status.setText((p.getBoolean(&quot;enabled&quot;,false)?ControlFeed.status:&quot;Collecte externe désactivée&quot;)+(ControlFeed.remaining>=0?&quot;\nQuota restant : &quot;+ControlFeed.remaining:&quot;&quot;)+&quot;\nDernière réception : &quot;+(p.getLong(&quot;last_success&quot;,0)>0?android.text.format.DateFormat.format(&quot;dd/MM HH:mm&quot;,p.getLong(&quot;last_success&quot;,0)):&quot;aucune&quot;));a.reloadControlMemory(false);handler.postDelayed(this,2000);}};dialog.setOnDismissListener(d->handler.removeCallbacksAndMessages(null));dialog.show();handler.post(pulse);"
+        errorLine2="                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/ControlMemoryUi.java"
+            line="32"
+            column="542"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    AlertDialog dialog=new AlertDialog.Builder(a).setTitle(&quot;Contrôles mémorisés&quot;).setView(scroll).setNeutralButton(&quot;Recharger la liste&quot;,(d,w)->show(a)).setPositiveButton(&quot;Fermer&quot;,null).create();android.os.Handler handler=new android.os.Handler(android.os.Looper.getMainLooper());Runnable pulse=new Runnable(){public void run(){if(!dialog.isShowing())return;sourceButton.setText(&quot;Fournisseur : &quot;+(&quot;wazeapi&quot;.equals(p.getString(&quot;provider&quot;,&quot;openweb&quot;))?&quot;WazeAPI&quot;:&quot;OpenWeb Ninja&quot;));enabled.setChecked(p.getBoolean(&quot;enabled&quot;,false));status.setText((p.getBoolean(&quot;enabled&quot;,false)?ControlFeed.status:&quot;Collecte externe désactivée&quot;)+(ControlFeed.remaining>=0?&quot;\nQuota restant : &quot;+ControlFeed.remaining:&quot;&quot;)+&quot;\nDernière réception : &quot;+(p.getLong(&quot;last_success&quot;,0)>0?android.text.format.DateFormat.format(&quot;dd/MM HH:mm&quot;,p.getLong(&quot;last_success&quot;,0)):&quot;aucune&quot;));a.reloadControlMemory(false);handler.postDelayed(this,2000);}};dialog.setOnDismissListener(d->handler.removeCallbacksAndMessages(null));dialog.show();handler.post(pulse);"
+        errorLine2="                                                                                                                                                                                                                                                                                                                                                                                          ~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/ControlMemoryUi.java"
+            line="32"
+            column="379"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="  static void show(MainActivity a){LinearLayout box=new LinearLayout(a);box.setOrientation(LinearLayout.VERTICAL);int padding=(int)(16*a.getResources().getDisplayMetrics().density);box.setPadding(padding,padding,padding,padding);TextView info=new TextView(a);info.setText(&quot;Au-dessus de 20 km/h sur deux mesures GPS fiables, les alertes démarrent. Après 1 minute à l’arrêt (moins de 3 km/h), les alertes et la bulle se coupent. Une veille GPS avec notification reste active pour détecter le prochain départ.\n\nPasser sur Waze garde le suivi. Fermer ROADGUARD depuis les applications récentes ou avec Retour arrête le suivi et retire la bulle. Après un arrêt forcé Android, rouvrez ROADGUARD pour réarmer le mode.\n\nUn GPS indisponible ne compte pas comme un arrêt : les alertes et la bulle sont suspendues jusqu’à une nouvelle détection de conduite.&quot;);box.addView(info);TextView state=new TextView(a);box.addView(state);Button bubble=new Button(a);bubble.setText(&quot;Armer avec la bulle&quot;);bubble.setOnClickListener(v->a.startFloatingRadar());box.addView(bubble);Button quiet=new Button(a);quiet.setText(&quot;Armer sans bulle&quot;);quiet.setOnClickListener(v->a.startBackgroundAlerts());box.addView(quiet);Button stop=new Button(a);stop.setText(&quot;Arrêter le mode auto&quot;);stop.setOnClickListener(v->{a.getPreferences(0).edit().putBoolean(&quot;monitor_armed&quot;,false).putBoolean(&quot;floating_auto&quot;,false).apply();BackgroundAlertService.stopMonitor(a);a.updateFloatingChip();});box.addView(stop);AlertDialog dialog=new AlertDialog.Builder(a).setTitle(&quot;Surveillance automatique&quot;).setView(box).setPositiveButton(&quot;Fermer&quot;,null).create();android.os.Handler h=new android.os.Handler(android.os.Looper.getMainLooper());Runnable refresh=new Runnable(){public void run(){if(!dialog.isShowing())return;state.setText(BackgroundAlertService.running?(BackgroundAlertService.monitoring?&quot;Surveillance active&quot;:&quot;Veille GPS · prochain départ au-dessus de 20 km/h&quot;):&quot;Mode auto arrêté&quot;);h.postDelayed(this,1000);}};dialog.setOnDismissListener(d->h.removeCallbacksAndMessages(null));dialog.show();h.post(refresh);}"
+        errorLine2="                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/DriveAutoUi.java"
+            line="6"
+            column="965"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="  static void show(MainActivity a){LinearLayout box=new LinearLayout(a);box.setOrientation(LinearLayout.VERTICAL);int padding=(int)(16*a.getResources().getDisplayMetrics().density);box.setPadding(padding,padding,padding,padding);TextView info=new TextView(a);info.setText(&quot;Au-dessus de 20 km/h sur deux mesures GPS fiables, les alertes démarrent. Après 1 minute à l’arrêt (moins de 3 km/h), les alertes et la bulle se coupent. Une veille GPS avec notification reste active pour détecter le prochain départ.\n\nPasser sur Waze garde le suivi. Fermer ROADGUARD depuis les applications récentes ou avec Retour arrête le suivi et retire la bulle. Après un arrêt forcé Android, rouvrez ROADGUARD pour réarmer le mode.\n\nUn GPS indisponible ne compte pas comme un arrêt : les alertes et la bulle sont suspendues jusqu’à une nouvelle détection de conduite.&quot;);box.addView(info);TextView state=new TextView(a);box.addView(state);Button bubble=new Button(a);bubble.setText(&quot;Armer avec la bulle&quot;);bubble.setOnClickListener(v->a.startFloatingRadar());box.addView(bubble);Button quiet=new Button(a);quiet.setText(&quot;Armer sans bulle&quot;);quiet.setOnClickListener(v->a.startBackgroundAlerts());box.addView(quiet);Button stop=new Button(a);stop.setText(&quot;Arrêter le mode auto&quot;);stop.setOnClickListener(v->{a.getPreferences(0).edit().putBoolean(&quot;monitor_armed&quot;,false).putBoolean(&quot;floating_auto&quot;,false).apply();BackgroundAlertService.stopMonitor(a);a.updateFloatingChip();});box.addView(stop);AlertDialog dialog=new AlertDialog.Builder(a).setTitle(&quot;Surveillance automatique&quot;).setView(box).setPositiveButton(&quot;Fermer&quot;,null).create();android.os.Handler h=new android.os.Handler(android.os.Looper.getMainLooper());Runnable refresh=new Runnable(){public void run(){if(!dialog.isShowing())return;state.setText(BackgroundAlertService.running?(BackgroundAlertService.monitoring?&quot;Surveillance active&quot;:&quot;Veille GPS · prochain départ au-dessus de 20 km/h&quot;):&quot;Mode auto arrêté&quot;);h.postDelayed(this,1000);}};dialog.setOnDismissListener(d->h.removeCallbacksAndMessages(null));dialog.show();h.post(refresh);}"
+        errorLine2="                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/DriveAutoUi.java"
+            line="6"
+            column="1102"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="  static void show(MainActivity a){LinearLayout box=new LinearLayout(a);box.setOrientation(LinearLayout.VERTICAL);int padding=(int)(16*a.getResources().getDisplayMetrics().density);box.setPadding(padding,padding,padding,padding);TextView info=new TextView(a);info.setText(&quot;Au-dessus de 20 km/h sur deux mesures GPS fiables, les alertes démarrent. Après 1 minute à l’arrêt (moins de 3 km/h), les alertes et la bulle se coupent. Une veille GPS avec notification reste active pour détecter le prochain départ.\n\nPasser sur Waze garde le suivi. Fermer ROADGUARD depuis les applications récentes ou avec Retour arrête le suivi et retire la bulle. Après un arrêt forcé Android, rouvrez ROADGUARD pour réarmer le mode.\n\nUn GPS indisponible ne compte pas comme un arrêt : les alertes et la bulle sont suspendues jusqu’à une nouvelle détection de conduite.&quot;);box.addView(info);TextView state=new TextView(a);box.addView(state);Button bubble=new Button(a);bubble.setText(&quot;Armer avec la bulle&quot;);bubble.setOnClickListener(v->a.startFloatingRadar());box.addView(bubble);Button quiet=new Button(a);quiet.setText(&quot;Armer sans bulle&quot;);quiet.setOnClickListener(v->a.startBackgroundAlerts());box.addView(quiet);Button stop=new Button(a);stop.setText(&quot;Arrêter le mode auto&quot;);stop.setOnClickListener(v->{a.getPreferences(0).edit().putBoolean(&quot;monitor_armed&quot;,false).putBoolean(&quot;floating_auto&quot;,false).apply();BackgroundAlertService.stopMonitor(a);a.updateFloatingChip();});box.addView(stop);AlertDialog dialog=new AlertDialog.Builder(a).setTitle(&quot;Surveillance automatique&quot;).setView(box).setPositiveButton(&quot;Fermer&quot;,null).create();android.os.Handler h=new android.os.Handler(android.os.Looper.getMainLooper());Runnable refresh=new Runnable(){public void run(){if(!dialog.isShowing())return;state.setText(BackgroundAlertService.running?(BackgroundAlertService.monitoring?&quot;Surveillance active&quot;:&quot;Veille GPS · prochain départ au-dessus de 20 km/h&quot;):&quot;Mode auto arrêté&quot;);h.postDelayed(this,1000);}};dialog.setOnDismissListener(d->h.removeCallbacksAndMessages(null));dialog.show();h.post(refresh);}"
+        errorLine2="                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/DriveAutoUi.java"
+            line="6"
+            column="1235"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    if(startupStatus!=null)startupStatus.setText(&quot;Chargement des données locales…&quot;);"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="60"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="  void render(){if(destinationSearchDialog==null){driveSearchRequestToken++;if(driveSearchRunnable!=null)driveSearchHandler.removeCallbacks(driveSearchRunnable);destinationSearchInput=null;driveSearchResults=null;}if(legacySection&amp;&amp;!selected.equals(legacySectionScreen))legacySection=false;driveSheet=null;guidanceFooterHeightDp=0;driveSheetHandle=null;stopRadarPulse();if(map!=null){map.destroy();map=null;}if(referenceWebView!=null){referenceWebView.destroy();referenceWebView=null;}speed=null;gps=null;routeStatus=null;modeChip=null;accuracyChip=null;headingChip=null;searchWidget=null;gpsWidget=null;dangerBanner=null;drivingDecluttered=false;maneuverTitle=null;maneuverDistance=null;maneuverGlyph=null;tripMinutes=null;tripArrival=null;tripSummary=null;routeProgress=null;mapReady=false;root=column();root.setBackgroundColor(navy);setContentView(root);top=row();top.setPadding(8,2,8,2);TextView menu=button(&quot;☰&quot;,()->showRoadguardDrawer());menu.setMinHeight(pxDp(30));menu.setMinWidth(pxDp(30));menu.setPadding(0,0,0,0);menu.setTextSize(22);menu.setContentDescription(&quot;Ouvrir le menu latéral ROADGUARD&quot;);menu.setBackground(outlined(0xff171d26,0xff343c48,16));top.addView(menu);TextView title=label(&quot;◈ ROADGUARD&quot;,14);premiumLabel(title,0.06f);title.setSingleLine(true);title.setEllipsize(android.text.TextUtils.TruncateAt.END);title.setPadding(pxDp(6),0,0,0);title.setTypeface(null,Typeface.BOLD);title.setOnClickListener(v->showProjectDashboard());title.setContentDescription(&quot;ROADGUARD, toucher pour voir les barres de progression et la maquette&quot;);top.addView(title,new LinearLayout.LayoutParams(0,-2,1));TextView version=label(&quot;v&quot;+getPackageVersion(),9);version.setSingleLine(true);version.setTextColor(0xffff5260);top.addView(version);if(getResources().getConfiguration().screenWidthDp&lt;390){version.setVisibility(android.view.View.GONE);title.setText(&quot;ROADGUARD&quot;);}TextView progressShortcut=button(&quot;▰ %&quot;,()->showProjectDashboard());progressShortcut.setTextSize(12);progressShortcut.setContentDescription(&quot;Afficher le suivi d’avancement du projet ROADGUARD&quot;);progressShortcut.setMinWidth(pxDp(48));progressShortcut.setMinHeight(pxDp(40));LinearLayout.LayoutParams progressParams=new LinearLayout.LayoutParams(pxDp(48),pxDp(40));progressParams.setMargins(pxDp(5),0,0,0);top.addView(progressShortcut,progressParams);top.setBackground(premiumPanel(0xff182230,0xff090d15,0xff202b3b,0));if(!selected.equals(&quot;Carte&quot;)&amp;&amp;legacySection){TextView backToDesign=button(&quot;‹  VUE MAQUETTE&quot;,()->{legacySection=false;render();});top.addView(backToDesign);add(root,top);}"
+        errorLine2="                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="290"
+            column="1858"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="@Override public WebResourceResponse shouldInterceptRequest(WebView v,WebResourceRequest req){return serveMapResource(req);}@Override public void onPageFinished(WebView v,String url){if(map!=owner||v!=owner||!LocalPagePolicy.mapPage(url))return;mapReady=true;map.evaluateJavascript(&quot;typeof updateGPS === &apos;function&apos;&quot;,result->{if(map!=owner)return;if(!&quot;true&quot;.equals(result)){if(gps!=null)gps.setText(&quot;CARTE INDISPONIBLE · moteur WebView&quot;);}});      if(driveSheet!=null){int covered=Math.max(0,Math.round(driveSheet.getHeight()/getResources().getDisplayMetrics().density));map.evaluateJavascript(&quot;if(typeof rgSetSheetOcclusion===&apos;function&apos;)rgSetSheetOcclusion(&quot;+covered+&quot;)&quot;,null);}"
+        errorLine2="                                                                                                                                                                                                                                                                                                                                                                                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="366"
+            column="399"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    driveSheetHandle=new DragHandleView(this);driveSheetHandle.setText(&quot;⌃   RECHERCHER UN TRAJET&quot;);driveSheetHandle.setContentDescription(&quot;Rechercher un trajet, toucher pour agrandir ou réduire le panneau&quot;);driveSheetHandle.setGravity(Gravity.CENTER);"
+        errorLine2="                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="465"
+            column="72"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="      tripSummary.setText(&quot;RESTANT  ·  &quot;+dist+(closest>100?&quot;  ·  HORS TRACÉ ?&quot;:&quot;&quot;));"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="2054"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="      tripSummary.setText(&quot;RESTANT  ·  &quot;+dist+(closest>100?&quot;  ·  HORS TRACÉ ?&quot;:&quot;&quot;));"
+        errorLine2="                          ~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="2054"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    if(navigationPoints.size()&lt;2){maneuverTitle.setText(&quot;Destination sélectionnée&quot;);maneuverDistance.setText(&quot;Calculer un itinéraire dans Trajet&quot;);if(maneuverGlyph!=null)maneuverGlyph.setText(&quot;↑&quot;);return;}"
+        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="2517"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    if(navigationPoints.size()&lt;2){maneuverTitle.setText(&quot;Destination sélectionnée&quot;);maneuverDistance.setText(&quot;Calculer un itinéraire dans Trajet&quot;);if(maneuverGlyph!=null)maneuverGlyph.setText(&quot;↑&quot;);return;}"
+        errorLine2="                                                                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="2517"
+            column="110"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    if(pos==null){maneuverTitle.setText(&quot;Itinéraire prêt&quot;);maneuverDistance.setText(&quot;En attente du GPS&quot;);return;}"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="2519"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    if(pos==null){maneuverTitle.setText(&quot;Itinéraire prêt&quot;);maneuverDistance.setText(&quot;En attente du GPS&quot;);return;}"
+        errorLine2="                                                                                    ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="2519"
+            column="85"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    if(tripSummary!=null)tripSummary.setText((pos.remaining>=1000?String.format(Locale.FRANCE,&quot;%.1f km&quot;,pos.remaining/1000):String.format(Locale.FRANCE,&quot;%.0f m&quot;,pos.remaining))+(pos.lateral>100?&quot; · hors trajet&quot;:&quot;&quot;));"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="2522"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    if(tripMinutes!=null)tripMinutes.setText((pos.arrived()?0:Math.max(1,Math.round(remainingSeconds/60)))+&quot; min&quot;);"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="2523"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    if(tripMinutes!=null)tripMinutes.setText((pos.arrived()?0:Math.max(1,Math.round(remainingSeconds/60)))+&quot; min&quot;);"
+        errorLine2="                                                                                                           ~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="2523"
+            column="108"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    if(pos.arrived()){maneuverTitle.setText(&quot;Vous êtes à destination&quot;);maneuverDistance.setText(&quot;Arrivée&quot;);if(maneuverGlyph!=null)maneuverGlyph.setText(&quot;⚑&quot;);return;}"
+        errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="2526"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    if(pos.arrived()){maneuverTitle.setText(&quot;Vous êtes à destination&quot;);maneuverDistance.setText(&quot;Arrivée&quot;);if(maneuverGlyph!=null)maneuverGlyph.setText(&quot;⚑&quot;);return;}"
+        errorLine2="                                                                                                ~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="2526"
+            column="97"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    if(next==null){maneuverTitle.setText(&quot;Continuer vers la destination&quot;);maneuverDistance.setText(pos.lateral>100?&quot;Rejoindre le trajet&quot;:&quot;Suivre la route&quot;);if(maneuverGlyph!=null)maneuverGlyph.setText(&quot;↑&quot;);return;}"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="2528"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    if(!Double.isFinite(gpsMotion.speed(android.os.SystemClock.elapsedRealtime()))&amp;&amp;gps!=null)gps.setText(&quot;⌖  GPS · mesure en attente&quot;);"
+        errorLine2="                                                                                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="2733"
+            column="107"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1=" lastAccuracy=l.hasAccuracy()?l.getAccuracy():0f;getPreferences(0).edit().putLong(&quot;foreground_gps_heartbeat&quot;,System.currentTimeMillis()).apply();recordTripPoint(l);refreshNearbySector();pushPosition();maybeAutoReroute(l);announceNextManeuver(l);if(routeStatus!=null)routeStatus.setText(routeStatusText());updateManeuverCard();checkDangers();ReferenceUi.refresh(MainActivity.this);}@Override public void onProviderEnabled(String provider){}@Override public void onProviderDisabled(String provider){if(gps!=null)gps.setText(&quot;GPS désactivé · active la localisation&quot;);}@Override public void onStatusChanged(String provider,int status,Bundle extras){}};boolean precise=checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED;boolean subscribed=false;"
+        errorLine2="                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="2769"
+            column="523"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    if(!subscribed){listener=null;if(gps!=null)gps.setText(&quot;GPS indisponible · activer la localisation&quot;);return;}"
+        errorLine2="                                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="2772"
+            column="60"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    rateBar.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener(){public void onProgressChanged(android.widget.SeekBar b,int value,boolean user){rateLabel.setText(&quot;Débit · &quot;+(60+value)+&quot; %&quot;);}public void onStartTrackingTouch(android.widget.SeekBar b){}public void onStopTrackingTouch(android.widget.SeekBar b){}});"
+        errorLine2="                                                                                                                                                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="2845"
+            column="190"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    rateBar.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener(){public void onProgressChanged(android.widget.SeekBar b,int value,boolean user){rateLabel.setText(&quot;Débit · &quot;+(60+value)+&quot; %&quot;);}public void onStartTrackingTouch(android.widget.SeekBar b){}public void onStopTrackingTouch(android.widget.SeekBar b){}});"
+        errorLine2="                                                                                                                                                                                                         ~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="2845"
+            column="202"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    rateBar.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener(){public void onProgressChanged(android.widget.SeekBar b,int value,boolean user){rateLabel.setText(&quot;Débit · &quot;+(60+value)+&quot; %&quot;);}public void onStartTrackingTouch(android.widget.SeekBar b){}public void onStopTrackingTouch(android.widget.SeekBar b){}});"
+        errorLine2="                                                                                                                                                                                             ~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="2845"
+            column="190"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    pitchBar.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener(){public void onProgressChanged(android.widget.SeekBar b,int value,boolean user){pitchLabel.setText(&quot;Hauteur · &quot;+(50+value)+&quot; %&quot;);}public void onStartTrackingTouch(android.widget.SeekBar b){}public void onStopTrackingTouch(android.widget.SeekBar b){}});"
+        errorLine2="                                                                                                                                                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="2846"
+            column="192"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    pitchBar.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener(){public void onProgressChanged(android.widget.SeekBar b,int value,boolean user){pitchLabel.setText(&quot;Hauteur · &quot;+(50+value)+&quot; %&quot;);}public void onStartTrackingTouch(android.widget.SeekBar b){}public void onStopTrackingTouch(android.widget.SeekBar b){}});"
+        errorLine2="                                                                                                                                                                                                             ~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="2846"
+            column="206"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    pitchBar.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener(){public void onProgressChanged(android.widget.SeekBar b,int value,boolean user){pitchLabel.setText(&quot;Hauteur · &quot;+(50+value)+&quot; %&quot;);}public void onStartTrackingTouch(android.widget.SeekBar b){}public void onStopTrackingTouch(android.widget.SeekBar b){}});"
+        errorLine2="                                                                                                                                                                                               ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="2846"
+            column="192"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="      activeRadarUi=isRadarDanger(closest.type)?closest:null;dangerBanner.setText((isRadarDanger(closest.type)?&quot;◉  &quot;+closest.type+&quot;  ·  &quot;:&quot;⚠  &quot;+closest.type+&quot;  ·  &quot;)+(rounded>=1000?String.format(Locale.FRANCE,&quot;%.1f km&quot;,rounded/1000f):rounded+&quot; m&quot;));"
+        errorLine2="                                                                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/MainActivity.java"
+            line="2950"
+            column="83"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    text.setText(&quot;⚠ RADAR · &quot; + (meters >= 1000 ? String.format(java.util.Locale.FRANCE,&quot;%.1f km&quot;,meters/1000f) : Math.max(50, (meters / 50) * 50) + &quot; m&quot;) + &quot;\n&quot; + name);"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/RadarBubbleOverlay.java"
+            line="118"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    text.setText(&quot;⚠ RADAR · &quot; + (meters >= 1000 ? String.format(java.util.Locale.FRANCE,&quot;%.1f km&quot;,meters/1000f) : Math.max(50, (meters / 50) * 50) + &quot; m&quot;) + &quot;\n&quot; + name);"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/RadarBubbleOverlay.java"
+            line="118"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    Button access=new Button(a);access.setText(&quot;Autoriser les commandes Spotify&quot;);box.addView(access);access.setOnClickListener(v->new AlertDialog.Builder(a).setTitle(&quot;Commandes musicales&quot;).setMessage(&quot;Android demande l’accès aux notifications pour autoriser le contrôle de la session musicale. ROADGUARD utilise uniquement les commandes et le titre de la session Spotify; il ne lit, n’enregistre et n’envoie pas le contenu de vos notifications.&quot;).setNegativeButton(&quot;Annuler&quot;,null).setPositiveButton(&quot;Réglages Android&quot;,(d,w)->authorize(a)).show());"
+        errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/SpotifyControls.java"
+            line="28"
+            column="48"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    Button launch=new Button(a);launch.setText(&quot;Ouvrir Spotify&quot;);launch.setOnClickListener(v->open(a));box.addView(launch);LinearLayout row=new LinearLayout(a);box.addView(row);Button previous=new Button(a),toggle=new Button(a),next=new Button(a);previous.setText(&quot;Précédent&quot;);next.setText(&quot;Suivant&quot;);for(Button b:new Button[]{previous,toggle,next})row.addView(b,new LinearLayout.LayoutParams(0,-2,1));"
+        errorLine2="                                               ~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/SpotifyControls.java"
+            line="29"
+            column="48"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    Button launch=new Button(a);launch.setText(&quot;Ouvrir Spotify&quot;);launch.setOnClickListener(v->open(a));box.addView(launch);LinearLayout row=new LinearLayout(a);box.addView(row);Button previous=new Button(a),toggle=new Button(a),next=new Button(a);previous.setText(&quot;Précédent&quot;);next.setText(&quot;Suivant&quot;);for(Button b:new Button[]{previous,toggle,next})row.addView(b,new LinearLayout.LayoutParams(0,-2,1));"
+        errorLine2="                                                                                                                                                                                                                                                                        ~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/SpotifyControls.java"
+            line="29"
+            column="265"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    Button launch=new Button(a);launch.setText(&quot;Ouvrir Spotify&quot;);launch.setOnClickListener(v->open(a));box.addView(launch);LinearLayout row=new LinearLayout(a);box.addView(row);Button previous=new Button(a),toggle=new Button(a),next=new Button(a);previous.setText(&quot;Précédent&quot;);next.setText(&quot;Suivant&quot;);for(Button b:new Button[]{previous,toggle,next})row.addView(b,new LinearLayout.LayoutParams(0,-2,1));"
+        errorLine2="                                                                                                                                                                                                                                                                                                  ~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/SpotifyControls.java"
+            line="29"
+            column="291"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="    TextView note=new TextView(a);note.setText(&quot;Démarrez une musique dans Spotify, puis revenez ici. Les commandes disponibles dépendent de Spotify et de votre compte. Sur Android Auto, utilisez aussi le lecteur Spotify de la voiture.&quot;);box.addView(note);"
+        errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/3b8e03231ad6/roadguard/src/ROADGUARD-11.14.195/app/src/main/java/fr/roadguard/app/SpotifyControls.java"
+            line="31"
+            column="48"/>
+    </issue>
+
+</issues>

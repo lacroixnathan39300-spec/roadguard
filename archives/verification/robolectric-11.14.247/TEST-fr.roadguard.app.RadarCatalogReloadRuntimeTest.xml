@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="fr.roadguard.app.RadarCatalogReloadRuntimeTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-21T09:39:03" hostname="dec3125c2336" time="11.795">
+  <properties/>
+  <testcase name="activeReloadPreservesTheGpsSubscriptionAndDoesNotAppendDuplicates[26]" classname="fr.roadguard.app.RadarCatalogReloadRuntimeTest" time="2.227"/>
+  <testcase name="returnFromManagerReloadsCatalogAndPreservesCustomPoints[26]" classname="fr.roadguard.app.RadarCatalogReloadRuntimeTest" time="1.893"/>
+  <testcase name="unchangedRevisionDoesNotScheduleAnotherFullCatalogRead[26]" classname="fr.roadguard.app.RadarCatalogReloadRuntimeTest" time="1.538"/>
+  <testcase name="activeReloadPreservesTheGpsSubscriptionAndDoesNotAppendDuplicates" classname="fr.roadguard.app.RadarCatalogReloadRuntimeTest" time="2.425"/>
+  <testcase name="returnFromManagerReloadsCatalogAndPreservesCustomPoints" classname="fr.roadguard.app.RadarCatalogReloadRuntimeTest" time="2.051"/>
+  <testcase name="unchangedRevisionDoesNotScheduleAnotherFullCatalogRead" classname="fr.roadguard.app.RadarCatalogReloadRuntimeTest" time="1.655"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+]]></system-err>
+</testsuite>

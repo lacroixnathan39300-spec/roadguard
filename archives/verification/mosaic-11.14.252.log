@@ -1,0 +1,6 @@
+2026-10-21 ROADGUARD 11.14.252
+Java 17 compiler: InstalledPmtilesMosaic.java compiled successfully via java com.sun.tools.javac.Main.
+Mosaic executable check: PASS 2 packs, France Sud-Est coordinate, Switzerland coordinate, uncovered tile.
+PMTiles header v3 Python tests: 9 tests passed.
+MapLibre inline JavaScript: node --check passed.
+Android Gradle/APK and physical WebView test: unavailable in this environment; no pass claimed.

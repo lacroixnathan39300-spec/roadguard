@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ROADGUARD DRIVE</string>
+    <string name="apps">Applications</string>
+    <string name="speed_unit">km/h</string>
+    <string name="gps_waiting">GPS…</string>
+    <string name="map_placeholder">Carte ROADGUARD</string>
+    <string name="music_placeholder">Aucune musique</string>
+    <string name="location_needed">Autoriser la position pour la vitesse</string>
+</resources>

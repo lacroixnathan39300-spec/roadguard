@@ -1,0 +1,323 @@
+<!doctype html><html lang="fr"><head><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><link href="vendor/maplibre-gl.css" rel="stylesheet"><style>
+html,body,#map{margin:0;width:100%;height:100%;background:#0c1119;font-family:system-ui,Arial,sans-serif}
+#status{position:absolute;top:12px;left:12px;right:12px;color:#f6f8fb;background:#111a26f2;border:1px solid #667486;padding:11px 14px;border-radius:16px;z-index:4;font-size:12px;font-weight:600;pointer-events:none;box-shadow:0 7px 20px #0009}
+#status.error{color:#fff;background:#401d29f5;border-color:#f04458}
+.maplibregl-ctrl-attrib{font-size:10px;background:#0c121bd9!important;color:#c9d0d8!important;border-radius:0 9px 0 0;padding:3px 7px!important}
+.maplibregl-ctrl-attrib a{color:#ff8792!important}
+.maplibregl-ctrl button{background-color:#141d28!important;color:#f6f8fb!important}
+.maplibregl-ctrl-group{background:#141d28!important;border:1px solid #394555!important;border-radius:14px!important;overflow:hidden;box-shadow:0 6px 18px #000a!important}
+#rg-follow-pause{display:none;position:absolute;left:50%;bottom:166px;transform:translateX(-50%);z-index:5;background:#121d2cf2;color:#fff;border:2px solid #ff405e;border-radius:18px;padding:10px 14px;font:600 13px system-ui,Arial,sans-serif;box-shadow:0 5px 18px #0009;white-space:nowrap}
+</style><style>
+:root{--rg-top-inset:112px}
+#status:not(.error){display:none!important}
+#status.error{max-width:210px;font-size:0!important;padding:7px 10px!important;pointer-events:none}
+#status.error::after{content:'Carte · détails dans ⋯';font-size:11px}
+.maplibregl-ctrl-attrib,.maplibregl-ctrl-attrib-button{background-color:transparent!important;box-shadow:none!important}
+.maplibregl-ctrl-attrib{font-size:8px!important;padding:1px 3px!important;max-width:calc(100vw - 100px)}
+#rg-follow-pause{font-size:11px!important;padding:7px 11px!important;border-width:1px!important}
+#status{top:var(--rg-top-inset)!important;box-sizing:border-box;overflow-wrap:anywhere}
+#rg-camera{top:var(--rg-top-inset)!important;white-space:normal!important;box-sizing:border-box;text-align:center}
+#note{top:var(--rg-top-inset)!important}
+</style><script src="map_packs/palette.js"></script><script>
+window.rgTopInsetPx=0;
+window.rgSetTopInset=function(value){
+  if(!Number.isFinite(value)||value<0)return;window.rgTopInsetPx=Math.ceil(value);document.documentElement.style.setProperty('--rg-top-inset',window.rgTopInsetPx+'px');
+  if(typeof rgCameraOptions!=='undefined'&&rgCameraOptions&&ready&&followOn&&!manualCameraPaused)map.easeTo({...rgCameraOptions,offset:rgCameraOffset(),duration:180,essential:true});
+};
+</script><style>
+.maplibregl-ctrl-attrib.maplibregl-compact{min-width:44px!important;min-height:44px!important;padding:0!important;border-radius:12px!important}
+.maplibregl-ctrl-attrib-button{width:44px!important;height:44px!important;background-image:none!important;border:0!important;color:#f4f6fa!important;text-shadow:0 1px 3px #000,0 0 2px #000}
+.maplibregl-ctrl-attrib-button::after{content:'ⓘ';font:16px/44px system-ui,Arial}
+.maplibregl-ctrl-attrib.maplibregl-compact-show{background:#111a26ed!important;padding:4px 44px 4px 8px!important;font-size:11px!important}
+</style><style>body[data-rg-gps-fresh='false'] #roadguard-gps-marker{background:#8e979e!important;box-shadow:0 0 0 6px #8e979e33!important;opacity:.6}</style></head><body><div id="map"></div><div id="status">MAPLIBRE · moteur local en cours de chargement…</div><script src="map_lifecycle.js"></script><script src="camera_motion.js"></script><script src="map_view_state.js"></script><script src="camera_geometry.js"></script><script src="radar_icons.js"></script><script src="radar_cluster.js"></script><script src="vendor/maplibre-gl.js"></script><script>
+'use strict';
+const rgEngineLifecycle=new RoadguardMapLifecycle((state,message)=>{
+ if(window.RoadguardMap&&typeof window.RoadguardMap.engineState==='function')window.RoadguardMap.engineState(state,message);
+},setTimeout,clearTimeout);
+rgEngineLifecycle.start();
+window.addEventListener('pagehide',()=>rgEngineLifecycle.close());
+const rgVectorAutoZoom=new RoadguardAutoZoom();
+
+const rgPremiumPalettes={"night": {"background": "#0a1422", "water": "#15579c", "landcover": "#163627", "building": "#26344d", "road": "#daeaff", "roadOutline": "#425471", "motorway": "#ffd550", "rail": "#52627e", "text": "#edf4ff", "halo": "#091322"}, "day": {"background": "#f5f2e9", "water": "#88c7e7", "landcover": "#bcd5aa", "building": "#cdd1d2", "road": "#ffffff", "roadOutline": "#aeb7b9", "motorway": "#f1bd56", "rail": "#a4a9b0", "text": "#344153", "halo": "#f8f6ed"}};
+let rgPremiumTheme="night";
+function rgRefreshNightCanvas(){if(map)map.getCanvas().style.filter='';}
+function setRoadguardVectorTheme(theme){
+ const next=theme==="day"?"day":"night";
+ if(next===rgPremiumTheme&&!rgPendingVectorTheme&&(!map||!map.isStyleLoaded()))return;
+ rgPremiumTheme=next;rgMapDiagnostics.theme=next;rgRefreshNightCanvas();
+ // Raster mode cannot recolor road classes, but its broad green cast can be
+ // reduced consistently with the graphite night palette.
+ if(!activeVectorPack){
+  if(map&&map.isStyleLoaded()&&map.getLayer('osm-online-layer')){
+   const night=next==='night';
+   try{map.setPaintProperty('osm-online-layer','raster-saturation',night?-.38:-.08);map.setPaintProperty('osm-online-layer','raster-contrast',night ? .08 : 0);map.setPaintProperty('osm-online-layer','raster-brightness-min',night ? .05 : 0);map.setPaintProperty('osm-online-layer','raster-brightness-max',night ? .78 : 1);}catch(e){reportMapError({error:e});}
+  }
+  applyRoadguardMapPack();return;
+ }
+ // Update the active style in-place: avoids discarding loaded vector tiles, GPS and route layers.
+ if(activeVectorPack&&map&&map.isStyleLoaded()){
+  const p=rgPalette(next);
+  const paints={bg:{'background-color':p.background},water:{'fill-color':p.water},landcover:{'fill-color':p.landcover},building:{'fill-color':p.building},'premium-rail':{'line-color':p.rail},'transportation':{'line-color':p.road},'transportation-outline':{'line-color':p.roadOutline},'roads':{'line-color':p.road},'roads-outline':{'line-color':p.roadOutline},'protomaps-roads':{'line-color':p.road},'protomaps-roads-outline':{'line-color':p.roadOutline},'premium-motorway':{'line-color':p.motorway},'premium-motorway-outline':{'line-color':p.roadOutline},'premium-rail-omt':{'line-color':p.rail},'road-names':{'text-color':p.text,'text-halo-color':p.halo},'city-names':{'text-color':p.text,'text-halo-color':p.halo},'protomaps-road-names':{'text-color':p.text,'text-halo-color':p.halo},'protomaps-places':{'text-color':p.text,'text-halo-color':p.halo}};
+  for(const id of ['premium-major','roads-major','protomaps-roads-major'])paints[id]={'line-color':p.motorway};
+  for(const id of ['premium-major-outline','roads-major-outline','protomaps-roads-major-outline'])paints[id]={'line-color':p.roadOutline};
+  Object.keys(paints).forEach(id=>{if(map.getLayer(id))Object.keys(paints[id]).forEach(k=>{try{map.setPaintProperty(id,k,paints[id][k]);}catch(e){reportMapError({error:e});}});});
+  rgPendingVectorTheme=false;applyRoadguardMapPack();
+ }else if(activeVectorPack&&map){
+  // Style en cours de chargement : la palette demandee sera appliquee au style.load.
+  rgPendingVectorTheme=true;
+}
+}
+let rgActiveVectorMaxZoom=14;
+let rgStyleGeneration=0;
+let rgPendingVectorTheme=false;
+function applyPendingVectorTheme(){
+ if(!rgPendingVectorTheme||!activeVectorPack||!map||!map.isStyleLoaded())return;
+ const desired=rgPremiumTheme;
+ // Apply directly, without temporarily lying about the selected theme.
+ const p=rgPalette(desired);
+ const colorByLayer={bg:['background-color',p.background],water:['fill-color',p.water],landcover:['fill-color',p.landcover],building:['fill-color',p.building],'premium-rail':['line-color',p.rail],'transportation':['line-color',p.road],'transportation-outline':['line-color',p.roadOutline],roads:['line-color',p.road],'roads-outline':['line-color',p.roadOutline],'protomaps-roads':['line-color',p.road],'protomaps-roads-outline':['line-color',p.roadOutline],'premium-motorway':['line-color',p.motorway],'premium-motorway-outline':['line-color',p.roadOutline],'road-names':['text-color',p.text],'city-names':['text-color',p.text],'protomaps-road-names':['text-color',p.text],'protomaps-places':['text-color',p.text]};
+ for(const id of ['premium-major','roads-major','protomaps-roads-major'])colorByLayer[id]=['line-color',p.motorway];
+ for(const id of ['premium-major-outline','roads-major-outline','protomaps-roads-major-outline'])colorByLayer[id]=['line-color',p.roadOutline];
+ Object.keys(colorByLayer).forEach(id=>{if(map.getLayer(id)){const entry=colorByLayer[id];try{map.setPaintProperty(id,entry[0],entry[1]);}catch(e){reportMapError({error:e});}}});
+ for(const id of ['road-names','city-names','protomaps-road-names','protomaps-places'])if(map.getLayer(id))try{map.setPaintProperty(id,'text-halo-color',p.halo);}catch(e){reportMapError({error:e});}
+ rgPendingVectorTheme=false;
+}
+// The source-loading event is not a tile counter. Track successful vector source events separately.
+
+let rgAppearancePack='graphite',rgCustomPalette={};
+function rgPalette(theme){return RoadguardPalette.resolve(theme,rgAppearancePack,rgCustomPalette);}
+function setRoadguardCustomPalette(value){rgCustomPalette=value&&typeof value==='object'?value:{};applyRoadguardMapPack();}
+function setRoadguardMapPack(value){
+ rgAppearancePack=RoadguardPalette.normalize(value);
+ document.body.setAttribute('data-rg-map-pack',rgAppearancePack);
+ applyRoadguardMapPack();return rgAppearancePack;
+}
+function getRoadguardMapPackStatus(){return {pack:rgAppearancePack,tiles:rgMapDiagnostics.vectorTilesSeen||0,mode:activeVectorPack?'vector':'raster'};}
+function applyRoadguardMapPack(){
+ if(!map||!map.isStyleLoaded())return;
+ const night=rgPremiumTheme==='night',p=rgPalette(rgPremiumTheme);rgRefreshNightCanvas();
+ const safe=(id,key,value)=>{if(map.getLayer(id))try{map.setPaintProperty(id,key,value);}catch(e){reportMapError({error:e});}};
+ safe('osm-online-layer','raster-opacity',1);safe('osm-online-layer','raster-hue-rotate',p.rasterHue);
+ safe('osm-online-layer','raster-saturation',night?(rgAppearancePack==='original'?-.04:rgAppearancePack==='readable'?-.12:-.3):(rgAppearancePack==='original'?0:rgAppearancePack==='readable'?-.22:-.44));
+ safe('osm-online-layer','raster-contrast',night?.14:rgAppearancePack==='original'?0:.08);safe('osm-online-layer','raster-brightness-max',night?.72:1);
+ const paints={bg:['background-color',p.background],background:['background-color',p.background],water:['fill-color',p.water],landcover:['fill-color',p.landcover],building:['fill-color',p.building]};
+ for(const id of ['transportation','roads','protomaps-roads'])paints[id]=['line-color',p.road];
+ for(const id of ['transportation-outline','roads-outline','protomaps-roads-outline','premium-major-outline','roads-major-outline','protomaps-roads-major-outline','premium-motorway-outline'])paints[id]=['line-color',p.roadOutline];
+ for(const id of ['premium-major','roads-major','protomaps-roads-major','premium-motorway'])paints[id]=['line-color',p.motorway];
+ for(const id of ['premium-rail','premium-rail-omt'])paints[id]=['line-color',p.rail];
+ Object.keys(paints).forEach(id=>safe(id,paints[id][0],paints[id][1]));
+ for(const id of ['road-names','city-names','protomaps-road-names','protomaps-places']){safe(id,'text-color',p.text);safe(id,'text-halo-color',p.halo);}
+}
+
+const status=document.getElementById('status');let activeVectorPack=null;let map=null,ready=false,lastPos=null,followOn=true,manualCameraPaused=false,heading=0,route=[],dangers=[],destination=null,rgShowRadarMarkers=true,rgMapMarkerScale=1,rgSheetOcclusionPx=0,rgCameraOptions=null,rgCameraAnchorPercent=50,rgAnchorActive=false;
+let rgGpsFresh=false;
+function setRoadguardGpsState(fresh){rgGpsFresh=!!fresh;document.body.setAttribute('data-rg-gps-fresh',String(rgGpsFresh));
+ if(map&&ready&&map.isStyleLoaded())for(const id of ['rg-position-point','rg-position-halo'])if(map.getLayer(id)){
+  map.setPaintProperty(id,'circle-color',rgGpsFresh?'#20bfff':'#8e979e');
+  if(id==='rg-position-halo')map.setPaintProperty(id,'circle-opacity',rgGpsFresh?.4:.1);
+ }
+}
+const rgFollowPause=document.createElement('button');rgFollowPause.id='rg-follow-pause';rgFollowPause.textContent='⌖ Reprendre';rgFollowPause.onclick=()=>resumeCamera();document.body.appendChild(rgFollowPause);
+function rgShowFollowState(){rgFollowPause.style.display=manualCameraPaused&&lastPos?'block':'none';}
+function say(t,error){status.textContent=t;status.className=error?'error':'';}
+// Diagnostic consultable depuis la WebView, sans exposer la position GPS.
+const rgMapDiagnostics={errors:[],pack:null,styleLoaded:false,theme:'night',glyphsBundled:null,vectorTilesSeen:null,vectorSourceEvents:0,vectorTileErrors:0,styleGeneration:0,sourceReady:false};
+function getMapDiagnostics(){return JSON.stringify({pack:rgMapDiagnostics.pack,theme:rgPremiumTheme,styleLoaded:rgMapDiagnostics.styleLoaded,networkOnline:rgNetworkOnline,followOn,manualCameraPaused,cameraReady:ready,gpsFresh:rgGpsFresh,gpsScreenOffset:rgGpsScreenOffset(),glyphsBundled:rgMapDiagnostics.glyphsBundled,vectorTilesSeen:rgMapDiagnostics.vectorTilesSeen,vectorSourceEvents:rgMapDiagnostics.vectorSourceEvents,vectorTileErrors:rgMapDiagnostics.vectorTileErrors,sourceReady:rgMapDiagnostics.sourceReady,styleGeneration:rgStyleGeneration,errors:rgMapDiagnostics.errors.slice(-8)});}
+function rgGpsScreenOffset(){if(!map||!lastPos)return null;try{const pt=map.project(lastPos),canvas=map.getCanvas();return [Math.round(pt.x-canvas.clientWidth/2),Math.round(pt.y-canvas.clientHeight/2)];}catch(_){return null;}}
+function reportMapError(event){
+ const message=String((event&&event.error&&event.error.message)||'Erreur MapLibre inconnue').slice(0,240);
+ const type=/glyph|font/i.test(message)?'POLICES':/404|tile|pmtiles|source/i.test(message)?'TUILES':'MOTEUR';
+ rgMapDiagnostics.errors.push({type,message});if(rgMapDiagnostics.errors.length>20)rgMapDiagnostics.errors.shift();
+ if(activeVectorPack){if(type==='TUILES')rgMapDiagnostics.vectorTileErrors++;if(!rgNetworkOnline)say('CARTE VECTORIELLE · erreur '+type+' : '+message,true);}
+ else if(!ready)say('MapLibre · erreur '+type+' : '+message,true);
+}
+
+// Etat de connectivite, distinct de la couverture du cache : ne jamais promettre 50 km.
+let rgNetworkOnline=true,rgLocalVectorVisible=false;
+function setLocalVectorVisibility(visible){
+ rgLocalVectorVisible=!!visible;
+ if(!map||!map.isStyleLoaded())return;
+ const style=map.getStyle();if(!style||!style.layers)return;
+ for(const layer of style.layers)if(layer.source==='roads'&&map.getLayer(layer.id))map.setLayoutProperty(layer.id,'visibility',visible?'visible':'none');
+ if(map.getLayer('osm-online-layer'))map.setLayoutProperty('osm-online-layer','visibility','visible');
+}
+function setRoadguardNetworkState(online){
+ const wasOnline=rgNetworkOnline;rgNetworkOnline=!!online;
+ if(!wasOnline&&rgNetworkOnline&&map&&ready){const source=map.getSource('osm-online');if(source&&typeof source.setTiles==='function')source.setTiles(['https://tile.openstreetmap.org/{z}/{x}/{y}.png']);}
+ rgMapDiagnostics.networkOnline=rgNetworkOnline;
+ rgRefreshNightCanvas();
+ if(activeVectorPack&&map){
+  if(!ready||!map.isStyleLoaded())return;
+  if(rgNetworkOnline&&!map.getSource('osm-online')){setVectorPmtiles(activeVectorPack,rgActiveVectorMaxZoom,true);return;}
+  setLocalVectorVisibility(true);applyRoadguardMapPack();
+  if(ready)say(rgNetworkOnline?'CARTES LOCALES PRIORITAIRES · réseau en complément':'CARTES TÉLÉCHARGÉES · hors réseau');
+ }
+ if(!activeVectorPack&&ready){
+  say(rgNetworkOnline?'CARTE EN LIGNE · chargement selon le reseau':'RESEAU COUPE · affichage des seules tuiles deja en cache');
+ }
+}
+function valid(lat,lon){return Number.isFinite(+lat)&&Number.isFinite(+lon)&&Math.abs(+lat)<=90&&Math.abs(+lon)<=180;}
+function dangerCategory(type){return RoadguardRadarIcons.describe(type).category;}
+function featurePoint(lon,lat,props){return {type:'Feature',geometry:{type:'Point',coordinates:[+lon,+lat]},properties:props||{}};}
+function fc(features){return {type:'FeatureCollection',features};}
+function put(id,data){if(ready&&map.getSource(id))map.getSource(id).setData(data);}
+function syncDangers(){
+ if(!ready||!map)return;
+ const visible=dangers.filter(d=>Array.isArray(d)?valid(d[0],d[1]):valid(d.lat,d.lon)).map(d=>Array.isArray(d)?d:[d.lat,d.lon,d.type]);
+ const filtered=visible.filter(d=>rgShowRadarMarkers||!RoadguardRadarIcons.isRadar(String(d[2]||'')));
+ const canvas=map.getCanvas(),bounds=map.getBounds();
+ const clusters=RoadguardRadarClusters.group(filtered.filter(d=>bounds.contains([+d[1],+d[0]])),d=>map.project([+d[1],+d[0]]),canvas.clientWidth||canvas.width,canvas.clientHeight||canvas.height,96*rgMapMarkerScale);
+ put('rg-alerts',fc(clusters.filter(c=>c.count===1).map(c=>{
+  const type=String(c.items[0][2]||'danger');
+  return featurePoint(c.lon,c.lat,{type,category:dangerCategory(type),icon:'rg-icon-'+RoadguardRadarIcons.describe(type).variant,radar:RoadguardRadarIcons.isRadar(type)});
+ })));
+ put('rg-alert-clusters',fc(clusters.filter(c=>c.count>1).map(c=>featurePoint(c.lon,c.lat,{count:c.count,label:c.count>99?'99+':String(c.count)}))));
+}
+function sync(){if(!ready)return;put('rg-route',fc(route.length>1?[{type:'Feature',properties:{},geometry:{type:'LineString',coordinates:route}}]:[]));syncDangers();put('rg-dest',fc(destination?[featurePoint(destination[0],destination[1])]:[]));put('rg-position',fc(lastPos?[featurePoint(lastPos[0],lastPos[1])]:[]));setGPSVisible();}
+function parsePoints(items){return (Array.isArray(items)?items:[]).map(p=>Array.isArray(p)?[+p[1],+p[0]]:[+p.lon,+p.lat]).filter(p=>valid(p[1],p[0]));}
+function setRoute(points){route=parsePoints(points);sync();}
+function setDangers(items){dangers=Array.isArray(items)?items:[];sync();}
+function setRadarMarkersVisible(show){rgShowRadarMarkers=!!show;sync();}
+function setMapMarkerScale(size){rgMapMarkerScale=[0.78,1,1.3][Math.max(0,Math.min(2,Number(size)||0))];if(map&&map.getLayer('rg-alert-points')){syncDangers();try{map.setLayoutProperty('rg-alert-points','icon-size',rgMapMarkerScale*.875);}catch(e){reportMapError({error:e});}}}
+function registerRadarPictograms(){
+ RoadguardRadarIcons.variants.forEach(variant=>RoadguardRadarIcons.image(variant,img=>{
+  if(!img||!map||!map.getSource('rg-alerts'))return;
+  try{const id='rg-icon-'+variant;if(!map.hasImage(id))map.addImage(id,img,{pixelRatio:2});map.triggerRepaint();}catch(e){reportMapError({error:e});}
+ }));
+}
+
+function setDestination(lat,lon){destination=valid(lat,lon)?[+lon,+lat]:null;sync();}
+function rgCameraOffset(){const height=map&&map.getContainer?map.getContainer().clientHeight:0;return RoadguardCameraGeometry.offset(height,rgSheetOcclusionPx,rgAnchorActive,rgCameraAnchorPercent,typeof window==='undefined'?0:window.rgTopInsetPx||0);}
+function setCameraAnchor(percent){const next=RoadguardCameraGeometry.percent(percent);if(next===rgCameraAnchorPercent)return;rgCameraAnchorPercent=next;if(rgCameraOptions){rgCameraOptions.offset=rgCameraOffset();if(ready&&followOn&&!manualCameraPaused)map.easeTo({...rgCameraOptions,duration:220,essential:true});}}
+function rgSetSheetOcclusion(px){const height=map&&map.getContainer?map.getContainer().clientHeight:0;rgSheetOcclusionPx=Math.max(0,Math.min(Number(px)||0,height?height*.7:480));const credits=document.querySelector('.maplibregl-ctrl-bottom-right');if(credits)credits.style.bottom=(rgSheetOcclusionPx+8)+'px';rgFollowPause.style.bottom=Math.max(166,rgSheetOcclusionPx+16)+'px';if(rgCameraOptions){rgCameraOptions.offset=rgCameraOffset();if(ready&&followOn&&!manualCameraPaused)map.easeTo({...rgCameraOptions,duration:220,essential:true});}}
+function showRouteOverview(){if(!ready||route.length<2)return;let bounds=route.reduce((b,p)=>b.extend(p),new maplibregl.LngLatBounds(route[0],route[0]));manualCameraPaused=true;followOn=false;rgShowFollowState();map.fitBounds(bounds,{padding:{top:65,bottom:65+rgSheetOcclusionPx,left:65,right:65},duration:500,maxZoom:15});}
+function focusRoadguardPoint(lat,lon){if(!valid(lat,lon)||!map)return;manualCameraPaused=true;followOn=false;rgShowFollowState();const focus=()=>map.easeTo({center:[+lon,+lat],zoom:Math.max(map.getZoom(),15),duration:350});if(ready)focus();else map.once('load',focus);}
+function rgFollowCamera(){if(!map||!lastPos||!rgCameraOptions)return;try{map.jumpTo({...rgCameraOptions,center:lastPos,offset:rgCameraOffset()});}catch(error){reportMapError({error});try{map.setCenter(lastPos);}catch(second){reportMapError({error:second});}}}
+function resumeCamera(){manualCameraPaused=false;followOn=true;RoadguardViewState.publish(map,false,window.RoadguardMap);rgShowFollowState();if(lastPos&&ready)rgFollowCamera();}
+function restoreCachedMapViewport(value){const state=RoadguardViewState.normalizeViewport(value);if(state)map.jumpTo({center:[state.lon,state.lat],zoom:state.zoom});}
+function restoreRoadguardView(value){const state=RoadguardViewState.normalize(value);if(!state||!map)return;
+ manualCameraPaused=true;followOn=false;rgShowFollowState();
+ const apply=()=>{if(!manualCameraPaused)return;map.jumpTo({center:[state.lon,state.lat],zoom:state.zoom});RoadguardViewState.publish(map,true,window.RoadguardMap);};
+ if(ready)apply();else map.once('style.load',apply);
+}
+function resetView(){resumeCamera();}
+function rgManualZoom(direction){manualCameraPaused=true;followOn=false;rgShowFollowState();if(!map)return;if(direction>0)map.zoomIn();else map.zoomOut();}
+function setHeading(deg,visible){if(Number.isFinite(+deg))heading=+deg;}
+// Marqueur DOM independant du style PMTiles : reste visible pendant setStyle().
+let rgGpsMarker=null;
+function ensureGpsMarker(){
+ if(!map||!lastPos||!window.maplibregl)return;
+ if(!rgGpsMarker){
+  const el=document.createElement('div');el.id='roadguard-gps-marker';
+  el.style.cssText='width:24px;height:24px;border:4px solid white;border-radius:50%;background:#20bfff;box-shadow:0 0 0 12px #20bfff55,0 2px 12px #001827;box-sizing:border-box;pointer-events:none;z-index:100;';
+  rgGpsMarker=new maplibregl.Marker({element:el,anchor:'center'}).setLngLat(lastPos).addTo(map);
+ }else rgGpsMarker.setLngLat(lastPos);
+}
+function updateGPS(lat,lon,follow,bearing,accuracy,headingUp,speedKmh,adaptiveZoom,lookAhead){
+ if(!valid(lat,lon))return;lastPos=[+lon,+lat];
+ followOn=!!follow&&!manualCameraPaused;heading=Number.isFinite(+bearing)?+bearing:heading;rgShowFollowState();
+ const speed=Number.isFinite(+speedKmh)&&+speedKmh>=0?+speedKmh:-1;
+ let zoom=rgCameraOptions?rgCameraOptions.zoom:(adaptiveZoom?16:(map?map.getZoom():16));
+ if(adaptiveZoom&&followOn){const next=rgVectorAutoZoom.update(speed,zoom,Date.now());if(next!==null)zoom=next;}
+ else if(!adaptiveZoom&&map)zoom=map.getZoom();
+ rgAnchorActive=!!headingUp||(!!lookAhead&&speed>=12);
+ // MapLibre applies this screen offset after bearing and pitch. Never invent
+ // a displaced geographic GPS centre for look-ahead.
+ rgCameraOptions={center:lastPos,bearing:headingUp?heading:0,pitch:headingUp?55:45,zoom,offset:rgCameraOffset()};
+ // A new GPS fix can arrive before the previous easing ends. Snap the camera
+ // to each accepted fix so the vehicle remains anchored while the map moves.
+ // Camera tracking must never depend on optional radar icons, clusters or
+ // geojson layers: a script error there previously left the blue dot wandering.
+ if(ready&&followOn)rgFollowCamera();
+ try{ensureGpsMarker();sync();}catch(error){reportMapError({error});}
+}
+function setGPSVisible(){ensureGpsMarker();setRoadguardGpsState(rgGpsFresh);if(!ready)return;let show=!!lastPos;for(const id of ['rg-position-point','rg-position-halo'])if(map.getLayer(id))map.setLayoutProperty(id,'visibility',show?'visible':'none');}
+// Aperçu vectoriel expérimental : le moteur MapLibre est embarqué à la compilation.
+// Les noms de source-layer suivent le schéma OpenMapTiles ; d'autres packs peuvent rester vides.
+function buildRoadguardVectorStyle(id,maxZoom){
+ const p=rgPalette(rgPremiumTheme);
+ const url='https://roadguard.local/pmtiles/'+id+'/{z}/{x}/{y}.pbf';
+ const style={version:8,name:'ROADGUARD Premium Vector '+rgPremiumTheme,glyphs:'https://roadguard.local/fonts/{fontstack}/{range}.pbf',sources:{roads:{type:'vector',tiles:[url],minzoom:0,maxzoom:maxZoom,attribution:'© Protomaps © OpenStreetMap contributors'}},
+ layers:[
+  {id:'bg',type:'background',paint:{'background-color':p.background}},
+  {id:'water',type:'fill',source:'roads','source-layer':'water',paint:{'fill-color':p.water}},
+  {id:'landcover',type:'fill',source:'roads','source-layer':'landcover',paint:{'fill-color':p.landcover,'fill-opacity':0.82}},
+  {id:'building',type:'fill',source:'roads','source-layer':'building',paint:{'fill-color':p.building,'fill-opacity':0.9}},
+  {id:'premium-rail',type:'line',source:'roads','source-layer':'transportation',filter:['in',['get','class'],['literal',['rail','transit','subway','tram']]],paint:{'line-color':p.rail,'line-width':['interpolate',['linear'],['zoom'],8,0.4,16,1.2],'line-opacity':0.6}},
+  {id:'transportation-outline',type:'line',source:'roads','source-layer':'transportation',filter:['!', ['in',['get','class'],['literal',['rail','transit','subway','tram','motorway']]]],paint:{'line-color':p.roadOutline,'line-width':['interpolate',['linear'],['zoom'],6,2.1,14,7.8]}},
+  {id:'transportation',type:'line',source:'roads','source-layer':'transportation',filter:['!', ['in',['get','class'],['literal',['rail','transit','subway','tram','motorway']]]],paint:{'line-color':p.road,'line-width':['interpolate',['linear'],['zoom'],6,1.15,14,5.8]}},
+  {id:'premium-major-outline',type:'line',source:'roads','source-layer':'transportation',filter:['in',['get','class'],['literal',['trunk','primary','secondary']]],paint:{'line-color':p.roadOutline,'line-width':['interpolate',['linear'],['zoom'],6,2.8,14,8.5]}},
+  {id:'premium-major',type:'line',source:'roads','source-layer':'transportation',filter:['in',['get','class'],['literal',['trunk','primary','secondary']]],paint:{'line-color':p.motorway,'line-width':['interpolate',['linear'],['zoom'],6,1.6,14,6.5]}},
+  {id:'premium-motorway-outline',type:'line',source:'roads','source-layer':'transportation',filter:['==',['get','class'],'motorway'],paint:{'line-color':p.roadOutline,'line-width':['interpolate',['linear'],['zoom'],6,3.0,14,9.2]}},
+  {id:'premium-motorway',type:'line',source:'roads','source-layer':'transportation',filter:['==',['get','class'],'motorway'],paint:{'line-color':p.motorway,'line-width':['interpolate',['linear'],['zoom'],6,1.6,14,6.5]}},
+  {id:'roads-outline',type:'line',source:'roads','source-layer':'road',paint:{'line-color':p.roadOutline,'line-width':['interpolate',['linear'],['zoom'],6,2.1,14,7.8]}},
+  {id:'roads',type:'line',source:'roads','source-layer':'road',paint:{'line-color':p.road,'line-width':['interpolate',['linear'],['zoom'],6,1.15,14,5.8]}},
+  {id:'roads-major-outline',type:'line',source:'roads','source-layer':'road',filter:['in',['get','class'],['literal',['trunk','primary','secondary']]],paint:{'line-color':p.roadOutline,'line-width':['interpolate',['linear'],['zoom'],6,2.8,14,8.5]}},
+  {id:'roads-major',type:'line',source:'roads','source-layer':'road',filter:['in',['get','class'],['literal',['trunk','primary','secondary']]],paint:{'line-color':p.motorway,'line-width':['interpolate',['linear'],['zoom'],6,1.6,14,6.5]}},
+  // Protomaps schema: roads/places differ from OpenMapTiles transportation/place.
+  // Empty source-layers are ignored by MapLibre, allowing either schema to render.
+  {id:'protomaps-roads-outline',type:'line',source:'roads','source-layer':'roads',paint:{'line-color':p.roadOutline,'line-width':['interpolate',['linear'],['zoom'],6,2,14,7.8]}},
+  {id:'protomaps-roads',type:'line',source:'roads','source-layer':'roads',paint:{'line-color':p.road,'line-width':['interpolate',['linear'],['zoom'],6,1.0,14,5.8]}},
+  {id:'protomaps-roads-major-outline',type:'line',source:'roads','source-layer':'roads',filter:['any',['in',['get','class'],['literal',['trunk','primary','secondary']]],['in',['get','kind'],['literal',['major_road','highway']]]],paint:{'line-color':p.roadOutline,'line-width':['interpolate',['linear'],['zoom'],6,2.8,14,8.5]}},
+  {id:'protomaps-roads-major',type:'line',source:'roads','source-layer':'roads',filter:['any',['in',['get','class'],['literal',['trunk','primary','secondary']]],['in',['get','kind'],['literal',['major_road','highway']]]],paint:{'line-color':p.motorway,'line-width':['interpolate',['linear'],['zoom'],6,1.6,14,6.5]}},
+  {id:'protomaps-road-names',type:'symbol',source:'roads','source-layer':'roads',filter:['has','name'],layout:{'symbol-placement':'line','text-field':['coalesce',['get','name:fr'],['get','name']],'text-font':['Noto Sans Regular'],'text-size':['interpolate',['linear'],['zoom'],10,12,15,15],'text-keep-upright':true},paint:{'text-color':p.text,'text-halo-color':p.halo,'text-halo-width':2.4}},
+  {id:'protomaps-places',type:'symbol',source:'roads','source-layer':'places',filter:['has','name'],layout:{'text-field':['coalesce',['get','name:fr'],['get','name']],'text-font':['Noto Sans Regular'],'text-size':['interpolate',['linear'],['zoom'],6,13,12,19]},paint:{'text-color':p.text,'text-halo-color':p.halo,'text-halo-width':2.8}},
+  {id:'road-names',type:'symbol',source:'roads','source-layer':'transportation_name',layout:{'symbol-placement':'line','text-field':['coalesce',['get','name:fr'],['get','name']],'text-font':['Noto Sans Regular'],'text-size':['interpolate',['linear'],['zoom'],10,12,15,16],'text-keep-upright':true},paint:{'text-color':p.text,'text-halo-color':p.halo,'text-halo-width':2.5}},
+  {id:'city-names',type:'symbol',source:'roads','source-layer':'place',filter:['match',['get','class'],['city','town','village','hamlet'],true,false],layout:{'text-field':['coalesce',['get','name:fr'],['get','name']],'text-font':['Noto Sans Regular'],'text-size':['interpolate',['linear'],['zoom'],5,13,10,19,15,23],'text-anchor':'center','text-offset':[0,0.7],'text-max-width':9},paint:{'text-color':p.text,'text-halo-color':p.halo,'text-halo-width':3}}
+ ]};
+ // A visible online/cached base fills places where no region has been saved.
+ // Offline requests are served by the native cache, with Internet blocked by the native mode.
+ {
+  style.sources['osm-online']={type:'raster',tiles:['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],tileSize:256,maxzoom:19,attribution:'© OpenStreetMap contributors'};
+  style.layers.splice(1,0,{id:'osm-online-layer',type:'raster',source:'osm-online',paint:{'raster-saturation':rgPremiumTheme==='night'?-.6:0,'raster-brightness-max':rgPremiumTheme==='night'?.75:1}});
+ }
+ return style;
+}
+function setVectorPmtiles(id,maxZoom,onlineBackdrop){
+ maxZoom=Number.isInteger(maxZoom)&&maxZoom>=0&&maxZoom<=22?maxZoom:14;
+ if(!/^[A-Za-z0-9_-]{1,64}$/.test(id)){say('Identifiant PMTiles incorrect',true);return;}
+ if(!map||!window.maplibregl){say('Moteur MapLibre local absent : exécuter tools/fetch_maplibre_vendor.py avant compilation',true);return;}
+ if(activeVectorPack===id&&rgActiveVectorMaxZoom===maxZoom&&map.getSource('roads')){setLocalVectorVisibility(true);return;}
+ rgActiveVectorMaxZoom=maxZoom;const style=buildRoadguardVectorStyle(id,maxZoom);
+ rgEngineLifecycle.start();const styleGeneration=++rgStyleGeneration;rgMapDiagnostics.styleGeneration=styleGeneration;
+ activeVectorPack=id;rgLocalVectorVisible=true;rgPendingVectorTheme=false;rgMapDiagnostics.pack=id;rgMapDiagnostics.styleLoaded=false;rgMapDiagnostics.vectorTilesSeen=null;rgMapDiagnostics.vectorSourceEvents=0;rgMapDiagnostics.vectorTileErrors=0;rgMapDiagnostics.sourceReady=false;ready=false;
+ // Recreate the style: MapLibre's diff path may only emit styledata, while
+ // readiness and overlays below require a new style.load event.
+ map.setStyle(style,{diff:false});
+ // setStyle peut reinitialiser les couches maison et arriver apres la derniere position GPS.
+ // Ce listener est volontairement independant du gestionnaire style.load principal :
+ // meme si celui-ci sort sur une source conservee par MapLibre, on reactive le GPS.
+ map.once('style.load',()=>{if(styleGeneration!==rgStyleGeneration)return;setLocalVectorVisibility(true);applyPendingVectorTheme();ensureGpsMarker();sync();if(lastPos){for(const layer of ['rg-position-halo','rg-position-point']){if(map.getLayer(layer)){try{map.moveLayer(layer);}catch(_){}}}setGPSVisible();}});
+ say(onlineBackdrop?'CARTES LOCALES PRIORITAIRES · réseau en complément':'CARTES TÉLÉCHARGÉES · chargement local');
+}
+function setRoads(items){} // Les routes hors ligne sont gerees par l'ancien moteur.
+function setOfflineRoads(items){}
+function showRouteStatus(distanceFromRoute,remaining,progress){}
+function updateRouteProgress(lat,lon){}
+window.onerror=function(message,source,line,column,error){const problem=String((error&&error.stack)||message||'erreur WebView').slice(0,240);rgMapDiagnostics.errors.push({type:'JAVASCRIPT',message:problem,source:String(source||'').split('/').pop(),line:line||0});if(rgMapDiagnostics.errors.length>20)rgMapDiagnostics.errors.shift();if(!ready){say('Carte : erreur de démarrage · repli 2D',true);rgEngineLifecycle.fail(problem);}};
+const rgStartViewport=RoadguardViewState.readViewport();
+let rgBootstrap={};try{if(window.RoadguardMap&&typeof RoadguardMap.mapBootstrap==='function')rgBootstrap=JSON.parse(RoadguardMap.mapBootstrap());}catch(_){}
+rgNetworkOnline=rgBootstrap.online!==false;rgPremiumTheme=rgBootstrap.night===false?'day':'night';rgAppearancePack=RoadguardPalette.normalize(rgBootstrap.pack);rgCustomPalette=rgBootstrap.palette||{};
+if(rgBootstrap.local){activeVectorPack='all_downloaded';rgActiveVectorMaxZoom=Number.isInteger(rgBootstrap.maxZoom)?rgBootstrap.maxZoom:14;rgLocalVectorVisible=true;rgMapDiagnostics.pack=activeVectorPack;}
+
+try{if(!window.maplibregl)throw Error('MapLibre JS non charge');map=new maplibregl.Map({container:'map',antialias:true,style:activeVectorPack?buildRoadguardVectorStyle(activeVectorPack,rgActiveVectorMaxZoom):{version:8,name:'ROADGUARD online OSM (consultation)',glyphs:'https://roadguard.local/fonts/{fontstack}/{range}.pbf',sources:{'osm-online':{type:'raster',tiles:['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],tileSize:256,maxzoom:19,attribution:'© OpenStreetMap'}},layers:[{id:'background',type:'background',paint:{'background-color':'#172c35'}},{id:'osm-online-layer',type:'raster',source:'osm-online',minzoom:0,maxzoom:22}]},center:rgStartViewport?[rgStartViewport.lon,rgStartViewport.lat]:[5.9,46.7],zoom:rgStartViewport?rgStartViewport.zoom:11,pitch:0,bearing:0,attributionControl:false});map.addControl(new maplibregl.AttributionControl({compact:true}),'bottom-right');map.on('style.load',()=>{
+ // The base map and GPS can work even if an optional layer fails to register.
+ ready=true;rgMapDiagnostics.styleLoaded=true;rgEngineLifecycle.ready();
+ const source=(id)=>{try{if(!map.getSource(id))map.addSource(id,{type:'geojson',data:fc([])});}catch(error){reportMapError({error});}};
+ const layer=(id,def)=>{try{if(!map.getLayer(id)&&map.getSource(def.source))map.addLayer({id,...def});}catch(error){reportMapError({error});}};
+ source('rg-route');source('rg-alerts');source('rg-alert-clusters');source('rg-dest');source('rg-position');
+ layer('rg-route-glow',{type:'line',source:'rg-route',paint:{'line-color':'#146cff','line-width':13,'line-opacity':0.22}});
+ layer('rg-route-line',{type:'line',source:'rg-route',paint:{'line-color':'#37afff','line-width':5}});
+ try{registerRadarPictograms();}catch(error){reportMapError({error});}
+ layer('rg-alert-points',{type:'symbol',source:'rg-alerts',layout:{'icon-image':['get','icon'],'icon-size':rgMapMarkerScale*.875,'icon-allow-overlap':false,'icon-ignore-placement':false,'icon-padding':2,'icon-anchor':'center','icon-pitch-alignment':'viewport','icon-rotation-alignment':'viewport'}});
+ layer('rg-alert-cluster-circles',{type:'circle',source:'rg-alert-clusters',paint:{'circle-color':'#141d29','circle-radius':21,'circle-stroke-color':'#ff6576','circle-stroke-width':2}});
+ layer('rg-alert-cluster-count',{type:'symbol',source:'rg-alert-clusters',layout:{'text-field':['get','label'],'text-size':15,'text-font':['Noto Sans Regular'],'text-allow-overlap':true},paint:{'text-color':'#ffffff'}});
+ layer('rg-dest-point',{type:'circle',source:'rg-dest',paint:{'circle-color':'#ffb64b','circle-radius':9}});
+ layer('rg-position-halo',{type:'circle',source:'rg-position',paint:{'circle-color':'#20bfff','circle-radius':22,'circle-opacity':0.40,'circle-stroke-color':'#ffffff','circle-stroke-width':3}});
+ layer('rg-position-point',{type:'circle',source:'rg-position',paint:{'circle-color':'#20bfff','circle-radius':13,'circle-stroke-color':'#ffffff','circle-stroke-width':4}});
+ if(lastPos&&followOn&&!manualCameraPaused){if(!rgCameraOptions)rgCameraOptions={center:lastPos,offset:rgCameraOffset()};rgFollowCamera();}
+ try{setLocalVectorVisibility(!!activeVectorPack);setRoadguardVectorTheme(rgPremiumTheme);applyPendingVectorTheme();applyRoadguardMapPack();sync();setGPSVisible();}catch(error){reportMapError({error});}
+ say(activeVectorPack?(rgNetworkOnline?'CARTE UNIFIÉE EN LIGNE · packs locaux disponibles':'CARTES TÉLÉCHARGÉES · hors réseau'):'CARTE EN LIGNE · OpenStreetMap · en attente du GPS');
+ for(const id of ['rg-route-glow','rg-route-line','rg-alert-points','rg-alert-cluster-circles','rg-alert-cluster-count','rg-dest-point','rg-position-halo','rg-position-point'])if(map.getLayer(id)){try{map.moveLayer(id);}catch(_){}}
+ });map.on('sourcedata',e=>{if(activeVectorPack&&e.sourceId==='roads'&&e.isSourceLoaded){rgMapDiagnostics.vectorSourceEvents++;rgMapDiagnostics.sourceReady=true;if(ready&&!rgNetworkOnline)say('CARTES TÉLÉCHARGÉES · chargées hors réseau');}});map.on('resize',()=>rgSetSheetOcclusion(rgSheetOcclusionPx));map.on('error',reportMapError);map.on('moveend',()=>{try{RoadguardViewState.publish(map,manualCameraPaused,window.RoadguardMap);syncDangers();}catch(error){reportMapError({error});}});map.on('click','rg-alert-cluster-circles',e=>{if(!e.features||!e.features.length)return;const p=e.features[0].geometry.coordinates;if(map.getZoom()<18)map.easeTo({center:p,zoom:Math.min(18,map.getZoom()+2),duration:300});else new maplibregl.Popup().setLngLat(p).setText(e.features[0].properties.count+' points dans cette zone').addTo(map);});map.on('dragstart',e=>{if(e&&e.originalEvent){manualCameraPaused=true;followOn=false;rgShowFollowState();}});map.on('zoomstart',e=>{if(e&&e.originalEvent){manualCameraPaused=true;followOn=false;rgShowFollowState();}});}catch(e){say('Moteur vectoriel indisponible · repli 2D',true);rgEngineLifecycle.fail(e&&e.message);}
+</script></body></html>

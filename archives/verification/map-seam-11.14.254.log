@@ -1,0 +1,5 @@
+2026-10-21 ROADGUARD 11.14.254
+node tools/test_map_pack_runtime.js: PASS six palette combinations and online/offline vector/raster visibility switches.
+node --check inline map_maplibre.html: PASS.
+Python PMTiles v3 header tests: 9 PASS.
+No Android build or Xiaomi visual validation available.

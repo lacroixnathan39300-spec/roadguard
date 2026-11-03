@@ -1,0 +1,2 @@
+Correction compilation MainActivity.java : gpsWidget=hud; -> gpsWidget=gps;
+Compilation Android non effectuee.

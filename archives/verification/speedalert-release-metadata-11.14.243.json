@@ -1,0 +1,23 @@
+{
+  "checked_date": "2026-10-21",
+  "repository": "https://github.com/hvdwolf/SpeedAlert_Databases",
+  "release": "europe-202606",
+  "published_at": "2026-06-04T11:58:14Z",
+  "metadata_only": true,
+  "download_performed": false,
+  "source_license": "CC BY 4.0 (README du dépôt relu)",
+  "archives": [
+    {
+      "file_name": "ch-camera.sqlite.7z",
+      "bytes": 16391,
+      "sha256": "1ad92d13d8e7282db196c45f53b179af0f7578806c529e8029e27650385e5098",
+      "url": "https://github.com/hvdwolf/SpeedAlert_Databases/releases/download/europe-202606/ch-camera.sqlite.7z"
+    },
+    {
+      "file_name": "fr-camera.sqlite.7z",
+      "bytes": 101736,
+      "sha256": "5d38478a92d488668818232495bbd1ae690952ced5e409e2e69cbd3bfd6d63d1",
+      "url": "https://github.com/hvdwolf/SpeedAlert_Databases/releases/download/europe-202606/fr-camera.sqlite.7z"
+    }
+  ]
+}

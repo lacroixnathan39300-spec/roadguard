@@ -1,0 +1,278 @@
+[
+  {
+    "path": "AVANCEMENT-11.14.245.md",
+    "new": true,
+    "sha256": "9673a0ee6dfaf87f793d4494fbcfca5537e818dd9e131c6e5ab46c869e293172",
+    "bytes": 14021
+  },
+  {
+    "path": "FICHIERS-POUR-IMPORT-7Z.md",
+    "new": false,
+    "sha256": "c6cf58ef0532b5f4930934cfecfc8243f05f43b784421e3af3387c3127888f02",
+    "bytes": 1107
+  },
+  {
+    "path": "LIRE-11.14.245.md",
+    "new": true,
+    "sha256": "2f87a65a861357e5b4d6a04667bd5439957ae24fddbcf84b7e71dde3693094f8",
+    "bytes": 1138
+  },
+  {
+    "path": "WORK-11.14.245.md",
+    "new": true,
+    "sha256": "0e0f7fae68260de227ed27b89704e76345ea5264862c77144c5f57b1205d6aa4",
+    "bytes": 9550
+  },
+  {
+    "path": "app/build.gradle",
+    "new": false,
+    "sha256": "b3693ee4ae12bebb4e15a094c52a129af79a6ef97d06247ea5f34b6c04f6b15d",
+    "bytes": 8065
+  },
+  {
+    "path": "app/libs/commons-codec-1.19.0.jar",
+    "new": true,
+    "sha256": "5c3881e4f556855e9c532927ee0c9dfde94cc66760d5805c031a59887070af5f",
+    "bytes": 374716
+  },
+  {
+    "path": "app/libs/commons-compress-1.28.0.jar",
+    "new": true,
+    "sha256": "e1522945218456f3649a39bc4afd70ce4bd466221519dba7d378f2141a4642ca",
+    "bytes": 1117221
+  },
+  {
+    "path": "app/libs/commons-io-2.20.0.jar",
+    "new": true,
+    "sha256": "df90bba0fe3cb586b7f164e78fe8f8f4da3f2dd5c27fa645f888100ccc25dd72",
+    "bytes": 563971
+  },
+  {
+    "path": "app/libs/commons-lang3-3.18.0.jar",
+    "new": true,
+    "sha256": "4eeeae8d20c078abb64b015ec158add383ac581571cddc45c68f0c9ae0230720",
+    "bytes": 702952
+  },
+  {
+    "path": "app/libs/xz-1.12.jar",
+    "new": true,
+    "sha256": "3e158a87bd73d8afb4b6e8239c013b7d049c48563f45860ce99cd2e448cf4a6b",
+    "bytes": 168792
+  },
+  {
+    "path": "app/radar-dependencies.json",
+    "new": true,
+    "sha256": "efbb515402d98aa9d91745d86f7127dd916850cc312c0da7d1a4a244a9d65315",
+    "bytes": 1040
+  },
+  {
+    "path": "app/src/main/assets/radar_archives/ch-camera.sqlite.7z",
+    "new": true,
+    "sha256": "1ad92d13d8e7282db196c45f53b179af0f7578806c529e8029e27650385e5098",
+    "bytes": 16391
+  },
+  {
+    "path": "app/src/main/assets/radar_archives/fr-camera.sqlite.7z",
+    "new": true,
+    "sha256": "5d38478a92d488668818232495bbd1ae690952ced5e409e2e69cbd3bfd6d63d1",
+    "bytes": 101736
+  },
+  {
+    "path": "app/src/main/assets/roadguard_progress_11_14_245.json",
+    "new": true,
+    "sha256": "ed4c132fc107337fbe8bf20c1f5051f658f79f3bc8de7d19061711eed81ce8ba",
+    "bytes": 40470
+  },
+  {
+    "path": "app/src/main/assets/vendor/LICENSE-SpeedAlert-Databases-CC-BY-4.0.txt",
+    "new": true,
+    "sha256": "81ad0d3087a42b58e41d90452e62d87593160db09b51fb2dc5278adc7f8c7954",
+    "bytes": 161
+  },
+  {
+    "path": "app/src/main/assets/vendor/LICENSE-commons-codec-1.19.0-LICENSE.txt",
+    "new": true,
+    "sha256": "b1d2870f1a00e4d7f56576e5f0870cba109e041f8af66866cf5b499478e654e7",
+    "bytes": 11359
+  },
+  {
+    "path": "app/src/main/assets/vendor/LICENSE-commons-codec-1.19.0-NOTICE.txt",
+    "new": true,
+    "sha256": "b64933ee1d36d14659156223a2604edadb60bffdd465d5368ff422d7689db5fb",
+    "bytes": 175
+  },
+  {
+    "path": "app/src/main/assets/vendor/LICENSE-commons-compress-1.28.0-LICENSE.txt",
+    "new": true,
+    "sha256": "51b88fd3e9e24edcdce1dd145a4fca2dcd12911407f00b06dfa6ff600f9733c1",
+    "bytes": 11358
+  },
+  {
+    "path": "app/src/main/assets/vendor/LICENSE-commons-compress-1.28.0-NOTICE.txt",
+    "new": true,
+    "sha256": "0d98967f0ab328af8d9d536aa9a5c684b5dd665657245f6ee6b5915affe811c0",
+    "bytes": 178
+  },
+  {
+    "path": "app/src/main/assets/vendor/LICENSE-commons-io-2.20.0-LICENSE.txt",
+    "new": true,
+    "sha256": "c1d1a38c99c48ccad170890ade6066e2e240bb6ce59861d4eb7f672eddd2a4c6",
+    "bytes": 11360
+  },
+  {
+    "path": "app/src/main/assets/vendor/LICENSE-commons-io-2.20.0-NOTICE.txt",
+    "new": true,
+    "sha256": "b54b0db6c617273efff79ba193bb01b05eadcddfff55c24063b38b2acef714c3",
+    "bytes": 172
+  },
+  {
+    "path": "app/src/main/assets/vendor/LICENSE-commons-lang3-3.18.0-LICENSE.txt",
+    "new": true,
+    "sha256": "b1d2870f1a00e4d7f56576e5f0870cba109e041f8af66866cf5b499478e654e7",
+    "bytes": 11359
+  },
+  {
+    "path": "app/src/main/assets/vendor/LICENSE-commons-lang3-3.18.0-NOTICE.txt",
+    "new": true,
+    "sha256": "64bc8696af3f6c770521412b85d3a733fa44b2ef5b0f4bd739e0c4d02eca492a",
+    "bytes": 174
+  },
+  {
+    "path": "app/src/main/assets/vendor/LICENSE-xz-1.12.txt",
+    "new": true,
+    "sha256": "1e77ef26cee5216d6531e49cbf2f6111a0270dc7b322fc65477063c5aff88766",
+    "bytes": 663
+  },
+  {
+    "path": "app/src/main/java/fr/roadguard/app/MainActivity.java",
+    "new": false,
+    "sha256": "c8f1a799f6414418febde7ae5e4e33576dfad58c52d0ad680cbe1a084fdfd071",
+    "bytes": 406661
+  },
+  {
+    "path": "app/src/main/java/fr/roadguard/app/RadarArchiveInstaller.java",
+    "new": true,
+    "sha256": "8f35196742d28cdd9f169f2eb2b8a0c8b396f43706f55f9ca104541fd17eb1e5",
+    "bytes": 2605
+  },
+  {
+    "path": "app/src/main/java/fr/roadguard/app/RadarCountryBatch.java",
+    "new": false,
+    "sha256": "c79129b1bfded758630399473be13593f26cc88ae9b6aa6f3570b6259064b82c",
+    "bytes": 1736
+  },
+  {
+    "path": "app/src/main/java/fr/roadguard/app/RadarDownloadActivity.java",
+    "new": false,
+    "sha256": "56652417ba52faa57d5ad4eb23f52d8dfcd0a10f6c593a68f8de7d84b4610a2b",
+    "bytes": 38804
+  },
+  {
+    "path": "app/src/main/java/fr/roadguard/app/RadarSevenZipExtractor.java",
+    "new": true,
+    "sha256": "778ebc271761b84ec62b0d58227b11e59c2d5a94ec744d8786fb95eca62340bb",
+    "bytes": 2931
+  },
+  {
+    "path": "app/src/test/java/fr/roadguard/app/RealSevenZipRuntimeTest.java",
+    "new": true,
+    "sha256": "e33b8b61d497ad043affe95877fa282030bc8f7cb412d1d436b63fbcd12d67f8",
+    "bytes": 1510
+  },
+  {
+    "path": "radar_sources/speedalert-europe-202606/ATTRIBUTION.md",
+    "new": true,
+    "sha256": "c412553ba884535859522af6aeefbab4194d93eb9c648c6d904a43cb96d4bcac",
+    "bytes": 543
+  },
+  {
+    "path": "radar_sources/speedalert-europe-202606/ch-camera.sqlite.7z",
+    "new": true,
+    "sha256": "1ad92d13d8e7282db196c45f53b179af0f7578806c529e8029e27650385e5098",
+    "bytes": 16391
+  },
+  {
+    "path": "radar_sources/speedalert-europe-202606/fr-camera.sqlite.7z",
+    "new": true,
+    "sha256": "5d38478a92d488668818232495bbd1ae690952ced5e409e2e69cbd3bfd6d63d1",
+    "bytes": 101736
+  },
+  {
+    "path": "tools/TestSevenZipImport.java",
+    "new": true,
+    "sha256": "0d77d15732af78d77732660b6d774b7d6850f8a52422d039ae213c8b89d1c799",
+    "bytes": 9468
+  },
+  {
+    "path": "tools/render_progress_report.py",
+    "new": false,
+    "sha256": "f2a1ee7725c3fcd846acb949faeb6433c8a1c383987f51d1d0bba035149d88ce",
+    "bytes": 3268
+  },
+  {
+    "path": "tools/render_progress_report_11_14_244.py",
+    "new": true,
+    "sha256": "b9fa8bbc213852e6ceeed9580242efd0f386490cfbcc4f773ad1914770b2176d",
+    "bytes": 4112
+  },
+  {
+    "path": "tools/run_targeted_checks.py",
+    "new": false,
+    "sha256": "c08edcf033580758553f1d212c317560363c080adabb46ea6a641aced62d0038",
+    "bytes": 4324
+  },
+  {
+    "path": "tools/run_targeted_checks_11_14_244.py",
+    "new": true,
+    "sha256": "5fcf33efabbb413c2e8b0b233c5a7d7322c21a82e48a82cd6dc583c359b9bd27",
+    "bytes": 3869
+  },
+  {
+    "path": "tools/update_progress_11_14_245.py",
+    "new": true,
+    "sha256": "815bc92fd58ca8a48748f4151233ae7a13681c2c5c86f9aaa2e2d00d72cd8444",
+    "bytes": 6494
+  },
+  {
+    "path": "verification/data-integrity-11.14.245.json",
+    "new": true,
+    "sha256": "f5a4553043c869d2bc47c4acd9f890ff7b279a81d8e9ffe02f4435f9ac34d956",
+    "bytes": 100
+  },
+  {
+    "path": "verification/dependencies-11.14.245.json",
+    "new": true,
+    "sha256": "af4491e14e4b8353a48c0249cf032cbd1a78346c5f26c51cf24b0216eb8df57c",
+    "bytes": 3293
+  },
+  {
+    "path": "verification/environment-11.14.245.json",
+    "new": true,
+    "sha256": "1d61b3ffa5a3578809bffb0f0f4c7aa12e66c6f28eba72d4bc33f07140a0cb0e",
+    "bytes": 876
+  },
+  {
+    "path": "verification/release-contract-11.14.245.json",
+    "new": true,
+    "sha256": "f4ca2c7eaebb49cbc1fb78f17f1bead3546bb89c33acae30f78286f07f4b3d2f",
+    "bytes": 971
+  },
+  {
+    "path": "verification/targeted-checks-11.14.245.log",
+    "new": true,
+    "sha256": "7f8fe345509860650eadc0206de6dfbf37167150493cb3469c935eb91a46069a",
+    "bytes": 1947
+  },
+  {
+    "path": "verification/targeted-results-11.14.245.json",
+    "new": true,
+    "sha256": "d1ad9a40b15023239d79e1247a277f029600ed0f197672cf515201168cfc99a7",
+    "bytes": 2692
+  },
+  {
+    "path": "verification/xz-1.12.pom",
+    "new": true,
+    "sha256": "937b44d869c059c39f07ae194d8cd6219f5aebf2200ef9707f0b50b7837da281",
+    "bytes": 1929
+  }
+]

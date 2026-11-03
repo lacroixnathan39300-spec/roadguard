@@ -1,0 +1,38 @@
+{
+  "camera-anchor": {
+    "passed": true,
+    "evidence": "verification/camera-tests-11.14.241.log"
+  },
+  "camera-manual": {
+    "passed": true,
+    "evidence": "verification/camera-tests-11.14.241.log"
+  },
+  "camera-zoom": {
+    "passed": true,
+    "evidence": "verification/camera-tests-11.14.241.log"
+  },
+  "gps-motion": {
+    "passed": true,
+    "evidence": "verification/java-policy-tests-11.14.241.log"
+  },
+  "alert-distance": {
+    "passed": true,
+    "evidence": "verification/java-policy-tests-11.14.241.log"
+  },
+  "alert-types": {
+    "passed": true,
+    "evidence": "verification/java-policy-tests-11.14.241.log"
+  },
+  "source-audit": {
+    "passed": true,
+    "evidence": "verification/java-policy-tests-11.14.241.log ; verification/speedalert-source-audit.json"
+  },
+  "http-policy": {
+    "passed": true,
+    "evidence": "verification/ledger-and-http-tests-11.14.241.log"
+  },
+  "data-integrity": {
+    "passed": true,
+    "evidence": "verification/data-integrity-11.14.241.json ; ZIP CRC checked during packaging"
+  }
+}

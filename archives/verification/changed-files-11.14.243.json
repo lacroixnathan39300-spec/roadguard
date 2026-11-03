@@ -1,0 +1,209 @@
+{
+  "baseline": "11.14.242",
+  "files": [
+    {
+      "path": "AVANCEMENT-11.14.243.md",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "eedf5a11c836b16964e9487b440aebf6219cd8322a9a1983b7a82a19984f6b13"
+    },
+    {
+      "path": "FICHIERS-POUR-IMPORT-7Z.md",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "070c88e8f663bdd94c799b01fc7eaf22ded766ea60d2fa33e3d41449eea584cb"
+    },
+    {
+      "path": "LIRE-11.14.243.md",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "75b1bb16159448409e6e262d6a4db5a3fcf8a7977893617762e19f578baa9558"
+    },
+    {
+      "path": "WORK-11.14.243.md",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "06db3ef11a72fd01b78cf4597009736ef22e447ae6f935b78e3e1c9715c866c8"
+    },
+    {
+      "path": "app/build.gradle",
+      "status": "modified",
+      "before_sha256": "01b0101948920a18aee931e04c8215348cb9064c64061cc91ac05ddb7d9fcf79",
+      "after_sha256": "297c744942c18bd87c3688ce225a941addd6acf285055d41c3e333bde49dc5dc"
+    },
+    {
+      "path": "app/src/main/assets/roadguard_progress_11_14_243.json",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "3b1884b17a41e8bf79877d9fb3248c799697878f42b975dece4a46bc436d077f"
+    },
+    {
+      "path": "app/src/main/java/fr/roadguard/app/CanonicalRadar.java",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "de2f2db54ee2f2885a21f6cefed95ffec1c33b9aa21c969954381b96c8d35070"
+    },
+    {
+      "path": "app/src/main/java/fr/roadguard/app/CanonicalRadarCatalog.java",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "a8ae7a5d76ff52f76dd6a190ab1a57e59c28a605bc35472e3f8e374fecfa07cb"
+    },
+    {
+      "path": "app/src/main/java/fr/roadguard/app/CanonicalRadarStore.java",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "fb635f439ff3fa46563a83da52871d04fb3682116b29f80ad301a975bd1e5eb5"
+    },
+    {
+      "path": "app/src/main/java/fr/roadguard/app/MainActivity.java",
+      "status": "modified",
+      "before_sha256": "10398262c953cffe0b00ad0dd11a2c35f3f0f1000547ff4c302e33b8d463add0",
+      "after_sha256": "82fb1c5d62d71ea9002042b2075ef65cdc57e792a35c6d1adc65fc3ed88df095"
+    },
+    {
+      "path": "app/src/main/java/fr/roadguard/app/RadarActivationState.java",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "a7ee3e83592bc16ec564e462e0d6de89425bbf3645ec1f26672e89ef7d290bbf"
+    },
+    {
+      "path": "app/src/main/java/fr/roadguard/app/RadarCatalogRevision.java",
+      "status": "modified",
+      "before_sha256": "bc5e32468e4bcdb63050276a0790dd8694df5e903200f0612abc209c221eb784",
+      "after_sha256": "30117e6225cb52a3e7cdf1cb0405d012dd99d1fa661d8597c6d5b692be8bf503"
+    },
+    {
+      "path": "app/src/main/java/fr/roadguard/app/RadarDownloadActivity.java",
+      "status": "modified",
+      "before_sha256": "034ee507bc50c2ffd2df6b7d23700f622fb11b7304c20d7e0f7cb51bf3ec162e",
+      "after_sha256": "176a219c201c551ba426357a24495528df9a41f194712b15e2d3a15287880888"
+    },
+    {
+      "path": "app/src/main/java/fr/roadguard/app/SpeedAlertSqliteImporter.java",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "75d476d02b191a9a1262f835219cdafdae495ccac7a0a5219fd7ceaf41032789"
+    },
+    {
+      "path": "app/src/main/java/fr/roadguard/app/UpdatedRadarCatalog.java",
+      "status": "modified",
+      "before_sha256": "971b07de34def37f5cee6536c72838d7fd7b28ec7e4475bc977309cf2ee7c85d",
+      "after_sha256": "2440163f0848a5a724c5e0615dcfdba78060e8b701ce6cb931e28a1840101f39"
+    },
+    {
+      "path": "app/src/test/java/fr/roadguard/app/CanonicalSqliteRuntimeTest.java",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "b6a4727b066e26853f5b3d90438ee9bccf423a630131e88906da5e2d2e1a2feb"
+    },
+    {
+      "path": "tools/TestCanonicalRadar.java",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "a105214fb0a272f39bab5a6320b7b618e67ecdde970c7893b32c5c30ccdccf0a"
+    },
+    {
+      "path": "tools/create_sqlite_fixtures.py",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "b3448736f16a4e76f71d208e601c355d7f1fc969c893764c2e20930e845ac06c"
+    },
+    {
+      "path": "tools/jvm-support/android/database/Cursor.java",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "515a8dd8fd416972891e273b29fae8598f175fbb487967c2610d7ee43889f24e"
+    },
+    {
+      "path": "tools/jvm-support/android/database/DatabaseErrorHandler.java",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "96e0b504fe77204496228347676e27bc32639f69f8fb18d7f41ffe2608b7cca2"
+    },
+    {
+      "path": "tools/jvm-support/android/database/sqlite/SQLiteDatabase.java",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "11a3b33fee88d5f98e9e0fdc0371736763dc019065c30cf46d5c29e1015db79e"
+    },
+    {
+      "path": "tools/jvm-support/android/database/sqlite/SQLiteException.java",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "0119c616c2bd1dcd03d03f491eb875a266982c34b2c71dd5dae01be0675e904a"
+    },
+    {
+      "path": "tools/render_progress_report.py",
+      "status": "modified",
+      "before_sha256": "4298b93eeb3daa81e9c67dfb9de8604557389dedf7b8912bfa15653ce2497c15",
+      "after_sha256": "ef09c4c8f657711a0529d82c047cb79eb6ee8a9b9c760da42db55caf5f119699"
+    },
+    {
+      "path": "tools/render_progress_report_11_14_242.py",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "4298b93eeb3daa81e9c67dfb9de8604557389dedf7b8912bfa15653ce2497c15"
+    },
+    {
+      "path": "tools/run_targeted_checks.py",
+      "status": "modified",
+      "before_sha256": "666178433b2c9694e2a5bc277bec3983fd6dc98ea1759e2545946d399d9f1228",
+      "after_sha256": "8289ca71f521da0a13ffebe4251d9c2e31f447f349754124bce02cb8e6642330"
+    },
+    {
+      "path": "tools/run_targeted_checks_11_14_242.py",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "666178433b2c9694e2a5bc277bec3983fd6dc98ea1759e2545946d399d9f1228"
+    },
+    {
+      "path": "tools/sqlite_jvm_probe.py",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "3730ea916d8615791f9d6a34b409853394cd7d1db056060d1e07c514da1add84"
+    },
+    {
+      "path": "tools/update_progress_11_14_243.py",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "2e452f619fc4afa35fbd2d2ab17901c2f2819d428d01822e5f4b16747a97dab2"
+    },
+    {
+      "path": "verification/data-integrity-11.14.243.json",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "f5a4553043c869d2bc47c4acd9f890ff7b279a81d8e9ffe02f4435f9ac34d956"
+    },
+    {
+      "path": "verification/environment-11.14.243.json",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "713a9d167aba69c64c63444c8254c5616be1ee3d36595c9e645d905fbb3ad14e"
+    },
+    {
+      "path": "verification/release-contract-11.14.243.json",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "280d368d6be7529511a6bff5409c11cfa77cfaf208178b661c5e41f30a8f5bf4"
+    },
+    {
+      "path": "verification/speedalert-release-metadata-11.14.243.json",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "dd57e353d517e35e7bff21c6981c5ac5c270d74a9f1b0eeecb413aaaf90bff97"
+    },
+    {
+      "path": "verification/targeted-checks-11.14.243.log",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "91ff8f0ccf03ac92b12e2b05ca89446dd407e0126e1d97633966991953428a1a"
+    },
+    {
+      "path": "verification/targeted-results-11.14.243.json",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "f1d7df82749e7fb619e63cdbc0022177f247378526b408e5c72064bfe0d2e1e5"
+    }
+  ]
+}

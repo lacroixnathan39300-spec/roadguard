@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "region_id": "demo-firenze",
+  "filename": "demo-firenze.pmtiles",
+  "bbox": [
+    11.2,
+    43.75,
+    11.28,
+    43.81
+  ],
+  "bytes": 3150892,
+  "sha256": "cb623ed8ff03cee892ba7604655853864b504f2e8afb7fd8deffd8c23373c11a",
+  "format": "pmtiles-v3",
+  "attribution": "Protomaps © OpenStreetMap contributors",
+  "status": "prepared_locally_not_hosted",
+  "source_filename": "protomaps(vector)ODbL_firenze.pmtiles",
+  "notes": "A hosting endpoint, Android downloader and map rendering connection are still required."
+}

@@ -1,0 +1,47 @@
+[
+  {
+    "name": "compile-core-java8",
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "name": "sqlite-fixtures",
+    "exit_code": 0,
+    "output": "Created 14 synthetic SQLite fixtures using real sqlite3\n"
+  },
+  {
+    "name": "canonical-sqlite-store",
+    "exit_code": 0,
+    "output": "PASS canonical/SQLite: 35 scenarios, 43 assertions; real SQLite read-only via JVM adapter, atomic files/backups, additive engine catalog and activation receipts; Android native runtime NOT executed\n"
+  },
+  {
+    "name": "download-errors-queue",
+    "exit_code": 0,
+    "output": "PASS downloads/queue: 27 scenarios, 59 assertions; mocked HTTP, real temporary files and atomic rename; no live network or 7z extraction\n"
+  },
+  {
+    "name": "catalog-additive-rollback",
+    "exit_code": 0,
+    "output": "PASS catalog/policy core: 14 scenarios, 430302 assertions; real bundled files (Europe=80021, FR=24429, CH=1777, active=104838); JVM Android adapters, NOT Android runtime\n"
+  },
+  {
+    "name": "alert-distance-types",
+    "exit_code": 0,
+    "output": "PASS alert policies: matching voice/text distances, invalid values, red lights, crossings, limits, hysteresis and distinct point types\n"
+  },
+  {
+    "name": "gps-motion",
+    "exit_code": 0,
+    "output": "PASS motion: GNSS/network, missing speed/course, true stop, stale/quality guards, compensation, heading reset, navigation intents and projection\n"
+  },
+  {
+    "name": "compile-parser",
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "name": "java-syntax",
+    "exit_code": 0,
+    "output": "PASS Java syntax: 84 files parsed; Android symbols NOT resolved; APK NOT built\n"
+  }
+]

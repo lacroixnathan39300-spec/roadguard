@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="fr.roadguard.app.LocalPageRuntimeTest" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-10-21T09:37:51" hostname="dec3125c2336" time="14.712">
+  <properties/>
+  <testcase name="onlyExactPackagedPagesCanReceiveApplicationState[26]" classname="fr.roadguard.app.LocalPageRuntimeTest" time="0.871"/>
+  <testcase name="externalPagesCannotMarkMapReadyOrReceivePosition[26]" classname="fr.roadguard.app.LocalPageRuntimeTest" time="0.952"/>
+  <testcase name="webSettingsBlockArbitraryFilesContentAndCrossFileAccess[26]" classname="fr.roadguard.app.LocalPageRuntimeTest" time="1.037"/>
+  <testcase name="lateJavascriptEngineCallbackCannotChangeNewMapStatus[26]" classname="fr.roadguard.app.LocalPageRuntimeTest" time="1.088"/>
+  <testcase name="currentPackagedScreenBridgeStillNavigates[26]" classname="fr.roadguard.app.LocalPageRuntimeTest" time="1.064"/>
+  <testcase name="onlyExplicitHttpsLinksMayBeHandedToBrowser[26]" classname="fr.roadguard.app.LocalPageRuntimeTest" time="1.097"/>
+  <testcase name="bridgeFromReplacedScreenCannotNavigateCurrentScreen[26]" classname="fr.roadguard.app.LocalPageRuntimeTest" time="1.008"/>
+  <testcase name="onlyExactPackagedPagesCanReceiveApplicationState" classname="fr.roadguard.app.LocalPageRuntimeTest" time="1.064"/>
+  <testcase name="externalPagesCannotMarkMapReadyOrReceivePosition" classname="fr.roadguard.app.LocalPageRuntimeTest" time="1.11"/>
+  <testcase name="webSettingsBlockArbitraryFilesContentAndCrossFileAccess" classname="fr.roadguard.app.LocalPageRuntimeTest" time="0.927"/>
+  <testcase name="lateJavascriptEngineCallbackCannotChangeNewMapStatus" classname="fr.roadguard.app.LocalPageRuntimeTest" time="1.331"/>
+  <testcase name="currentPackagedScreenBridgeStillNavigates" classname="fr.roadguard.app.LocalPageRuntimeTest" time="1.103"/>
+  <testcase name="onlyExplicitHttpsLinksMayBeHandedToBrowser" classname="fr.roadguard.app.LocalPageRuntimeTest" time="1.018"/>
+  <testcase name="bridgeFromReplacedScreenCannotNavigateCurrentScreen" classname="fr.roadguard.app.LocalPageRuntimeTest" time="1.023"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+]]></system-err>
+</testsuite>

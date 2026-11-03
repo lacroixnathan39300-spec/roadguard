@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="fr.roadguard.app.SpotifyRuntimeTest" tests="16" skipped="0" failures="0" errors="0" timestamp="2026-10-27T07:39:13.388Z" hostname="2895238405b8" time="9.381">
+  <properties/>
+  <testcase name="sessionSelectionNeverTargetsAnotherMusicApp[26]" classname="fr.roadguard.app.SpotifyRuntimeTest" time="1.418"/>
+  <testcase name="activeSpotifySessionWinsOverAnOldPausedSession[26]" classname="fr.roadguard.app.SpotifyRuntimeTest" time="0.034"/>
+  <testcase name="previousAndNextRequireTheirOwnSupportedActions[26]" classname="fr.roadguard.app.SpotifyRuntimeTest" time="0.039"/>
+  <testcase name="nativeSpotifyPanelBuildsWithoutSessionOrSecret[26]" classname="fr.roadguard.app.SpotifyRuntimeTest" time="2.458"/>
+  <testcase name="noMediaAccessMeansNoControllerAndNoAccountRequest[26]" classname="fr.roadguard.app.SpotifyRuntimeTest" time="0.023"/>
+  <testcase name="pauseAndPlayFollowCurrentSpotifyState[26]" classname="fr.roadguard.app.SpotifyRuntimeTest" time="0.031"/>
+  <testcase name="unsupportedSpotifyActionsAreDisabled[26]" classname="fr.roadguard.app.SpotifyRuntimeTest" time="0.022"/>
+  <testcase name="seekRequiresTheSpotifySessionCapability[26]" classname="fr.roadguard.app.SpotifyRuntimeTest" time="0.02"/>
+  <testcase name="sessionSelectionNeverTargetsAnotherMusicApp" classname="fr.roadguard.app.SpotifyRuntimeTest" time="2.83"/>
+  <testcase name="activeSpotifySessionWinsOverAnOldPausedSession" classname="fr.roadguard.app.SpotifyRuntimeTest" time="0.023"/>
+  <testcase name="previousAndNextRequireTheirOwnSupportedActions" classname="fr.roadguard.app.SpotifyRuntimeTest" time="0.023"/>
+  <testcase name="nativeSpotifyPanelBuildsWithoutSessionOrSecret" classname="fr.roadguard.app.SpotifyRuntimeTest" time="2.341"/>
+  <testcase name="noMediaAccessMeansNoControllerAndNoAccountRequest" classname="fr.roadguard.app.SpotifyRuntimeTest" time="0.03"/>
+  <testcase name="pauseAndPlayFollowCurrentSpotifyState" classname="fr.roadguard.app.SpotifyRuntimeTest" time="0.022"/>
+  <testcase name="unsupportedSpotifyActionsAreDisabled" classname="fr.roadguard.app.SpotifyRuntimeTest" time="0.026"/>
+  <testcase name="seekRequiresTheSpotifySessionCapability" classname="fr.roadguard.app.SpotifyRuntimeTest" time="0.022"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+]]></system-err>
+</testsuite>

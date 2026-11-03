@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="fr.roadguard.app.CarSearchRuntimeTest" tests="18" skipped="0" failures="0" errors="0" timestamp="2026-10-18T14:21:43" hostname="891fc462d9e7" time="0.734">
+  <properties/>
+  <testcase name="submittedQueryBuildsHostSearchResults[26]" classname="fr.roadguard.app.CarSearchRuntimeTest" time="0.059"/>
+  <testcase name="networkErrorEndsLoadingAndAllowsRetry[26]" classname="fr.roadguard.app.CarSearchRuntimeTest" time="0.031"/>
+  <testcase name="closedScreenRejectsLateResponseAndStopsExecutor[26]" classname="fr.roadguard.app.CarSearchRuntimeTest" time="0.022"/>
+  <testcase name="coordinatesWorkWithoutSearchServer[26]" classname="fr.roadguard.app.CarSearchRuntimeTest" time="0.026"/>
+  <testcase name="obsoleteResponseCannotReplaceNewerQuery[26]" classname="fr.roadguard.app.CarSearchRuntimeTest" time="0.023"/>
+  <testcase name="invalidAndDuplicatePlacesAreExcludedAndListIsBounded[26]" classname="fr.roadguard.app.CarSearchRuntimeTest" time="0.033"/>
+  <testcase name="submittedQueryBuildsHostSearchResults[34]" classname="fr.roadguard.app.CarSearchRuntimeTest" time="0.051"/>
+  <testcase name="networkErrorEndsLoadingAndAllowsRetry[34]" classname="fr.roadguard.app.CarSearchRuntimeTest" time="0.057"/>
+  <testcase name="closedScreenRejectsLateResponseAndStopsExecutor[34]" classname="fr.roadguard.app.CarSearchRuntimeTest" time="0.037"/>
+  <testcase name="coordinatesWorkWithoutSearchServer[34]" classname="fr.roadguard.app.CarSearchRuntimeTest" time="0.033"/>
+  <testcase name="obsoleteResponseCannotReplaceNewerQuery[34]" classname="fr.roadguard.app.CarSearchRuntimeTest" time="0.029"/>
+  <testcase name="invalidAndDuplicatePlacesAreExcludedAndListIsBounded[34]" classname="fr.roadguard.app.CarSearchRuntimeTest" time="0.042"/>
+  <testcase name="submittedQueryBuildsHostSearchResults" classname="fr.roadguard.app.CarSearchRuntimeTest" time="0.053"/>
+  <testcase name="networkErrorEndsLoadingAndAllowsRetry" classname="fr.roadguard.app.CarSearchRuntimeTest" time="0.036"/>
+  <testcase name="closedScreenRejectsLateResponseAndStopsExecutor" classname="fr.roadguard.app.CarSearchRuntimeTest" time="0.042"/>
+  <testcase name="coordinatesWorkWithoutSearchServer" classname="fr.roadguard.app.CarSearchRuntimeTest" time="0.051"/>
+  <testcase name="obsoleteResponseCannotReplaceNewerQuery" classname="fr.roadguard.app.CarSearchRuntimeTest" time="0.035"/>
+  <testcase name="invalidAndDuplicatePlacesAreExcludedAndListIsBounded" classname="fr.roadguard.app.CarSearchRuntimeTest" time="0.028"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

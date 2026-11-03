@@ -1,0 +1,3 @@
+PASS baseline 290: real browser reproduces Illegal invocation before map initialization, no vector requests.
+PASS partial fix reproduces style diff stall: source loads but style.load readiness remains false.
+PASS 291: real bundled MapLibre/WebGL and worker ready; 6 local vector requests, offline source loaded, cached raster retained, timer cancellation succeeds, no page error. Synthetic PBF, no Android/country data validation.

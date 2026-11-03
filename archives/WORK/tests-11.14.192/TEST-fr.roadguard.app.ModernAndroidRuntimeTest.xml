@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="fr.roadguard.app.ModernAndroidRuntimeTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-18T13:30:02" hostname="891fc462d9e7" time="2.798">
+  <properties/>
+  <testcase name="notificationApprovalResumesFloatingActivation" classname="fr.roadguard.app.ModernAndroidRuntimeTest" time="1.587"/>
+  <testcase name="locationServicesStopCleanlyWithoutPrecisePermission" classname="fr.roadguard.app.ModernAndroidRuntimeTest" time="0.308"/>
+  <testcase name="backReturnsFromSecondaryPageAndThenExitsNavigationStack" classname="fr.roadguard.app.ModernAndroidRuntimeTest" time="0.393"/>
+  <testcase name="notificationRefusalContinuesRequestedTrackingWithoutPromptLoop" classname="fr.roadguard.app.ModernAndroidRuntimeTest" time="0.244"/>
+  <testcase name="systemBarsCutoutAndKeyboardNeverCoverContent" classname="fr.roadguard.app.ModernAndroidRuntimeTest" time="0.265"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+]]></system-err>
+</testsuite>

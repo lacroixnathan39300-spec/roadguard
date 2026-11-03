@@ -1,0 +1,62 @@
+{
+  "/api/v1/health": {
+    "ok": true,
+    "body": {
+      "ok": true,
+      "schema": 1,
+      "reportRefreshSeconds": 120,
+      "presenceRefreshSeconds": 600,
+      "presenceExpiresSeconds": 1200,
+      "capacityTargetConcurrent": 500000,
+      "capacityValidated": false
+    }
+  },
+  "/api/v1/config": {
+    "ok": true,
+    "body": {
+      "tileUrl": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "tileAttribution": "© OpenStreetMap contributors",
+      "osm": true
+    }
+  },
+  "/data/manifest.json": {
+    "ok": true,
+    "body": {
+      "schema": 1,
+      "version": "2026-10-16.2",
+      "url": "/data/radars-7678e9c8f901.json",
+      "sha256": "7678e9c8f9016375ce17f4112268644f4cf106df875a8db849291d578b726842",
+      "count": 8908,
+      "bytes": 1672037,
+      "assembledOn": "2026-10-16",
+      "licence": "ODbL-1.0",
+      "attributionUrl": "/data/sources.txt",
+      "live": false
+    }
+  },
+  "/api/v1/reports?bbox=5.7,46.5,6.0,46.9": {
+    "ok": true,
+    "body": {
+      "schema": 1,
+      "generatedAt": 1792220211914,
+      "bbox": [
+        5.7,
+        46.5,
+        6,
+        46.9
+      ],
+      "reports": [],
+      "nextCursor": null,
+      "refreshSeconds": 120
+    }
+  },
+  "/api/v1/presence?bbox=5.7,46.5,6.0,46.9": {
+    "ok": true,
+    "body": {
+      "members": [],
+      "clusters": [],
+      "truncated": false,
+      "refreshSeconds": 600
+    }
+  }
+}

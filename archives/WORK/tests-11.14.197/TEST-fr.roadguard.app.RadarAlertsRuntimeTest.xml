@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="fr.roadguard.app.RadarAlertsRuntimeTest" tests="26" skipped="0" failures="0" errors="0" timestamp="2026-10-19T03:03:55" hostname="1d593308f0f4" time="1.114">
+  <properties/>
+  <testcase name="quietAlertsHaveThreeApproachStagesAndSharedDeduplication[26]" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.024"/>
+  <testcase name="repeatPassCanAlertAgainAfterThirtyMinutes[26]" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.032"/>
+  <testcase name="nativeBlueFrameIsPersistentNonInteractiveAndReleasedOnPause[26]" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.091"/>
+  <testcase name="exactLimitIsQuietAndStaleSpeedNeverProvesOverspeed[26]" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.024"/>
+  <testcase name="unknownLimitNeverGeneratesLoudAlarm[26]" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.018"/>
+  <testcase name="catalogRetainsKnownSpeedButRejectsConflictingValues[26]" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.02"/>
+  <testcase name="haloHysteresisIsSteadyWithinApproach[26]" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.019"/>
+  <testcase name="nearbyHazardDoesNotMaskBlueRadarApproach[26]" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.101"/>
+  <testcase name="exceedingKnownLimitImmediatelyEscalatesBetweenMilestones[26]" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.023"/>
+  <testcase name="onlyExplicitKilometreLimitLabelsAreAccepted[26]" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.019"/>
+  <testcase name="loudCooldownAppliesAcrossNearbyRadarsAndOwners[26]" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.027"/>
+  <testcase name="loadedLimitsReachPhoneBackgroundAndCar[26]" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.059"/>
+  <testcase name="floatingWarningRemainsBlueBeyondOldTimeoutAndClearsExplicitly[26]" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.03"/>
+  <testcase name="quietAlertsHaveThreeApproachStagesAndSharedDeduplication" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.028"/>
+  <testcase name="repeatPassCanAlertAgainAfterThirtyMinutes" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.023"/>
+  <testcase name="nativeBlueFrameIsPersistentNonInteractiveAndReleasedOnPause" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.121"/>
+  <testcase name="exactLimitIsQuietAndStaleSpeedNeverProvesOverspeed" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.023"/>
+  <testcase name="unknownLimitNeverGeneratesLoudAlarm" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.022"/>
+  <testcase name="catalogRetainsKnownSpeedButRejectsConflictingValues" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.021"/>
+  <testcase name="haloHysteresisIsSteadyWithinApproach" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.022"/>
+  <testcase name="nearbyHazardDoesNotMaskBlueRadarApproach" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.108"/>
+  <testcase name="exceedingKnownLimitImmediatelyEscalatesBetweenMilestones" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.021"/>
+  <testcase name="onlyExplicitKilometreLimitLabelsAreAccepted" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.04"/>
+  <testcase name="loudCooldownAppliesAcrossNearbyRadarsAndOwners" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.029"/>
+  <testcase name="loadedLimitsReachPhoneBackgroundAndCar" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.054"/>
+  <testcase name="floatingWarningRemainsBlueBeyondOldTimeoutAndClearsExplicitly" classname="fr.roadguard.app.RadarAlertsRuntimeTest" time="0.109"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+]]></system-err>
+</testsuite>

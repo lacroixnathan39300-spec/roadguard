@@ -1,0 +1,10 @@
+package fr.roadguard.app;
+import android.app.Application;import org.junit.*;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.*;import static org.junit.Assert.*;
+@RunWith(RobolectricTestRunner.class) @Config(sdk={27,28},application=Application.class)
+public class ProgressiveRadarRuntimeTest {
+ Application app;@Before public void setup(){app=RuntimeEnvironment.getApplication();app.getSharedPreferences("roadguard_radar_audio",0).edit().clear().commit();}
+ @Test public void progressivelyFasterAndContinuousOnlyInLastFiftyMetres(){long previous=Long.MAX_VALUE;for(double d:new double[]{1000,750,500,300,200,100,50,0}){long interval=RadarProximityCadence.interval(d);assertTrue(interval<=previous);previous=interval;}assertFalse(RadarProximityCadence.continuous(51));assertTrue(RadarProximityCadence.continuous(50));assertFalse(RadarProximityCadence.continuous(Double.NaN));assertEquals(0,RadarProximityCadence.interval(-1));assertEquals(0,RadarProximityCadence.interval(1001));}
+ @Test public void proximityChangesCadenceWithoutWaitingForGpsHeartbeat(){assertEquals(1,RadarAlertAudio.claim(app,46,5,1000,50,70,100000));assertEquals(0,RadarAlertAudio.claim(app,46,5,990,50,70,101000));assertEquals(1,RadarAlertAudio.claim(app,46,5,100,50,70,101001));assertEquals(0,RadarAlertAudio.claim(app,46,5,100,50,70,101100));}
+ @Test public void overspeedChangesToneButUnknownLimitNeverDoes(){assertEquals(1,RadarAlertAudio.claim(app,46,5,900,70,70,100000));assertEquals(2,RadarAlertAudio.claim(app,46,5,899,71,70,100001));assertEquals(0,RadarAlertAudio.claim(app,46,5,899,90,70,100002));app.getSharedPreferences("roadguard_radar_audio",0).edit().clear().commit();assertEquals(1,RadarAlertAudio.claim(app,46,5,50,130,0,100003));}
+ @Test public void semanticVersionIsNumeric(){assertTrue(SiteAppUpdate.newer("1.10.0","1.9.0-roadguard"));assertFalse(SiteAppUpdate.newer("1.9.0","1.10.0-roadguard"));assertTrue(SiteAppUpdate.newer("11.14.293","11.14.292"));assertFalse(SiteAppUpdate.newer("1.10.0","1.10.0-roadguard"));}
+}

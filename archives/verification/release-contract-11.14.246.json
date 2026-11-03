@@ -1,0 +1,43 @@
+{
+  "version": "11.14.246",
+  "version_code": 446,
+  "application_id": "fr.roadguard.app",
+  "baseline": "11.14.245",
+  "task_count": 39,
+  "weight": 100,
+  "totals": {
+    "development": 85,
+    "validation": 44.0,
+    "previous_development": 81,
+    "previous_validation": 31.0
+  },
+  "new_coded_tasks": [
+    "Q3",
+    "Q4"
+  ],
+  "new_validation_tasks": {
+    "M1": 2,
+    "D3": 2,
+    "U3": 1,
+    "C1": 2,
+    "Q2": 2,
+    "Q3": 2,
+    "Q4": 2
+  },
+  "android_native_runtime_executed": true,
+  "robolectric_tests": 86,
+  "physical_device_executed": false,
+  "apk_produced": [
+    "phone",
+    "auto"
+  ],
+  "automatic_camera_reaudit": false,
+  "real_webview_render_executed": false,
+  "original_data": {
+    "reference": "11.14.240",
+    "checked_original_files": 59,
+    "unchanged": 59,
+    "failures": []
+  },
+  "scope": "Eight suites; API 26/36 except TileCacheRuntimeTest on 26/28/34/36. Native SQLite mode for the two SQLite import suites. Shadow WebView; no real browser pixel rendering or physical device."
+}

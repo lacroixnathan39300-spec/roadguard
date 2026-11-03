@@ -1,0 +1,11 @@
+# ROADGUARD 11.14.264 — radars, audio et carte hors réseau
+
+La capture du 22 octobre montre sept imports 7z en échec : la bibliothèque du lecteur radar manque dans l'APK installé. Les bases radar d'origine sont conservées, mais les sept mises à jour n'ont pas été installées. Le lecteur 7z est maintenant lié à la compilation : si CodeAssist ne prend pas en compte `app/libs/roadguard-radar-runtime-1.jar`, la compilation doit échouer clairement au lieu de livrer un APK incomplet. Le projet doit être importé comme projet Gradle complet, avec le dossier `app/libs`, puis compilé de nouveau. Le succès des imports sur le téléphone reste à confirmer.
+
+À moins de 1 km du radar sélectionné, bip normal au maximum de `ToneGenerator` (100/100) toutes les 1,3 s et double bip de dépassement toutes les 0,9 s. La priorité audio temporaire `AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK` demande à Android d'atténuer la musique lue par une application du téléphone pendant l'approche et libère cette priorité dès la fin de l'alerte. Le volume multimédia et la prise en charge de cette priorité par le lecteur et la liaison Bluetooth restent déterminants. L'application ne peut pas régler le volume d'un autoradio autonome.
+
+Lors d'une perte de réseau, si une carte vectorielle PMTiles est téléchargée et installée, la carte principale bascule automatiquement sur le moteur des cartes locales. Les régions installées restent disponibles ensemble. Sans carte installée couvrant la position, seules les tuiles déjà vues dans le cache peuvent être affichées. Le mode avion ne télécharge pas de nouvelles zones.
+
+Vérification locale : `python3 tools/run_targeted_checks.py`. Aucun APK ni essai matériel n'a été produit ici faute de SDK Android.
+
+🔴 INTERVENTION OBLIGATOIRE — Importer le ZIP entier comme projet Gradle dans CodeAssist et vérifier que la compilation inclut les JAR de `app/libs`. À l'arrêt ou comme passager, refaire l'import radar France et contrôler le nouveau compte de points ; écouter le bip avec de la musique du téléphone sur votre autoradio. Télécharger une carte couvrant votre position, ouvrir la carte puis passer en mode avion : l'état doit indiquer « CARTES LOCALES · HORS RÉSEAU » et les routes de cette zone doivent rester visibles.

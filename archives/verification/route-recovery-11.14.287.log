@@ -1,0 +1,23 @@
+compile-java8
+
+exit=0
+
+TestRouteDirection
+PASS route direction: 27 checks; local tangent/corners/wraparound/quality and opposite-travel fallback, no road identity inferred
+
+exit=0
+
+TestLatestRouteHttp
+PASS latest route HTTP: 24 checks; injected HTTP boundary, no external request
+
+exit=0
+
+TestRouteContinuity
+PASS route continuity: 22 checks, real projection/tracker/corridor classes; no GPS hardware
+
+exit=0
+
+RadarApproachFilterProbe
+Radar approach geometry OK: forward/behind/parallel roads, diagonal routes at three latitudes, antimeridian and invalid projections
+
+exit=0

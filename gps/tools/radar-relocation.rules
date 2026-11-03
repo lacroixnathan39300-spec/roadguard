@@ -1,0 +1,4 @@
+# Android 16's framework/test image includes older Commons Compress / XZ.
+# Keep the app's pinned implementation independent of those package names.
+rule org.apache.commons.** fr.roadguard.vendor.commons.@1
+rule org.tukaani.xz.** fr.roadguard.vendor.xz.@1

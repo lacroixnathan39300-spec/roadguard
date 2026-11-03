@@ -1,0 +1,1 @@
+Sauvegarde technique des fichiers modifies/ajoutes de la reprise 11.14.241, avant fin des controles. Ne constitue pas le ZIP complet CodeAssist. A superposer a la source 11.14.240 dont SHA256 est c987f78d1d73a170993d7b41007fc50e74f85760a37eed36ac4f102033b26b24. Les 59 ressources originales sont inchangees. Le ZIP complet reste le livrable principal.

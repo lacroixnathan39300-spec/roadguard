@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="fr.roadguard.app.ControlMemoryRuntimeTest" tests="54" skipped="0" failures="0" errors="0" timestamp="2026-10-19T03:03:40" hostname="1d593308f0f4" time="3.978">
+  <properties/>
+  <testcase name="pollingSameReportNeverAddsConfirmationOrExtendsItsLifetime[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.023"/>
+  <testcase name="unconfirmedLocationExpiresAndOldPayloadCannotResurrectIt[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.022"/>
+  <testcase name="choosingSameProviderPreservesStoredCredentialAndOptIn[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.023"/>
+  <testcase name="requestHostsAreFixedAndUnknownProvidersRejected[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.02"/>
+  <testcase name="repeatedLocalButtonPressesCannotInstantlyCreatePermanentLocation[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.024"/>
+  <testcase name="concurrentFetchesDoNotLoseConfirmations[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.024"/>
+  <testcase name="sharedPointsAreVisibleInPhoneAndCarDataWithExpiry[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.041"/>
+  <testcase name="permanentPlaceBecomesHistoricalWhenLatestReportExpires[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.02"/>
+  <testcase name="malformedAndStaleAlertsNeverBecomeFreshOnDownload[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.024"/>
+  <testcase name="expiredVotesDoNotCarryOverToNewControl[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.021"/>
+  <testcase name="thirdDistinctReportMakesPlacePermanentAcrossRestart[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.02"/>
+  <testcase name="removedLocationCannotReturnFromSameDownloadedReports[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.019"/>
+  <testcase name="wazeApiParserUsesOwnCoordinatesAndOriginalTimestamp[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.023"/>
+  <testcase name="simultaneousNearbyReplacementIdsDoNotInflateVotes[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.017"/>
+  <testcase name="corruptedFileIsPreservedInsteadOfOverwritten[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.018"/>
+  <testcase name="openwebParserOnlyKeepsPoliceAndIgnoresJams[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.016"/>
+  <testcase name="switchingProviderCannotReuseOtherProvidersCredential[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.02"/>
+  <testcase name="settingsBridgeOpensNativeMemoryWithoutExposingApiSecret[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="1.269"/>
+  <testcase name="sameWazeUuidFromTwoProvidersCountsOnce[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.029"/>
+  <testcase name="repeatedValidationsExtendTemporaryPointWithoutInflatingCount[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.021"/>
+  <testcase name="invalidFutureAndUnrelatedRecordsAreRejected[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.017"/>
+  <testcase name="ttlSettingIsBoundedAndAffectsTemporaryPointsOnly[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.019"/>
+  <testcase name="removalDoesNotTouchOtherLocations[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.02"/>
+  <testcase name="nearbyObservationsMergeButDistantControlsStaySeparate[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.022"/>
+  <testcase name="localReportRepeatedDuringCooldownStillExtendsItsLifetime[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.029"/>
+  <testcase name="expiredTemporaryLocationIsRemovedFromDiskOnRead[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.024"/>
+  <testcase name="manualConfirmationNeedsProximityAndCooldown[26]" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.025"/>
+  <testcase name="pollingSameReportNeverAddsConfirmationOrExtendsItsLifetime" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.026"/>
+  <testcase name="unconfirmedLocationExpiresAndOldPayloadCannotResurrectIt" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.036"/>
+  <testcase name="choosingSameProviderPreservesStoredCredentialAndOptIn" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.04"/>
+  <testcase name="requestHostsAreFixedAndUnknownProvidersRejected" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.054"/>
+  <testcase name="repeatedLocalButtonPressesCannotInstantlyCreatePermanentLocation" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.027"/>
+  <testcase name="concurrentFetchesDoNotLoseConfirmations" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.031"/>
+  <testcase name="sharedPointsAreVisibleInPhoneAndCarDataWithExpiry" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.052"/>
+  <testcase name="permanentPlaceBecomesHistoricalWhenLatestReportExpires" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.024"/>
+  <testcase name="malformedAndStaleAlertsNeverBecomeFreshOnDownload" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.021"/>
+  <testcase name="expiredVotesDoNotCarryOverToNewControl" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.023"/>
+  <testcase name="thirdDistinctReportMakesPlacePermanentAcrossRestart" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.023"/>
+  <testcase name="removedLocationCannotReturnFromSameDownloadedReports" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.023"/>
+  <testcase name="wazeApiParserUsesOwnCoordinatesAndOriginalTimestamp" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.021"/>
+  <testcase name="simultaneousNearbyReplacementIdsDoNotInflateVotes" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.021"/>
+  <testcase name="corruptedFileIsPreservedInsteadOfOverwritten" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.025"/>
+  <testcase name="openwebParserOnlyKeepsPoliceAndIgnoresJams" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.024"/>
+  <testcase name="switchingProviderCannotReuseOtherProvidersCredential" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.03"/>
+  <testcase name="settingsBridgeOpensNativeMemoryWithoutExposingApiSecret" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="1.4"/>
+  <testcase name="sameWazeUuidFromTwoProvidersCountsOnce" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.023"/>
+  <testcase name="repeatedValidationsExtendTemporaryPointWithoutInflatingCount" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.024"/>
+  <testcase name="invalidFutureAndUnrelatedRecordsAreRejected" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.02"/>
+  <testcase name="ttlSettingIsBoundedAndAffectsTemporaryPointsOnly" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.028"/>
+  <testcase name="removalDoesNotTouchOtherLocations" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.023"/>
+  <testcase name="nearbyObservationsMergeButDistantControlsStaySeparate" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.02"/>
+  <testcase name="localReportRepeatedDuringCooldownStillExtendsItsLifetime" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.023"/>
+  <testcase name="expiredTemporaryLocationIsRemovedFromDiskOnRead" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.023"/>
+  <testcase name="manualConfirmationNeedsProximityAndCooldown" classname="fr.roadguard.app.ControlMemoryRuntimeTest" time="0.025"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+]]></system-err>
+</testsuite>

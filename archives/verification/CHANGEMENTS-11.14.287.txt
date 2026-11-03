@@ -1,0 +1,20 @@
+Différences par rapport au projet 11.14.286
+00-LIRE-EN-PREMIER-11.14.287.md
+AVANCEMENT-11.14.287.md
+LIVRAISON-ACTUELLE.md
+SUIVI-ACTIF-ROADGUARD.md
+app/build.gradle
+app/src/main/assets/roadguard_progress.json
+app/src/main/java/fr/roadguard/app/BackgroundAlertService.java
+app/src/main/java/fr/roadguard/app/LatestRouteHttp.java
+app/src/main/java/fr/roadguard/app/MainActivity.java
+app/src/main/java/fr/roadguard/app/NavigationProgress.java
+app/src/main/java/fr/roadguard/app/RadarApproachFilter.java
+app/src/main/java/fr/roadguard/app/RouteRequestPolicy.java
+tools/TestLatestRouteHttp.java
+tools/TestRouteDirection.java
+tools/run_route_recovery_checks.py
+verification/VALIDATION-11.14.287.md
+verification/assets-11.14.287.json
+verification/route-recovery-11.14.287.log
+verification/syntax-11.14.287.log

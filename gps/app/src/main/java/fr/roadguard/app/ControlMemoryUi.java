@@ -1,0 +1,53 @@
+package fr.roadguard.app;
+
+import android.app.AlertDialog;
+import android.content.SharedPreferences;
+import android.text.InputType;
+import android.widget.*;
+import org.json.*;
+import java.util.*;
+
+/** Native controls: API credentials never enter the JavaScript bridge. */
+final class ControlMemoryUi {
+  static void show(MainActivity a){
+    new AlertDialog.Builder(a).setTitle("Contrôles mémorisés")
+      .setMessage("Cette mémoire conserve tes observations de contrôles mobiles. Les radars fixes déjà intégrés restent indépendants.\n\nWazeAPI et OpenWeb Ninja sont deux services externes facultatifs. Ils demandent une clé personnelle ; aucun abonnement ni clé n’est nécessaire pour utiliser les radars embarqués de ROADGUARD. La collecte externe est actuellement "+(ControlFeed.prefs(a).getBoolean("enabled",false)?"activée.":"désactivée."))
+      .setNegativeButton("Fermer",null).setNeutralButton("Sources externes · facultatif",(d,w)->showAdvanced(a))
+      .setPositiveButton("Mes lieux mémorisés",(d,w)->showPlaces(a)).show();
+  }
+  static void showPlaces(MainActivity a){
+    LinearLayout box=new LinearLayout(a);box.setOrientation(LinearLayout.VERTICAL);ScrollView scroll=new ScrollView(a);scroll.addView(box);
+    try{JSONArray places=ControlMemory.snapshot(a,System.currentTimeMillis());
+      TextView count=new TextView(a);count.setPadding(24,24,24,24);count.setText(places.length()+" lieux mémorisés · trois observations distinctes pour conserver un lieu. Une présence actuelle n’est jamais garantie.");box.addView(count);
+      ArrayList<JSONObject> sorted=new ArrayList<>();for(int i=0;i<places.length();i++)sorted.add(places.getJSONObject(i));
+      if(CommunityPolicy.coordinate(a.lastLat,a.lastLon))sorted.sort(Comparator.comparingDouble(o->ControlMemory.meters(a.lastLat,a.lastLon,o.optDouble("lat"),o.optDouble("lon"))));
+      for(int i=0;i<Math.min(50,sorted.size());i++){JSONObject item=sorted.get(i);button(a,box,(item.optBoolean("permanent")?"Lieu conservé":"Lieu temporaire")+" · "+item.optInt("confirmations")+"/3 · "+String.format(Locale.FRANCE,"%.5f, %.5f",item.optDouble("lat"),item.optDouble("lon")),()->detail(a,item));}
+    }catch(Exception error){TextView text=new TextView(a);text.setText("Lecture impossible · données locales conservées");box.addView(text);}
+    new AlertDialog.Builder(a).setTitle("Mes contrôles mémorisés").setView(scroll).setPositiveButton("Fermer",null).show();
+  }
+  static void showAdvanced(MainActivity a){
+    LinearLayout box=new LinearLayout(a);box.setOrientation(LinearLayout.VERTICAL);int pad=(int)(16*a.getResources().getDisplayMetrics().density);box.setPadding(pad,pad,pad,pad);ScrollView scroll=new ScrollView(a);scroll.addView(box);
+    TextView intro=new TextView(a);intro.setText("Trois observations distinctes au même endroit conservent le lieu. Un lieu mémorisé ne confirme pas une présence actuelle. Les relectures d’un signalement ne comptent pas à nouveau. Seuls les contrôles police/gendarmerie et radars mobiles alimentent cette mémoire.");box.addView(intro);
+    SharedPreferences p=ControlFeed.prefs(a);TextView status=new TextView(a);status.setPadding(0,pad,0,pad);box.addView(status);
+    Button sourceButton=new Button(a);sourceButton.setAllCaps(false);box.addView(sourceButton);sourceButton.setOnClickListener(v->new AlertDialog.Builder(a).setTitle("Source des signalements").setItems(new String[]{"OpenWeb Ninja","WazeAPI"},(d,n)->{if(ControlFeed.selectProvider(a,n==0?"openweb":"wazeapi"))Toast.makeText(a,"Fournisseur changé · configurez sa clé puis activez la collecte",Toast.LENGTH_LONG).show();}).setNegativeButton("Annuler",null).show());
+    button(a,box,ControlFeed.configured(a)?"Remplacer la clé API":"Configurer une clé API",()->{
+      EditText input=new EditText(a);input.setSingleLine(true);input.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);input.setHint("Clé personnelle du fournisseur choisi");
+      AlertDialog dialog=new AlertDialog.Builder(a).setTitle("Clé API privée").setMessage("La clé sera chiffrée sur ce téléphone. L’enregistrement laisse la collecte désactivée. Ne partagez pas votre clé.").setView(input).setNegativeButton("Annuler",null).setPositiveButton("Enregistrer",null).create();dialog.setOnShowListener(v->dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(b->{try{ControlFeed.saveKey(a,input.getText().toString());input.setText("");dialog.dismiss();Toast.makeText(a,"Clé enregistrée · activez la collecte pour commencer",Toast.LENGTH_LONG).show();}catch(Exception e){input.setError(e instanceof java.io.IOException?e.getMessage():"Chiffrement indisponible : clé non enregistrée");}}));dialog.show();
+    });
+    Switch enabled=new Switch(a);enabled.setText("Collecte externe pendant le suivi GPS");enabled.setChecked(p.getBoolean("enabled",false));box.addView(enabled);enabled.setOnCheckedChangeListener((v,on)->{if(on&&!ControlFeed.configured(a)){v.setChecked(false);Toast.makeText(a,"Configurez d’abord une clé pour ce fournisseur",Toast.LENGTH_LONG).show();return;}p.edit().putBoolean("enabled",on).apply();ControlFeed.status=on?"Collecte activée · en attente d’un GPS récent":"Collecte externe désactivée";});
+    TextView network=new TextView(a);network.setText("Une zone autour de votre GPS est envoyée au fournisseur choisi. Son quota et ses éventuels frais s’appliquent. Les accidents et bouchons reçus ne sont pas conservés.");box.addView(network);
+    button(a,box,"Actualisation : "+p.getInt("interval_minutes",2)+" min",()->new AlertDialog.Builder(a).setTitle("Fréquence de collecte").setItems(new String[]{"1 minute","2 minutes","5 minutes","10 minutes"},(d,n)->{p.edit().putInt("interval_minutes",new int[]{1,2,5,10}[n]).apply();Toast.makeText(a,"Fréquence modifiée",Toast.LENGTH_SHORT).show();}).show());
+    button(a,box,"Expiration temporaire : "+(ControlMemory.ttl(a)/ControlMemory.HOUR)+" h",()->new AlertDialog.Builder(a).setTitle("Sans trois observations, supprimer après…").setItems(new String[]{"24 heures","7 jours","30 jours"},(d,n)->{p.edit().putInt("ttl_hours",new int[]{24,168,720}[n]).apply();a.reloadControlMemory(true);Toast.makeText(a,"Expiration modifiée",Toast.LENGTH_SHORT).show();}).show());
+    button(a,box,"Actualiser les signalements maintenant",()->{a.refreshLastPosition();if(!p.getBoolean("enabled",false)){Toast.makeText(a,"Activez la collecte après configuration de la clé",Toast.LENGTH_LONG).show();return;}if(!a.hasFreshPreciseLocation()){Toast.makeText(a,"Attendez une position GPS récente et précise",Toast.LENGTH_LONG).show();return;}ControlFeed.tick(a,a.previousAcceptedGps,true);});
+    try{
+      JSONArray snapshot=ControlMemory.snapshot(a,System.currentTimeMillis());List<JSONObject> places=new ArrayList<>();int permanent=0;for(int i=0;i<snapshot.length();i++){JSONObject item=snapshot.getJSONObject(i);places.add(item);if(item.getBoolean("permanent"))permanent++;}
+      TextView count=new TextView(a);count.setText(snapshot.length()+" lieux · "+permanent+" permanents · "+(snapshot.length()-permanent)+" temporaires\nLes 50 premiers sont affichés, triés par proximité si le GPS est disponible.");count.setPadding(0,pad,0,pad);box.addView(count);
+      if(CommunityPolicy.coordinate(a.lastLat,a.lastLon))places.sort(Comparator.comparingDouble(o->ControlMemory.meters(a.lastLat,a.lastLon,o.optDouble("lat"),o.optDouble("lon"))));else places.sort((x,y)->Long.compare(y.optLong("last"),x.optLong("last")));
+      for(int i=0;i<Math.min(50,places.size());i++){JSONObject place=places.get(i);String title=(place.optBoolean("permanent")?"Lieu permanent":"Lieu temporaire")+" · "+place.optInt("confirmations")+"/3\n"+String.format(Locale.FRANCE,"%.5f, %.5f",place.optDouble("lat"),place.optDouble("lon"));button(a,box,title,()->detail(a,place));}
+    }catch(Exception e){TextView error=new TextView(a);error.setText("Lecture impossible · fichier local conservé. Aucun remplacement automatique.");box.addView(error);}
+    AlertDialog dialog=new AlertDialog.Builder(a).setTitle("Sources externes · facultatif").setView(scroll).setNeutralButton("Recharger la liste",(d,w)->showAdvanced(a)).setPositiveButton("Fermer",null).create();android.os.Handler handler=new android.os.Handler(android.os.Looper.getMainLooper());Runnable pulse=new Runnable(){public void run(){if(!dialog.isShowing())return;sourceButton.setText("Fournisseur : "+("wazeapi".equals(p.getString("provider","openweb"))?"WazeAPI":"OpenWeb Ninja"));enabled.setChecked(p.getBoolean("enabled",false));status.setText((p.getBoolean("enabled",false)?ControlFeed.status:"Collecte externe désactivée")+(ControlFeed.remaining>=0?"\nQuota restant : "+ControlFeed.remaining:"")+"\nDernière réception : "+(p.getLong("last_success",0)>0?android.text.format.DateFormat.format("dd/MM HH:mm",p.getLong("last_success",0)):"aucune"));a.reloadControlMemory(false);handler.postDelayed(this,2000);}};dialog.setOnDismissListener(d->handler.removeCallbacksAndMessages(null));dialog.show();handler.post(pulse);
+  }
+  static void detail(MainActivity a,JSONObject p){long last=p.optLong("last");new AlertDialog.Builder(a).setTitle(p.optBoolean("permanent")?"Lieu de contrôle mémorisé":"Contrôle temporaire").setMessage(p.optInt("confirmations")+"/3 observations distinctes\nDernier signalement : "+android.text.format.DateFormat.format("dd/MM/yyyy HH:mm",last)+"\n\nLa présence actuelle n’est pas garantie. Pour confirmer, utilisez un GPS récent à moins de 100 m du lieu. Chaque validation prolonge la présence signalée. Pour compter comme une nouvelle observation, attendez au moins30minutes entre deux validations manuelles sur ce téléphone.").setNegativeButton("Fermer",null).setNeutralButton("Supprimer",(d,w)->{try{ControlMemory.remove(a,p.getString("id"));a.reloadControlMemory(true);Toast.makeText(a,"Lieu supprimé",Toast.LENGTH_SHORT).show();}catch(Exception e){Toast.makeText(a,"Suppression non enregistrée",Toast.LENGTH_LONG).show();}}).setPositiveButton("Confirmer sur place",(d,w)->{a.refreshLastPosition();if(!a.hasFreshPreciseLocation()){Toast.makeText(a,"Une position GPS récente et précise est nécessaire",Toast.LENGTH_LONG).show();return;}try{ControlMemory.confirm(a,p.getString("id"),a.lastLat,a.lastLon,System.currentTimeMillis());a.reloadControlMemory(true);Toast.makeText(a,"Observation enregistrée",Toast.LENGTH_LONG).show();}catch(Exception e){Toast.makeText(a,e.getMessage(),Toast.LENGTH_LONG).show();}}).show();}
+  private static void button(MainActivity a,LinearLayout box,String label,Runnable action){Button b=new Button(a);b.setAllCaps(false);b.setText(label);b.setOnClickListener(v->action.run());box.addView(b,new LinearLayout.LayoutParams(-1,-2));}
+  private ControlMemoryUi(){}
+}

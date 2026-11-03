@@ -1,0 +1,53 @@
+{
+  "version": "11.14.194",
+  "test_suites": [
+    {
+      "suite": "fr.roadguard.app.AndroidRuntimeTest",
+      "tests": 72,
+      "failures": 0
+    },
+    {
+      "suite": "fr.roadguard.app.CarSearchRuntimeTest",
+      "tests": 18,
+      "failures": 0
+    },
+    {
+      "suite": "fr.roadguard.app.CarSurfaceRuntimeTest",
+      "tests": 9,
+      "failures": 0
+    },
+    {
+      "suite": "fr.roadguard.app.LocalPageRuntimeTest",
+      "tests": 14,
+      "failures": 0
+    },
+    {
+      "suite": "fr.roadguard.app.ModernAndroidRuntimeTest",
+      "tests": 5,
+      "failures": 0
+    },
+    {
+      "suite": "fr.roadguard.app.PhoneRuntimeTest",
+      "tests": 36,
+      "failures": 0
+    },
+    {
+      "suite": "fr.roadguard.app.TileCacheRuntimeTest",
+      "tests": 52,
+      "failures": 0
+    }
+  ],
+  "tests": 206,
+  "failures": 0,
+  "lint_errors": 0,
+  "lint_warnings": 37,
+  "lint_warning_categories": {
+    "UnusedAttribute": 1,
+    "SetJavaScriptEnabled": 1,
+    "ExportedService": 1,
+    "UsableSpace": 4,
+    "SetTextI18n": 30
+  },
+  "vehicle_tested": false,
+  "play_uploaded": false
+}

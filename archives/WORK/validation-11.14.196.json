@@ -1,0 +1,91 @@
+{
+  "version": "11.14.196",
+  "test_suites": [
+    {
+      "suite": "fr.roadguard.app.AndroidRuntimeTest",
+      "tests": 72,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "fr.roadguard.app.CarSearchRuntimeTest",
+      "tests": 18,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "fr.roadguard.app.CarSurfaceRuntimeTest",
+      "tests": 9,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "fr.roadguard.app.ControlMemoryRuntimeTest",
+      "tests": 54,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "fr.roadguard.app.DriveAutoRuntimeTest",
+      "tests": 28,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "fr.roadguard.app.LocalPageRuntimeTest",
+      "tests": 14,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "fr.roadguard.app.ModernAndroidRuntimeTest",
+      "tests": 5,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "fr.roadguard.app.PhoneRuntimeTest",
+      "tests": 36,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "fr.roadguard.app.SpotifyRuntimeTest",
+      "tests": 12,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "fr.roadguard.app.TileCacheRuntimeTest",
+      "tests": 52,
+      "failures": 0,
+      "skipped": 0
+    }
+  ],
+  "tests": 300,
+  "failures": 0,
+  "control_memory_tests": 54,
+  "drive_auto_tests": 28,
+  "spotify_local_session_tests": 12,
+  "android_auto_suite_tests": 99,
+  "lint_errors": 0,
+  "lint_warnings": 55,
+  "lint_warning_categories": {
+    "UnusedAttribute": 1,
+    "SetJavaScriptEnabled": 1,
+    "ExportedService": 1,
+    "UsableSpace": 4,
+    "SetTextI18n": 48
+  },
+  "external_api_authenticated_tested": false,
+  "xiaomi_tested": false,
+  "spotify_real_app_tested": false,
+  "vehicle_tested": false,
+  "play_uploaded": false,
+  "apk_sha256": "6dadac652b7f98703fcea5a2f62088490a5163eee19b65005ee55d82cf748968",
+  "apk_assembled": true,
+  "signature_v2_v3_verified": true,
+  "zipalign_verified": true,
+  "assets_match_source": true,
+  "map_camera_identical_to_195": true
+}

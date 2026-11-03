@@ -1,0 +1,13 @@
+# ROADGUARD11.14.195 — contrôles mémorisés
+
+La mémoire des lieux de contrôles police/gendarmerie et radars mobiles est intégrée. Un lieu devient permanent à la troisième observation distincte. Avant ce seuil il expire24heures après son dernier signalement, sauf réglage7 ou30jours. Les relectures API ne sont pas de nouvelles confirmations. Les événements de moins de2minutes au même endroit ne sont pas cumulés; les UUID Waze communs aux deux fournisseurs sont dédupliqués. Regroupement40m, ancré sur le premier emplacement.
+
+Un lieu permanent ancien est affiché comme zone de contrôle possible, sans garantir une présence actuelle. Confirmation manuelle disponible à moins de100m, avec GPS récent et précis; délai30minutes entre confirmations manuelles sur ce téléphone. Il s'agit d'observations distinctes, pas de trois identités de conducteurs vérifiées. Une suppression empêche la relecture des anciens signalements de recréer le point; un nouveau signalement ultérieur peut créer un nouveau point temporaire.
+
+Accès : Paramètres → Contrôles mémorisés, également depuis l'historique des signalements. Le bouton «Recharger la liste» actualise les compteurs et les50lieux affichés. La mémoire locale est partagée avec la carte, la surveillance en arrière-plan et Android Auto. Plafond3000lieux, sans éviction automatique des lieux permanents. Les signalements privés «Radar mobile» alimentent la mémoire; les autres catégories ne l'alimentent pas.
+
+Collecte externe optionnelle : choisissez OpenWeb Ninja ou WazeAPI, configurez une clé personnelle puis activez la collecte. Les clés sont chiffrées sur le téléphone et ne sont pas incluses dans cette livraison. Sans clé, aucune récupération externe n'est effectuée. La fréquence initiale est2minutes, réglable1/2/5/10minutes. Les quotas et frais du fournisseur s'appliquent;100requêtes ne suffisent pas à un usage quotidien régulier. La zone de recherche autour du GPS est transmise au fournisseur choisi. Les accidents et bouchons reçus sont ignorés.
+
+Aucune clé n'a été fournie : aucune connexion authentifiée testée, aucun abonnement et aucune donnée de démonstration installée. France/Suisse, zones transfrontalières, disponibilité et droits de conservation des données externes restent à valider. Android Auto est activé par défaut; les essais véhicule/DHU et la distribution Play restent à effectuer.
+
+APK de vérification signée avec la même clé que191–194. Ne pas désinstaller une ancienne application ayant une signature différente pour forcer la mise à jour sans sauvegarde. Cache4Go et moteur carte/caméra conservés. Gradle8.11.1/AGP8.10.1, SDK36; JDK21 pour les tests. Voir WORK/VALIDATION-11.14.195.md et les rapports associés pour les résultats exacts.

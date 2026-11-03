@@ -1,0 +1,23 @@
+# Secrets : ne jamais versionner
+*.jks
+*.keystore
+*.p12
+keystore.properties
+local.properties
+.env
+.env.*
+
+# Compilation
+.gradle/
+build/
+*/build/
+*/app/build/
+.idea/
+*.iml
+captures/
+.kotlin/
+
+# Site
+site/node_modules/
+site/.next/
+site/.open-next/

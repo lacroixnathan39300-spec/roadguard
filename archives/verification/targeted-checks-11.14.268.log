@@ -1,0 +1,73 @@
+compile-core-java8
+exit=0
+
+
+codeassist-no-vendor-classpath
+exit=0
+PASS extractor compiles with no vendor JAR and fails visibly when 7z runtime is absent
+
+
+real-7z-sqlite-import
+exit=0
+PASS real 7z/SQLite pipeline: 27 scenarios / 8892 assertions; FR=3824 CH=593; newly consumed after dedup={CH=86, FR=2197}; real libraries and files, JVM Android SQLite adapters, no Android native execution
+
+
+visible-tile-cache
+exit=0
+PASS 17 real-file tile-cache scenarios; HTTP transport injected; no Android runtime
+
+
+radar-supplements
+exit=0
+PASS 10 radar supplement scenarios / 24440 assertions; originals preserved, real files, no Android runtime
+
+
+tile-recovery-and-pack
+exit=0
+PASS 11 tile recovery / local pack / rendered UI scenarios; actual shipped JS executed; no WebView or device claim
+
+
+sqlite-fixtures
+exit=0
+Created 14 synthetic SQLite fixtures using real sqlite3
+
+
+canonical-sqlite-store
+exit=0
+PASS canonical/SQLite: 35 scenarios, 43 assertions; real SQLite read-only via JVM adapter, atomic files/backups, additive engine catalog and activation receipts; Android native runtime NOT executed
+
+
+download-errors-queue
+exit=0
+PASS downloads/queue: 27 scenarios, 59 assertions; mocked HTTP, real temporary files and atomic rename; no live network or 7z extraction
+
+
+catalog-additive-rollback
+exit=0
+PASS catalog/policy core: 15 scenarios, 430305 assertions; real bundled files (Europe=80021, FR=24429, CH=1777, active=104838); JVM Android adapters, NOT Android runtime
+
+
+alert-distance-types
+exit=0
+PASS alert policies: matching voice/text distances, invalid values, red lights, crossings, limits, hysteresis and distinct point types
+
+
+gps-motion
+exit=0
+PASS motion: GNSS/network, missing speed/course, true stop, stale/quality guards, compensation, heading reset, navigation intents and projection
+
+
+compile-parser
+exit=0
+
+
+java-syntax
+exit=0
+PASS Java syntax: 93 files parsed; Android symbols NOT resolved; APK NOT built
+
+
+map-inline-syntax
+exit=0
+app/src/main/assets/map.html: 2 inline script(s) parse OK
+app/src/main/assets/map_maplibre.html: 1 inline script(s) parse OK
+

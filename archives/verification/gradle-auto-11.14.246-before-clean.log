@@ -1,0 +1,138 @@
+Picked up JAVA_TOOL_OPTIONS:  -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.11.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Task :app:prepareBundledMapLibre
+ROADGUARD: bundled MapLibre asset already present: maplibre-gl.js
+ROADGUARD: bundled MapLibre asset already present: maplibre-gl.css
+
+> Task :app:verifyBundledRadarDependencies
+> Task :app:preBuild
+> Task :app:preDebugBuild
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:checkDebugAarMetadata
+> Task :app:mapDebugSourceSetPaths
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:mergeDebugResources
+> Task :app:processDebugMainManifest
+> Task :app:processDebugManifest
+> Task :app:mergeDebugShaders UP-TO-DATE
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:processDebugManifestForPackage
+> Task :app:processDebugJavaRes NO-SOURCE
+> Task :app:processDebugResources
+> Task :app:mergeDebugJavaResource
+
+> Task :app:compileDebugJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses
+> Task :app:dexBuilderDebug
+> Task :app:mergeLibDexDebug UP-TO-DATE
+
+> Task :app:mergeProjectDexDebug FAILED
+ERROR: /workspace/scratch/03aedc6483d4/ROADGUARD-11.14.246/app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/8d98a3e720f6ebb2ca4a39acc51e07cb81aed6bc41151198ee79efe7c0ab5341_0.jar: D8: Type fr.roadguard.app.R$array is defined multiple times: /workspace/scratch/03aedc6483d4/ROADGUARD-11.14.246/app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/8d98a3e720f6ebb2ca4a39acc51e07cb81aed6bc41151198ee79efe7c0ab5341_0.jar:classes.dex, /workspace/scratch/03aedc6483d4/ROADGUARD-11.14.246/app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/c29c6ed6f9cf4c0b0c7a65a49f5fe9d9e05e038558e1a6ec2447f5fa9eb29811_0.jar:classes.dex
+com.android.builder.dexing.DexArchiveMergerException: Error while merging dex archives: 
+Type fr.roadguard.app.R$array is defined multiple times: /workspace/scratch/03aedc6483d4/ROADGUARD-11.14.246/app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/8d98a3e720f6ebb2ca4a39acc51e07cb81aed6bc41151198ee79efe7c0ab5341_0.jar:classes.dex, /workspace/scratch/03aedc6483d4/ROADGUARD-11.14.246/app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/c29c6ed6f9cf4c0b0c7a65a49f5fe9d9e05e038558e1a6ec2447f5fa9eb29811_0.jar:classes.dex
+Learn how to resolve the issue at https://developer.android.com/studio/build/dependencies#duplicate_classes.
+	at com.android.builder.dexing.D8DexArchiveMerger.getMergingExceptionToRethrow(D8DexArchiveMerger.java:230)
+	at com.android.builder.dexing.D8DexArchiveMerger.mergeDexArchives(D8DexArchiveMerger.java:218)
+	at com.android.build.gradle.internal.tasks.DexMergingWorkAction.merge(DexMergingTask.kt:919)
+	at com.android.build.gradle.internal.tasks.DexMergingWorkAction.run(DexMergingTask.kt:870)
+	at com.android.build.gradle.internal.profile.ProfileAwareWorkAction.execute(ProfileAwareWorkAction.kt:74)
+	at org.gradle.workers.internal.DefaultWorkerServer.execute(DefaultWorkerServer.java:63)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:66)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:62)
+	at org.gradle.internal.classloader.ClassLoaderUtils.executeInClassloader(ClassLoaderUtils.java:100)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.lambda$execute$0(NoIsolationWorkerFactory.java:62)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:44)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:41)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.workers.internal.AbstractWorker.executeWrappedInBuildOperation(AbstractWorker.java:41)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.execute(NoIsolationWorkerFactory.java:59)
+	at org.gradle.workers.internal.DefaultWorkerExecutor.lambda$submitWork$0(DefaultWorkerExecutor.java:174)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runExecution(DefaultConditionalExecutionQueue.java:194)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.access$700(DefaultConditionalExecutionQueue.java:127)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner$1.run(DefaultConditionalExecutionQueue.java:169)
+	at org.gradle.internal.Factories$1.create(Factories.java:31)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:263)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:127)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:132)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runBatch(DefaultConditionalExecutionQueue.java:164)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.run(DefaultConditionalExecutionQueue.java:133)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: com.android.tools.r8.CompilationFailedException: Compilation failed to complete, origin: /workspace/scratch/03aedc6483d4/ROADGUARD-11.14.246/app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/8d98a3e720f6ebb2ca4a39acc51e07cb81aed6bc41151198ee79efe7c0ab5341_0.jar:classes.dex
+	at Version.fakeStackEntry(Version_8.10.24.java:0)
+	at com.android.tools.r8.Q.a(R8_8.10.24_9e9057dad18d37eb780da811fe3614733dcf9651f84e198486f77e150f7678a4:5)
+	at com.android.tools.r8.internal.nv.a(R8_8.10.24_9e9057dad18d37eb780da811fe3614733dcf9651f84e198486f77e150f7678a4:82)
+	at com.android.tools.r8.internal.nv.a(R8_8.10.24_9e9057dad18d37eb780da811fe3614733dcf9651f84e198486f77e150f7678a4:32)
+	at com.android.tools.r8.internal.nv.a(R8_8.10.24_9e9057dad18d37eb780da811fe3614733dcf9651f84e198486f77e150f7678a4:31)
+	at com.android.tools.r8.internal.nv.b(R8_8.10.24_9e9057dad18d37eb780da811fe3614733dcf9651f84e198486f77e150f7678a4:2)
+	at com.android.tools.r8.D8.run(R8_8.10.24_9e9057dad18d37eb780da811fe3614733dcf9651f84e198486f77e150f7678a4:11)
+	at com.android.builder.dexing.D8DexArchiveMerger.mergeDexArchives(D8DexArchiveMerger.java:216)
+	... 37 more
+Caused by: com.android.tools.r8.internal.g: Type fr.roadguard.app.R$array is defined multiple times: /workspace/scratch/03aedc6483d4/ROADGUARD-11.14.246/app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/8d98a3e720f6ebb2ca4a39acc51e07cb81aed6bc41151198ee79efe7c0ab5341_0.jar:classes.dex, /workspace/scratch/03aedc6483d4/ROADGUARD-11.14.246/app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/c29c6ed6f9cf4c0b0c7a65a49f5fe9d9e05e038558e1a6ec2447f5fa9eb29811_0.jar:classes.dex
+	at com.android.tools.r8.internal.Gf0.a(R8_8.10.24_9e9057dad18d37eb780da811fe3614733dcf9651f84e198486f77e150f7678a4:21)
+	at com.android.tools.r8.internal.c80.a(R8_8.10.24_9e9057dad18d37eb780da811fe3614733dcf9651f84e198486f77e150f7678a4:54)
+	at com.android.tools.r8.internal.c80.a(R8_8.10.24_9e9057dad18d37eb780da811fe3614733dcf9651f84e198486f77e150f7678a4:10)
+	at java.base/java.util.concurrent.ConcurrentHashMap.merge(ConcurrentHashMap.java:2056)
+	at com.android.tools.r8.internal.c80.a(R8_8.10.24_9e9057dad18d37eb780da811fe3614733dcf9651f84e198486f77e150f7678a4:6)
+	at com.android.tools.r8.graph.w4$a.d(R8_8.10.24_9e9057dad18d37eb780da811fe3614733dcf9651f84e198486f77e150f7678a4:6)
+	at com.android.tools.r8.dex.c.a(R8_8.10.24_9e9057dad18d37eb780da811fe3614733dcf9651f84e198486f77e150f7678a4:56)
+	at com.android.tools.r8.dex.c.a(R8_8.10.24_9e9057dad18d37eb780da811fe3614733dcf9651f84e198486f77e150f7678a4:12)
+	at com.android.tools.r8.dex.c.a(R8_8.10.24_9e9057dad18d37eb780da811fe3614733dcf9651f84e198486f77e150f7678a4:9)
+	at com.android.tools.r8.D8.a(R8_8.10.24_9e9057dad18d37eb780da811fe3614733dcf9651f84e198486f77e150f7678a4:33)
+	at com.android.tools.r8.D8.d(R8_8.10.24_9e9057dad18d37eb780da811fe3614733dcf9651f84e198486f77e150f7678a4:20)
+	at com.android.tools.r8.D8.b(R8_8.10.24_9e9057dad18d37eb780da811fe3614733dcf9651f84e198486f77e150f7678a4:1)
+	at com.android.tools.r8.internal.nv.a(R8_8.10.24_9e9057dad18d37eb780da811fe3614733dcf9651f84e198486f77e150f7678a4:28)
+	... 40 more
+
+
+> Task :app:mergeExtDexDebug
+[Incubating] Problems report is available at: file:///workspace/scratch/03aedc6483d4/ROADGUARD-11.14.246/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:mergeProjectDexDebug'.
+> A failure occurred while executing com.android.build.gradle.internal.tasks.DexMergingTaskDelegate
+   > There was a failure while executing work items
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.DexMergingWorkAction
+         > com.android.builder.dexing.DexArchiveMergerException: Error while merging dex archives: 
+           Type fr.roadguard.app.R$array is defined multiple times: /workspace/scratch/03aedc6483d4/ROADGUARD-11.14.246/app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/8d98a3e720f6ebb2ca4a39acc51e07cb81aed6bc41151198ee79efe7c0ab5341_0.jar:classes.dex, /workspace/scratch/03aedc6483d4/ROADGUARD-11.14.246/app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/c29c6ed6f9cf4c0b0c7a65a49f5fe9d9e05e038558e1a6ec2447f5fa9eb29811_0.jar:classes.dex
+           Learn how to resolve the issue at https://developer.android.com/studio/build/dependencies#duplicate_classes.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 48s
+27 actionable tasks: 15 executed, 12 up-to-date
+
+GRADLE_EXIT=1

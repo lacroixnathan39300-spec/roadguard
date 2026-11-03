@@ -1,0 +1,65 @@
+[
+  {
+    "id": "interieur",
+    "name": "Ministère de l’Intérieur / data.gouv.fr",
+    "url": "https://www.data.gouv.fr/datasets/liste-des-radars-fixes-en-france",
+    "licence": "Licence Ouverte 2.0",
+    "snapshot": "2025-12-30",
+    "retrieved_on": "2026-10-16",
+    "notes": "3309 enregistrements officiels; publication et non validation terrain actuelle."
+  },
+  {
+    "id": "lufop",
+    "name": "Lufop et contributeurs",
+    "url": "https://lufop.net/full-access/",
+    "licence": "ODbL 1.0",
+    "snapshot": "2026-10-01 (horodatage des fichiers exportés)",
+    "retrieved_on": "2026-10-16",
+    "notes": "Archive fournie par l’utilisateur. ASC/CSV/POI-Warner comparés par contenu indépendamment de l’ordre des lignes; catégories préservées."
+  },
+  {
+    "id": "mapatlas",
+    "name": "MapAtlas Camera Index",
+    "url": "https://mapatlas.eu/tools/speed-camera-map",
+    "licence": "CC BY 4.0",
+    "snapshot": "2024-05-21",
+    "retrieved_on": "2026-10-16",
+    "notes": "Publication du catalogue 2026-08-27; observations plus anciennes. Communautaire, pas un registre officiel actuel."
+  },
+  {
+    "id": "osm_live",
+    "name": "© OpenStreetMap contributors via Overpass Suisse",
+    "url": "https://overpass.osm.ch/api/interpreter",
+    "licence": "ODbL 1.0",
+    "snapshot": null,
+    "retrieved_on": "2026-10-16",
+    "notes": "Extraction directe CH: noeuds speed_camera et relations de contrôle (feux et tronçons). Les rôles device/from/to sont interprétés; aucun centre artificiel ajouté. Le serveur renvoie des numéros de réplication, sans date ISO fiable; fraîcheur terrain inconnue."
+  },
+  {
+    "id": "osm_snapshot",
+    "name": "© OpenStreetMap contributors via SpeedCams.world",
+    "url": "https://speedcams.world/downloads",
+    "licence": "ODbL 1.0",
+    "snapshot": null,
+    "retrieved_on": "2026-10-16",
+    "notes": "La source indique explicitement une date de snapshot inconnue. Date de récupération distincte de la fraîcheur."
+  },
+  {
+    "id": "sitg_reference",
+    "name": "Données SITG, État de Genève / Office cantonal des transports",
+    "url": "https://sitg.ge.ch/donnees/otc-sl-reseau-radar",
+    "licence": "SITG niveau A - accès libre; attribution et traitements indiqués",
+    "snapshot": null,
+    "retrieved_on": "2026-10-16",
+    "notes": "41 socles matériels de radars; disponibilité d’un socle et radar actif sont différents. Fichier de référence séparé, exclu du total et des alertes."
+  },
+  {
+    "id": "boundary",
+    "name": "Office fédéral de topographie swisstopo via geoBoundaries CHE ADM0",
+    "url": "https://www.geoboundaries.org/api/current/gbOpen/CHE/ADM0/",
+    "licence": "Conditions swisstopo; métadonnées et licence source conservées",
+    "snapshot": "2022 (année représentée)",
+    "retrieved_on": "2026-10-16",
+    "notes": "Polygone de frontière utilisé uniquement pour isoler les étiquettes pays ambiguës; aucune assimilation depuis un simple rectangle."
+  }
+]

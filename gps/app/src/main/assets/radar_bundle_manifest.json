@@ -1,0 +1,229 @@
+{
+  "schema": 1,
+  "bundle_version": "2026-10-16.2",
+  "assembled_on": "2026-10-16",
+  "licence": "ODbL 1.0 (derived database; individual source rights retained)",
+  "official_fr_count": 3309,
+  "countries": {
+    "FR": {
+      "file": "radars_embedded_fr.csv",
+      "count": 24429,
+      "static_count": 7325,
+      "historical_count": 17104,
+      "categories": {
+        "average": 132,
+        "average_end": 61,
+        "average_start": 61,
+        "carpool": 29,
+        "crossing": 83,
+        "discriminant": 562,
+        "fixed": 3914,
+        "redlight": 963,
+        "temporary": 15689,
+        "turret": 1492,
+        "urban": 27,
+        "variable": 1,
+        "works": 1415
+      },
+      "sha256": "79e3e8e9b18ef1e22c6ed9e74a69884f0cffdd2cd580b993edb9f781208015d0",
+      "app_usage": "active; historical opt-in"
+    },
+    "CH": {
+      "file": "radars_embedded_ch.csv",
+      "count": 1777,
+      "static_count": 1583,
+      "historical_count": 194,
+      "categories": {
+        "average": 5,
+        "average_end": 2,
+        "average_start": 2,
+        "fixed": 1007,
+        "mobile": 194,
+        "redlight": 523,
+        "tunnel": 33,
+        "variable": 11
+      },
+      "sha256": "6ae499183f4f4b69191384da5060cf0bc1b065124b93f37cd5806b9aea126da1",
+      "app_usage": "active; Swiss historical locations enabled by default, independently switchable"
+    }
+  },
+  "audit": {
+    "ch_label_outside_switzerland_excluded": 43,
+    "copilot_FR_corroborated": 20592,
+    "copilot_FR_records": 20592,
+    "fr_label_inside_switzerland_excluded": 18,
+    "identical_export_files_skipped": 31,
+    "observations_merged": 7893,
+    "older_osm_observations_superseded_by_same_node_id": 571
+  },
+  "raw_counts": {
+    "interieur": {
+      "FR": 3309
+    },
+    "mapatlas": {
+      "FR": 3853,
+      "CH": 638
+    },
+    "osm_snapshot": {
+      "FR": 3822,
+      "CH": 607
+    },
+    "osm_live": {
+      "CH": 1045
+    },
+    "lufop": {
+      "CH": 865,
+      "FR": 20592
+    }
+  },
+  "geneva_infrastructure_only": 41,
+  "deduplication": "25 m across compatible source categories; 2 m within an export family; known opposing directions retained; official device IDs retained",
+  "limitations": [
+    "Not an exhaustive or live register; presence and operation not guaranteed.",
+    "Publication/extraction date is not a field-validation date.",
+    "Historical mobile, temporary and works locations are opt-in and unconfirmed.",
+    "FR and CH points are loaded for map and GPS alerts; all historical presence is unconfirmed."
+  ],
+  "default_selection": {
+    "french_historical": false,
+    "swiss_historical": true,
+    "FR": 7325,
+    "CH": 1777,
+    "total": 9102
+  },
+  "sources": [
+    {
+      "id": "interieur",
+      "name": "Ministère de l’Intérieur / data.gouv.fr",
+      "url": "https://www.data.gouv.fr/datasets/liste-des-radars-fixes-en-france",
+      "licence": "Licence Ouverte 2.0",
+      "snapshot": "2025-12-30",
+      "retrieved_on": "2026-10-16",
+      "notes": "3309 enregistrements officiels; publication et non validation terrain actuelle."
+    },
+    {
+      "id": "lufop",
+      "name": "Lufop et contributeurs",
+      "url": "https://lufop.net/full-access/",
+      "licence": "ODbL 1.0",
+      "snapshot": "2026-10-01 (horodatage des fichiers exportés)",
+      "retrieved_on": "2026-10-16",
+      "notes": "Archive fournie par l’utilisateur. ASC/CSV/POI-Warner comparés par contenu indépendamment de l’ordre des lignes; catégories préservées."
+    },
+    {
+      "id": "mapatlas",
+      "name": "MapAtlas Camera Index",
+      "url": "https://mapatlas.eu/tools/speed-camera-map",
+      "licence": "CC BY 4.0",
+      "snapshot": "2024-05-21",
+      "retrieved_on": "2026-10-16",
+      "notes": "Publication du catalogue 2026-08-27; observations plus anciennes. Communautaire, pas un registre officiel actuel."
+    },
+    {
+      "id": "osm_live",
+      "name": "© OpenStreetMap contributors via Overpass Suisse",
+      "url": "https://overpass.osm.ch/api/interpreter",
+      "licence": "ODbL 1.0",
+      "snapshot": null,
+      "retrieved_on": "2026-10-16",
+      "notes": "Extraction directe CH: noeuds speed_camera et relations de contrôle (feux et tronçons). Les rôles device/from/to sont interprétés; aucun centre artificiel ajouté. Le serveur renvoie des numéros de réplication, sans date ISO fiable; fraîcheur terrain inconnue."
+    },
+    {
+      "id": "osm_snapshot",
+      "name": "© OpenStreetMap contributors via SpeedCams.world",
+      "url": "https://speedcams.world/downloads",
+      "licence": "ODbL 1.0",
+      "snapshot": null,
+      "retrieved_on": "2026-10-16",
+      "notes": "La source indique explicitement une date de snapshot inconnue. Date de récupération distincte de la fraîcheur."
+    },
+    {
+      "id": "sitg_reference",
+      "name": "Données SITG, État de Genève / Office cantonal des transports",
+      "url": "https://sitg.ge.ch/donnees/otc-sl-reseau-radar",
+      "licence": "SITG niveau A - accès libre; attribution et traitements indiqués",
+      "snapshot": null,
+      "retrieved_on": "2026-10-16",
+      "notes": "41 socles matériels de radars; disponibilité d’un socle et radar actif sont différents. Fichier de référence séparé, exclu du total et des alertes."
+    },
+    {
+      "id": "boundary",
+      "name": "Office fédéral de topographie swisstopo via geoBoundaries CHE ADM0",
+      "url": "https://www.geoboundaries.org/api/current/gbOpen/CHE/ADM0/",
+      "licence": "Conditions swisstopo; métadonnées et licence source conservées",
+      "snapshot": "2022 (année représentée)",
+      "retrieved_on": "2026-10-16",
+      "notes": "Polygone de frontière utilisé uniquement pour isoler les étiquettes pays ambiguës; aucune assimilation depuis un simple rectangle."
+    }
+  ],
+  "inputs": [
+    {
+      "file": "Copilot_avec_Zones_Temporaires.zip",
+      "sha256": "339826c34806c578b6c561830fe53fa10768e2da56b21e04ddc96601a7fe7eb6"
+    },
+    {
+      "file": "Lufop-Zones-de-danger-EU-ASC.zip",
+      "sha256": "cc2991cbe3796915ecf260696b3b7867bb874f6ba4cd1e0c8f9363f1ec7c8e7a"
+    },
+    {
+      "file": "POI-Warner_CSV.zip",
+      "sha256": "4e50980a3442ce4dfd408ee6bdb5df58664ed817a67df1e0be5ff427a5f6c0c4"
+    },
+    {
+      "file": "Radar_france_CSV_PL.zip",
+      "sha256": "bc93cd92a4bffff326bed92a24f0ca5ed4f5bc3ebc2f77484f2666ac67bf5d54"
+    },
+    {
+      "file": "ch_boundary.geojson",
+      "sha256": "3eb2414cea931ee2c2927d718b8ef57b4e492543bd8a34af4233e1d43007a55d"
+    },
+    {
+      "file": "ch_boundary_meta.json",
+      "sha256": "16b12583d3b2cdfea1073e50948cca7a32ea8f59f2ae27e44593c57f4085631d"
+    },
+    {
+      "file": "geneva_layer.json",
+      "sha256": "aeac092393e4c24c7567fb797a0c4d1d693042f40294c24fc9ba03358273fc5e"
+    },
+    {
+      "file": "geneva_points.geojson",
+      "sha256": "556e230f1bc2d69d1d72528ae02a6bb3b819d409e61f2a237b1855a340a23944"
+    },
+    {
+      "file": "mapatlas_catalog.json",
+      "sha256": "054f71c583bc6cf7416d3269996ee2bd762e4e7002334340f23a7739b50fd56f"
+    },
+    {
+      "file": "mapatlas_ch.geojson",
+      "sha256": "b48ad9fe9e5547c90788dd7ead56b68d2f96f5815bd184d211d49fff0db93bf4"
+    },
+    {
+      "file": "mapatlas_fr.geojson",
+      "sha256": "80523510782b58f2b9e55963965d5f97645ac1034b822ae9a47117a16e6bafd9"
+    },
+    {
+      "file": "official_fr.csv",
+      "sha256": "7ba0b36d002d6910fd6f9ba8e83379d5ea57b046366658be703bd1f074ee4803"
+    },
+    {
+      "file": "official_metadata.json",
+      "sha256": "b151095ced3c53d33a68453fb5563e5f0b37992c6a045d0337977c5f09fe306d"
+    },
+    {
+      "file": "overpass_ch.json",
+      "sha256": "58b602e383af0898e181f4f979fdb17bd812b1d6aefdc2f016fe58c09584bd7a"
+    },
+    {
+      "file": "source_provenance.json",
+      "sha256": "35e637ee3d019262cc57ecc9d60f1c088776987ccc87da6c14056d00c8e514e0"
+    },
+    {
+      "file": "speedcams_ch.csv",
+      "sha256": "423bf5b4214639fdd0e5f7639e1070889ae43f0e63246aac354fff37f54c3960"
+    },
+    {
+      "file": "speedcams_fr.csv",
+      "sha256": "35caaf66f6b79aa7c27760cc7db80d629d6f6f04aeecae5cd7660901c1f5736d"
+    }
+  ]
+}

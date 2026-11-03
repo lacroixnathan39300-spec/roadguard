@@ -1,0 +1,7 @@
+Résultats exécutés dans cette session le 20/10/2026 :
+PASS camera anchor: 405 projected cases, bearings, viewports, sheets, manual pause, immutable GPS
+MapLibre camera QA OK: sheet clearance, manual pause, latest-fix resume, route overview, style reload guard
+Camera controls QA OK: native zoom dispatch, Leaflet pause, vector/local handlers
+PASS adaptive zoom: hysteresis/dwell/cadence, absent speed, real map flyTo animation and single heading rotation
+app/src/main/assets/map.html: 2 inline script(s) parse OK
+app/src/main/assets/map_maplibre.html: 1 inline script(s) parse OK

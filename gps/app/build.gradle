@@ -1,0 +1,140 @@
+apply plugin: 'com.android.application'
+// Keep the phone build independent of AndroidX Car when CodeAssist cannot resolve it.
+def roadguardAndroidAuto = project.findProperty('roadguardAndroidAuto') == 'true'
+android { lint { if (project.hasProperty('roadguardApiLint')) checkOnly 'NewApi', 'InlinedApi' }; buildFeatures { aidl true }; namespace 'fr.roadguard.app'; compileSdk 36
+ defaultConfig { applicationId 'fr.roadguard.app'; minSdk 26; targetSdk 36; versionCode 505; versionName '11.14.305-cartes-liees' }
+ signingConfigs { debug { if (System.getenv('ROADGUARD_GPS_DEBUG_KEYSTORE')) storeFile file(System.getenv('ROADGUARD_GPS_DEBUG_KEYSTORE')); v1SigningEnabled true; v2SigningEnabled true } }
+ sourceSets {
+   test { if (!roadguardAndroidAuto) java.exclude '**/AndroidRuntimeTest.java', '**/CarSearchRuntimeTest.java', '**/CarSurfaceRuntimeTest.java' }
+   main {
+   if (roadguardAndroidAuto) {
+     java.srcDir 'src/auto/java'
+
+   }
+ } }
+ // Android Auto extends the phone manifest; it must never replace common screens/services.
+ if (roadguardAndroidAuto) {
+   sourceSets.debug.manifest.srcFile 'src/auto/AndroidManifest.xml'
+   sourceSets.release.manifest.srcFile 'src/auto/AndroidManifest.xml'
+ }
+ testOptions { unitTests.includeAndroidResources = true; unitTests.all { maxHeapSize = "1g"; if (project.hasProperty("roadguardTestSdks")) systemProperty "robolectric.enabledSdks", project.property("roadguardTestSdks"); systemProperty "robolectric.dependency.repo.url", "https://repo.maven.apache.org/maven2" } }
+ packaging { resources { excludes += ['META-INF/versions/**', 'META-INF/LICENSE.txt', 'META-INF/NOTICE.txt', 'META-INF/LICENSE', 'META-INF/NOTICE'] } }
+ compileOptions { sourceCompatibility JavaVersion.VERSION_1_8; targetCompatibility JavaVersion.VERSION_1_8 }
+}
+dependencies {
+ // Original upstream JARs remain in libs for provenance/reproduction. Only the
+ // isolated runtime is packaged, avoiding Android 16's older library classes.
+ implementation files('libs/brotli-dec-0.1.2.jar', 'libs/roadguard-radar-runtime-1.jar')
+ if (roadguardAndroidAuto) {
+   implementation 'androidx.car.app:app:1.4.0'
+   implementation 'androidx.car.app:app-projected:1.4.0'
+   testImplementation 'androidx.car.app:app-testing:1.4.0'
+ }
+ testImplementation 'junit:junit:4.13.2'
+ testImplementation 'org.robolectric:robolectric:4.16.1'
+}
+
+// Fetch only at build time. The APK loads these files locally, never from a CDN.
+// Missing assets with no network => fail explicitly, not a silently broken APK.
+tasks.register('prepareBundledMapLibre') {
+    doLast {
+        def folder = file('src/main/assets/vendor')
+        folder.mkdirs()
+        def assets = [
+            'maplibre-gl.js': [min:300000L,max:15000000L,sha:'be9633c4d870e26fb37f1cfe5c5a77181667114003ea16207ac7850d8da8add1'],
+            'maplibre-gl.css':[min:10000L,max:1000000L,sha:'576b085fdd9487a65a19215328c1e086c07ce5bf6da09b666b3806d3d008dae9']
+        ]
+        def digest = { f -> java.security.MessageDigest.getInstance('SHA-256').digest(f.bytes).encodeHex().toString() }
+        assets.each { name, limits ->
+            def target = new File(folder, name)
+            if (target.isFile() && target.length() >= limits.min && target.length() <= limits.max && digest(target) == limits.sha) {
+                logger.lifecycle("ROADGUARD: bundled MapLibre asset already present: ${name}")
+            } else {
+                def urls = [
+                    "https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/${name}",
+                    "https://unpkg.com/maplibre-gl@4.7.1/dist/${name}"
+                ]
+                def failures = []
+                boolean downloaded = false
+                for (url in urls) {
+                    def temp = new File(folder, name + '.part')
+                    try {
+                        def conn = new URL(url).openConnection()
+                        conn.setConnectTimeout(12000)
+                        conn.setReadTimeout(25000)
+                        conn.setRequestProperty('User-Agent', 'ROADGUARD-Gradle/1.0')
+                        conn.getInputStream().withCloseable { input ->
+                            temp.withOutputStream { output ->
+                                byte[] buf = new byte[16384]
+                                long total = 0L
+                                int count
+                                while ((count = input.read(buf)) != -1) {
+                                    total += count
+                                    if (total > limits.max) throw new IOException('Asset exceeds size limit')
+                                    output.write(buf, 0, count)
+                                }
+                            }
+                        }
+                        if (temp.length() < limits.min) throw new IOException('Asset too small')
+                        if (digest(temp) != limits.sha) throw new IOException('Asset SHA-256 mismatch')
+                        if (target.exists() && !target.delete()) throw new IOException('Cannot replace asset')
+                        if (!temp.renameTo(target)) throw new IOException('Cannot move asset into place')
+                        downloaded = true
+                        logger.lifecycle("ROADGUARD: downloaded ${name} (${target.length()} bytes)")
+                        break
+                    } catch (Exception e) {
+                        failures.add("${url}: ${e.message}")
+                        temp.delete()
+                    }
+                }
+                if (!downloaded) {
+                    throw new GradleException("ROADGUARD: missing MapLibre ${name}. Automatic download failed. Connect CodeAssist to the Internet, then rebuild. Details: ${failures.join(' | ')}")
+                }
+            }
+        }
+        def license = new File(folder, 'LICENSE-maplibre-gl.txt')
+        if (!license.isFile() || !license.text.contains('Redistribution and use in source and binary forms'))
+            throw new GradleException('ROADGUARD: MapLibre license notice is missing from app/src/main/assets/vendor')
+        if (!new File(folder,'LICENSE-google-brotli.txt').isFile())
+            throw new GradleException('ROADGUARD: Brotli MIT license notice is missing')
+        def brotli = file('libs/brotli-dec-0.1.2.jar')
+        if (!brotli.isFile() || digest(brotli) != '615c0c3efef990d77831104475fba6a1f7971388691d4bad1471ad84101f6d52')
+            throw new GradleException('ROADGUARD: Brotli decoder JAR is missing or failed SHA-256 verification')
+        def leafletRoot = file('src/main/assets/vendor/leaflet')
+        def leafletManifest = new groovy.json.JsonSlurper().parse(new File(leafletRoot, 'manifest.json'))
+        if (leafletManifest.version != '1.9.4') throw new GradleException('ROADGUARD: Leaflet version mismatch')
+        leafletManifest.files.each { name, limits ->
+            def asset = new File(leafletRoot, name)
+            if (!asset.isFile() || asset.length() != limits.bytes || digest(asset) != limits.sha256)
+                throw new GradleException("ROADGUARD: missing or altered local Leaflet asset: ${name}")
+        }
+        def glyphDir = file('src/main/assets/glyphs/Noto Sans Regular')
+        ['0-255.pbf','256-511.pbf','512-767.pbf'].each { name ->
+            if (!new File(glyphDir,name).isFile()) throw new GradleException("ROADGUARD: missing offline glyph range ${name}")
+        }
+        if (!file('src/main/assets/glyphs/OFL-Noto-Sans.txt').isFile())
+            throw new GradleException('ROADGUARD: Noto Sans OFL notice is missing')
+    }
+}
+afterEvaluate {
+    tasks.matching { it.name == 'preBuild' }.configureEach { dependsOn tasks.named('prepareBundledMapLibre') }
+}
+
+// Local, pinned runtime bits; no Maven access is needed for the sevenzip dependencies.
+tasks.register('verifyBundledRadarDependencies') {
+    doLast {
+        def manifest = new groovy.json.JsonSlurper().parse(file('radar-dependencies.json'))
+        manifest.each { path, expected ->
+            def item = file(path)
+            if (!item.isFile() || item.length() != expected.bytes || java.security.MessageDigest.getInstance('SHA-256').digest(item.bytes).encodeHex().toString() != expected.sha256)
+                throw new GradleException("ROADGUARD: missing or altered radar dependency: ${path}")
+        }
+        if (!file('src/main/assets/vendor/LICENSE-xz-1.12.txt').isFile())
+            throw new GradleException('ROADGUARD: XZ 0BSD license missing')
+        if (!file('src/main/assets/vendor/LICENSE-SpeedAlert-Databases-CC-BY-4.0.txt').isFile())
+            throw new GradleException('ROADGUARD: SpeedAlert data attribution missing')
+    }
+}
+afterEvaluate {
+    tasks.matching { it.name == 'preBuild' }.configureEach { dependsOn tasks.named('verifyBundledRadarDependencies') }
+}

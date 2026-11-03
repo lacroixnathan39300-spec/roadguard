@@ -1,0 +1,1 @@
+PASS initial download, offline boot, corrupted upgrade fallback, atomic upgrade, forced offline retry, malformed cache recovery and first-use error.

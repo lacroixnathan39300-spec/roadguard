@@ -1,0 +1,52 @@
+{
+  "version": "11.14.177",
+  "versionCode": 377,
+  "createdAt": "2026-10-17T07:11:11.553960+00:00",
+  "sourceVersion": "11.14.176",
+  "apk": {
+    "file": "ROADGUARD-11.14.177-RADARS-APPARENCE.apk",
+    "bytes": 4588691,
+    "sha256": "f3ab6ffcf527376d33c306ffe63e04f95f6e0ebac21ec178493ee221ce1a714c",
+    "java_compile": true,
+    "resource_link": true,
+    "dex_generated": true,
+    "zipalign_verified": true,
+    "signature_v2_v3_verified": true,
+    "same_verification_signer_as_176": true,
+    "source_asset_identity_verified": true,
+    "verification_debug_signed": true,
+    "executed_on_device": false,
+    "xiaomi_tested": false
+  },
+  "tests": {
+    "regression_scripts_total": 34,
+    "regression_scripts_passed": 34,
+    "ui_scripts_node_vm": true,
+    "ui_screens": 12,
+    "radar_update_busy_error_states": true,
+    "radar_shortcuts_in_settings_and_alerts": true,
+    "escaped_untrusted_labels": true,
+    "cursor_arrow_car_no_dot_overlay": true,
+    "cursor_dot_accent_and_switch_back": true,
+    "accuracy_circle_matches_accent": true,
+    "browser_rendered": false
+  },
+  "site": {
+    "modified_this_version": false,
+    "url": "https://roadguard-community.lacroixnathan39300.chatgpt.site",
+    "last_deployed_version": 3
+  },
+  "capacity": {
+    "target_concurrent": 500000,
+    "validated": false,
+    "load_test_executed": false
+  },
+  "limits": [
+    "Pas de Xiaomi ou émulateur accessible; installation et rendu réels non exécutés ici.",
+    "Le téléchargement réseau Android n’a pas été exécuté sur appareil; le mécanisme existant de vérification et de cache est réutilisé.",
+    "Les imports et les serveurs tiers ne garantissent pas une couverture exhaustive.",
+    "Les couleurs sémantiques des dangers et des panneaux ne sont pas remplacées par l’accent utilisateur.",
+    "Les voix françaises proposées dépendent du moteur TTS installé; aucun timbre féminin garanti.",
+    "500 000 connexions simultanées restent non validées."
+  ]
+}

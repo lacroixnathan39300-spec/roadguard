@@ -1,0 +1,34 @@
+{
+  "FR": {
+    "url": "https://mapatlas.eu/data/camera-index/FR.geojson",
+    "bytes": 654635,
+    "sha256": "80523510782b58f2b9e55963965d5f97645ac1034b822ae9a47117a16e6bafd9",
+    "features": 3853,
+    "classes": [
+      "adaptive",
+      "corridor",
+      "signal",
+      "spot"
+    ],
+    "region_verified": true,
+    "format_verified": true,
+    "licence": "CC BY 4.0",
+    "test_environment": "host curl, not Android"
+  },
+  "CH": {
+    "url": "https://mapatlas.eu/data/camera-index/CH.geojson",
+    "bytes": 105434,
+    "sha256": "b48ad9fe9e5547c90788dd7ead56b68d2f96f5815bd184d211d49fff0db93bf4",
+    "features": 638,
+    "classes": [
+      "adaptive",
+      "corridor",
+      "signal",
+      "spot"
+    ],
+    "region_verified": true,
+    "format_verified": true,
+    "licence": "CC BY 4.0",
+    "test_environment": "host curl, not Android"
+  }
+}

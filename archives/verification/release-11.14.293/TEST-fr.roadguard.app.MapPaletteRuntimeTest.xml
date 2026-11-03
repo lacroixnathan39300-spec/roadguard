@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="fr.roadguard.app.MapPaletteRuntimeTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-26T21:36:01.654Z" hostname="df8a615bb775" time="0.342">
+  <properties/>
+  <testcase name="javaPalettesMatchTheSharedJavaScriptRenderer[27]" classname="fr.roadguard.app.MapPaletteRuntimeTest" time="0.049"/>
+  <testcase name="dayAndNightCustomPalettesPersistIndependently[27]" classname="fr.roadguard.app.MapPaletteRuntimeTest" time="0.107"/>
+  <testcase name="allPresetsAndCustomColorsAreBounded[27]" classname="fr.roadguard.app.MapPaletteRuntimeTest" time="0.037"/>
+  <testcase name="javaPalettesMatchTheSharedJavaScriptRenderer" classname="fr.roadguard.app.MapPaletteRuntimeTest" time="0.03"/>
+  <testcase name="dayAndNightCustomPalettesPersistIndependently" classname="fr.roadguard.app.MapPaletteRuntimeTest" time="0.05"/>
+  <testcase name="allPresetsAndCustomColorsAreBounded" classname="fr.roadguard.app.MapPaletteRuntimeTest" time="0.063"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

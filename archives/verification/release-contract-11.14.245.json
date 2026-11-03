@@ -1,0 +1,32 @@
+{
+  "version": "11.14.245",
+  "version_code": 445,
+  "application_id": "fr.roadguard.app",
+  "baseline": "11.14.244",
+  "task_count": 39,
+  "weight": 100,
+  "totals": {
+    "development": 81,
+    "validation": 31.0,
+    "previous_development": 78,
+    "previous_validation": 29.0
+  },
+  "new_coded_tasks": [
+    "D5"
+  ],
+  "new_validation_tasks": {
+    "D5": 2
+  },
+  "android_native_runtime_executed": false,
+  "apk_produced": false,
+  "sevenzip_extraction_executed": true,
+  "automatic_camera_reaudit": false,
+  "browser_render_executed": false,
+  "original_data": {
+    "reference": "11.14.240",
+    "checked_original_files": 59,
+    "unchanged": 59,
+    "failures": []
+  },
+  "scope": "25 tests extraction/import réels avec les 2 archives FR/CH et 5 JAR officiels. 3824/593 entrées ; 2197/86 identifiants consommés après déduplication actuelle, historique FR/CH activé. Régressions 244 réexécutées. Android SQLite adapté pour JVM, aucun Android natif."
+}

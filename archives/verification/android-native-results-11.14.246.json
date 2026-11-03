@@ -1,0 +1,191 @@
+{
+  "version": "11.14.246",
+  "runner": "Robolectric 4.16.1",
+  "android_apis": [
+    26,
+    28,
+    34,
+    36
+  ],
+  "scope": "Eight suites; API 26/36 except TileCacheRuntimeTest on 26/28/34/36. Native SQLite mode for the two SQLite import suites. Shadow WebView; no real browser pixel rendering or physical device.",
+  "tests": 86,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "suites": [
+    {
+      "name": "fr.roadguard.app.CanonicalSqliteRuntimeTest",
+      "tests": "2",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "time": "8.173",
+      "timestamp": "2026-10-21T08:49:33",
+      "cases": [
+        "nativeReadOnlyImportPreservesFileMetadataAndUnknownLimits[26]",
+        "nativeReadOnlyImportPreservesFileMetadataAndUnknownLimits"
+      ]
+    },
+    {
+      "name": "fr.roadguard.app.CountryManagerRuntimeTest",
+      "tests": "6",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "time": "5.442",
+      "timestamp": "2026-10-21T08:49:41",
+      "cases": [
+        "countrySearchIgnoresAccentsAndListUsesFrenchOrder[26]",
+        "countryScreenAppliesInsetsWithoutCallingNewApisOnAndroidEight[26]",
+        "localCatalogIsSeparateFromDownloadAndUnsupportedUpdates[26]",
+        "countrySearchIgnoresAccentsAndListUsesFrenchOrder",
+        "countryScreenAppliesInsetsWithoutCallingNewApisOnAndroidEight",
+        "localCatalogIsSeparateFromDownloadAndUnsupportedUpdates"
+      ]
+    },
+    {
+      "name": "fr.roadguard.app.LocalPageRuntimeTest",
+      "tests": "14",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "time": "15.555",
+      "timestamp": "2026-10-21T08:49:47",
+      "cases": [
+        "onlyExactPackagedPagesCanReceiveApplicationState[26]",
+        "externalPagesCannotMarkMapReadyOrReceivePosition[26]",
+        "webSettingsBlockArbitraryFilesContentAndCrossFileAccess[26]",
+        "lateJavascriptEngineCallbackCannotChangeNewMapStatus[26]",
+        "currentPackagedScreenBridgeStillNavigates[26]",
+        "onlyExplicitHttpsLinksMayBeHandedToBrowser[26]",
+        "bridgeFromReplacedScreenCannotNavigateCurrentScreen[26]",
+        "onlyExactPackagedPagesCanReceiveApplicationState",
+        "externalPagesCannotMarkMapReadyOrReceivePosition",
+        "webSettingsBlockArbitraryFilesContentAndCrossFileAccess",
+        "lateJavascriptEngineCallbackCannotChangeNewMapStatus",
+        "currentPackagedScreenBridgeStillNavigates",
+        "onlyExplicitHttpsLinksMayBeHandedToBrowser",
+        "bridgeFromReplacedScreenCannotNavigateCurrentScreen"
+      ]
+    },
+    {
+      "name": "fr.roadguard.app.MapAppearanceRuntimeTest",
+      "tests": "2",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "time": "2.366",
+      "timestamp": "2026-10-21T08:50:02",
+      "cases": [
+        "eachLocalPackIsSavedAndSentToTheMapWithoutResettingTheChoice[26]",
+        "eachLocalPackIsSavedAndSentToTheMapWithoutResettingTheChoice"
+      ]
+    },
+    {
+      "name": "fr.roadguard.app.RadarCatalogReloadRuntimeTest",
+      "tests": "6",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "time": "12.772",
+      "timestamp": "2026-10-21T08:50:05",
+      "cases": [
+        "activeReloadPreservesTheGpsSubscriptionAndDoesNotAppendDuplicates[26]",
+        "returnFromManagerReloadsCatalogAndPreservesCustomPoints[26]",
+        "unchangedRevisionDoesNotScheduleAnotherFullCatalogRead[26]",
+        "activeReloadPreservesTheGpsSubscriptionAndDoesNotAppendDuplicates",
+        "returnFromManagerReloadsCatalogAndPreservesCustomPoints",
+        "unchangedRevisionDoesNotScheduleAnotherFullCatalogRead"
+      ]
+    },
+    {
+      "name": "fr.roadguard.app.RealSevenZipRuntimeTest",
+      "tests": "2",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "time": "0.856",
+      "timestamp": "2026-10-21T08:50:17",
+      "cases": [
+        "packagedArchivesExtractAndInstallUsingAndroidSQLite[26]",
+        "packagedArchivesExtractAndInstallUsingAndroidSQLite"
+      ]
+    },
+    {
+      "name": "fr.roadguard.app.StartupRuntimeTest",
+      "tests": "2",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "time": "2.301",
+      "timestamp": "2026-10-21T08:50:18",
+      "cases": [
+        "mapAndCustomPointsRemainAvailableWhileRadarWorkerIsBlocked[26]",
+        "mapAndCustomPointsRemainAvailableWhileRadarWorkerIsBlocked"
+      ]
+    },
+    {
+      "name": "fr.roadguard.app.TileCacheRuntimeTest",
+      "tests": "52",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "time": "3.269",
+      "timestamp": "2026-10-21T08:50:21",
+      "cases": [
+        "cleanupRemovesLeastRecentlyViewedAndKeepsBudgetBounded[26]",
+        "tileLargerThanBudgetIsDisplayedButNotStored[26]",
+        "lowSpaceRefreshNeverDeletesPreviousGoodVersion[26]",
+        "corruptCrcAndHeaderOnlyPayloadAreRejected[26]",
+        "completeTileSurvivesOfflineRestart[26]",
+        "phoneAndCarConcurrentWritesUseOneCapacity[26]",
+        "serverNoStoreRemovesPreviousTileAndUpdatesCounters[26]",
+        "separatePhoneAndCarCachesShareSingleFetch[26]",
+        "etag304RevalidatesWithoutLosingBytes[26]",
+        "externallyClearedCacheReconcilesSharedCounters[26]",
+        "fourGiBBudgetRetainsCacheLargerThanSignedInteger[26]",
+        "truncatedPngDoesNotReplacePreviousGoodTile[26]",
+        "lowFreeSpaceKeepsLiveMapWorkingWithoutCachingNewTile[26]",
+        "cleanupRemovesLeastRecentlyViewedAndKeepsBudgetBounded[28]",
+        "tileLargerThanBudgetIsDisplayedButNotStored[28]",
+        "lowSpaceRefreshNeverDeletesPreviousGoodVersion[28]",
+        "corruptCrcAndHeaderOnlyPayloadAreRejected[28]",
+        "completeTileSurvivesOfflineRestart[28]",
+        "phoneAndCarConcurrentWritesUseOneCapacity[28]",
+        "serverNoStoreRemovesPreviousTileAndUpdatesCounters[28]",
+        "separatePhoneAndCarCachesShareSingleFetch[28]",
+        "etag304RevalidatesWithoutLosingBytes[28]",
+        "externallyClearedCacheReconcilesSharedCounters[28]",
+        "fourGiBBudgetRetainsCacheLargerThanSignedInteger[28]",
+        "truncatedPngDoesNotReplacePreviousGoodTile[28]",
+        "lowFreeSpaceKeepsLiveMapWorkingWithoutCachingNewTile[28]",
+        "cleanupRemovesLeastRecentlyViewedAndKeepsBudgetBounded[34]",
+        "tileLargerThanBudgetIsDisplayedButNotStored[34]",
+        "lowSpaceRefreshNeverDeletesPreviousGoodVersion[34]",
+        "corruptCrcAndHeaderOnlyPayloadAreRejected[34]",
+        "completeTileSurvivesOfflineRestart[34]",
+        "phoneAndCarConcurrentWritesUseOneCapacity[34]",
+        "serverNoStoreRemovesPreviousTileAndUpdatesCounters[34]",
+        "separatePhoneAndCarCachesShareSingleFetch[34]",
+        "etag304RevalidatesWithoutLosingBytes[34]",
+        "externallyClearedCacheReconcilesSharedCounters[34]",
+        "fourGiBBudgetRetainsCacheLargerThanSignedInteger[34]",
+        "truncatedPngDoesNotReplacePreviousGoodTile[34]",
+        "lowFreeSpaceKeepsLiveMapWorkingWithoutCachingNewTile[34]",
+        "cleanupRemovesLeastRecentlyViewedAndKeepsBudgetBounded",
+        "tileLargerThanBudgetIsDisplayedButNotStored",
+        "lowSpaceRefreshNeverDeletesPreviousGoodVersion",
+        "corruptCrcAndHeaderOnlyPayloadAreRejected",
+        "completeTileSurvivesOfflineRestart",
+        "phoneAndCarConcurrentWritesUseOneCapacity",
+        "serverNoStoreRemovesPreviousTileAndUpdatesCounters",
+        "separatePhoneAndCarCachesShareSingleFetch",
+        "etag304RevalidatesWithoutLosingBytes",
+        "externallyClearedCacheReconcilesSharedCounters",
+        "fourGiBBudgetRetainsCacheLargerThanSignedInteger",
+        "truncatedPngDoesNotReplacePreviousGoodTile",
+        "lowFreeSpaceKeepsLiveMapWorkingWithoutCachingNewTile"
+      ]
+    }
+  ]
+}

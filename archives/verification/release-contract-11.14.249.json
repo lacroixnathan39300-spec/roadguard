@@ -1,0 +1,7 @@
+{
+  "version": "11.14.249",
+  "deliverable": "Phone APK only",
+  "android_auto": "Code retained, no APK delivered",
+  "physical_xiaomi_render_test": false,
+  "map_pack_fix": "Leaflet cascade, MapLibre raster/vector, offline canvas"
+}

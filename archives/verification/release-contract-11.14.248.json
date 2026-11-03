@@ -1,0 +1,19 @@
+{
+  "version": "11.14.248",
+  "phone_apk": "LIVRAISON/ROADGUARD-11.14.248-TELEPHONE-debug.apk",
+  "builds": "APK téléphone construit et vérifié ; Android Auto reporté, aucun APK livré",
+  "targeted_robolectric": {
+    "tests": 8,
+    "failures": 0,
+    "api": [
+      26,
+      36
+    ]
+  },
+  "radar_archive_scenarios": 25,
+  "original_files_unchanged": 59,
+  "physical_xiaomi_test": false,
+  "physical_android_auto_test": false,
+  "reason": "Native ANR stack is not available; local tests cannot prove device-specific resolution.",
+  "android_auto_status": "Code conservé pour plus tard ; absent de cette livraison"
+}

@@ -1,0 +1,8 @@
+# ROADGUARD 11.14.196 — demande et choix
+
+- Chaque confirmation sur place renouvelle la durée de vie du point temporaire. Les validations rapprochées ne gonflent pas le compteur : 30 minutes entre deux observations manuelles comptées sur le même téléphone. Trois observations distinctes rendent le lieu permanent. Les points permanents anciens restent des lieux possibles, sans affirmer une présence actuelle.
+- Mode automatique opt-in : au-dessus de 20 km/h sur deux mesures GPS fiables, démarrage des alertes. Après 60 secondes à 3 km/h maximum, arrêt des alertes et retrait de la bulle. Une veille GPS visible par notification reste nécessaire pour détecter le prochain départ. GPS absent/périmé : suspension du mode actif jusqu'à une nouvelle détection de conduite.
+- Passer à Waze ou à l'accueil garde le suivi armé. Retirer ROADGUARD des applications récentes arrête le service et retire la bulle. Après un arrêt forcé Android, l'utilisateur doit rouvrir l'application.
+- Spotify : ouverture de l'application et commandes de sa session musicale locale (lecture/pause, précédent, suivant, titre/artiste). Android demande l'accès aux notifications pour accéder aux sessions. Le service n'exploite pas le contenu des notifications. Aucune clé Spotify, aucun compte développeur, aucune authentification OAuth ajoutée. Démarrer la musique dans Spotify puis revenir dans ROADGUARD. Lecteur Spotify Android Auto fourni par Spotify, distinct de cet écran téléphone.
+
+À vérifier avant livraison : compilation, tests Android simulés, lint, signature/alignement APK, invariants de carte/caméra et rapports. Essais physiques Xiaomi, Spotify réel, clé externe et DHU/véhicule indisponibles dans cet environnement.

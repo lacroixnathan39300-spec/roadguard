@@ -1,0 +1,10 @@
+/* The ID keeps the appearance choice above older !important day/night/contrast rules.
+   Only raster tile images are filtered; road overlays, radar icons and labels outside
+   the raster images remain unchanged. A missing tile cannot be styled. */
+body[data-rg-map-pack="graphite"] #map .leaflet-tile-pane img.leaflet-tile{filter:grayscale(.88) sepia(.20) hue-rotate(172deg) brightness(.82) contrast(1.30)!important}
+body[data-rg-map-pack="graphite"].rg-night #map .leaflet-tile-pane img.leaflet-tile{filter:invert(.82) hue-rotate(180deg) grayscale(.92) brightness(.96) contrast(1.35)!important}
+body[data-rg-map-pack="readable"] #map .leaflet-tile-pane img.leaflet-tile{filter:brightness(1.13) contrast(1.48) saturate(1.28)!important}
+body[data-rg-map-pack="readable"].rg-night #map .leaflet-tile-pane img.leaflet-tile{filter:invert(.84) hue-rotate(180deg) brightness(1.65) contrast(1.55) saturate(.80)!important}
+body[data-rg-map-pack="original"] #map .leaflet-tile-pane img.leaflet-tile{filter:none!important}
+body[data-rg-map-pack="original"].rg-night #map .leaflet-tile-pane img.leaflet-tile{filter:invert(.86) hue-rotate(180deg) brightness(1.12) contrast(1.18) saturate(.80)!important}
+.leaflet-control-attribution a{color:var(--rg-accent-border)!important}

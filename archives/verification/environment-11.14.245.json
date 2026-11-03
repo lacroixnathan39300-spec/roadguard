@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-21",
+  "checked_at": "2026-10-21T10:09:16.647652+02:00",
+  "source_version": "11.14.244",
+  "seven_requested_files_available": true,
+  "real_7z_extraction_executed": true,
+  "real_sqlite_via_jvm_boundary_adapter_executed": true,
+  "android_native_runtime_executed": false,
+  "robolectric_executed": false,
+  "apk_produced": false,
+  "tools_download_approval": "rejected",
+  "rejected_action": "Download Android SDK/build tools from dl.google.com and Gradle from services.gradle.org",
+  "rejection_reason": "La commande ne contacte ni github.com ni une URL GitHub ; cette autorisation réseau ne découle pas de son contenu, qui vise uniquement dl.google.com et services.gradle.org.",
+  "rejected_action_retried": false,
+  "alternative_route_to_rejected_download_used": false,
+  "tools_not_used_after_rejection": true,
+  "camera_sources_unchanged": true
+}

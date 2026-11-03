@@ -1,0 +1,11 @@
+# ROADGUARD 11.14.278 — carte allégée et modes de connexion
+
+Sur la carte : sélecteur Auto / En ligne / Hors ligne avec choix mémorisé. Auto, par défaut, suit la connexion : fond en ligne quand elle est disponible, cartes locales installées et cache lors d'une coupure, reprise du réseau à son retour. En ligne sélectionne le fond raster en ligne (cache déjà présent si réseau absent). Hors ligne bloque les demandes distantes de la carte et utilise les packs déjà installés et le cache. Cela ne désactive pas la connexion du reste de l'application. Une zone absente des cartes locales et du cache ne peut pas s'afficher hors ligne. Aucun téléchargement de pays n'est ajouté.
+
+L'écran principal conserve la recherche, la vitesse réduite et le recentrage. Le menu ⋯ regroupe orientation, jour/nuit, textures, bulle radar et état GPS/carte/radars. Les grandes barres GPS et chargement radar sont retirées de la carte. Les boutons orientation, texture et signalement en double sont retirés de la colonne droite ; Signaler reste dans la barre du bas. Le titre de recherche est remplacé par une poignée compacte. Le rappel de suivi GPS est raccourci. Le diagnostic de carte est réduit à une pastille et son texte complet reste dans ⋯ > État GPS et radars.
+
+La bande noire du crédit cartographique sous la vitesse est supprimée. Les crédits restent accessibles en bas à droite, sur fond transparent, au-dessus du panneau de recherche.
+
+Vérifications réalisées : analyse syntaxique Java de MainActivity et MapConnectionPolicy avec le compilateur JDK, et des scripts intégrés des trois pages cartographiques. Cela ne vérifie pas les types Android. L'environnement ne dispose pas de Gradle préinstallé ni du navigateur local requis pour un rendu ; aucun APK ou rendu Android n'a été validé. L'erreur de chargement de la capture n'est pas déclarée résolue par cet allègement.
+
+🔴 INTERVENTION OBLIGATOIRE : importer ce projet dans CodeAssist, compiler et installer la mise à jour sans désinstaller l'application. Vérifier le sélecteur et sa mémorisation, les zones déjà consultées hors ligne, puis Auto avec coupure et rétablissement du réseau. Contrôler les crédits, le recentrage et la recherche en portrait et paysage. Les changements sont intégrés aux sources, en attente de validation Xiaomi.

@@ -1,0 +1,18 @@
+ROADGUARD 11.13.9 — CORRECTIF LIMITES PMTILES — À LIRE EN PREMIER
+
+Base exacte : projet 11.13.8 fourni par l’utilisateur. GPS/caméra non modifiés.
+
+Modifications effectuées :
+- plafond PMTiles porté de 2 Gio à 8 Gio (long 64 bits) pour la source France et les catalogues HTTPS.
+- distinction claire entre taille HTTP absente/invalide et pack >8 Gio.
+- contrôle de l’espace libre sans risque de multiplication dépassant la capacité de long.
+- versionCode 170, versionName 11.13.9.
+
+LIMITES IMPORTANTES :
+- Pas de reprise automatique HTTP Range après interruption : le téléchargement recommence.
+- Si HEAD et Range ne renvoient aucune taille, le téléchargement est toujours refusé pour éviter un téléchargement sans limite.
+- L'URL publique peut ne pas fonctionner; aucun pack n'a été téléchargé ou validé ici.
+- Le rendu PMTiles vectoriel reste expérimental et nécessite validation hors ligne.
+- Aucune compilation Android ni recette sur Xiaomi n'a été effectuée ici.
+
+MISSION WORK : compiler, contrôler les dépendances, tester un véritable pack sur Xiaomi en Wi-Fi, mode avion, vérifier la taille et les en-têtes serveur, valider MapLibre local. Ne pas déclarer les cartes hors ligne fonctionnelles sans essai réel. Ajouter reprise Range robuste et stockage temporaire adapté aux gros fichiers. Conserver la caméra et le GPS connus stables. Livrer ZIP consolidé, APK si réellement compilé, rapport des tests et blocages.

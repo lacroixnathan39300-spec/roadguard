@@ -1,0 +1,56 @@
+name: Android
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app: drive
+            tasks: ":app:testDebugUnitTest :app:lintDebug :app:assembleDebug"
+            release: ":app:assembleRelease"
+          - app: gps
+            tasks: ":app:assembleDebug"
+            release: ":app:assembleRelease"
+    defaults:
+      run:
+        working-directory: ${{ matrix.app }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Compiler et tester
+        run: |
+          chmod +x gradlew
+          ./gradlew --stacktrace ${{ matrix.tasks }}
+      - name: Version finale signée (si la clé est configurée)
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          KEYSTORE_B64: ${{ secrets[format('{0}_KEYSTORE_BASE64', matrix.app == 'gps' && 'GPS' || 'DRIVE')] }}
+          RG_KEYSTORE_PASSWORD: ${{ secrets[format('{0}_KEYSTORE_PASSWORD', matrix.app == 'gps' && 'GPS' || 'DRIVE')] }}
+          RG_KEY_ALIAS: ${{ secrets[format('{0}_KEY_ALIAS', matrix.app == 'gps' && 'GPS' || 'DRIVE')] }}
+          RG_KEY_PASSWORD: ${{ secrets[format('{0}_KEY_PASSWORD', matrix.app == 'gps' && 'GPS' || 'DRIVE')] }}
+        run: |
+          if [ -z "$KEYSTORE_B64" ]; then echo "Pas de clé configurée : version finale ignorée."; exit 0; fi
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          export RG_KEYSTORE_FILE="$RUNNER_TEMP/release.jks"
+          ./gradlew --stacktrace ${{ matrix.release }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ${{ matrix.app }}-apk-${{ github.run_number }}
+          path: |
+            ${{ matrix.app }}/app/build/outputs/apk/**/*.apk
+            ${{ matrix.app }}/app/build/reports/**
+          if-no-files-found: warn

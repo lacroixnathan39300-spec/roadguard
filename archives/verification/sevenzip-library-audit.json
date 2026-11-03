@@ -1,0 +1,38 @@
+[
+  {
+    "group": "org.apache.commons",
+    "artifact": "commons-compress",
+    "version": "1.28.0",
+    "bytes": 1117221,
+    "sha256": "e1522945218456f3649a39bc4afd70ce4bd466221519dba7d378f2141a4642ca",
+    "licenses": [],
+    "java": [
+      [
+        "maven.compiler.source",
+        "1.8"
+      ],
+      [
+        "maven.compiler.target",
+        "1.8"
+      ]
+    ],
+    "embedded_license_entry": "META-INF/LICENSE.txt",
+    "embedded_license_prefix": "                                 Apache License\n                           Version 2.0, January 2004\n                        http://www.apache.org/licenses/\n\n   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTIO",
+    "class_major": 52
+  },
+  {
+    "group": "org.tukaani",
+    "artifact": "xz",
+    "version": "1.12",
+    "bytes": 168792,
+    "sha256": "3e158a87bd73d8afb4b6e8239c013b7d049c48563f45860ce99cd2e448cf4a6b",
+    "licenses": [
+      {
+        "name": "0BSD",
+        "url": null
+      }
+    ],
+    "java": [],
+    "class_major": 52
+  }
+]

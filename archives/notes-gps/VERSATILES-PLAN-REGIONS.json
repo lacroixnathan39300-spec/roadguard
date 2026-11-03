@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "source": "https://download.versatiles.org/osm.versatiles",
+  "note": "Planning only. No packs downloaded, hosted, or Android-tested.",
+  "regions": [
+    {
+      "id": "france_mainland",
+      "bbox": [
+        -5.2,
+        41.2,
+        9.7,
+        51.2
+      ],
+      "output": "france_mainland.pmtiles",
+      "command": "versatiles convert --bbox-border 3 --bbox -5.200000,41.200000,9.700000,51.200000 --min-zoom 0 --max-zoom 14 https://download.versatiles.org/osm.versatiles france_mainland.pmtiles",
+      "status": "NOT_DOWNLOADED",
+      "source": "https://download.versatiles.org/osm.versatiles"
+    },
+    {
+      "id": "corsica",
+      "bbox": [
+        8.5,
+        41.3,
+        9.7,
+        43.1
+      ],
+      "output": "corsica.pmtiles",
+      "command": "versatiles convert --bbox-border 3 --bbox 8.500000,41.300000,9.700000,43.100000 --min-zoom 0 --max-zoom 14 https://download.versatiles.org/osm.versatiles corsica.pmtiles",
+      "status": "NOT_DOWNLOADED",
+      "source": "https://download.versatiles.org/osm.versatiles"
+    },
+    {
+      "id": "switzerland",
+      "bbox": [
+        5.9,
+        45.8,
+        10.6,
+        47.9
+      ],
+      "output": "switzerland.pmtiles",
+      "command": "versatiles convert --bbox-border 3 --bbox 5.900000,45.800000,10.600000,47.900000 --min-zoom 0 --max-zoom 14 https://download.versatiles.org/osm.versatiles switzerland.pmtiles",
+      "status": "NOT_DOWNLOADED",
+      "source": "https://download.versatiles.org/osm.versatiles"
+    }
+  ]
+}

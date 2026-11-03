@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="fr.roadguard.app.CanonicalSqliteRuntimeTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-21T08:42:24" hostname="dec3125c2336" time="9.302">
+  <properties/>
+  <testcase name="nativeReadOnlyImportPreservesFileMetadataAndUnknownLimits[26]" classname="fr.roadguard.app.CanonicalSqliteRuntimeTest" time="4.598"/>
+  <testcase name="nativeReadOnlyImportPreservesFileMetadataAndUnknownLimits" classname="fr.roadguard.app.CanonicalSqliteRuntimeTest" time="4.698"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

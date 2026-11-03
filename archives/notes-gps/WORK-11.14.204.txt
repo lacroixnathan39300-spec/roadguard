@@ -1,0 +1,8 @@
+ROADGUARD 11.14.204 — Acces au gestionnaire radar
+FAIT : entree visible dans l'onglet Alertes, ouverture de RadarDownloadActivity deja declaree au manifeste.
+FAIT : toutes les bases radar embarquees et l'overlay Lufop 11.14.203 conserves bit pour bit.
+NON FAIT : telechargement RadarDroid par pays en un clic ; l'ecran exige encore URL HTTPS et SHA-256.
+NON FAIT : activation des pays autres que FR/CH ; verification des protocoles Lufop ; compilation et tests Xiaomi.
+TESTS : comparaison des entrees ZIP, inspection statique du manifeste et des references Java ; aucune compilation APK.
+CHANTIER ACTIF : sources ZIP publiques autorisees + importateur robuste + activation pays.
+INTERVENTION OBLIGATOIRE : uniquement lors du test final sur Xiaomi.

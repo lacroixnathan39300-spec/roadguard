@@ -1,0 +1,219 @@
+{
+  "reference": "240 + checkpoint 241",
+  "files": [
+    {
+      "path": "ARCHIVE-CHECKPOINT-11.14.241-LIRE.txt",
+      "kind": "added",
+      "before": null,
+      "after": "461c6658529d69d6ec65567e3414332a7396e6d16d7c4053e8c739753802abe9"
+    },
+    {
+      "path": "AVANCEMENT-11.14.242.md",
+      "kind": "added",
+      "before": null,
+      "after": "70e0fe8cd577dbcc6a666031672cfd7c6bf78d02119c70ef0ff775d9e23b5a9a"
+    },
+    {
+      "path": "LIRE-11.14.242.md",
+      "kind": "added",
+      "before": null,
+      "after": "28d531b4818459fd3abcf3edb8b8d4638ec933bfb491bcaf04c8eb6093887739"
+    },
+    {
+      "path": "WORK-11.14.242.md",
+      "kind": "added",
+      "before": null,
+      "after": "186b296b3debdc53c9f51d442301cf6868e2379e6e944db4c2c9f5046adbb983"
+    },
+    {
+      "path": "app/build.gradle",
+      "kind": "modified",
+      "before": "550b993325a6fbe0c8d0f0ec8d0de3b866d3a89f6671ffaac0a3a80f21e872fc",
+      "after": "01b0101948920a18aee931e04c8215348cb9064c64061cc91ac05ddb7d9fcf79"
+    },
+    {
+      "path": "app/src/main/assets/roadguard_progress_11_14_242.json",
+      "kind": "added",
+      "before": null,
+      "after": "73f76c26080b66adc64872b8c60b37407af0237cbc90497119737acb0d93e076"
+    },
+    {
+      "path": "app/src/main/java/fr/roadguard/app/LufopEuropeCatalog.java",
+      "kind": "modified",
+      "before": "e9c4e034247796b4be3cca4a67eed5213680dcbde3fab1f81b1f406efc0be291",
+      "after": "ce7a482e1e8e8d4958fe528e78e73c37beae737a6c0d8cf311492d831c9dc829"
+    },
+    {
+      "path": "app/src/main/java/fr/roadguard/app/MainActivity.java",
+      "kind": "modified",
+      "before": "81aa8893988e9a3ae95c025716541f5bb2f25bf2731765cce4f71512ff7d05c0",
+      "after": "10398262c953cffe0b00ad0dd11a2c35f3f0f1000547ff4c302e33b8d463add0"
+    },
+    {
+      "path": "app/src/main/java/fr/roadguard/app/RadarArchiveDownloader.java",
+      "kind": "added",
+      "before": null,
+      "after": "2e39fe17c1da676b28cec1d8c2e8a6c41b3410c00d37fc7933740cf63cc19cd8"
+    },
+    {
+      "path": "app/src/main/java/fr/roadguard/app/RadarArchivePolicy.java",
+      "kind": "added",
+      "before": null,
+      "after": "57293db6809a928e1ab0dfa3f3ca69c8a86138eaaf55d6b207057ac9094ec142"
+    },
+    {
+      "path": "app/src/main/java/fr/roadguard/app/RadarCatalogRevision.java",
+      "kind": "added",
+      "before": null,
+      "after": "bc5e32468e4bcdb63050276a0790dd8694df5e903200f0612abc209c221eb784"
+    },
+    {
+      "path": "app/src/main/java/fr/roadguard/app/RadarCountryBatch.java",
+      "kind": "added",
+      "before": null,
+      "after": "945b681ebf87bbbb7911529dc11511668a9f09c7d8c7f7c9ffb6ccaefb4ac28d"
+    },
+    {
+      "path": "app/src/main/java/fr/roadguard/app/RadarDownloadActivity.java",
+      "kind": "modified",
+      "before": "dc8815450cbb96884191e9a7b4de77b415e6101e3fbdc8464fa275653a553b31",
+      "after": "034ee507bc50c2ffd2df6b7d23700f622fb11b7304c20d7e0f7cb51bf3ec162e"
+    },
+    {
+      "path": "app/src/main/java/fr/roadguard/app/RadarDownloadSource.java",
+      "kind": "modified",
+      "before": "d3a986a606b5a4cda7d712131205dbebcd26be5001e286192c92521c13562198",
+      "after": "158ccacbc1caa569c90f79f105c20ca256d6716c481a4d0fed2426bd5f3b7d5f"
+    },
+    {
+      "path": "app/src/test/java/fr/roadguard/app/RadarCatalogReloadRuntimeTest.java",
+      "kind": "added",
+      "before": null,
+      "after": "390b8a6356220ac0a8a5aa1dc2d8ad3c764a4443494a9e38500d7c88a60942a1"
+    },
+    {
+      "path": "tools/ParseJavaSources.java",
+      "kind": "added",
+      "before": null,
+      "after": "120bf87e61e88d70c84405ccb8f920c41e37d07f4477b37ad8f1ca5a0ec0b297"
+    },
+    {
+      "path": "tools/TestCatalogCore.java",
+      "kind": "added",
+      "before": null,
+      "after": "3c09c893ca9eb67fbf08d2d19d403ce6e61c2b4671019355e44845648e1b2ea8"
+    },
+    {
+      "path": "tools/TestRadarDownloads.java",
+      "kind": "added",
+      "before": null,
+      "after": "80550c970cdda6f20a9e5718a55f5fcf1485a61740f4920e9ecffcab93834676"
+    },
+    {
+      "path": "tools/jvm-support/android/content/Context.java",
+      "kind": "added",
+      "before": null,
+      "after": "b23728a3f9e5651a6ca1b4dff3be982a25a5e37efc130779ed59897f0d1c243c"
+    },
+    {
+      "path": "tools/jvm-support/android/content/SharedPreferences.java",
+      "kind": "added",
+      "before": null,
+      "after": "14d6ecc2af2577ce1f09af6d86f0d4fff2265e59b84cdd598e5ac4b701e5c27b"
+    },
+    {
+      "path": "tools/jvm-support/android/content/res/AssetManager.java",
+      "kind": "added",
+      "before": null,
+      "after": "1aa84fb26407ab82a2073252236f47ff54e9bfcfa4238311aba7ff96437e8387"
+    },
+    {
+      "path": "tools/jvm-support/android/location/Location.java",
+      "kind": "added",
+      "before": null,
+      "after": "f16cbc65b70a294ac63fb1b9a12a87772cb510cdfc6f0f3d0a1f687477cdb98a"
+    },
+    {
+      "path": "tools/jvm-support/android/util/Log.java",
+      "kind": "added",
+      "before": null,
+      "after": "5ec6b5a05b7b73ac5d6da7568b59bdfd15034297214f95b0b609ddf7ac353440"
+    },
+    {
+      "path": "tools/package_codeassist.py",
+      "kind": "modified",
+      "before": "d2748c5c5bc87dcf524dfd69960ba53175d96b6563aade86e21b89c73bc26b85",
+      "after": "116f30f55453cd2381312752d24ac8710748cc3dba5b73b43fc131ec0260295e"
+    },
+    {
+      "path": "tools/render_progress_report.py",
+      "kind": "modified",
+      "before": "31173c114ceeda134c4d81ab326deaa851173057dbf781de34ff476c8bd3c778",
+      "after": "4298b93eeb3daa81e9c67dfb9de8604557389dedf7b8912bfa15653ce2497c15"
+    },
+    {
+      "path": "tools/render_progress_report_11_14_241.py",
+      "kind": "added",
+      "before": null,
+      "after": "31173c114ceeda134c4d81ab326deaa851173057dbf781de34ff476c8bd3c778"
+    },
+    {
+      "path": "tools/run_targeted_checks.py",
+      "kind": "added",
+      "before": null,
+      "after": "666178433b2c9694e2a5bc277bec3983fd6dc98ea1759e2545946d399d9f1228"
+    },
+    {
+      "path": "tools/update_progress_11_14_242.py",
+      "kind": "added",
+      "before": null,
+      "after": "c1ed7f70e822c59d0ff31a9df7ae5904a6314bb77d97dc07c3d6c0b901dcda1f"
+    },
+    {
+      "path": "verification/data-integrity-11.14.242.json",
+      "kind": "added",
+      "before": null,
+      "after": "f5a4553043c869d2bc47c4acd9f890ff7b279a81d8e9ffe02f4435f9ac34d956"
+    },
+    {
+      "path": "verification/gradle-phone-11.14.242.log",
+      "kind": "added",
+      "before": null,
+      "after": "a8d9c373643e9567d62aef28e87cc8cd12e4bee393171ee9cf81ea479b65102b"
+    },
+    {
+      "path": "verification/lufop-regression-11.14.242.log",
+      "kind": "added",
+      "before": null,
+      "after": "4ab71f3b3dac38bffacdd4b14e7ab0640330953f9ff75b55435dc35b4205841f"
+    },
+    {
+      "path": "verification/release-contract-11.14.242.json",
+      "kind": "added",
+      "before": null,
+      "after": "8f27cc66b3f8c434a2131aa48e02fad5d9d181c14a740890cd2e030365fab8e7"
+    },
+    {
+      "path": "verification/session-11.14.242.json",
+      "kind": "added",
+      "before": null,
+      "after": "caf5271b4bab88fdfc298987eba95dedcc06fbdfbe2a1f42c03d1e8a8c4c9927"
+    },
+    {
+      "path": "verification/targeted-checks-11.14.242.log",
+      "kind": "added",
+      "before": null,
+      "after": "9e9b524d5589b18e1f44fddb87ab0af80cd0ec852a19ae795da99251b746a486"
+    },
+    {
+      "path": "verification/targeted-results-11.14.242.json",
+      "kind": "added",
+      "before": null,
+      "after": "dc9ca7fc55b9417710047df666c4eac55505d708d8f5990d58ebbbff18199a0d"
+    }
+  ],
+  "renamed_note": {
+    "from": "CHECKPOINT-LIRE.txt",
+    "to": "ARCHIVE-CHECKPOINT-11.14.241-LIRE.txt"
+  }
+}

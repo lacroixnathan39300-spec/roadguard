@@ -1,0 +1,42 @@
+compile-core-java8
+exit=0
+
+
+sqlite-fixtures
+exit=0
+Created 14 synthetic SQLite fixtures using real sqlite3
+
+
+canonical-sqlite-store
+exit=0
+PASS canonical/SQLite: 35 scenarios, 43 assertions; real SQLite read-only via JVM adapter, atomic files/backups, additive engine catalog and activation receipts; Android native runtime NOT executed
+
+
+download-errors-queue
+exit=0
+PASS downloads/queue: 27 scenarios, 59 assertions; mocked HTTP, real temporary files and atomic rename; no live network or 7z extraction
+
+
+catalog-additive-rollback
+exit=0
+PASS catalog/policy core: 14 scenarios, 430302 assertions; real bundled files (Europe=80021, FR=24429, CH=1777, active=104838); JVM Android adapters, NOT Android runtime
+
+
+alert-distance-types
+exit=0
+PASS alert policies: matching voice/text distances, invalid values, red lights, crossings, limits, hysteresis and distinct point types
+
+
+gps-motion
+exit=0
+PASS motion: GNSS/network, missing speed/course, true stop, stale/quality guards, compensation, heading reset, navigation intents and projection
+
+
+compile-parser
+exit=0
+
+
+java-syntax
+exit=0
+PASS Java syntax: 84 files parsed; Android symbols NOT resolved; APK NOT built
+

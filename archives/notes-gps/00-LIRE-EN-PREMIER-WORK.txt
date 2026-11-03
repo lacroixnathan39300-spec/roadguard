@@ -1,0 +1,18 @@
+ROADGUARD 11.13.10 / code 171 — lire `00-LIRE-EN-PREMIER-WORK-11.13.10.txt`, `WORK/01-MISSION-COMPLETE.md`, `WORK/02-RECETTE-OBLIGATOIRE.md`, puis `RETOUR-WORK-ROADGUARD-CARTES.md`. Carte hors ligne non validée sur Xiaomi.
+ROADGUARD — DOSSIER DE TRANSMISSION À CHATGPT WORK
+===================================================
+MISSION PRIORITAIRE : rendre les cartes hors ligne réellement téléchargeables et affichables.
+
+LIRE DANS CET ORDRE :
+1. WORK/01-MISSION-COMPLETE.md (objectif et invariants)
+2. WORK/02-RECETTE-OBLIGATOIRE.md (conditions d'acceptation)
+3. WORK/03-ETAT-ET-BLOCAGES.md (état de départ)
+4. RETOUR-WORK-ROADGUARD-CARTES.md (audit et tests de cette livraison)
+
+BASE ANDROID : ROADGUARD 11.13.10, versionCode 171. Le ZIP d'entrée annonçait 11.13.9/code170, mais avait des tests en 11.13.8/code169; cette incohérence de livraison est corrigée. GPS/caméra de référence : 11.12.7. Ne pas refaire l'interface ni modifier GPS/caméra sans preuve d'un défaut.
+
+ÉTAT APRÈS AUDIT : réseau mobile autorisé par défaut avec confirmation de taille/forfait. Le correctif ajoute import local PMTiles sans réseau, détection automatique du pack France privé, réponses tuiles avec CORS WebView et couches symboles routes/villes. Voir le rapport pour les validations restantes : vrai PMTiles, son schéma/rendu et essai Xiaomi.
+
+BLOQUÉ POUR LA VALIDATION : le PMTiles de 2,76 Go reste sur le téléphone et n'est pas accessible à ce poste ; le code prévoit de le réutiliser sans le retélécharger. MapLibre JS/CSS 4.7.1, décodeur Brotli et plages glyphes Noto Sans sont maintenant embarqués avec licences. Le build Android et l'essai Xiaomi restent non réalisés. Ne pas annoncer le hors-ligne opérationnel.
+
+UX EXIGÉE : l'utilisateur choisit un pays puis appuie sur Télécharger. Pas d'URL, empreinte SHA256, ordinateur, Colab ou préparation manuelle. Il faut donc un catalogue HTTPS et des packs autorisés et publiés ; aucune adresse ou disponibilité ne doit être inventée.

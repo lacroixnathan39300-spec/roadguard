@@ -1,0 +1,5 @@
+RADARS PAYS VOISINS — © MapAtlas, https://mapatlas.eu/tools/speed-camera-map
+Licence CC BY 4.0 : https://creativecommons.org/licenses/by/4.0/
+Le GeoJSON original (snapshot 2024-05-21) a été converti en CSV, colonnes non utilisées retirées, et doublons exactement identiques supprimés. Pays : Belgique, Allemagne, Espagne, Italie, Luxembourg. Points signalés par la communauté, non officiels, datés et incomplets; les radars mobiles ne sont pas confirmés.
+Les attributs de licence, source, date, empreinte et nombre par pays figurent dans radar_neighbors_manifest.json.
+France et Suisse restent séparées dans leurs bases précédentes. Le téléchargement volontaire OSM/MapAtlas par pays peut compléter ces données.

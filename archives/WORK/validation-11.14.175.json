@@ -1,0 +1,259 @@
+{
+  "version": "11.14.175",
+  "versionCode": 375,
+  "source_version": "11.14.174",
+  "date": "2026-10-17",
+  "tools": {
+    "Android_Build_Tools": "34.0.0",
+    "ECJ": "Java 8 compilation with Android API 34",
+    "D8": "8.2.2-dev",
+    "Chromium": "151.0.7922.34"
+  },
+  "apk": {
+    "filename": "ROADGUARD-11.14.175-VERIFICATION.apk",
+    "size_bytes": 4334507,
+    "sha256": "d3c5c4068797154a6d7b11053ac33f01a161229d94846e0a87fda5c7ce164e27",
+    "v2_signature_verified": true,
+    "v3_signature_verified": true,
+    "zip_alignment_verified": true,
+    "assets_match_source": true,
+    "executed_on_android": false,
+    "executed_on_xiaomi": false
+  },
+  "test_results": {
+    "regressions": [
+      {
+        "test": "test_embedded_radars.py",
+        "passed": true,
+        "output": "Data QA OK: hashes, all 3309 official IDs, country separation, categories, provenance, deduplication and OSM recursion"
+      },
+      {
+        "test": "test_radar_dataset.py",
+        "passed": true,
+        "output": "Base radars: 3309 entrées uniques valides; 7 types; attribution et licence embarquées\nSHA-256: f6c6114080473bf3e5b15fc522dd75dd3fafaf0f45d82a6cceef93fed7d02c26"
+      },
+      {
+        "test": "test_radar_storage_current.py",
+        "passed": true,
+        "output": "Contrôles radars locaux: import, limites, expiration et rafraîchissement réussis"
+      },
+      {
+        "test": "test_radar_spatial_index.py",
+        "passed": true,
+        "output": "Index radar : tests statiques + 25 000 contrôles de couverture géographique réussis"
+      },
+      {
+        "test": "test_radar_alert_accuracy.py",
+        "passed": true,
+        "output": "Alertes radar : précision GPS, âge du fix et anti-doublon premier plan/arrière-plan vérifiés"
+      },
+      {
+        "test": "test_radar_categories.py",
+        "passed": true,
+        "output": "Catégories radar : filtres, import tunnel et rendu différencié vérifiés"
+      },
+      {
+        "test": "test_radar_filter_indices.py",
+        "passed": true,
+        "output": "Filtres radar : indices des 10 catégories bornés et continus"
+      },
+      {
+        "test": "test_danger_type_policy.py",
+        "passed": true,
+        "output": "Types radar partagés; compteurs, filtres et deux moteurs GPS utilisent les mêmes règles"
+      },
+      {
+        "test": "test_swiss_radar_batch.py",
+        "passed": true,
+        "output": "Suisse : téléchargement groupé des sources publiques et import séparé du ZIP Lufop vérifiés"
+      },
+      {
+        "test": "test_poi_warner_import.py",
+        "passed": true,
+        "output": "Import POI-Warner séparé, catégories, filtre géographique et métadonnées de prudence vérifiés"
+      },
+      {
+        "test": "test_map_manual_pan.py",
+        "passed": true,
+        "output": "Exploration manuelle persistante dans Leaflet et MapLibre; position GPS continue à se mettre à jour; recentrage volontaire vérifié"
+      },
+      {
+        "test": "test_gps_stability.py",
+        "passed": true,
+        "output": "7 current GPS stability checks passed"
+      },
+      {
+        "test": "test_radar_counters_current.py",
+        "passed": true,
+        "output": "Compteurs radars : base officielle séparée; filtres locaux valides et non expirés"
+      },
+      {
+        "test": "test_radar_country_downloads.py",
+        "passed": true,
+        "output": "Bases radar : MapAtlas multi-pays, CC BY, téléchargement interne et catégories, catalogue HTTPS protégé contre les réponses périmées, progression annulable, SHA-256 et CSV local vérifiés"
+      },
+      {
+        "test": "test_radar_map_visibility.py",
+        "passed": true,
+        "output": "Contrôle ciblé visibilité des marqueurs radar réussi"
+      },
+      {
+        "test": "test_reference_navigation.py",
+        "passed": true,
+        "output": "Navigation visuelle : carte dégagée, menu/progression accessibles, signalement central, trajet bleu, GPS bleu conservé"
+      },
+      {
+        "test": "test_gps_map_refresh.py",
+        "passed": true,
+        "output": "9 GPS/map refresh checks passed"
+      },
+      {
+        "test": "test_map_marker_size.py",
+        "passed": true,
+        "output": "Contrôle ciblé des tailles d’icônes réussi sur les trois cartes"
+      },
+      {
+        "test": "test_route_alternatives.py",
+        "passed": true,
+        "output": "Itinéraires : alternatives OSRM, distance au segment et recalcul auto protégé vérifiés"
+      },
+      {
+        "test": "test_no_prefetch_current.py",
+        "passed": true,
+        "output": "OK: aucun préchargement cartographique; cache normal WebView conservé"
+      },
+      {
+        "test": "audit_offline_tile_policy.py",
+        "passed": true,
+        "output": "OK: 25 application files checked; public OSM tiles only used for interactive rendering."
+      },
+      {
+        "test": "test_radar_icons.js",
+        "passed": true,
+        "output": "Vector icon QA OK: 14 SVGs, classifier, Leaflet viewport/popups/scale/visibility, MapLibre registration/visibility/scale/style reload and image cache"
+      },
+      {
+        "test": "test_radar_map_render.py",
+        "passed": true,
+        "output": "Rendu carte radar borné au viewport; provenance et dédoublonnage préservés"
+      },
+      {
+        "test": "test_camera_controls.js",
+        "passed": true,
+        "output": "Camera controls QA OK: native zoom dispatch, Leaflet pause, vector/local handlers"
+      },
+      {
+        "test": "test_local_camera.js",
+        "passed": true,
+        "output": "Local camera QA OK: GPS follow, sheet, drag/zoom pause, data updates, route overview, recenter"
+      },
+      {
+        "test": "test_vector_camera.js",
+        "passed": true,
+        "output": "MapLibre camera QA OK: sheet clearance, manual pause, latest-fix resume, route overview, style reload guard"
+      },
+      {
+        "test": "test_dark_map.py",
+        "passed": true,
+        "output": ""
+      },
+      {
+        "test": "test_night_provider.py",
+        "passed": true,
+        "output": "..\n----------------------------------------------------------------------\nRan 2 tests in 0.004s\n\nOK"
+      },
+      {
+        "test": "test_visual_handoff_current.py",
+        "passed": true,
+        "output": "41 contrôles statiques ROADGUARD 11.14.175 réussis"
+      },
+      {
+        "test": "test_functional_handoff_current.py",
+        "passed": true,
+        "output": "Contrôles fonctionnels de passation ROADGUARD 11.14.175 réussis"
+      },
+      {
+        "test": "test_drive_search_inline.py",
+        "passed": true,
+        "output": "Recherche destination intégrée à la carte : saisie, clavier, résultats, coordonnées et itinéraire vérifiés"
+      },
+      {
+        "test": "test_reference_ui.js",
+        "passed": true,
+        "output": "Reference UI: eight pages, real data slots, actions and escaping OK"
+      },
+      {
+        "test": "check_handoff.py",
+        "passed": true,
+        "output": "OK: suivi, version, statuts et documents cohérents pour 11.14.175"
+      }
+    ],
+    "executable_java_scenarios": "PASS: persistent cache, restart, conditional revalidation, offline, corrupted file, concurrency, eviction, road progression and arrival.",
+    "browser_ui": "PASS: 11 screens at 393 and 320 px, images, pagination/filtering, favorites, XSS escaping, request pending state.",
+    "browser_map": "PASS: real map tiles loaded, manual drag while GPS updates, radar focus, explicit recenter, day/night and network transitions; map engine starts with HTTPS blocked."
+  },
+  "limitations": [
+    "No Android execution or native screenshot",
+    "No guaranteed 50 km prefetch coverage with current tile provider",
+    "No pixel-identical visual claim"
+  ],
+  "image_sha256": "5c0da2149cac5e32ab27ae7ff42dd5b9094f34e94645ddffd7b2f692f6fb0a74",
+  "browser_capture_files": [
+    {
+      "name": "Accueil.png",
+      "sha256": "9cae4eacd6061a566076093e6d3f1df5ac07fc92f45e13038b983e9c571ba887"
+    },
+    {
+      "name": "Trajet.png",
+      "sha256": "baec7c9f284859767ee54a01bdd140ede235831302ceff602e422bd55fff0ab1"
+    },
+    {
+      "name": "Signaler.png",
+      "sha256": "b7355007a48dad5d3dae2a55c7e3c59a326fe74c8dc1da78f3582deb856ae7d5"
+    },
+    {
+      "name": "Alertes.png",
+      "sha256": "47ef31bfbc5e42887e80ddaf862e39de2f38078f466e7f25bc0bd2469c982940"
+    },
+    {
+      "name": "Radar.png",
+      "sha256": "9fec169b8cafec01a2ff7c03d2c12afb05ddc1a58a077f27f0d2eeb16f4cc90b"
+    },
+    {
+      "name": "Hors-ligne.png",
+      "sha256": "027d0e680d117ce82910f57173e898f99ed13da4b36d5c0ceec2bd974e9ced27"
+    },
+    {
+      "name": "Paramètres.png",
+      "sha256": "5644565a571b7d7d37cc8b54b493561234bc361609775426b91981279e74257a"
+    },
+    {
+      "name": "Apparence.png",
+      "sha256": "dacd187305bfac5ea91a80bdfb16c1e06ca1d33f8690c2a0685af4e4d16cb8db"
+    },
+    {
+      "name": "Favoris.png",
+      "sha256": "7f10e53159dde7cf978a660de30a657f160271ad695a2ef0efa2397982badfea"
+    },
+    {
+      "name": "Favoris-vides.png",
+      "sha256": "ed9778e50f93e805a53181f838975c4ddf005dfd801ee9cf8d57bb883af682f0"
+    },
+    {
+      "name": "Historique.png",
+      "sha256": "622911caa4fbcf25b192235b655db06ebc7f81986ebf689e67e718714b7795f2"
+    },
+    {
+      "name": "Journal.png",
+      "sha256": "0c88bcd7cc8ac95be2ee50b741f1fb32dd965a090a7564d65829d1778fc099a7"
+    },
+    {
+      "name": "Carte-jour.png",
+      "sha256": "792bcda33eadcb758bad18957e01dd7bb43f29a6472b99f3abd6b9a1de067f03"
+    },
+    {
+      "name": "Carte-nuit.png",
+      "sha256": "53bc30d0ab28d6366ad8ba40cc44b28e0a5b4b26991d3441ceb7a3c580deb279"
+    }
+  ]
+}

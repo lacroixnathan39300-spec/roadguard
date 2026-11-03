@@ -1,0 +1,1199 @@
+{
+  "dataset": "MapAtlas Camera Index",
+  "abbreviation": "MCI",
+  "schemaVersion": "1.0",
+  "released": "2026-08-27",
+  "snapshot": "2024-05-21",
+  "licence": "CC BY 4.0",
+  "attribution": "MapAtlas, https://mapatlas.eu",
+  "classes": {
+    "spot": "Fixed point speed camera",
+    "signal": "Red light camera",
+    "corridor": "Average speed section",
+    "adaptive": "Variable limit camera"
+  },
+  "fields": {
+    "ref": "Stable MCI reference, derived from the coordinate and preserved across releases",
+    "class": "What the device does",
+    "limitKph": "Enforced limit in km/h",
+    "limitMinKph": "Lowest limit an adaptive device enforces",
+    "limitMaxKph": "Highest limit an adaptive device enforces",
+    "facingDeg": "Bearing the device faces, degrees clockwise from north",
+    "approach": "Approach direction it covers, or both",
+    "activeFromHour": "Hour the enforcement window opens, 24 hour clock, local time",
+    "activeToHour": "Hour the enforcement window closes, 24 hour clock, local time",
+    "activeDays": "Days the window applies",
+    "limitInWindowKph": "Limit enforced inside the window",
+    "limitOutsideWindowKph": "Limit enforced outside it",
+    "reportedInactive": "A reporter recorded the device as not currently operating"
+  },
+  "cameraCount": 106646,
+  "regions": [
+    {
+      "code": "BR",
+      "name": "Brazil",
+      "cameras": 17883,
+      "byClass": {
+        "spot": 14066,
+        "signal": 3803,
+        "corridor": 3,
+        "adaptive": 11
+      }
+    },
+    {
+      "code": "RU",
+      "name": "Russia",
+      "cameras": 17681,
+      "byClass": {
+        "spot": 13468,
+        "signal": 3619,
+        "corridor": 593,
+        "adaptive": 1
+      }
+    },
+    {
+      "code": "IT",
+      "name": "Italy",
+      "cameras": 10707,
+      "byClass": {
+        "spot": 8043,
+        "signal": 2512,
+        "corridor": 152,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "US",
+      "name": "United States of America",
+      "cameras": 8067,
+      "byClass": {
+        "spot": 3309,
+        "signal": 4114,
+        "corridor": 0,
+        "adaptive": 644
+      }
+    },
+    {
+      "code": "GB",
+      "name": "United Kingdom",
+      "cameras": 5806,
+      "byClass": {
+        "spot": 3670,
+        "signal": 1044,
+        "corridor": 787,
+        "adaptive": 305
+      }
+    },
+    {
+      "code": "DE",
+      "name": "Germany",
+      "cameras": 4714,
+      "byClass": {
+        "spot": 3585,
+        "signal": 856,
+        "corridor": 1,
+        "adaptive": 272
+      }
+    },
+    {
+      "code": "FR",
+      "name": "France",
+      "cameras": 3853,
+      "byClass": {
+        "spot": 3039,
+        "signal": 743,
+        "corridor": 70,
+        "adaptive": 1
+      }
+    },
+    {
+      "code": "BE",
+      "name": "Belgium",
+      "cameras": 2701,
+      "byClass": {
+        "spot": 1151,
+        "signal": 1042,
+        "corridor": 498,
+        "adaptive": 10
+      }
+    },
+    {
+      "code": "AE",
+      "name": "United Arab Emirates",
+      "cameras": 2563,
+      "byClass": {
+        "spot": 1990,
+        "signal": 573,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "SE",
+      "name": "Sweden",
+      "cameras": 2455,
+      "byClass": {
+        "spot": 2453,
+        "signal": 0,
+        "corridor": 2,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "ES",
+      "name": "Spain",
+      "cameras": 2104,
+      "byClass": {
+        "spot": 1532,
+        "signal": 407,
+        "corridor": 121,
+        "adaptive": 44
+      }
+    },
+    {
+      "code": "TR",
+      "name": "Turkey",
+      "cameras": 1710,
+      "byClass": {
+        "spot": 1341,
+        "signal": 296,
+        "corridor": 35,
+        "adaptive": 38
+      }
+    },
+    {
+      "code": "IR",
+      "name": "Iran",
+      "cameras": 1687,
+      "byClass": {
+        "spot": 1382,
+        "signal": 264,
+        "corridor": 1,
+        "adaptive": 40
+      }
+    },
+    {
+      "code": "AT",
+      "name": "Austria",
+      "cameras": 1457,
+      "byClass": {
+        "spot": 1205,
+        "signal": 195,
+        "corridor": 20,
+        "adaptive": 37
+      }
+    },
+    {
+      "code": "AU",
+      "name": "Australia",
+      "cameras": 1322,
+      "byClass": {
+        "spot": 240,
+        "signal": 1003,
+        "corridor": 58,
+        "adaptive": 21
+      }
+    },
+    {
+      "code": "AR",
+      "name": "Argentina",
+      "cameras": 1286,
+      "byClass": {
+        "spot": 772,
+        "signal": 513,
+        "corridor": 0,
+        "adaptive": 1
+      }
+    },
+    {
+      "code": "CA",
+      "name": "Canada",
+      "cameras": 1285,
+      "byClass": {
+        "spot": 266,
+        "signal": 1009,
+        "corridor": 0,
+        "adaptive": 10
+      }
+    },
+    {
+      "code": "CN-TW",
+      "name": "Taiwan",
+      "cameras": 1157,
+      "byClass": {
+        "spot": 691,
+        "signal": 461,
+        "corridor": 5,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "FI",
+      "name": "Finland",
+      "cameras": 1089,
+      "byClass": {
+        "spot": 1031,
+        "signal": 58,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "PL",
+      "name": "Poland",
+      "cameras": 875,
+      "byClass": {
+        "spot": 540,
+        "signal": 248,
+        "corridor": 86,
+        "adaptive": 1
+      }
+    },
+    {
+      "code": "CZ",
+      "name": "Czechia",
+      "cameras": 859,
+      "byClass": {
+        "spot": 271,
+        "signal": 98,
+        "corridor": 487,
+        "adaptive": 3
+      }
+    },
+    {
+      "code": "NL",
+      "name": "Netherlands",
+      "cameras": 844,
+      "byClass": {
+        "spot": 286,
+        "signal": 501,
+        "corridor": 55,
+        "adaptive": 2
+      }
+    },
+    {
+      "code": "QA",
+      "name": "Qatar",
+      "cameras": 765,
+      "byClass": {
+        "spot": 317,
+        "signal": 438,
+        "corridor": 0,
+        "adaptive": 10
+      }
+    },
+    {
+      "code": "OM",
+      "name": "Oman",
+      "cameras": 723,
+      "byClass": {
+        "spot": 547,
+        "signal": 176,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "CH",
+      "name": "Switzerland",
+      "cameras": 638,
+      "byClass": {
+        "spot": 255,
+        "signal": 370,
+        "corridor": 2,
+        "adaptive": 11
+      }
+    },
+    {
+      "code": "BY",
+      "name": "Belarus",
+      "cameras": 616,
+      "byClass": {
+        "spot": 613,
+        "signal": 0,
+        "corridor": 2,
+        "adaptive": 1
+      }
+    },
+    {
+      "code": "MA",
+      "name": "Morocco",
+      "cameras": 543,
+      "byClass": {
+        "spot": 530,
+        "signal": 13,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "HR",
+      "name": "Croatia",
+      "cameras": 486,
+      "byClass": {
+        "spot": 466,
+        "signal": 20,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "SA",
+      "name": "Saudi Arabia",
+      "cameras": 458,
+      "byClass": {
+        "spot": 260,
+        "signal": 197,
+        "corridor": 0,
+        "adaptive": 1
+      }
+    },
+    {
+      "code": "AZ",
+      "name": "Azerbaijan",
+      "cameras": 438,
+      "byClass": {
+        "spot": 417,
+        "signal": 13,
+        "corridor": 0,
+        "adaptive": 8
+      }
+    },
+    {
+      "code": "ZA",
+      "name": "South Africa",
+      "cameras": 425,
+      "byClass": {
+        "spot": 200,
+        "signal": 203,
+        "corridor": 22,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "KZ",
+      "name": "Kazakhstan",
+      "cameras": 407,
+      "byClass": {
+        "spot": 174,
+        "signal": 233,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "CO",
+      "name": "Colombia",
+      "cameras": 391,
+      "byClass": {
+        "spot": 228,
+        "signal": 163,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "KW",
+      "name": "Kuwait",
+      "cameras": 376,
+      "byClass": {
+        "spot": 259,
+        "signal": 115,
+        "corridor": 2,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "LT",
+      "name": "Lithuania",
+      "cameras": 370,
+      "byClass": {
+        "spot": 223,
+        "signal": 22,
+        "corridor": 124,
+        "adaptive": 1
+      }
+    },
+    {
+      "code": "HU",
+      "name": "Hungary",
+      "cameras": 366,
+      "byClass": {
+        "spot": 355,
+        "signal": 8,
+        "corridor": 1,
+        "adaptive": 2
+      }
+    },
+    {
+      "code": "GR",
+      "name": "Greece",
+      "cameras": 362,
+      "byClass": {
+        "spot": 311,
+        "signal": 50,
+        "corridor": 0,
+        "adaptive": 1
+      }
+    },
+    {
+      "code": "UA",
+      "name": "Ukraine",
+      "cameras": 348,
+      "byClass": {
+        "spot": 339,
+        "signal": 8,
+        "corridor": 1,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "MX",
+      "name": "Mexico",
+      "cameras": 339,
+      "byClass": {
+        "spot": 291,
+        "signal": 48,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "TH",
+      "name": "Thailand",
+      "cameras": 333,
+      "byClass": {
+        "spot": 222,
+        "signal": 101,
+        "corridor": 0,
+        "adaptive": 10
+      }
+    },
+    {
+      "code": "AM",
+      "name": "Armenia",
+      "cameras": 328,
+      "byClass": {
+        "spot": 205,
+        "signal": 123,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "HK",
+      "name": "Hong Kong S.A.R.",
+      "cameras": 328,
+      "byClass": {
+        "spot": 136,
+        "signal": 180,
+        "corridor": 0,
+        "adaptive": 12
+      }
+    },
+    {
+      "code": "BA",
+      "name": "Bosnia and Herzegovina",
+      "cameras": 316,
+      "byClass": {
+        "spot": 291,
+        "signal": 25,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "NO",
+      "name": "Norway",
+      "cameras": 290,
+      "byClass": {
+        "spot": 246,
+        "signal": 0,
+        "corridor": 42,
+        "adaptive": 2
+      }
+    },
+    {
+      "code": "BG",
+      "name": "Bulgaria",
+      "cameras": 270,
+      "byClass": {
+        "spot": 103,
+        "signal": 167,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "SG",
+      "name": "Singapore",
+      "cameras": 263,
+      "byClass": {
+        "spot": 28,
+        "signal": 235,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "UZ",
+      "name": "Uzbekistan",
+      "cameras": 257,
+      "byClass": {
+        "spot": 187,
+        "signal": 70,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "DZ",
+      "name": "Algeria",
+      "cameras": 257,
+      "byClass": {
+        "spot": 240,
+        "signal": 16,
+        "corridor": 0,
+        "adaptive": 1
+      }
+    },
+    {
+      "code": "RS",
+      "name": "Republic of Serbia",
+      "cameras": 234,
+      "byClass": {
+        "spot": 162,
+        "signal": 66,
+        "corridor": 6,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "EC",
+      "name": "Ecuador",
+      "cameras": 234,
+      "byClass": {
+        "spot": 222,
+        "signal": 12,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "IL",
+      "name": "Israel",
+      "cameras": 201,
+      "byClass": {
+        "spot": 75,
+        "signal": 126,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "GE",
+      "name": "Georgia",
+      "cameras": 191,
+      "byClass": {
+        "spot": 158,
+        "signal": 31,
+        "corridor": 2,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "JP",
+      "name": "Japan",
+      "cameras": 183,
+      "byClass": {
+        "spot": 181,
+        "signal": 1,
+        "corridor": 0,
+        "adaptive": 1
+      }
+    },
+    {
+      "code": "CL",
+      "name": "Chile",
+      "cameras": 183,
+      "byClass": {
+        "spot": 2,
+        "signal": 181,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "MD",
+      "name": "Moldova",
+      "cameras": 177,
+      "byClass": {
+        "spot": 60,
+        "signal": 109,
+        "corridor": 8,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "PT",
+      "name": "Portugal",
+      "cameras": 174,
+      "byClass": {
+        "spot": 152,
+        "signal": 0,
+        "corridor": 19,
+        "adaptive": 3
+      }
+    },
+    {
+      "code": "UY",
+      "name": "Uruguay",
+      "cameras": 167,
+      "byClass": {
+        "spot": 140,
+        "signal": 23,
+        "corridor": 0,
+        "adaptive": 4
+      }
+    },
+    {
+      "code": "CY",
+      "name": "Northern Cyprus",
+      "cameras": 167,
+      "byClass": {
+        "spot": 118,
+        "signal": 47,
+        "corridor": 2,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "EG",
+      "name": "Egypt",
+      "cameras": 164,
+      "byClass": {
+        "spot": 159,
+        "signal": 3,
+        "corridor": 2,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "SI",
+      "name": "Slovenia",
+      "cameras": 147,
+      "byClass": {
+        "spot": 144,
+        "signal": 3,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "RW",
+      "name": "Rwanda",
+      "cameras": 147,
+      "byClass": {
+        "spot": 137,
+        "signal": 10,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "LV",
+      "name": "Latvia",
+      "cameras": 147,
+      "byClass": {
+        "spot": 109,
+        "signal": 5,
+        "corridor": 33,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "MY",
+      "name": "Malaysia",
+      "cameras": 146,
+      "byClass": {
+        "spot": 32,
+        "signal": 114,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "IQ",
+      "name": "Iraq",
+      "cameras": 137,
+      "byClass": {
+        "spot": 125,
+        "signal": 12,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "NZ",
+      "name": "New Zealand",
+      "cameras": 96,
+      "byClass": {
+        "spot": 52,
+        "signal": 41,
+        "corridor": 3,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "JO",
+      "name": "Jordan",
+      "cameras": 90,
+      "byClass": {
+        "spot": 59,
+        "signal": 27,
+        "corridor": 4,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "PK",
+      "name": "Pakistan",
+      "cameras": 87,
+      "byClass": {
+        "spot": 19,
+        "signal": 68,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "BH",
+      "name": "Bahrain",
+      "cameras": 83,
+      "byClass": {
+        "spot": 33,
+        "signal": 50,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "RO",
+      "name": "Romania",
+      "cameras": 80,
+      "byClass": {
+        "spot": 53,
+        "signal": 27,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "EE",
+      "name": "Estonia",
+      "cameras": 75,
+      "byClass": {
+        "spot": 73,
+        "signal": 2,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "MU",
+      "name": "Mauritius",
+      "cameras": 62,
+      "byClass": {
+        "spot": 61,
+        "signal": 1,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "KG",
+      "name": "Kyrgyzstan",
+      "cameras": 50,
+      "byClass": {
+        "spot": 12,
+        "signal": 38,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "IS",
+      "name": "Iceland",
+      "cameras": 48,
+      "byClass": {
+        "spot": 29,
+        "signal": 19,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "GT",
+      "name": "Guatemala",
+      "cameras": 41,
+      "byClass": {
+        "spot": 41,
+        "signal": 0,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "LU",
+      "name": "Luxembourg",
+      "cameras": 37,
+      "byClass": {
+        "spot": 29,
+        "signal": 4,
+        "corridor": 4,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "PE",
+      "name": "Peru",
+      "cameras": 28,
+      "byClass": {
+        "spot": 26,
+        "signal": 2,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "IN",
+      "name": "India",
+      "cameras": 26,
+      "byClass": {
+        "spot": 23,
+        "signal": 3,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "MT",
+      "name": "Malta",
+      "cameras": 25,
+      "byClass": {
+        "spot": 25,
+        "signal": 0,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "TN",
+      "name": "Tunisia",
+      "cameras": 24,
+      "byClass": {
+        "spot": 24,
+        "signal": 0,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "AD",
+      "name": "Andorra",
+      "cameras": 23,
+      "byClass": {
+        "spot": 11,
+        "signal": 3,
+        "corridor": 9,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "SK",
+      "name": "Slovakia",
+      "cameras": 21,
+      "byClass": {
+        "spot": 18,
+        "signal": 0,
+        "corridor": 1,
+        "adaptive": 2
+      }
+    },
+    {
+      "code": "LB",
+      "name": "Lebanon",
+      "cameras": 21,
+      "byClass": {
+        "spot": 2,
+        "signal": 19,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "DK",
+      "name": "Denmark",
+      "cameras": 20,
+      "byClass": {
+        "spot": 19,
+        "signal": 0,
+        "corridor": 1,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "ZM",
+      "name": "Zambia",
+      "cameras": 17,
+      "byClass": {
+        "spot": 17,
+        "signal": 0,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "SM",
+      "name": "San Marino",
+      "cameras": 13,
+      "byClass": {
+        "spot": 13,
+        "signal": 0,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "FJ",
+      "name": "Fiji",
+      "cameras": 13,
+      "byClass": {
+        "spot": 8,
+        "signal": 5,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "KR",
+      "name": "South Korea",
+      "cameras": 13,
+      "byClass": {
+        "spot": 4,
+        "signal": 9,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "NA",
+      "name": "Namibia",
+      "cameras": 9,
+      "byClass": {
+        "spot": 4,
+        "signal": 5,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "IE",
+      "name": "Ireland",
+      "cameras": 6,
+      "byClass": {
+        "spot": 0,
+        "signal": 2,
+        "corridor": 4,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "MC",
+      "name": "Monaco",
+      "cameras": 5,
+      "byClass": {
+        "spot": 3,
+        "signal": 1,
+        "corridor": 1,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "PA",
+      "name": "Panama",
+      "cameras": 5,
+      "byClass": {
+        "spot": 1,
+        "signal": 4,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "ZW",
+      "name": "Zimbabwe",
+      "cameras": 4,
+      "byClass": {
+        "spot": 4,
+        "signal": 0,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "TT",
+      "name": "Trinidad and Tobago",
+      "cameras": 4,
+      "byClass": {
+        "spot": 4,
+        "signal": 0,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "GI",
+      "name": "Gibraltar",
+      "cameras": 3,
+      "byClass": {
+        "spot": 3,
+        "signal": 0,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "MK",
+      "name": "North Macedonia",
+      "cameras": 3,
+      "byClass": {
+        "spot": 2,
+        "signal": 0,
+        "corridor": 1,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "LA",
+      "name": "Laos",
+      "cameras": 2,
+      "byClass": {
+        "spot": 2,
+        "signal": 0,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "BZ",
+      "name": "Belize",
+      "cameras": 2,
+      "byClass": {
+        "spot": 2,
+        "signal": 0,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "MN",
+      "name": "Mongolia",
+      "cameras": 2,
+      "byClass": {
+        "spot": 2,
+        "signal": 0,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "CW",
+      "name": "Curaçao",
+      "cameras": 2,
+      "byClass": {
+        "spot": 2,
+        "signal": 0,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "VN",
+      "name": "Vietnam",
+      "cameras": 2,
+      "byClass": {
+        "spot": 2,
+        "signal": 0,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "HN",
+      "name": "Honduras",
+      "cameras": 2,
+      "byClass": {
+        "spot": 0,
+        "signal": 2,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "AF",
+      "name": "Afghanistan",
+      "cameras": 1,
+      "byClass": {
+        "spot": 1,
+        "signal": 0,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "PH",
+      "name": "Philippines",
+      "cameras": 1,
+      "byClass": {
+        "spot": 1,
+        "signal": 0,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "CN",
+      "name": "China",
+      "cameras": 1,
+      "byClass": {
+        "spot": 1,
+        "signal": 0,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "LI",
+      "name": "Liechtenstein",
+      "cameras": 1,
+      "byClass": {
+        "spot": 0,
+        "signal": 1,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    },
+    {
+      "code": "PY",
+      "name": "Paraguay",
+      "cameras": 1,
+      "byClass": {
+        "spot": 0,
+        "signal": 1,
+        "corridor": 0,
+        "adaptive": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-21",
+  "checked_at_utc": "2026-10-21T05:00:17.929395+00:00",
+  "source_version": "11.14.242",
+  "previous_delivery_saved": true,
+  "previous_library_files": {
+    "zip": "libfile_0372c340c6148191a6187be7019c72d7",
+    "work": "libfile_05d23821afd48191a0fda0b73a4f17b6",
+    "progress": "libfile_85488a7572488191b895f49411d7e047"
+  },
+  "source_files_available": true,
+  "native_android_sdk_available": false,
+  "maven_access": "Proxy CONNECT aborted due to timeout (curl --max-time 4)",
+  "missing_for_real_7z": [
+    "fr-camera.sqlite.7z",
+    "ch-camera.sqlite.7z",
+    "commons-compress-1.28.0.jar",
+    "commons-io-2.20.0.jar",
+    "commons-lang3-3.18.0.jar",
+    "commons-codec-1.19.0.jar",
+    "xz-1.12.jar"
+  ],
+  "native_android_build_attempted_this_lot": false,
+  "build_blocker_evidence": "verification/gradle-phone-11.14.242.log",
+  "notes": "Pas de nouvelle tentative de build : distribution Gradle absente, réseau inchangé et SDK manquant. Vérifications de ce lot ciblées sur SQLite/canonique et sources modifiées."
+}

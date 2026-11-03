@@ -1,0 +1,17 @@
+app/src/auto/java/fr/roadguard/app/RoadguardCarScreen.java
+app/src/main/java/fr/roadguard/app/DestinationCoordinates.java
+app/src/main/java/fr/roadguard/app/TileArchiveInstaller.java
+app/src/main/java/fr/roadguard/app/RadarApproachFilter.java
+app/src/main/java/fr/roadguard/app/LatestSearchHttp.java
+app/src/main/java/fr/roadguard/app/MainActivity.java
+app/src/main/java/fr/roadguard/app/RouteRequestPolicy.java
+app/src/main/java/fr/roadguard/app/MapOverlayPlacement.java
+app/src/main/java/fr/roadguard/app/NavigationProgress.java
+app/src/main/java/fr/roadguard/app/BackgroundAlertService.java
+app/src/main/java/fr/roadguard/app/NavigationIntentInput.java
+app/src/test/java/fr/roadguard/app/MapOverlayRuntimeTest.java
+app/src/test/java/fr/roadguard/app/StartupRuntimeTest.java
+
+Java syntax OK (no Android type checking)
+
+exit=0

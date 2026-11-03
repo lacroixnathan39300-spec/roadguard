@@ -1,0 +1,14 @@
+
+PASS user screenshot catalog regression: 24444 checks; both real Champagnole duplicates reconciled, all FR originals retained, conflicts/ambiguity preserved
+
+PASS music progress: 15 checks, actual timing policy; no Spotify session or sound
+
+PASS raster source: 12 checks, real cache/files and restart, offline makes zero external requests; JPEG fixture tests signatures only
+
+PASS 17 real-file tile-cache scenarios; HTTP transport injected; no Android runtime
+
+PASS radar metadata merge / 28 checks plus retention of all FR originals; real assets, JVM boundaries only
+
+PASS 12 radar supplement scenarios / 24442 assertions; originals preserved, real files, no Android runtime
+
+PASS catalog/policy core: 15 scenarios, 424104 assertions; real bundled files (Europe=80021, FR=24429, CH=1777, active=82158); JVM Android adapters, NOT Android runtime

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="fr.roadguard.app.TileCacheRuntimeTest" tests="52" skipped="0" failures="0" errors="0" timestamp="2026-10-21T08:43:21" hostname="dec3125c2336" time="3.649">
+  <properties/>
+  <testcase name="cleanupRemovesLeastRecentlyViewedAndKeepsBudgetBounded[26]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.034"/>
+  <testcase name="tileLargerThanBudgetIsDisplayedButNotStored[26]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.02"/>
+  <testcase name="lowSpaceRefreshNeverDeletesPreviousGoodVersion[26]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.029"/>
+  <testcase name="corruptCrcAndHeaderOnlyPayloadAreRejected[26]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.02"/>
+  <testcase name="completeTileSurvivesOfflineRestart[26]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.016"/>
+  <testcase name="phoneAndCarConcurrentWritesUseOneCapacity[26]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.07"/>
+  <testcase name="serverNoStoreRemovesPreviousTileAndUpdatesCounters[26]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.018"/>
+  <testcase name="separatePhoneAndCarCachesShareSingleFetch[26]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.057"/>
+  <testcase name="etag304RevalidatesWithoutLosingBytes[26]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.018"/>
+  <testcase name="externallyClearedCacheReconcilesSharedCounters[26]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.016"/>
+  <testcase name="fourGiBBudgetRetainsCacheLargerThanSignedInteger[26]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.016"/>
+  <testcase name="truncatedPngDoesNotReplacePreviousGoodTile[26]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.015"/>
+  <testcase name="lowFreeSpaceKeepsLiveMapWorkingWithoutCachingNewTile[26]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.018"/>
+  <testcase name="cleanupRemovesLeastRecentlyViewedAndKeepsBudgetBounded[28]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.992"/>
+  <testcase name="tileLargerThanBudgetIsDisplayedButNotStored[28]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.019"/>
+  <testcase name="lowSpaceRefreshNeverDeletesPreviousGoodVersion[28]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.021"/>
+  <testcase name="corruptCrcAndHeaderOnlyPayloadAreRejected[28]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.022"/>
+  <testcase name="completeTileSurvivesOfflineRestart[28]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.022"/>
+  <testcase name="phoneAndCarConcurrentWritesUseOneCapacity[28]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.027"/>
+  <testcase name="serverNoStoreRemovesPreviousTileAndUpdatesCounters[28]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.018"/>
+  <testcase name="separatePhoneAndCarCachesShareSingleFetch[28]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.06"/>
+  <testcase name="etag304RevalidatesWithoutLosingBytes[28]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.02"/>
+  <testcase name="externallyClearedCacheReconcilesSharedCounters[28]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.02"/>
+  <testcase name="fourGiBBudgetRetainsCacheLargerThanSignedInteger[28]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.021"/>
+  <testcase name="truncatedPngDoesNotReplacePreviousGoodTile[28]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.017"/>
+  <testcase name="lowFreeSpaceKeepsLiveMapWorkingWithoutCachingNewTile[28]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.017"/>
+  <testcase name="cleanupRemovesLeastRecentlyViewedAndKeepsBudgetBounded[34]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="1.419"/>
+  <testcase name="tileLargerThanBudgetIsDisplayedButNotStored[34]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.02"/>
+  <testcase name="lowSpaceRefreshNeverDeletesPreviousGoodVersion[34]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.02"/>
+  <testcase name="corruptCrcAndHeaderOnlyPayloadAreRejected[34]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.02"/>
+  <testcase name="completeTileSurvivesOfflineRestart[34]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.023"/>
+  <testcase name="phoneAndCarConcurrentWritesUseOneCapacity[34]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.028"/>
+  <testcase name="serverNoStoreRemovesPreviousTileAndUpdatesCounters[34]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.022"/>
+  <testcase name="separatePhoneAndCarCachesShareSingleFetch[34]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.067"/>
+  <testcase name="etag304RevalidatesWithoutLosingBytes[34]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.023"/>
+  <testcase name="externallyClearedCacheReconcilesSharedCounters[34]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.018"/>
+  <testcase name="fourGiBBudgetRetainsCacheLargerThanSignedInteger[34]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.017"/>
+  <testcase name="truncatedPngDoesNotReplacePreviousGoodTile[34]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.016"/>
+  <testcase name="lowFreeSpaceKeepsLiveMapWorkingWithoutCachingNewTile[34]" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.017"/>
+  <testcase name="cleanupRemovesLeastRecentlyViewedAndKeepsBudgetBounded" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.022"/>
+  <testcase name="tileLargerThanBudgetIsDisplayedButNotStored" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.017"/>
+  <testcase name="lowSpaceRefreshNeverDeletesPreviousGoodVersion" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.019"/>
+  <testcase name="corruptCrcAndHeaderOnlyPayloadAreRejected" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.017"/>
+  <testcase name="completeTileSurvivesOfflineRestart" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.018"/>
+  <testcase name="phoneAndCarConcurrentWritesUseOneCapacity" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.024"/>
+  <testcase name="serverNoStoreRemovesPreviousTileAndUpdatesCounters" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.018"/>
+  <testcase name="separatePhoneAndCarCachesShareSingleFetch" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.063"/>
+  <testcase name="etag304RevalidatesWithoutLosingBytes" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.019"/>
+  <testcase name="externallyClearedCacheReconcilesSharedCounters" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.019"/>
+  <testcase name="fourGiBBudgetRetainsCacheLargerThanSignedInteger" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.02"/>
+  <testcase name="truncatedPngDoesNotReplacePreviousGoodTile" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.018"/>
+  <testcase name="lowFreeSpaceKeepsLiveMapWorkingWithoutCachingNewTile" classname="fr.roadguard.app.TileCacheRuntimeTest" time="0.025"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

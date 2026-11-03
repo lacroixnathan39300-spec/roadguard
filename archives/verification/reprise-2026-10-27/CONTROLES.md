@@ -1,0 +1,1 @@
+Test local-first réparé : adaptateurs complétés pour DownloadedMapStore réel.115assertions réussies avec/sans réseau, routes/pages/assets réels, tuiles PMTiles et XYZ locales ; scripts de démarrage13scénarios et autorité réseau native réussis. Pas de simulation WebGL ni essai Android réel. Code applicatif GPS293 inchangé.

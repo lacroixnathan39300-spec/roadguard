@@ -1,0 +1,120 @@
+{
+  "application": "gps",
+  "filename": "ROADGUARD-GPS-11.14.297.apk",
+  "version": "11.14.297",
+  "code": 497,
+  "package": "fr.roadguard.app",
+  "minSdk": 26,
+  "certificate_sha256": "a78735412fc59bdaf681e43459b559be35d96228d181227d1b8500ea23334bdf",
+  "v1": true,
+  "v2": true,
+  "zip_crc": true,
+  "abis": [],
+  "dex": [
+    "dex\n038\u0000"
+  ],
+  "size": 11970180,
+  "sha256": "1ac26c408f56e2b5eb0242d3ec8fab58427c6aacda92bb831bfeb19db58dbc6f",
+  "tests": [
+    {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "module": "app",
+      "suite": "fr.roadguard.app.PhoneGuidanceSharingRuntimeTest"
+    },
+    {
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "module": "app",
+      "suite": "fr.roadguard.app.SpotifyRuntimeTest"
+    },
+    {
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "module": "app",
+      "suite": "fr.roadguard.app.ProgressiveRadarRuntimeTest"
+    },
+    {
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "module": "app",
+      "suite": "fr.roadguard.app.MapPaletteRuntimeTest"
+    },
+    {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "module": "app",
+      "suite": "fr.roadguard.app.PhoneBackgroundGuidanceTest"
+    },
+    {
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "module": "app",
+      "suite": "fr.roadguard.app.MobileAudioRuntimeTest"
+    },
+    {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "module": "app",
+      "suite": "fr.roadguard.app.RadarDownloadEntryTest"
+    },
+    {
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "module": "app",
+      "suite": "fr.roadguard.app.RadarToolsRuntimeTest"
+    },
+    {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "module": "app",
+      "suite": "fr.roadguard.app.LocalFirstBootstrapRuntimeTest"
+    },
+    {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "module": "app",
+      "suite": "fr.roadguard.app.RadarCsvInputTest"
+    },
+    {
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "module": "app",
+      "suite": "fr.roadguard.app.RuntimeManifestContractTest"
+    },
+    {
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "module": "app",
+      "suite": "fr.roadguard.app.OverspeedSpeechRuntimeTest"
+    }
+  ],
+  "test_count": 82,
+  "api_lint": "No issues found.",
+  "hardware_tests": "not performed",
+  "seven_embedded_radar_databases_and_map_engine_identical": true
+}

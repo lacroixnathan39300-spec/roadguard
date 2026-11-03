@@ -1,0 +1,94 @@
+{
+  "version": "11.14.197",
+  "test_suites": [
+    {
+      "suite": "fr.roadguard.app.AndroidRuntimeTest",
+      "tests": 72,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "fr.roadguard.app.CarSearchRuntimeTest",
+      "tests": 18,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "fr.roadguard.app.CarSurfaceRuntimeTest",
+      "tests": 9,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "fr.roadguard.app.ControlMemoryRuntimeTest",
+      "tests": 54,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "fr.roadguard.app.DriveAutoRuntimeTest",
+      "tests": 28,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "fr.roadguard.app.LocalPageRuntimeTest",
+      "tests": 14,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "fr.roadguard.app.ModernAndroidRuntimeTest",
+      "tests": 5,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "fr.roadguard.app.PhoneRuntimeTest",
+      "tests": 36,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "fr.roadguard.app.RadarAlertsRuntimeTest",
+      "tests": 26,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "fr.roadguard.app.SpotifyRuntimeTest",
+      "tests": 12,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "fr.roadguard.app.TileCacheRuntimeTest",
+      "tests": 52,
+      "failures": 0,
+      "skipped": 0
+    }
+  ],
+  "tests": 326,
+  "failures": 0,
+  "radar_alert_tests": 26,
+  "android_auto_suite_tests": 99,
+  "lint_errors": 0,
+  "lint_warnings": 55,
+  "lint_warning_categories": {
+    "UnusedAttribute": 1,
+    "SetJavaScriptEnabled": 1,
+    "ExportedService": 1,
+    "UsableSpace": 4,
+    "SetTextI18n": 48
+  },
+  "xiaomi_tested": false,
+  "vehicle_tested": false,
+  "external_api_authenticated_tested": false,
+  "spotify_real_app_tested": false,
+  "play_uploaded": false,
+  "apk_sha256": "6b04b404b2a7671e88c2742b080248e87735c8eede1440dbd8f4ebe81386a6e2",
+  "apk_assembled": true,
+  "signature_v2_v3_verified": true,
+  "zipalign_verified": true,
+  "assets_match_source": true
+}

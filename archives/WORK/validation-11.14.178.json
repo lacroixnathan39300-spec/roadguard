@@ -1,0 +1,62 @@
+{
+  "version": "11.14.178",
+  "versionCode": 378,
+  "sourceVersion": "11.14.177",
+  "createdAt": "2026-10-17T07:40:21.376421+00:00",
+  "apk": {
+    "file": "ROADGUARD-11.14.178-CORRECTIF-MAPATLAS.apk",
+    "bytes": 4588691,
+    "sha256": "b67eb307f8dd1d1a6e767f5a4e230730bad1ebe72d52b4d221f1560bdab98d4f",
+    "java_compile": true,
+    "resources_linked": true,
+    "dex_generated": true,
+    "zipalign_verified": true,
+    "signature_v2_v3_verified": true,
+    "source_asset_identity_verified": true,
+    "same_verification_signer_as_177": true,
+    "verification_debug_signed": true,
+    "executed_on_device": false,
+    "xiaomi_tested": false
+  },
+  "tests": {
+    "regression_scripts_passed": 34,
+    "regression_scripts_total": 34,
+    "java_secure_http_test": true,
+    "original_android_late_header_error_reproduced": true,
+    "corrected_request_readable": true,
+    "http_status_error_cases": [
+      301,
+      403,
+      404,
+      429,
+      500
+    ],
+    "transport_error_connection_closed": true,
+    "https_and_no_userinfo_guard": true,
+    "source_catalog_only_offered_when_pack_exists_static_check": true,
+    "mapatlas_fr_ch_host_download_and_metadata": true,
+    "ui_scripts_node_vm": true,
+    "ui_screens": 12,
+    "browser_rendered": false
+  },
+  "user_feedback_177": {
+    "radar_bases_screen_visible_on_xiaomi": true,
+    "mapatlas_download_failed": true,
+    "source": "Three user screenshots received 2026-10-17; no complete-device validation inferred."
+  },
+  "site": {
+    "modified_this_version": false,
+    "last_deployed_version": 3
+  },
+  "capacity": {
+    "target_concurrent": 500000,
+    "validated": false,
+    "load_test_executed": false
+  },
+  "limits": [
+    "Correctif 11.14.178 non exécuté sur téléphone; téléchargement réel Android à revalider.",
+    "Test HTTP Java avec connexion stricte simulée, distinct des téléchargements FR/CH effectués avec curl depuis cet environnement.",
+    "Aucun compte ou clé Lufop utilisé; aucune source privée testée.",
+    "Aucun essai de 500 000 connexions simultanées."
+  ]
+}

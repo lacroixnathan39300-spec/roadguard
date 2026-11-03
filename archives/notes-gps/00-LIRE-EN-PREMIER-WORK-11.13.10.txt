@@ -1,0 +1,26 @@
+ROADGUARD 11.13.11 — Correctif point GPS après chargement du style PMTiles.
+Voir WORK/05-CORRECTIF-POINT-GPS-11.13.11.md pour le changement et la recette Xiaomi.
+
+ROADGUARD 11.13.10 — MISSION CORRECTIF RENDU HORS LIGNE (priorité absolue)
+
+OBSERVATION UTILISATEUR CONFIRMÉE : ROADGUARD 11.13.9 a téléchargé ~2764 Mo de PMTiles France, le fichier est annoncé valide, mais la carte disparaît en mode avion. Ne pas confondre validation de l'en-tête PMTiles avec capacité d'affichage. Version de ce correctif : 11.13.10 / versionCode 171.
+
+DIAGNOSTIC SOURCE (état initial du ZIP, avant ce correctif) :
+1. Le ZIP d'entrée ne contenait que README.txt sous app/src/main/assets/vendor ; maplibre-gl.js et maplibre-gl.css manquaient, bien que map_maplibre.html les référence.
+2. La carte par défaut est app/src/main/assets/map.html, qui dépend des tuiles en ligne. La prévisualisation MapLibre est distincte et n'est activée que par le bouton dans la bibliothèque de cartes.
+3. La page map_maplibre.html utilise un style supposant les source-layers OpenMapTiles ('transportation','road', etc.). Il faut lire les metadata du PMTiles réel pour connaître le schéma et le style correct.
+4. Le téléchargement stocke les packs dans getFilesDir()/pmtiles ; NE PAS SUPPRIMER le pack existant, ne pas changer le nom des fichiers ni l'identité de l'application Android.
+
+ÉTAT DU CORRECTIF SOURCE :
+- Ajout d'un sélecteur pour réutiliser une archive PMTiles déjà présente sur le téléphone, sans téléchargement réseau. L'import local vérifie taille, en-tête, type, emprise France/Corse pour le vectoriel et SHA-256. Si le fichier est déjà dans le dossier privé de ROADGUARD, il est détecté au démarrage et n'est pas recopié.
+- L'intercepteur Android renvoie les tuiles PMTiles locales avec en-têtes CORS. Le style ajoute des couches de noms de routes et de villes et pointe vers un chemin local pour les glyphes.
+- Le démarrage sélectionne automatiquement un PMTiles vectoriel France déjà installé lorsque MapLibre JS/CSS est présent ; le menu offre explicitement le retour à la carte en ligne.
+
+BLOQUÉ POUR FINIR LA RECETTE :
+- La carte de 2,76 Go n'est pas jointe au ZIP ni accessible à cet espace de travail. Le nouveau sélecteur doit la reprendre sur le téléphone sans la retélécharger; l'import copie le fichier dans le stockage privé et demande donc assez d'espace libre pour une seconde copie. Un fichier déjà dans `getFilesDir()/pmtiles/` n'est pas dupliqué.
+- MapLibre GL JS/CSS 4.7.1, trois plages locales de glyphes Noto Sans et le décodeur Brotli sont maintenant présents dans les sources avec leurs licences. Ils sont destinés à l'APK au prochain build; aucun APK n'a encore été construit.
+- Aucun Gradle/SDK Android ni Xiaomi n'est disponible ici. Le vrai PMTiles, le rendu, les glyphes, le GPS et la caméra doivent être testés dans CodeAssist et en mode avion avant de déclarer la mission réussie.
+
+Garder GPS/caméra existants ; ne pas étendre à d'autres pays avant réussite concrète en France.
+
+ACCEPTATION : installer un APK construit depuis ces sources sans désinstaller l'application, réutiliser l'archive France existante, ouvrir Carte en mode avion et voir routes + noms de villes, puis vérifier GPS/caméra sur Xiaomi. Ensuite seulement étendre à Suisse, Allemagne et autres pays.

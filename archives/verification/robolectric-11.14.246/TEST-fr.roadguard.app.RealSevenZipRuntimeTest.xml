@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="fr.roadguard.app.RealSevenZipRuntimeTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-21T08:50:17" hostname="dec3125c2336" time="0.856">
+  <properties/>
+  <testcase name="packagedArchivesExtractAndInstallUsingAndroidSQLite[26]" classname="fr.roadguard.app.RealSevenZipRuntimeTest" time="0.498"/>
+  <testcase name="packagedArchivesExtractAndInstallUsingAndroidSQLite" classname="fr.roadguard.app.RealSevenZipRuntimeTest" time="0.355"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

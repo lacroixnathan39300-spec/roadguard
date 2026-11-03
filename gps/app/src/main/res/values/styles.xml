@@ -1,0 +1,12 @@
+<resources>
+<style name="RoadguardTheme" parent="android:style/Theme.Material.NoActionBar">
+<item name="android:fontFamily">sans</item><item name="android:colorAccent">#FF425B</item>
+<item name="android:windowBackground">#080D14</item><item name="android:colorBackground">#080D14</item>
+<item name="android:statusBarColor">#080D14</item><item name="android:navigationBarColor">#080D14</item>
+<item name="android:alertDialogTheme">@style/RoadguardDialog</item><item name="android:windowLightStatusBar">false</item>
+</style>
+<style name="RoadguardDialog" parent="android:style/Theme.Material.Dialog.Alert">
+<item name="android:colorAccent">#FF425B</item><item name="android:colorBackground">#151B24</item>
+<item name="android:windowBackground">@drawable/dialog_background</item><item name="android:textColorPrimary">#F4F6FB</item>
+<item name="android:textColorSecondary">#B7C2D0</item><item name="android:windowMinWidthMajor">90%</item><item name="android:windowMinWidthMinor">90%</item>
+</style></resources>

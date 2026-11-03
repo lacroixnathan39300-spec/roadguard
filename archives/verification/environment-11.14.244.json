@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-21",
+  "checked_at": "2026-10-21T08:22:16.018390+02:00",
+  "source_version": "11.14.243",
+  "sdk_search_available": false,
+  "gradle_build_attempted_this_lot": false,
+  "build_blocker_previous_evidence": "verification/gradle-phone-11.14.242.log",
+  "native_android_runtime_executed": false,
+  "real_webview_executed": false,
+  "live_tile_server_test_executed": false,
+  "note": "SDK et distribution Gradle absents. Pas de nouvelle tentative identique. Chromium pour le rendu local absent ; tests JS dans Node avec adaptateurs uniquement.",
+  "camera_geometry_and_motion_sources_unchanged": true,
+  "missing_for_real_7z": [
+    "fr-camera.sqlite.7z",
+    "ch-camera.sqlite.7z",
+    "commons-compress-1.28.0.jar",
+    "commons-io-2.20.0.jar",
+    "commons-lang3-3.18.0.jar",
+    "commons-codec-1.19.0.jar",
+    "xz-1.12.jar"
+  ]
+}

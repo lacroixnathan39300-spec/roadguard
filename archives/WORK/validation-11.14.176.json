@@ -1,0 +1,63 @@
+{
+  "version": "11.14.176",
+  "versionCode": 376,
+  "createdAt": "2026-10-17T06:57:45.265097+00:00",
+  "apk": {
+    "file": "ROADGUARD-11.14.176-COMMUNAUTE.apk",
+    "sha256": "12d994b90c9e2ff434a0f8dfcd926a1e9362d91a4c1a00bd63b74d06391a78d7",
+    "bytes": 4584595,
+    "java_compile": true,
+    "resources_linked": true,
+    "dex_generated": true,
+    "zipalign_verified": true,
+    "signature_v2_v3_verified": true,
+    "verification_debug_signed": true,
+    "source_asset_identity_verified": true,
+    "executed_on_device": false,
+    "xiaomi_tested": false
+  },
+  "tests": {
+    "android_regression_scripts_passed": 33,
+    "android_regression_scripts_total": 33,
+    "android_community_policy_java": true,
+    "actual_ui_scripts_node_vm": true,
+    "site_api_groups": 31,
+    "site_inventory_scenarios": true,
+    "typescript_no_emit": true,
+    "site_production_build": true,
+    "browser_render_this_version": false
+  },
+  "site": {
+    "url": "https://roadguard-community.lacroixnathan39300.chatgpt.site",
+    "version": 3,
+    "commit": "f104afc9c47fb08f5ed4da935e071e5c69ca386e",
+    "deployment": "appgdep_6ad31c01375481918190be5e2c3afbcc",
+    "status": "succeeded",
+    "live_health_config_manifest_reports_presence": true,
+    "tables": [
+      "devices",
+      "events",
+      "geocode_cache",
+      "preferences",
+      "presence",
+      "presence_sessions",
+      "rate_limits",
+      "reports",
+      "votes"
+    ]
+  },
+  "capacity": {
+    "target_concurrent": 500000,
+    "validated": false,
+    "synthetic_sql_fixture_only": true,
+    "production_load_test_executed": false,
+    "dedicated_infrastructure_provisioned": false
+  },
+  "limits": [
+    "Aucun essai réel du compte associé sur téléphone.",
+    "Aucun rendu Android ni validation GPS, voix ou écran éteint sur Xiaomi.",
+    "Banc SQL local et profil k6 préparé; ne prouvent pas 500 000 connexions simultanées.",
+    "Fournisseurs publics actuels non dimensionnés ni autorisés pour préchargement de pays/rayon.",
+    "Signature de vérification distincte de celle éventuellement utilisée dans CodeAssist."
+  ]
+}

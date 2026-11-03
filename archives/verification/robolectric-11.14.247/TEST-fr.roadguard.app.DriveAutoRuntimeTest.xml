@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="fr.roadguard.app.DriveAutoRuntimeTest" tests="28" skipped="0" failures="0" errors="0" timestamp="2026-10-21T09:37:39" hostname="dec3125c2336" time="11.556">
+  <properties/>
+  <testcase name="returnToRoadguardHidesBubbleWithoutStoppingSession[26]" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.978"/>
+  <testcase name="taskLifetimeAndSpotifyListenerAreDeclaredSafely[26]" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.026"/>
+  <testcase name="backFromRootFinishesAndStopsWatch[26]" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="1.549"/>
+  <testcase name="slowMovingTrafficDoesNotCountAsParking[26]" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.026"/>
+  <testcase name="longGpsGapBreaksStationaryContinuity[26]" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.018"/>
+  <testcase name="removingTaskClosesOverlayAndCannotResurrectIt[26]" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.815"/>
+  <testcase name="explicitStopDisarmsAutomaticResume[26]" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.789"/>
+  <testcase name="armedServiceDoesNotShowBubbleBeforeDriving[26]" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.814"/>
+  <testcase name="stopRequiresWholeMinuteOfStationaryFreshFixes[26]" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.03"/>
+  <testcase name="stoppedSessionRestartsOnNextDrive[26]" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.023"/>
+  <testcase name="movementResetsStopTimer[26]" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.023"/>
+  <testcase name="stationaryMinuteHidesBubbleButKeepsRearmWatch[26]" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.778"/>
+  <testcase name="strictThresholdNeedsTwoDistinctReliableMeasurements[26]" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.021"/>
+  <testcase name="lostOrInvalidSpeedSuspendsWithoutInventingAStop[26]" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.015"/>
+  <testcase name="returnToRoadguardHidesBubbleWithoutStoppingSession" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.894"/>
+  <testcase name="taskLifetimeAndSpotifyListenerAreDeclaredSafely" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.025"/>
+  <testcase name="backFromRootFinishesAndStopsWatch" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="1.46"/>
+  <testcase name="slowMovingTrafficDoesNotCountAsParking" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.028"/>
+  <testcase name="longGpsGapBreaksStationaryContinuity" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.019"/>
+  <testcase name="removingTaskClosesOverlayAndCannotResurrectIt" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.829"/>
+  <testcase name="explicitStopDisarmsAutomaticResume" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.783"/>
+  <testcase name="armedServiceDoesNotShowBubbleBeforeDriving" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.711"/>
+  <testcase name="stopRequiresWholeMinuteOfStationaryFreshFixes" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.026"/>
+  <testcase name="stoppedSessionRestartsOnNextDrive" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.018"/>
+  <testcase name="movementResetsStopTimer" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.017"/>
+  <testcase name="stationaryMinuteHidesBubbleButKeepsRearmWatch" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.78"/>
+  <testcase name="strictThresholdNeedsTwoDistinctReliableMeasurements" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.03"/>
+  <testcase name="lostOrInvalidSpeedSuspendsWithoutInventingAStop" classname="fr.roadguard.app.DriveAutoRuntimeTest" time="0.023"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+]]></system-err>
+</testsuite>

@@ -1,0 +1,3 @@
+Exécutions Java observées dans la session du 20/10/2026 :
+PASS weighted ledger: seven modules, 100 points, four decimals, invalid weights and unproved validation rejected
+PASS secure HTTP: original late-header failure reproduced; corrected MapAtlas request readable; timeout/header order, HTTP errors, TLS failure, close and HTTPS guards verified.

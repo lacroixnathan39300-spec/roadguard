@@ -1,0 +1,17 @@
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): true
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+Signer #1 certificate DN: CN=ROADGUARD Verification, O=Local development, C=FR
+Signer #1 certificate SHA-256 digest: 52ff1a034ff05a11847435e25c0f2077614fe278290818b42b4bad198502ffa3
+Signer #1 certificate SHA-1 digest: 7b06b6c47f9b8469e2adce9ca756e694b7043609
+Signer #1 certificate MD5 digest: 1ad503e76bcb1044facb9080f51722db
+Signer #1 key algorithm: RSA
+Signer #1 key size (bits): 2048
+Signer #1 public key SHA-256 digest: 9ba592d434fa36d7969a8b0760220e3d756d887e3784d8fbe8faa0a7440e2858
+Signer #1 public key SHA-1 digest: 5a1ce585ba5fa12f9d8eaf738746cd45098bc096
+Signer #1 public key MD5 digest: 6a23a3f7875408ba7bc22491af911eeb

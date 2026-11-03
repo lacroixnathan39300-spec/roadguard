@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="fr.roadguard.app.ProgressiveRadarRuntimeTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-10-27T07:39:29.835Z" hostname="2895238405b8" time="0.173">
+  <properties/>
+  <testcase name="semanticVersionIsNumeric[27]" classname="fr.roadguard.app.ProgressiveRadarRuntimeTest" time="0.018"/>
+  <testcase name="proximityChangesCadenceWithoutWaitingForGpsHeartbeat[27]" classname="fr.roadguard.app.ProgressiveRadarRuntimeTest" time="0.022"/>
+  <testcase name="overspeedChangesToneButUnknownLimitNeverDoes[27]" classname="fr.roadguard.app.ProgressiveRadarRuntimeTest" time="0.025"/>
+  <testcase name="progressivelyFasterAndContinuousOnlyInLastFiftyMetres[27]" classname="fr.roadguard.app.ProgressiveRadarRuntimeTest" time="0.019"/>
+  <testcase name="semanticVersionIsNumeric" classname="fr.roadguard.app.ProgressiveRadarRuntimeTest" time="0.021"/>
+  <testcase name="proximityChangesCadenceWithoutWaitingForGpsHeartbeat" classname="fr.roadguard.app.ProgressiveRadarRuntimeTest" time="0.02"/>
+  <testcase name="overspeedChangesToneButUnknownLimitNeverDoes" classname="fr.roadguard.app.ProgressiveRadarRuntimeTest" time="0.027"/>
+  <testcase name="progressivelyFasterAndContinuousOnlyInLastFiftyMetres" classname="fr.roadguard.app.ProgressiveRadarRuntimeTest" time="0.019"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

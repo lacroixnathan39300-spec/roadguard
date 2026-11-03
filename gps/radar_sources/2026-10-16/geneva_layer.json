@@ -1,0 +1,194 @@
+{
+ "currentVersion": 11.3,
+ "cimVersion": "3.3.0",
+ "id": 0,
+ "name": "OTC_SL_RESEAU_RADAR",
+ "type": "Feature Layer",
+ "description": "Une nouvelle série de couches en lien avec la gestion du trafic est mise à disposition par l'Office cantonal des transports\nCet ensemble de couche sert à la gestion de tous les équipements des carrefours à feux qui régulent le trafic des véhicules privés et des transports collectifs, mais également les piétons et les cyclistes.\n\nQuelques chiffres pour illustrer ces données : plus de 9000 boîtes à feux tout confondu pour les voitures, piétons, cyclistes, bus ou trams, 2180 détecteurs (boutons poussoirs piéton / cycliste ou détecteurs vidéo), 3392 mâts pour maintenir le tout ! Sur un total de 359 armoires qui commande 454 carrefours, ainsi que 164 installations avec des feux clignotants pour les piétons.\n\nCes données servent à l'inventaire, à l'entretien et au dépannage de ces équipements. Ils servent également à prévoir et étudier toutes les modifications apportées régulièrement à ces carrefours.\n\nCette couche représente les socles des différents radars de vitesse et de surveillance de la signalisation lumineuse.",
+ "geometryType": "esriGeometryPoint",
+ "sourceSpatialReference": {
+  "wkid": 2056,
+  "latestWkid": 2056,
+  "xyTolerance": 0.001,
+  "zTolerance": 0.001,
+  "mTolerance": 0.001,
+  "falseX": -27386400,
+  "falseY": -32067900,
+  "xyUnits": 10000,
+  "falseZ": 0,
+  "zUnits": 1,
+  "falseM": 0,
+  "mUnits": 1
+ },
+ "copyrightText": "",
+ "parentLayer": null,
+ "subLayers": [],
+ "minScale": 0,
+ "maxScale": 0,
+ "referenceScale": 0.0,
+ "drawingInfo": {
+  "renderer": {
+   "type": "simple",
+   "symbol": {
+    "type": "esriPMS",
+    "url": "d01dc659e8e7976ad971ff372d31c98c",
+    "imageData": "iVBORw0KGgoAAAANSUhEUgAAACIAAAAmCAYAAACh1knUAAAACXBIWXMAAA7EAAAOxAGVKw4bAAADQ0lEQVRYhd3YTWgUZxjA8f8zO2kSNVZSEnc3emhL6SlSsNDqpdIGbDKzqblIW1ovQUgreCsehDRQKvRSRKkVSj+CWIIBg9ldNdIP+0V7qFiqPVRBL5mZ1WCkTUI3TmaeshELtkl2NjtLg3/Y077z8ltm5p131mSFZLJCMlkhmTwQEEVsjwNqcDyf5PL/A1Ek4/GBwhsS0msVeL4ajFktgru1SMhX1WDMGBDEgTFjQlSNqQhiO2zSBM2qXALqRZgRZUrvzrMWpQGDCQl4HdgXO2SbYq4usBtlp8CgH/Dm2EYmFxrb7fBkCK9YLucM4d1sim9igXR6tCQ8jqlwqjFFx7AQLDV+tI3fgYHScaIcsF1efDrF/gEhXDbEusFjEjBoKHtH01ykgs6kmAB22y59FzyGtimvnhfmKoZ0T9CkPp9isGs0yXWWWS7N0YzLTFOB94G9FUPU5whCf7YKxL2yaY7ZDu2Ww8v5NoYiQ7oKPKMhxVzECy1K03fob6pnrPMqI2eeYDYSxFD2Eyy6Viyr849StDw+MdfQCxwpC+n0aEGZzW3EIebCaYZkNSORIEZIBoMsNah0SmyPP3sKtI4kubkkRIRNRsiHtYDMzw8/+3O0A18uCVEl5Tfg1QqiiqcGqfKnRlibb2aqVhCE24Q8XhaiMNnj0DwCt2rjoBXuvz4WhihuoLRRI0iopFX4vizEEH4KDJ4Dfq0FRIRnVyU4VBYya3D2oZATwOG4ETuus25OmRtuZbos5FySGdvlVleB9tPJ+Q1QbAX19CF8vtB3Cy7xmmBAgvmn5Y64ED3jPOILHbkk70WG5NdzLePyW8ahN9vGx1UrFPE9jhohbyOlGzMipFRDiv6/Cpy0XK7k03xHFZVewkT4ejTND4uNWRQyLAQdk+xqLDJkOQwuto9Yqs1KXdLjsMDNbOq/D7pIkFJfNPPHZqU76XLQdnnBr6N/rCXa8m85bBWXdxQ+ykb4EWU3zxcEH9hjj7Olzucz2+GqJDg5tZ5v/70H7Zjk4cYiVgg7Dbhxp47XosIjv9fkNvAjsL1rnKcM5aUmj7dst7Ri/5NQZAYYU5O+bCuFqHNXBLnX6Q38AvOfWHtA/h+JsRUD+RuDMDdsOgDFUQAAAABJRU5ErkJggg==",
+    "contentType": "image/png",
+    "width": 25,
+    "height": 28,
+    "angle": 0,
+    "xoffset": 0,
+    "yoffset": 0
+   },
+   "visualVariables": [
+    {
+     "type": "rotationInfo",
+     "field": "ANGLE",
+     "rotationType": "geographic"
+    }
+   ]
+  },
+  "scaleSymbols": true,
+  "transparency": 0,
+  "labelingInfo": null
+ },
+ "defaultVisibility": true,
+ "extent": {
+  "xmin": 2490941.8472,
+  "ymin": 1111381.854,
+  "xmax": 2507570.2043,
+  "ymax": 1125881.934,
+  "spatialReference": {
+   "wkid": 2056,
+   "latestWkid": 2056,
+   "xyTolerance": 0.001,
+   "zTolerance": 0.001,
+   "mTolerance": 0.001,
+   "falseX": -27386400,
+   "falseY": -32067900,
+   "xyUnits": 10000,
+   "falseZ": -100000,
+   "zUnits": 10000,
+   "falseM": -100000,
+   "mUnits": 10000
+  }
+ },
+ "hasAttachments": false,
+ "htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+ "displayFieldExpressionInfo": {
+  "expression": "\"\"",
+  "title": ""
+ },
+ "displayField": "ANGLE",
+ "typeIdField": null,
+ "subtypeFieldName": null,
+ "subtypeField": null,
+ "defaultSubtypeCode": null,
+ "fields": [
+  {
+   "name": "OBJECTID",
+   "type": "esriFieldTypeOID",
+   "alias": "OBJECTID",
+   "domain": null
+  },
+  {
+   "name": "ANGLE",
+   "type": "esriFieldTypeDouble",
+   "alias": "ANGLE",
+   "domain": null
+  },
+  {
+   "name": "SHAPE",
+   "type": "esriFieldTypeGeometry",
+   "alias": "SHAPE",
+   "domain": null
+  }
+ ],
+ "geometryField": {
+  "name": "SHAPE",
+  "type": "esriFieldTypeGeometry",
+  "alias": "SHAPE"
+ },
+ "indexes": [
+  {
+   "name": "R2651_SDE_ROWID_UK",
+   "fields": "OBJECTID",
+   "isAscending": true,
+   "isUnique": true,
+   "description": ""
+  },
+  {
+   "name": "A2634_IX1",
+   "fields": "SHAPE",
+   "isAscending": true,
+   "isUnique": true,
+   "description": ""
+  }
+ ],
+ "subtypes": [],
+ "relationships": [],
+ "canModifyLayer": true,
+ "canScaleSymbols": false,
+ "hasLabels": false,
+ "capabilities": "Map,Query,Data",
+ "maxRecordCount": 4000,
+ "supportsStatistics": true,
+ "supportsExceedsLimitStatistics": true,
+ "supportsAdvancedQueries": true,
+ "supportedQueryFormats": "JSON, geoJSON, PBF",
+ "isDataVersioned": false,
+ "ownershipBasedAccessControlForFeatures": {"allowOthersToQuery": true},
+ "useStandardizedQueries": true,
+ "supportedSpatialRelationships": [
+  "esriSpatialRelIntersects",
+  "esriSpatialRelContains",
+  "esriSpatialRelCrosses",
+  "esriSpatialRelEnvelopeIntersects",
+  "esriSpatialRelIndexIntersects",
+  "esriSpatialRelOverlaps",
+  "esriSpatialRelTouches",
+  "esriSpatialRelWithin",
+  "esriSpatialRelRelation"
+ ],
+ "advancedQueryCapabilities": {
+  "useStandardizedQueries": true,
+  "supportsStatistics": true,
+  "supportsPercentileStatistics": true,
+  "supportsHavingClause": true,
+  "supportsOrderBy": true,
+  "supportsDistinct": true,
+  "supportsCountDistinct": true,
+  "supportsAdvancedQueryRelated": true,
+  "supportsQueryRelatedPagination": true,
+  "supportsPagination": true,
+  "supportsLod": false,
+  "supportsQueryWithLodSR": false,
+  "supportsTrueCurve": true,
+  "supportsQueryWithDatumTransformation": true,
+  "supportsReturningQueryExtent": true,
+  "supportsQueryWithDistance": true,
+  "supportsSqlExpression": true,
+  "supportsTimeRelation": true,
+  "supportsSqlFormat": false,
+  "supportsQueryAnalytic": true,
+  "supportsCurrentUserQueries": true
+ },
+ "supportsDatumTransformation": true,
+ "advancedQueryAnalyticCapabilities": {
+  "supportsLinearRegression": true,
+  "supportsAsync": false,
+  "supportsPercentileAnalytic": true
+ },
+ "dateFieldsTimeReference": null,
+ "preferredTimeReference": null,
+ "datesInUnknownTimezone": false,
+ "hasMetadata": true,
+ "isDataArchived": false,
+ "archivingInfo": {
+  "supportsQueryWithHistoricMoment": false,
+  "startArchivingMoment": -1
+ },
+ "supportsCoordinatesQuantization": true,
+ "supportsDynamicLegends": true,
+ "serviceItemId": "54fdb3f1dcfc4ad9a99805b5efa0abf5"
+}

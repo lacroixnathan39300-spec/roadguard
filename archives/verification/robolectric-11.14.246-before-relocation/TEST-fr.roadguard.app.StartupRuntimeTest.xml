@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="fr.roadguard.app.StartupRuntimeTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-21T08:43:09" hostname="dec3125c2336" time="2.173">
+  <properties/>
+  <testcase name="mapAndCustomPointsRemainAvailableWhileRadarWorkerIsBlocked[26]" classname="fr.roadguard.app.StartupRuntimeTest" time="1.074"/>
+  <testcase name="mapAndCustomPointsRemainAvailableWhileRadarWorkerIsBlocked" classname="fr.roadguard.app.StartupRuntimeTest" time="1.095"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+]]></system-err>
+</testsuite>

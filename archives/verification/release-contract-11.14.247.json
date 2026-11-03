@@ -1,0 +1,34 @@
+{
+  "version": "11.14.247",
+  "version_code": 447,
+  "application_id": "fr.roadguard.app",
+  "baseline": "11.14.246",
+  "task_count": 39,
+  "weight": 100,
+  "totals": {
+    "development": 85,
+    "validation": 44.0,
+    "previous_development": 85,
+    "previous_validation": 44
+  },
+  "new_coded_tasks": [],
+  "new_validation_tasks": {},
+  "physical_device_executed": false,
+  "codeassist_build_executed": false,
+  "real_webview_render_executed": false,
+  "original_data": {
+    "reference": "11.14.240",
+    "checked_original_files": 59,
+    "unchanged": 59,
+    "failures": []
+  },
+  "scope": "All compiled unit test suites, including eight radar/map startup suites; Android APIs 26/36 and tile cache API 28/34. Native SQLite mode for the two SQLite import suites. Shadow WebView; no real browser pixel rendering or physical device.",
+  "robolectric_tests": 263,
+  "apk_produced": [
+    "phone",
+    "auto"
+  ],
+  "android_simulated_runtime_executed": true,
+  "java_no_vendor_jar_compiles": true,
+  "automatic_camera_reaudit": false
+}

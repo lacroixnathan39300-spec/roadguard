@@ -1,0 +1,1 @@
+Mise à jour de vérification397 : signature identique191–196. Voir 00-LIRE-EN-PREMIER-11.14.197.md à la racine et WORK/VALIDATION-11.14.197.md. Conserver les données; ne pas désinstaller pour forcer une mise à jour à signature différente sans sauvegarde.

@@ -1,0 +1,37 @@
+{
+  "tool": {
+    "coordinate": "com.eed3si9n.jarjar:jarjar-assembly:1.14.1",
+    "sha256": "270fe285e399e298fb08c5daf1486648203a5bd5e90eaba4a6466097be7dd50f",
+    "url": "https://repo.maven.apache.org/maven2/com/eed3si9n/jarjar/jarjar-assembly/1.14.1/jarjar-assembly-1.14.1.jar"
+  },
+  "inputs": {
+    "commons-compress-1.28.0.jar": {
+      "bytes": 1117221,
+      "sha256": "e1522945218456f3649a39bc4afd70ce4bd466221519dba7d378f2141a4642ca"
+    },
+    "commons-io-2.20.0.jar": {
+      "bytes": 563971,
+      "sha256": "df90bba0fe3cb586b7f164e78fe8f8f4da3f2dd5c27fa645f888100ccc25dd72"
+    },
+    "commons-lang3-3.18.0.jar": {
+      "bytes": 702952,
+      "sha256": "4eeeae8d20c078abb64b015ec158add383ac581571cddc45c68f0c9ae0230720"
+    },
+    "commons-codec-1.19.0.jar": {
+      "bytes": 374716,
+      "sha256": "5c3881e4f556855e9c532927ee0c9dfde94cc66760d5805c031a59887070af5f"
+    },
+    "xz-1.12.jar": {
+      "bytes": 168792,
+      "sha256": "3e158a87bd73d8afb4b6e8239c013b7d049c48563f45860ce99cd2e448cf4a6b"
+    }
+  },
+  "rules": "# Android 16's framework/test image includes older Commons Compress / XZ.\n# Keep the app's pinned implementation independent of those package names.\nrule org.apache.commons.** fr.roadguard.vendor.commons.@1\nrule org.tukaani.xz.** fr.roadguard.vendor.xz.@1\n",
+  "output": {
+    "path": "app/libs/roadguard-radar-runtime-1.jar",
+    "bytes": 2875576,
+    "sha256": "89f5279abf79d30949ff26caed3e128c23bd460c3f76dad2cd6d8dcb7195f4bf",
+    "class_count": 1627,
+    "max_class_version": 52
+  }
+}

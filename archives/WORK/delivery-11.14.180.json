@@ -1,0 +1,17 @@
+{
+  "version": "11.14.180",
+  "versionCode": 380,
+  "apk_sha256": "06086c17f1073fdfa0d88681773ad901abefe348073816f8d1b97a607b3d0ed2",
+  "signature_schemes_verified": [
+    "v2",
+    "v3"
+  ],
+  "certificate_sha256": "52ff1a034ff05a11847435e25c0f2077614fe278290818b42b4bad198502ffa3",
+  "zipalign_passed": true,
+  "android_simulated_tests": 87,
+  "regression_groups": 35,
+  "final_apk_executed_emulator": false,
+  "xiaomi_tested": false,
+  "android_auto_dhu_tested": false,
+  "android_auto_vehicle_tested": false
+}

@@ -1,0 +1,1079 @@
+{
+  "version": "11.14.244",
+  "baseline_version": "11.14.243",
+  "date": "2026-10-21",
+  "historical_unverified_estimate": 48,
+  "method": "39 tâches et 100 points inchangés. Corrections sur tâches déjà codées : développement inchangé. M6 +1,5 point de validation automatique par fichiers réels et JS exécuté avec adaptateurs. Aucun crédit appareil, build Android ou extraction 7z.",
+  "active_work": "Démarrage carte sans attente du catalogue, reprise des tuiles et pack graphique local réalisés ; validation Android à regrouper en fin de lot. Import 7z automatique en attente des deux archives FR/CH et des cinq JAR demandés.",
+  "modules": [
+    {
+      "name": "Carte / GPS",
+      "weight": 20,
+      "tasks": [
+        {
+          "id": "M1",
+          "name": "Démarrage local sans attendre les mises à jour réseau",
+          "weight": 3,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "MainActivity : carte avant catalogue ; catalogue/surcouches assemblés sur worker puis publication complète ; CommunitySync.prepareStartup sans attente de réseau ni de cache ; StartupRuntimeTest avec worker bloqué ajouté mais non exécuté. Aucun point Android natif ajouté.",
+          "date": "2026-10-21",
+          "version": "11.14.244",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 2,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "local-pages"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "M2",
+          "name": "Filtrage de la vitesse, du cap et des sauts GPS",
+          "weight": 3,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "GpsMotion; MainActivity.startGPS",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 2,
+              "passed": true,
+              "baseline_passed": true,
+              "evidence": "verification/java-policy-tests-11.14.241.log ; réexécuté : verification/targeted-checks-11.14.242.log ; réexécuté : verification/targeted-checks-11.14.243.log ; réexécuté : verification/targeted-checks-11.14.244.log",
+              "contract": "gps-motion"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "M3",
+          "name": "Ancrage horizontal sous rotation et hauteur réglable",
+          "weight": 4,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "camera_geometry.js; rgVisualCamera; rgCameraOffset; MainActivity.pushPosition",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 3,
+              "passed": true,
+              "baseline_passed": true,
+              "evidence": "verification/camera-tests-11.14.241.log ; réexécuté : verification/targeted-checks-11.14.242.log",
+              "contract": "camera-anchor",
+              "carried_from_version": "11.14.243"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "M4",
+          "name": "Exploration manuelle et recentrage volontaire",
+          "weight": 2,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "resumeCamera; rgManualZoom; showRouteOverview",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 1,
+              "passed": true,
+              "baseline_passed": true,
+              "evidence": "verification/camera-tests-11.14.241.log ; réexécuté : verification/targeted-checks-11.14.242.log",
+              "contract": "camera-manual",
+              "carried_from_version": "11.14.243"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "M5",
+          "name": "Zoom adaptatif avec hystérésis",
+          "weight": 2,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "camera_motion.js; updateGPS",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 1,
+              "passed": true,
+              "baseline_passed": true,
+              "evidence": "verification/camera-tests-11.14.241.log ; réexécuté : verification/targeted-checks-11.14.242.log",
+              "contract": "camera-zoom",
+              "carried_from_version": "11.14.243"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "M6",
+          "name": "Cache temporaire de tuiles, limites et récupération",
+          "weight": 3,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "VisibleTileCache : cache HTTP, budget partagé 4 Gio, réserve 512 Mio, compteurs et reprise après retour du réseau ; tile_recovery.js et map.html : quatre reprises bornées des échecs visibles, conservation des bonnes tuiles. Callback réseau Android ajouté, non essayé sur appareil.",
+          "date": "2026-10-21",
+          "version": "11.14.244",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 1.5,
+              "passed": true,
+              "baseline_passed": false,
+              "evidence": "verification/targeted-checks-11.14.244.log : visible-tile-cache (17 scénarios, fichiers réels, HTTP injecté) et tile-recovery-and-pack (11 scénarios JS/DOM/Leaflet adaptés ; aucun WebView réel).",
+              "contract": "tile-cache"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1.5,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "M7",
+          "name": "Itinéraire, cache et reprise du guidage",
+          "weight": 3,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "RouteRequestPolicy; MainActivity navigation methods",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "routing"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 2,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Alertes",
+      "weight": 20,
+      "tasks": [
+        {
+          "id": "A1",
+          "name": "Refus du GPS périmé et effacement des avertissements",
+          "weight": 3,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "AlertPresentation.fresh; gpsFreshnessPulse; BackgroundAlertService.autoPulse",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 2,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "alert-freshness"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "A2",
+          "name": "Même distance arrondie pour texte, bulle et voix",
+          "weight": 3,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "AlertPresentation; MainActivity.checkDangers; BackgroundAlertService.check; RadarBubbleOverlay",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 2,
+              "passed": true,
+              "baseline_passed": true,
+              "evidence": "verification/java-policy-tests-11.14.241.log ; réexécuté : verification/targeted-checks-11.14.242.log ; réexécuté : verification/targeted-checks-11.14.243.log ; réexécuté : verification/targeted-checks-11.14.244.log",
+              "contract": "alert-distance"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "A3",
+          "name": "Feu rouge et passage à niveau sans fausse limitation",
+          "weight": 3,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "RadarAlertPolicy.applicableLimit; CarRouteData.Radar",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 2,
+              "passed": true,
+              "baseline_passed": true,
+              "evidence": "verification/java-policy-tests-11.14.241.log ; réexécuté : verification/targeted-checks-11.14.242.log ; réexécuté : verification/targeted-checks-11.14.243.log ; réexécuté : verification/targeted-checks-11.14.244.log",
+              "contract": "alert-types"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "A4",
+          "name": "Paliers partagés par type et position",
+          "weight": 3,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "AlertMilestones; RadarIdentity; ReferenceUi.radarSeen; RoadguardCarScreen",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 2,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "alert-dedup"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "A5",
+          "name": "Bandeau contextuel, hystérésis et état nettoyé",
+          "weight": 3,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "MainActivity.checkDangers; clearDangerWarning",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 2,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "alert-banner"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "A6",
+          "name": "Sens source et routes parallèles réellement distingués",
+          "weight": 3,
+          "baseline_coded": false,
+          "coded": false,
+          "code_evidence": "Filtre cap/couloir présent, direction source et cas parallèles encore incomplets",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 2,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "alert-direction"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "A7",
+          "name": "Audio de proximité, vitesse inconnue et temporisation",
+          "weight": 2,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "RadarAlertAudio; RadarAlertsRuntimeTest",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "alert-audio"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sources / activation radar",
+      "weight": 25,
+      "tasks": [
+        {
+          "id": "D1",
+          "name": "Surcouches additives sans retirer un original",
+          "weight": 5,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "UpdatedRadarCatalog.active; LufopEuropeCatalog.all : originaux + surcouche, tests sur les vraies ressources",
+          "date": "2026-10-21",
+          "version": "11.14.242",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 4,
+              "passed": true,
+              "baseline_passed": true,
+              "evidence": "verification/targeted-checks-11.14.242.log (catalog-additive-rollback; adaptateurs JVM) ; réexécuté : verification/targeted-checks-11.14.243.log ; réexécuté : verification/targeted-checks-11.14.244.log",
+              "contract": "catalog-additive"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "D2",
+          "name": "Catalogues d’origine et Lufop communs téléphone/service/voiture",
+          "weight": 3,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "UpdatedRadarCatalog; BundledRadarCatalog; NeighborRadarCatalog; LufopEuropeCatalog",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 2,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "catalog-common"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "D3",
+          "name": "États véridiques et comptages du catalogue chargé",
+          "weight": 3,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "Gestionnaire : base locale et archive reçue affichées ensemble ; archive reçue sans prétendre à l’activation. Bouton non redondant une fois l’archive vérifiée ; confirmation du consommateur inchangée. Aucun essai natif ajouté.",
+          "date": "2026-10-21",
+          "version": "11.14.244",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 2,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "country-ui"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "D4",
+          "name": "Sept sources publiques contrôlées et téléchargements épinglés",
+          "weight": 3,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "RadarDownloadSource; verified public release europe-202606",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 3,
+              "passed": true,
+              "baseline_passed": true,
+              "evidence": "verification/java-policy-tests-11.14.241.log ; verification/speedalert-source-audit.json",
+              "contract": "source-audit",
+              "carried_from_version": "11.14.243"
+            }
+          ]
+        },
+        {
+          "id": "D5",
+          "name": "Extraction 7z bornée dans Android",
+          "weight": 3,
+          "baseline_coded": false,
+          "coded": false,
+          "code_evidence": "Extraction Android 7z non intégrée : cinq JAR et vraies archives FR/CH manquent pour le test. Aucun point acquis pour une vérification de signature seule.",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 2,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "sevenzip-android"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "D6",
+          "name": "SQLite vers modèle canonique avec métadonnées",
+          "weight": 3,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "SpeedAlertSqliteImporter : lecture seule, schéma/tailles/types ; CanonicalRadar : provenance, champs inconnus et vitesse/sens inconnus préservés ; import local raccordé à RadarDownloadActivity",
+          "date": "2026-10-21",
+          "version": "11.14.243",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 2,
+              "passed": true,
+              "baseline_passed": true,
+              "evidence": "verification/targeted-checks-11.14.243.log (canonical-sqlite-store : SQLite réel via adaptateurs JVM ; Android natif non exécuté) ; réexécuté : verification/targeted-checks-11.14.244.log",
+              "contract": "sqlite-activation"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "D7",
+          "name": "Fusion avec sens/fiabilité et rechargement complet à chaud",
+          "weight": 3,
+          "baseline_coded": false,
+          "coded": false,
+          "code_evidence": "Import canonique additif et accusé de chargement téléphone ajoutés ; sens, conflits, fiabilité/fusion complète et confirmations service/voiture encore incomplets.",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 2,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "canonical-reload"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "D8",
+          "name": "File séquentielle, annulation et remplacement atomique",
+          "weight": 2,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "RadarArchiveDownloader; RadarCountryBatch : annulation, bornes, HTTP simulé, fichiers réels et remplacement atomique",
+          "date": "2026-10-21",
+          "version": "11.14.242",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 1,
+              "passed": true,
+              "baseline_passed": true,
+              "evidence": "verification/targeted-checks-11.14.242.log (download-errors-queue; adaptateurs JVM) ; réexécuté : verification/targeted-checks-11.14.243.log ; réexécuté : verification/targeted-checks-11.14.244.log",
+              "contract": "download-errors"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "UI / ergonomie",
+      "weight": 10,
+      "tasks": [
+        {
+          "id": "U1",
+          "name": "Thème graphite et rouge conservé",
+          "weight": 3,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "Thème graphite/rouge conservé ; pack local facultatif Graphite/Lisibilité/Couleurs OSM dans Apparence. Filtre de pixels raster uniquement. Aucun essai visuel Android ajouté.",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "theme-ui"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 2,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "U2",
+          "name": "Insets Android récents et formats d’écran",
+          "weight": 3,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "MainActivity.configureModernAndroid; RadarDownloadActivity.onCreate",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "modern-insets"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 2,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "U3",
+          "name": "Pays triés et recherche avec/sans accents",
+          "weight": 2,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "RadarDownloadActivity.searchKey; Collator",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "country-ui"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "U4",
+          "name": "Revue globale d’accessibilité et paysage",
+          "weight": 2,
+          "baseline_coded": false,
+          "coded": false,
+          "code_evidence": "Descriptions ciblées présentes; revue complète non réalisée",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "accessibility"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Android Auto",
+      "weight": 10,
+      "tasks": [
+        {
+          "id": "C1",
+          "name": "Variant téléphone indépendant de la bibliothèque Car",
+          "weight": 2,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "app/build.gradle conditional roadguardAndroidAuto",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 2,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "phone-build"
+            }
+          ]
+        },
+        {
+          "id": "C2",
+          "name": "Service et écrans natifs de navigation Car App",
+          "weight": 3,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "app/src/auto; AndroidRuntimeTest; CarSurfaceRuntimeTest",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "auto-runtime"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 2,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "C3",
+          "name": "Propriété des alertes et guidage cohérents entre appareils",
+          "weight": 3,
+          "baseline_coded": false,
+          "coded": false,
+          "code_evidence": "Catalogue partagé et limites corrigées; transition multimode à finaliser",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 2,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "auto-alerts"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "C4",
+          "name": "Validation DHU et autoradio du parcours complet",
+          "weight": 2,
+          "baseline_coded": false,
+          "coded": false,
+          "code_evidence": "Essai DHU/autoradio non réalisé",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "auto-device"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Qualité / tests / compilation",
+      "weight": 10,
+      "tasks": [
+        {
+          "id": "Q1",
+          "name": "Version Gradle alignée sur la livraison",
+          "weight": 2,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "app/build.gradle : 11.14.244 / 444 ; package/SDK conservés ; ledger 244 et référence des deltas 243 raccordés.",
+          "date": "2026-10-21",
+          "version": "11.14.244",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 2,
+              "passed": true,
+              "baseline_passed": true,
+              "evidence": "verification/release-contract-11.14.244.json",
+              "contract": "version-build"
+            }
+          ]
+        },
+        {
+          "id": "Q2",
+          "name": "Tests ciblés et progression pondérée reproductible",
+          "weight": 2,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "tools/test_camera_anchor.js; AlertConsistencyRuntimeTest; ProgressLedger",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 2,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "targeted-tests"
+            }
+          ]
+        },
+        {
+          "id": "Q3",
+          "name": "APK téléphone produit avec SDK 36",
+          "weight": 2,
+          "baseline_coded": false,
+          "coded": false,
+          "code_evidence": "Aucun APK 244 : SDK absent, environnement consigné dans environment-11.14.244.json. Blocage Gradle précédent conservé, aucune compilation déclarée.",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 2,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "phone-build"
+            }
+          ]
+        },
+        {
+          "id": "Q4",
+          "name": "APK Android Auto compilé séparément",
+          "weight": 2,
+          "baseline_coded": false,
+          "coded": false,
+          "code_evidence": "Gradle assembleDebug -ProadguardAndroidAuto=true",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 2,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "auto-build"
+            }
+          ]
+        },
+        {
+          "id": "Q5",
+          "name": "Installation CodeAssist et retours du lot sur matériel",
+          "weight": 2,
+          "baseline_coded": false,
+          "coded": false,
+          "code_evidence": "Captures utilisateur reçues le 21/10/2026 : problèmes radars/cache/démarrage et réglages externes. Version non visible dans ces captures ; aucun crédit de compilation ou de validation complète 243/244.",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "device-install"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 1,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sécurité / données",
+      "weight": 5,
+      "tasks": [
+        {
+          "id": "S1",
+          "name": "Empreintes des 59 ressources d’origine et ZIP contrôlé",
+          "weight": 2,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "verification/original-data-11.14.240.json; integrity report",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 2,
+              "passed": true,
+              "baseline_passed": true,
+              "evidence": "verification/data-integrity-11.14.241.json ; ZIP CRC checked during packaging ; verification/data-integrity-11.14.242.json (CRC du nouveau ZIP contrôlé au packaging) ; verification/data-integrity-11.14.243.json ; CRC du ZIP contrôlé au conditionnement ; verification/data-integrity-11.14.244.json ; CRC du ZIP contrôlé au conditionnement",
+              "contract": "data-integrity",
+              "carried_from_version": "11.14.243"
+            }
+          ]
+        },
+        {
+          "id": "S2",
+          "name": "Mises à jour séparées, atomiques et repli",
+          "weight": 1,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "CanonicalRadarStore : fichier indépendant, validation avant remplacement, renommage atomique, deux sauvegardes, annulation et repli contrôlés. Chemins CSV/Lufop historiques conservés, non réaudités dans ce lot.",
+          "date": "2026-10-21",
+          "version": "11.14.243",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 0.5,
+              "passed": true,
+              "baseline_passed": true,
+              "evidence": "verification/targeted-checks-11.14.243.log (canonical-sqlite-store : SQLite réel via adaptateurs JVM ; Android natif non exécuté) ; réexécuté : verification/targeted-checks-11.14.244.log",
+              "contract": "import-rollback"
+            },
+            {
+              "name": "Essai réel Xiaomi / véhicule",
+              "weight": 0.5,
+              "passed": false,
+              "baseline_passed": false,
+              "evidence": "",
+              "contract": "Essai utilisateur non réalisé pour cette version"
+            }
+          ]
+        },
+        {
+          "id": "S3",
+          "name": "Provenance et licence des nouvelles sources consignées",
+          "weight": 1,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "RadarDownloadSource; verification/speedalert-source-audit.json",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 1,
+              "passed": true,
+              "baseline_passed": true,
+              "evidence": "verification/java-policy-tests-11.14.241.log ; verification/speedalert-source-audit.json",
+              "contract": "source-audit",
+              "carried_from_version": "11.14.243"
+            }
+          ]
+        },
+        {
+          "id": "S4",
+          "name": "Limites des imports et destinations HTTPS contrôlées",
+          "weight": 1,
+          "baseline_coded": true,
+          "coded": true,
+          "code_evidence": "RadarSourcePolicy; SecureHttp; RadarDownloadSource.allowed",
+          "date": "2026-10-20",
+          "version": "11.14.241",
+          "checks": [
+            {
+              "name": "Contrôle automatique défini",
+              "weight": 1,
+              "passed": true,
+              "baseline_passed": true,
+              "evidence": "verification/ledger-and-http-tests-11.14.241.log",
+              "contract": "http-policy",
+              "carried_from_version": "11.14.243"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

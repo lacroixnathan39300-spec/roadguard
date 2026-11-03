@@ -1,0 +1,3 @@
+PASS alert policies: matching voice/text distances, invalid values, red lights, crossings, limits, hysteresis and distinct point types
+PASS pinned sources: seven real downloaded archives, same-size corruption rejected, unverified country and host blocked
+PASS motion: GNSS/network, missing speed/course, true stop, stale/quality guards, compensation, heading reset, navigation intents and projection

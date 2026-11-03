@@ -1,0 +1,177 @@
+[
+  {
+    "test": "test_embedded_radars.py",
+    "passed": true,
+    "output": "Data QA OK: hashes, all 3309 official IDs, country separation, categories, provenance, deduplication and OSM recursion\n"
+  },
+  {
+    "test": "test_radar_dataset.py",
+    "passed": true,
+    "output": "Base radars: 3309 entrées uniques valides; 7 types; attribution et licence embarquées\nSHA-256: f6c6114080473bf3e5b15fc522dd75dd3fafaf0f45d82a6cceef93fed7d02c26\n"
+  },
+  {
+    "test": "test_radar_storage_current.py",
+    "passed": true,
+    "output": "Contrôles radars locaux: import, limites, expiration et rafraîchissement réussis\n"
+  },
+  {
+    "test": "test_radar_spatial_index.py",
+    "passed": true,
+    "output": "Index radar : tests statiques + 25 000 contrôles de couverture géographique réussis\n"
+  },
+  {
+    "test": "test_radar_alert_accuracy.py",
+    "passed": true,
+    "output": "Alertes radar : précision GPS, âge du fix et anti-doublon premier plan/arrière-plan vérifiés\n"
+  },
+  {
+    "test": "test_radar_categories.py",
+    "passed": true,
+    "output": "Catégories radar : filtres, import tunnel et rendu différencié vérifiés\n"
+  },
+  {
+    "test": "test_radar_filter_indices.py",
+    "passed": true,
+    "output": "Filtres radar : indices des 10 catégories bornés et continus\n"
+  },
+  {
+    "test": "test_danger_type_policy.py",
+    "passed": true,
+    "output": "Types radar partagés; compteurs, filtres et deux moteurs GPS utilisent les mêmes règles\n"
+  },
+  {
+    "test": "test_swiss_radar_batch.py",
+    "passed": true,
+    "output": "Suisse : téléchargement groupé des sources publiques et import séparé du ZIP Lufop vérifiés\n"
+  },
+  {
+    "test": "test_poi_warner_import.py",
+    "passed": true,
+    "output": "Import POI-Warner séparé, catégories, filtre géographique et métadonnées de prudence vérifiés\n"
+  },
+  {
+    "test": "test_map_manual_pan.py",
+    "passed": true,
+    "output": "Exploration manuelle persistante dans Leaflet et MapLibre; position GPS continue à se mettre à jour; recentrage volontaire vérifié\n"
+  },
+  {
+    "test": "test_gps_stability.py",
+    "passed": true,
+    "output": "7 current GPS stability checks passed\n"
+  },
+  {
+    "test": "test_radar_counters_current.py",
+    "passed": true,
+    "output": "Compteurs radars : base officielle séparée; filtres locaux valides et non expirés\n"
+  },
+  {
+    "test": "test_radar_country_downloads.py",
+    "passed": true,
+    "output": "Bases radar : MapAtlas multi-pays, CC BY, téléchargement interne et catégories, catalogue HTTPS protégé contre les réponses périmées, progression annulable, SHA-256 et CSV local vérifiés\n"
+  },
+  {
+    "test": "test_radar_map_visibility.py",
+    "passed": true,
+    "output": "Contrôle ciblé visibilité des marqueurs radar réussi\n"
+  },
+  {
+    "test": "test_reference_navigation.py",
+    "passed": true,
+    "output": "Navigation visuelle : carte dégagée, menu/progression accessibles, signalement central, trajet bleu, GPS bleu conservé\n"
+  },
+  {
+    "test": "test_gps_map_refresh.py",
+    "passed": true,
+    "output": "9 GPS/map refresh checks passed\n"
+  },
+  {
+    "test": "test_map_marker_size.py",
+    "passed": true,
+    "output": "Contrôle ciblé des tailles d’icônes réussi sur les trois cartes\n"
+  },
+  {
+    "test": "test_route_alternatives.py",
+    "passed": true,
+    "output": "Itinéraires : alternatives OSRM, distance au segment et recalcul auto protégé vérifiés\n"
+  },
+  {
+    "test": "test_no_prefetch_current.py",
+    "passed": true,
+    "output": "OK: aucun préchargement cartographique; cache normal WebView conservé\n"
+  },
+  {
+    "test": "audit_offline_tile_policy.py",
+    "passed": true,
+    "output": "OK: 41 application files checked; public OSM tiles only used for interactive rendering.\n"
+  },
+  {
+    "test": "test_radar_icons.js",
+    "passed": true,
+    "output": "Vector icon QA OK: 14 SVGs, classifier, Leaflet viewport/popups/scale/visibility, MapLibre registration/visibility/scale/style reload and image cache\n"
+  },
+  {
+    "test": "test_radar_map_render.py",
+    "passed": true,
+    "output": "Rendu carte radar borné au viewport; provenance et dédoublonnage préservés\n"
+  },
+  {
+    "test": "test_camera_controls.js",
+    "passed": true,
+    "output": "Camera controls QA OK: native zoom dispatch, Leaflet pause, vector/local handlers\n"
+  },
+  {
+    "test": "test_local_camera.js",
+    "passed": true,
+    "output": "Local camera QA OK: GPS follow, sheet, drag/zoom pause, data updates, route overview, recenter\n"
+  },
+  {
+    "test": "test_vector_camera.js",
+    "passed": true,
+    "output": "MapLibre camera QA OK: sheet clearance, manual pause, latest-fix resume, route overview, style reload guard\n"
+  },
+  {
+    "test": "test_dark_map.py",
+    "passed": true,
+    "output": ""
+  },
+  {
+    "test": "test_night_provider.py",
+    "passed": true,
+    "output": "..\n----------------------------------------------------------------------\nRan 2 tests in 0.001s\n\nOK\n"
+  },
+  {
+    "test": "test_visual_handoff_current.py",
+    "passed": true,
+    "output": "41 contrôles statiques ROADGUARD 11.14.180 réussis\n"
+  },
+  {
+    "test": "test_functional_handoff_current.py",
+    "passed": true,
+    "output": "Contrôles fonctionnels de passation ROADGUARD 11.14.180 réussis\n"
+  },
+  {
+    "test": "test_drive_search_inline.py",
+    "passed": true,
+    "output": "Recherche destination intégrée à la carte : saisie, clavier, résultats, coordonnées et itinéraire vérifiés\n"
+  },
+  {
+    "test": "test_reference_ui.js",
+    "passed": true,
+    "output": "Reference UI: eight pages, real data slots, actions and escaping OK\n"
+  },
+  {
+    "test": "check_handoff.py",
+    "passed": true,
+    "output": "OK: suivi, version, statuts et documents cohérents pour 11.14.180\n"
+  },
+  {
+    "test": "test_community_ui.js",
+    "passed": true,
+    "output": "PASS actual UI scripts: 13 screens, easy radar installation/update controls, error/busy states, escaped notes, arrow/car/dot without blue overlay, precision color, expiry and HTTPS provider.\n"
+  },
+  {
+    "test": "test_camera_motion.js",
+    "passed": true,
+    "output": "PASS adaptive zoom: hysteresis/dwell/cadence, absent speed, real map flyTo animation and single heading rotation\n"
+  }
+]

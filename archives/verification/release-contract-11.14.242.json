@@ -1,0 +1,32 @@
+{
+  "version": "11.14.242",
+  "version_code": 442,
+  "application_id": "fr.roadguard.app",
+  "source_checkpoint": "11.14.241",
+  "module_count": 7,
+  "task_count": 39,
+  "total_weight": 100,
+  "totals": {
+    "development": 75,
+    "validation": 25,
+    "previous_development": 75,
+    "previous_validation": 18
+  },
+  "new_validation_points": 7,
+  "new_credit_tasks": [
+    "D1",
+    "D8",
+    "Q1"
+  ],
+  "android_compiled": false,
+  "robolectric_executed": false,
+  "android_device_tested": false,
+  "sevenzip_extracted_on_android": false,
+  "original_files": {
+    "reference": "11.14.240",
+    "checked_original_files": 59,
+    "unchanged": 59,
+    "failures": []
+  },
+  "limits": "JVM adapters test catalog/core logic only; inherited 241 evidence remains dated and is not claimed as rerun unless stated."
+}

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="fr.roadguard.app.CountryManagerRuntimeTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-21T09:37:36" hostname="dec3125c2336" time="3.195">
+  <properties/>
+  <testcase name="countrySearchIgnoresAccentsAndListUsesFrenchOrder[26]" classname="fr.roadguard.app.CountryManagerRuntimeTest" time="0.554"/>
+  <testcase name="countryScreenAppliesInsetsWithoutCallingNewApisOnAndroidEight[26]" classname="fr.roadguard.app.CountryManagerRuntimeTest" time="0.385"/>
+  <testcase name="localCatalogIsSeparateFromDownloadAndUnsupportedUpdates[26]" classname="fr.roadguard.app.CountryManagerRuntimeTest" time="0.33"/>
+  <testcase name="countrySearchIgnoresAccentsAndListUsesFrenchOrder" classname="fr.roadguard.app.CountryManagerRuntimeTest" time="0.817"/>
+  <testcase name="countryScreenAppliesInsetsWithoutCallingNewApisOnAndroidEight" classname="fr.roadguard.app.CountryManagerRuntimeTest" time="0.569"/>
+  <testcase name="localCatalogIsSeparateFromDownloadAndUnsupportedUpdates" classname="fr.roadguard.app.CountryManagerRuntimeTest" time="0.536"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+]]></system-err>
+</testsuite>

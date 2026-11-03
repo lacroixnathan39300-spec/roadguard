@@ -1,0 +1,1 @@
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android"><background android:drawable="@color/roadguard_background"/><foreground android:drawable="@drawable/roadguard_foreground"/><monochrome android:drawable="@drawable/roadguard_monochrome"/></adaptive-icon>

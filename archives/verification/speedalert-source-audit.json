@@ -1,0 +1,174 @@
+{
+  "date": "2026-10-20",
+  "repository": "https://github.com/hvdwolf/SpeedAlert_Databases",
+  "release": "europe-202606",
+  "published": "2026-06-04",
+  "license": "CC BY 4.0",
+  "license_evidence": "https://github.com/hvdwolf/SpeedAlert_Databases/blob/main/LICENSE",
+  "checks": "7 téléchargements HTTP réels; taille et SHA-256 de release; CRC en-tête 7z; extraction hors Android avec py7zr; SQLite en lecture seule et quick_check=ok pour chaque pays. Extraction/activation Android non implémentée.",
+  "sources": [
+    {
+      "country": "BE",
+      "url": "https://github.com/hvdwolf/SpeedAlert_Databases/releases/download/europe-202606/be-camera.sqlite.7z",
+      "bytes": 39129,
+      "sha256": "a36efc1159b3260ae1e4494c73eea1c509cbaf9c7c1ea2cce095017445b8b72c",
+      "license": "CC BY 4.0",
+      "release": "europe-202606"
+    },
+    {
+      "country": "CH",
+      "url": "https://github.com/hvdwolf/SpeedAlert_Databases/releases/download/europe-202606/ch-camera.sqlite.7z",
+      "bytes": 16391,
+      "sha256": "1ad92d13d8e7282db196c45f53b179af0f7578806c529e8029e27650385e5098",
+      "license": "CC BY 4.0",
+      "release": "europe-202606"
+    },
+    {
+      "country": "DE",
+      "url": "https://github.com/hvdwolf/SpeedAlert_Databases/releases/download/europe-202606/de-camera.sqlite.7z",
+      "bytes": 134412,
+      "sha256": "feab87c86ab121590f10e336abb379e3dc530f5a94c063e2a52a00fd63f2dc85",
+      "license": "CC BY 4.0",
+      "release": "europe-202606"
+    },
+    {
+      "country": "ES",
+      "url": "https://github.com/hvdwolf/SpeedAlert_Databases/releases/download/europe-202606/es-camera.sqlite.7z",
+      "bytes": 63186,
+      "sha256": "1f49ac08de0ed1db2af73618434768b07c7bdfa04103bc249f47d93bff44e197",
+      "license": "CC BY 4.0",
+      "release": "europe-202606"
+    },
+    {
+      "country": "FR",
+      "url": "https://github.com/hvdwolf/SpeedAlert_Databases/releases/download/europe-202606/fr-camera.sqlite.7z",
+      "bytes": 101736,
+      "sha256": "5d38478a92d488668818232495bbd1ae690952ced5e409e2e69cbd3bfd6d63d1",
+      "license": "CC BY 4.0",
+      "release": "europe-202606"
+    },
+    {
+      "country": "IT",
+      "url": "https://github.com/hvdwolf/SpeedAlert_Databases/releases/download/europe-202606/it-camera.sqlite.7z",
+      "bytes": 122237,
+      "sha256": "59ae552cdfc242d27fe61c6b7fb47b4f97fdc10462ae4e56347a542d555b85a1",
+      "license": "CC BY 4.0",
+      "release": "europe-202606"
+    },
+    {
+      "country": "LU",
+      "url": "https://github.com/hvdwolf/SpeedAlert_Databases/releases/download/europe-202606/lu-camera.sqlite.7z",
+      "bytes": 1729,
+      "sha256": "3c91bdd2db41c3ff6d58f66474917a613d2584189127290220ddf022cb6af109",
+      "license": "CC BY 4.0",
+      "release": "europe-202606"
+    }
+  ],
+  "sqlite_schema": {
+    "fr": {
+      "bytes": 258048,
+      "tables": [
+        {
+          "name": "cameras",
+          "schema": "CREATE TABLE cameras(\n            id INTEGER PRIMARY KEY,\n            lat REAL NOT NULL,\n            lon REAL NOT NULL,\n            type TEXT NOT NULL\n        )",
+          "count": 3824
+        },
+        {
+          "name": "sqlite_stat1",
+          "schema": "CREATE TABLE sqlite_stat1(tbl,idx,stat)",
+          "count": 1
+        }
+      ]
+    },
+    "ch": {
+      "bytes": 57344,
+      "tables": [
+        {
+          "name": "cameras",
+          "schema": "CREATE TABLE cameras(\n            id INTEGER PRIMARY KEY,\n            lat REAL NOT NULL,\n            lon REAL NOT NULL,\n            type TEXT NOT NULL\n        )",
+          "count": 593
+        },
+        {
+          "name": "sqlite_stat1",
+          "schema": "CREATE TABLE sqlite_stat1(tbl,idx,stat)",
+          "count": 1
+        }
+      ]
+    },
+    "de": {
+      "bytes": 344064,
+      "tables": [
+        {
+          "name": "cameras",
+          "schema": "CREATE TABLE cameras(\n            id INTEGER PRIMARY KEY,\n            lat REAL NOT NULL,\n            lon REAL NOT NULL,\n            type TEXT NOT NULL\n        )",
+          "count": 5176
+        },
+        {
+          "name": "sqlite_stat1",
+          "schema": "CREATE TABLE sqlite_stat1(tbl,idx,stat)",
+          "count": 1
+        }
+      ]
+    },
+    "be": {
+      "bytes": 114688,
+      "tables": [
+        {
+          "name": "cameras",
+          "schema": "CREATE TABLE cameras(\n            id INTEGER PRIMARY KEY,\n            lat REAL NOT NULL,\n            lon REAL NOT NULL,\n            type TEXT NOT NULL\n        )",
+          "count": 1527
+        },
+        {
+          "name": "sqlite_stat1",
+          "schema": "CREATE TABLE sqlite_stat1(tbl,idx,stat)",
+          "count": 1
+        }
+      ]
+    },
+    "es": {
+      "bytes": 176128,
+      "tables": [
+        {
+          "name": "cameras",
+          "schema": "CREATE TABLE cameras(\n            id INTEGER PRIMARY KEY,\n            lat REAL NOT NULL,\n            lon REAL NOT NULL,\n            type TEXT NOT NULL\n        )",
+          "count": 2474
+        },
+        {
+          "name": "sqlite_stat1",
+          "schema": "CREATE TABLE sqlite_stat1(tbl,idx,stat)",
+          "count": 1
+        }
+      ]
+    },
+    "it": {
+      "bytes": 327680,
+      "tables": [
+        {
+          "name": "cameras",
+          "schema": "CREATE TABLE cameras(\n            id INTEGER PRIMARY KEY,\n            lat REAL NOT NULL,\n            lon REAL NOT NULL,\n            type TEXT NOT NULL\n        )",
+          "count": 4913
+        },
+        {
+          "name": "sqlite_stat1",
+          "schema": "CREATE TABLE sqlite_stat1(tbl,idx,stat)",
+          "count": 1
+        }
+      ]
+    },
+    "lu": {
+      "bytes": 16384,
+      "tables": [
+        {
+          "name": "cameras",
+          "schema": "CREATE TABLE cameras(\n            id INTEGER PRIMARY KEY,\n            lat REAL NOT NULL,\n            lon REAL NOT NULL,\n            type TEXT NOT NULL\n        )",
+          "count": 39
+        },
+        {
+          "name": "sqlite_stat1",
+          "schema": "CREATE TABLE sqlite_stat1(tbl,idx,stat)",
+          "count": 1
+        }
+      ]
+    }
+  }
+}

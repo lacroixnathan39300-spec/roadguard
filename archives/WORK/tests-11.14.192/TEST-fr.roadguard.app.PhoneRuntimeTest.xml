@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="fr.roadguard.app.PhoneRuntimeTest" tests="36" skipped="0" failures="0" errors="0" timestamp="2026-10-18T13:30:05" hostname="891fc462d9e7" time="11.003">
+  <properties/>
+  <testcase name="allNativeReferenceScreensBuildWithoutReleasingGps[26]" classname="fr.roadguard.app.PhoneRuntimeTest" time="1.052"/>
+  <testcase name="masterVoiceSwitchAlsoControlsTurnGuidance[26]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.14"/>
+  <testcase name="publicReportsRefreshPreservesLocalInventoryAndGps[26]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.195"/>
+  <testcase name="routeSavedOnPhoneLoadsInCar[26]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.153"/>
+  <testcase name="interleavedNetworkCannotZeroNativeHudOrCourse[26]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.156"/>
+  <testcase name="speedCompensationDoesNotChangeRawMeasurement[26]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.194"/>
+  <testcase name="rerenderPreservesGpsSubscriptionAndCounter[26]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.243"/>
+  <testcase name="isolatedZeroThenConfirmedStopAndLostSignal[26]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.13"/>
+  <testcase name="pauseReleasesSubscriptionAndResumeReacquires[26]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.176"/>
+  <testcase name="allNativeReferenceScreensBuildWithoutReleasingGps[28]" classname="fr.roadguard.app.PhoneRuntimeTest" time="1.15"/>
+  <testcase name="masterVoiceSwitchAlsoControlsTurnGuidance[28]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.205"/>
+  <testcase name="publicReportsRefreshPreservesLocalInventoryAndGps[28]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.219"/>
+  <testcase name="routeSavedOnPhoneLoadsInCar[28]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.181"/>
+  <testcase name="interleavedNetworkCannotZeroNativeHudOrCourse[28]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.195"/>
+  <testcase name="speedCompensationDoesNotChangeRawMeasurement[28]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.221"/>
+  <testcase name="rerenderPreservesGpsSubscriptionAndCounter[28]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.314"/>
+  <testcase name="isolatedZeroThenConfirmedStopAndLostSignal[28]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.224"/>
+  <testcase name="pauseReleasesSubscriptionAndResumeReacquires[28]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.21"/>
+  <testcase name="allNativeReferenceScreensBuildWithoutReleasingGps[34]" classname="fr.roadguard.app.PhoneRuntimeTest" time="1.434"/>
+  <testcase name="masterVoiceSwitchAlsoControlsTurnGuidance[34]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.263"/>
+  <testcase name="publicReportsRefreshPreservesLocalInventoryAndGps[34]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.244"/>
+  <testcase name="routeSavedOnPhoneLoadsInCar[34]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.188"/>
+  <testcase name="interleavedNetworkCannotZeroNativeHudOrCourse[34]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.229"/>
+  <testcase name="speedCompensationDoesNotChangeRawMeasurement[34]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.327"/>
+  <testcase name="rerenderPreservesGpsSubscriptionAndCounter[34]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.26"/>
+  <testcase name="isolatedZeroThenConfirmedStopAndLostSignal[34]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.187"/>
+  <testcase name="pauseReleasesSubscriptionAndResumeReacquires[34]" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.19"/>
+  <testcase name="allNativeReferenceScreensBuildWithoutReleasingGps" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.436"/>
+  <testcase name="masterVoiceSwitchAlsoControlsTurnGuidance" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.169"/>
+  <testcase name="publicReportsRefreshPreservesLocalInventoryAndGps" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.283"/>
+  <testcase name="routeSavedOnPhoneLoadsInCar" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.238"/>
+  <testcase name="interleavedNetworkCannotZeroNativeHudOrCourse" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.185"/>
+  <testcase name="speedCompensationDoesNotChangeRawMeasurement" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.199"/>
+  <testcase name="rerenderPreservesGpsSubscriptionAndCounter" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.281"/>
+  <testcase name="isolatedZeroThenConfirmedStopAndLostSignal" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.278"/>
+  <testcase name="pauseReleasesSubscriptionAndResumeReacquires" classname="fr.roadguard.app.PhoneRuntimeTest" time="0.214"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+]]></system-err>
+</testsuite>

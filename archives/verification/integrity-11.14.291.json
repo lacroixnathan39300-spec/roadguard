@@ -1,0 +1,25 @@
+{
+  "baseline": "11.14.290",
+  "version": "11.14.291",
+  "changed": [
+    "SUIVI-ACTIF-ROADGUARD.md",
+    "SUIVI-AVANCEMENT.md",
+    "app/build.gradle",
+    "app/src/main/assets/map_lifecycle.js",
+    "app/src/main/assets/map_maplibre.html",
+    "app/src/main/assets/roadguard_progress.json"
+  ],
+  "added": [
+    "AVANCEMENT-11.14.291.md",
+    "00-LIRE-EN-PREMIER-11.14.291.md",
+    "verification/browser-startup-11.14.291.log",
+    "verification/local-map-policy-11.14.291.log",
+    "verification/map-syntax-11.14.291.log",
+    "verification/simulated-startup-11.14.291.log",
+    "verification/local-map-pipeline-11.14.291.log",
+    "tools/test_map_browser_startup.js"
+  ],
+  "deleted": [],
+  "unchanged_files": 1580,
+  "note": "Tous les autres fichiers, dont catalogues et code natif Java, sont conservés octet pour octet."
+}

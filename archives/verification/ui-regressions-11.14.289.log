@@ -1,0 +1,40 @@
+test_marker_duplicates.js
+PASS 12 marker scenarios: duplicates/local+community, distance/type/direction/speed protection, independent reports, catalog sites, no chain, true cluster counts.
+
+exit=0
+
+test_offline_regressions.js
+PASS offline regressions: cold boot retains actual viewport/zoom without pausing GPS, throttled/native persistence, invalid storage and real cached/parent/missing coverage callbacks; simulated map, no WebView
+
+exit=0
+
+test_radar_icons.js
+Vector icon QA OK: 15 SVGs, classifier, Leaflet viewport/popups/scale/visibility, MapLibre registration/visibility/scale/style reload and image cache
+
+exit=0
+
+test_map_startup.js
+PASS 13 full-script startup/network/manual-camera scenarios (simulated renderer).
+
+exit=0
+
+test_map_view_state.js
+PASS Leaflet view restore, invalid state rejection, explicit follow reset and external-script ordering
+
+exit=0
+
+test_map_native_network.js
+PASS actual Leaflet native-authority and standalone-browser network event wiring
+
+exit=0
+
+test_vector_camera.js
+MapLibre camera QA OK: sheet clearance, manual pause, latest-fix resume, route overview, style reload guard
+
+exit=0
+
+roadguard_map_syntax_check.js
+app/src/main/assets/map.html: 4 inline script(s) parse OK
+app/src/main/assets/map_maplibre.html: 2 inline script(s) parse OK
+
+exit=0

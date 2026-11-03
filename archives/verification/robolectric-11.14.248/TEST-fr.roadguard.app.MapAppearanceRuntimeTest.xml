@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="fr.roadguard.app.MapAppearanceRuntimeTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-21T13:16:34" hostname="0b421b2e7c9b" time="15.186">
+  <properties/>
+  <testcase name="eachLocalPackIsSavedAndSentToTheMapWithoutResettingTheChoice[26]" classname="fr.roadguard.app.MapAppearanceRuntimeTest" time="4.435"/>
+  <testcase name="mapPickerSelectsAVisiblePackWithoutLeavingTheMap[26]" classname="fr.roadguard.app.MapAppearanceRuntimeTest" time="1.436"/>
+  <testcase name="largeCatalogSendsOnlyOneBoundedMapSlice[26]" classname="fr.roadguard.app.MapAppearanceRuntimeTest" time="1.125"/>
+  <testcase name="eachLocalPackIsSavedAndSentToTheMapWithoutResettingTheChoice" classname="fr.roadguard.app.MapAppearanceRuntimeTest" time="5.316"/>
+  <testcase name="mapPickerSelectsAVisiblePackWithoutLeavingTheMap" classname="fr.roadguard.app.MapAppearanceRuntimeTest" time="1.631"/>
+  <testcase name="largeCatalogSendsOnlyOneBoundedMapSlice" classname="fr.roadguard.app.MapAppearanceRuntimeTest" time="1.216"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+]]></system-err>
+</testsuite>

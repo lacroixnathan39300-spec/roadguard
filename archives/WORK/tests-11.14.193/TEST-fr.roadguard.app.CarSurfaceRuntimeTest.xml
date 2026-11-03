@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="fr.roadguard.app.CarSurfaceRuntimeTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-10-18T13:45:47" hostname="891fc462d9e7" time="0.502">
+  <properties/>
+  <testcase name="closingActiveSessionReleasesMapSurface[26]" classname="fr.roadguard.app.CarSurfaceRuntimeTest" time="0.097"/>
+  <testcase name="resizingAndDisconnectionReleaseEveryReceivedSurface[26]" classname="fr.roadguard.app.CarSurfaceRuntimeTest" time="0.03"/>
+  <testcase name="lateSurfaceAfterSessionCloseIsReleasedImmediately[26]" classname="fr.roadguard.app.CarSurfaceRuntimeTest" time="0.027"/>
+  <testcase name="closingActiveSessionReleasesMapSurface[34]" classname="fr.roadguard.app.CarSurfaceRuntimeTest" time="0.1"/>
+  <testcase name="resizingAndDisconnectionReleaseEveryReceivedSurface[34]" classname="fr.roadguard.app.CarSurfaceRuntimeTest" time="0.046"/>
+  <testcase name="lateSurfaceAfterSessionCloseIsReleasedImmediately[34]" classname="fr.roadguard.app.CarSurfaceRuntimeTest" time="0.025"/>
+  <testcase name="closingActiveSessionReleasesMapSurface" classname="fr.roadguard.app.CarSurfaceRuntimeTest" time="0.08"/>
+  <testcase name="resizingAndDisconnectionReleaseEveryReceivedSurface" classname="fr.roadguard.app.CarSurfaceRuntimeTest" time="0.055"/>
+  <testcase name="lateSurfaceAfterSessionCloseIsReleasedImmediately" classname="fr.roadguard.app.CarSurfaceRuntimeTest" time="0.034"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

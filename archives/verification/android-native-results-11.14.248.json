@@ -1,0 +1,17 @@
+{
+  "version": "11.14.248",
+  "suites": [
+    {
+      "name": "fr.roadguard.app.MapAppearanceRuntimeTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "name": "fr.roadguard.app.StartupRuntimeTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0
+    }
+  ]
+}

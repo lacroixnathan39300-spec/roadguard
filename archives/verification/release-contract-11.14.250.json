@@ -1,0 +1,7 @@
+{
+  "version": "11.14.250",
+  "deliverable": "Phone APK only",
+  "android_auto": "Code retained; no APK",
+  "physical_xiaomi_render_test": false,
+  "palette": "3 styles x 2 modes, plus automatic system theme"
+}

@@ -1,0 +1,34 @@
+{
+  "authorized-download-results-246.json": [
+    {
+      "name": "platform-36_r02.zip",
+      "bytes": 65878410,
+      "sha1": "2c1a80dd4d9f7d0e6dd336ec603d9b5c55a6f576",
+      "installed": "/workspace/scratch/03aedc6483d4/android-tools/sdk/platforms/android-36"
+    },
+    {
+      "name": "build-tools_r35_linux.zip",
+      "bytes": 61958799,
+      "sha1": "2cfaa0bbb2336e9ec18ed3ecea84fa2e2af607bc",
+      "installed": "/workspace/scratch/03aedc6483d4/android-tools/sdk/build-tools/35.0.0"
+    },
+    {
+      "name": "gradle-8.11.1-bin.zip",
+      "bytes": 136920070,
+      "sha256": "f397b287023acdba1e9f6fc5ea72d22dd63669d59ed4a289a29b1a76eee151c6",
+      "installed": "/workspace/scratch/03aedc6483d4/android-tools/gradle-8.11.1"
+    }
+  ],
+  "jdk17-download.json": {
+    "release": "jdk-17.0.20.1+1",
+    "url": "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.20.1%2B1/OpenJDK17U-jdk_x64_linux_hotspot_17.0.20.1_1.tar.gz",
+    "bytes": 193252603,
+    "sha256": "3808d1d15e3ec6bd5b84057fb5d84c33d8a1536a258146bcea2e603fc726e08e"
+  },
+  "jdk21-download.json": {
+    "release": "jdk-21.0.12.1+1",
+    "url": "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.12.1%2B1/OpenJDK21U-jdk_x64_linux_hotspot_21.0.12.1_1.tar.gz",
+    "bytes": 207473347,
+    "sha256": "ce79869e1307ed8ee1e2baa86a412b1eb5b75d10a01006d788a6f968bcfaee94"
+  }
+}

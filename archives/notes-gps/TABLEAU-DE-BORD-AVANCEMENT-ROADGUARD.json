@@ -1,0 +1,488 @@
+{
+  "schema_version": 1,
+  "project": "ROADGUARD",
+  "version": "11.14.197",
+  "updated_at": "2026-10-19",
+  "global_percent_estimate": 95,
+  "global_percent_audited": false,
+  "percentages_are_estimates": true,
+  "source_version": "11.14.196",
+  "artifact_type": "source_zip_with_separate_debug_apk",
+  "user_action_required_now": true,
+  "workstreams": [
+    {
+      "name": "GPS bleu",
+      "percent_estimate": 100,
+      "status": "controle_source_et_tests_gps",
+      "evidence_or_limit": "Moteur vitesse/cap séparé de la position : priorité GNSS, confirmation des zéros isolés, cap conservé à basse vitesse, mesure périmée affichée --, réglage compteur ±15 km/h. Tests Java; aucun nouveau trajet Xiaomi. Le 100 % décrit le code prévu, pas une validation sur appareil.",
+      "previous_percent_estimate": 100,
+      "delta_points": 0,
+      "weight_percent": 3.292683
+    },
+    {
+      "name": "Carte en ligne MapLibre",
+      "percent_estimate": 96,
+      "status": "implementation_et_tests_android_simules_validation_terrain_restante",
+      "evidence_or_limit": "Moteur Leaflet courant, composants locaux et tuiles en ligne. Écrans natifs exécutés dans un environnement Android simulé sur API26/28/34; rendu et connexion Xiaomi réels encore à vérifier.",
+      "previous_percent_estimate": 96,
+      "delta_points": 0,
+      "weight_percent": 9.878049
+    },
+    {
+      "name": "Cache normal des tuiles consultées",
+      "percent_estimate": 92,
+      "status": "cache_partage_4gib_reserve512mib_tests_valides",
+      "evidence_or_limit": "Plafond commun téléphone/voiture4Gio, réserve libre512Mio, nettoyage des moins récemment consultées, budget global en64bits.52 tests cache réussis API26/28/34/36. Aucun préchargement de zone ajouté; rayon50km non garanti.",
+      "previous_percent_estimate": 92,
+      "delta_points": 0,
+      "weight_percent": 6.585366
+    },
+    {
+      "name": "APK et tests Xiaomi",
+      "percent_estimate": 90,
+      "status": "implementation_et_tests_android_simules_validation_terrain_restante",
+      "evidence_or_limit": "APK 11.14.197 assemblée, cible36, signature de vérification. Aucun essai physique Xiaomi.",
+      "previous_percent_estimate": 90,
+      "delta_points": 0,
+      "weight_percent": 3.292683
+    },
+    {
+      "name": "Navigation",
+      "percent_estimate": 100,
+      "status": "implementation_code_complete_validation_after_compile",
+      "evidence_or_limit": "Corrections de projection sur segments, distance/manœuvre, départ accentué, arrivée et temps restant testées. Le 100 % décrit le code; guidage vocal et trajet réel sur Xiaomi non validés dans cette passe.",
+      "previous_percent_estimate": 100,
+      "delta_points": 0,
+      "weight_percent": 13.170732
+    },
+    {
+      "name": "Radars",
+      "percent_estimate": 99,
+      "status": "donnees_et_controles_source_verifies",
+      "evidence_or_limit": "France 24 429 et Suisse 1 777 conservées dans l’APK. Téléchargement par pays des radars fixes OSM selon couverture et disponibilité; autres sources à choisir. Aucun inventaire mondial complet embarqué ou vérifié. Cinq pays voisins totalisant 20 263 points MapAtlas datés du 21/05/2024 sont inclus et reliés à la carte et au service GPS; couverture non exhaustive. Limites connues acheminées vers les alertes, valeurs contradictoires ignorées; tests simulés de bips gradués en197.",
+      "previous_percent_estimate": 99,
+      "delta_points": 0,
+      "weight_percent": 9.878049
+    },
+    {
+      "name": "Caméra",
+      "percent_estimate": 95,
+      "status": "implementation_et_tests_android_simules_validation_terrain_restante",
+      "evidence_or_limit": "Rotation courte même après plusieurs tours complets, zoom Leaflet animé avec hystérésis et priorité aux gestes manuels. Scénarios JavaScript exécutés; fluidité de conduite sur Xiaomi non mesurée.",
+      "previous_percent_estimate": 95,
+      "delta_points": 0,
+      "weight_percent": 6.585366
+    },
+    {
+      "name": "Interface",
+      "percent_estimate": 99,
+      "status": "implementation_et_tests_android_simules_validation_terrain_restante",
+      "evidence_or_limit": "Cadre, bandeau et bulle bleus persistants; tests Android simulés. Volume et rendu Xiaomi/Bluetooth réels restants.",
+      "previous_percent_estimate": 99,
+      "delta_points": 0,
+      "weight_percent": 9.878049
+    },
+    {
+      "name": "Architecture visuelle premium",
+      "percent_estimate": 100,
+      "status": "ressources_et_parcours_sources_finalises",
+      "evidence_or_limit": "Fond fourni conservé, thème natif graphite/rouge, icône, pages et ressources locales assemblés. 100 % de réalisation du socle dans le périmètre actuel, pas une validation physique de toutes les fonctions.",
+      "previous_percent_estimate": 100,
+      "delta_points": 0,
+      "weight_percent": 3.292683
+    },
+    {
+      "name": "Site communautaire",
+      "percent_estimate": 95,
+      "previous_percent_estimate": 95,
+      "delta_points": 0,
+      "weight_percent": 10.97561,
+      "status": "estimation_non_auditee",
+      "evidence_or_limit": "Site publié, API et persistance partagées; 31 groupes de tests, cache et compilation. Approbation avec un vrai compte et rendu navigateur non testés ici."
+    },
+    {
+      "name": "Intégration communauté Android",
+      "percent_estimate": 90,
+      "previous_percent_estimate": 90,
+      "delta_points": 0,
+      "weight_percent": 10.97561,
+      "status": "implementation_et_tests_android_simules_validation_terrain_restante",
+      "evidence_or_limit": "Cache partagé atomiquement, lectures concurrentes et actualisation des signalements sans relire la base locale testés sur API26/28/34. Association et publication avec un vrai compte restant à tester."
+    },
+    {
+      "name": "Android Auto",
+      "percent_estimate": 90,
+      "previous_percent_estimate": 90,
+      "delta_points": 0,
+      "weight_percent": 12.19512,
+      "status": "migration_android16_recherche_lifecycle_tests_simules_valides_vehicule_restant",
+      "evidence_or_limit": "API36, recherche, permissions, surfaces et liste de certificats des hôtes contrôlées en Android simulé. Aucun DHU/véhicule ou dépôt Play."
+    }
+  ],
+  "completed_this_version": [
+    "Cadre/bandeau bleu fixe et bulle persistante à l’approche, sans repli sur temporisation ni clignotement.",
+    "Limites de vitesse numériques non contradictoires préservées sur téléphone, service et voiture; aucune limite inventée.",
+    "Bip discret à500/250/100m; deux bips plus forts en dépassement connu, au moins6s entre alertes fortes et déduplication entre propriétaires GPS.",
+    "326 tests Android simulés réussis (+26), dont26 spécifiques aux alertes radar; lint sans erreur."
+  ],
+  "next_actions": [
+    "Installer la mise à jour; vérifier Halo bleu radar et Bips de danger dans les paramètres.",
+    "Vérifier le cadre/panneau bleu, les paliers et le volume multimédia sur Xiaomi puis le routage Bluetooth.",
+    "Tester Android Auto sur DHU/véhicule; ne pas provoquer un dépassement pour tester le bip fort.",
+    "Configurer et essayer une clé personnelle de fournisseur si collecte externe souhaitée."
+  ],
+  "blockers": [
+    "Aucune clé OpenWeb Ninja/WazeAPI : aucun appel authentifié effectué; couverture et schémas de production restant à vérifier.",
+    "Aucun téléphone Android ni écran voiture/hôte DHU connecté; les tests Robolectric ne prouvent pas le fonctionnement sur ces appareils.",
+    "Pas de compte/canal de test Play accessible; aucun dépôt effectué. Cible API36 modernisée, mais fiche, conformité, signature de publication et validation Google restent distinctes.",
+    "Cache limité aux tuiles consultées avec le fournisseur actuel; préchargement 50 km bloqué faute de source autorisant cet usage. Aucun téléchargement intégral de pays prévu.",
+    "Compte communautaire : association et publication réelles non essayées; recherche publique vérifiée séparément.",
+    "Spotify réel et gestion d’énergie Xiaomi non essayés; mode automatique réarmable uniquement après réouverture si arrêt forcé Android."
+  ],
+  "modified_files": [
+    "RadarAlertPolicy.java",
+    "RadarAlertAudio.java",
+    "BundledRadarCatalog.java",
+    "MainActivity.java",
+    "BackgroundAlertService.java",
+    "RadarBubbleOverlay.java",
+    "CarRouteData.java",
+    "RoadguardCarScreen.java",
+    "CarMapSurface.java (cadre uniquement)",
+    "RadarAlertsRuntimeTest.java",
+    "app/build.gradle",
+    "roadguard_progress.json"
+  ],
+  "latest_work": "11.14.197 : halo bleu persistant et bips radar gradués; 326 tests Android simulés réussis.",
+  "last_update_note": "Estimations historiques inchangées (+0point), tests supplémentaires sans nouvelle preuve physique.",
+  "integration_11_13_62": "GPS foreground callback schedules one-pack sync on background executor; requires trusted offline_pack_catalog.tsv asset; no real provider configured; no APK build",
+  "design_revision_note": "Révision après retour utilisateur : la version 11.14.111 ne se rapprochait pas assez de Waze. La présente version change l’organisation du cockpit et les gestes du panneau, au-delà des seules couleurs.",
+  "release_note": "11.14.197 : halo bleu persistant et bips radar gradués; 326 tests Android simulés réussis.",
+  "ui_workstreams": [
+    {
+      "name": "Navigation jour/nuit",
+      "previous": 80,
+      "current": 95,
+      "note": "Rendu navigateur et contrôles des parcours effectués; validation Android/Xiaomi restante."
+    },
+    {
+      "name": "Accueil",
+      "previous": 100,
+      "current": 100,
+      "note": "Rendu navigateur et contrôles des parcours effectués; validation Android/Xiaomi restante."
+    },
+    {
+      "name": "Radars et alertes",
+      "previous": 100,
+      "current": 100,
+      "note": "Rendu navigateur et contrôles des parcours effectués; validation Android/Xiaomi restante."
+    },
+    {
+      "name": "Signalements",
+      "previous": 100,
+      "current": 100,
+      "note": "Rendu navigateur et contrôles des parcours effectués; validation Android/Xiaomi restante."
+    },
+    {
+      "name": "Itinéraires",
+      "previous": 100,
+      "current": 100,
+      "note": "Rendu navigateur et contrôles des parcours effectués; validation Android/Xiaomi restante."
+    },
+    {
+      "name": "Paramètres et apparence",
+      "previous": 100,
+      "current": 100,
+      "note": "Rendu navigateur et contrôles des parcours effectués; validation Android/Xiaomi restante."
+    }
+  ],
+  "global_percent_previous": 95,
+  "visual_implementation_percent": 99,
+  "visual_validation_status": "13 écrans natifs construits en Android simulé (API26/28/34); scripts JavaScript vérifiés. Comparaison visuelle et fluidité sur Xiaomi non validées.",
+  "active_workstream": "Halo bleu persistant et bips radar à deux niveaux intégrés; validation du rendu/volume Xiaomi, Bluetooth et véhicule restante.",
+  "previous_version": "11.14.196",
+  "versionCode": 395,
+  "global_delta_points": 0,
+  "bundled_radar_counts": {
+    "FR": {
+      "file": "radars_embedded_fr.csv",
+      "count": 24429,
+      "static_count": 7325,
+      "historical_count": 17104,
+      "categories": {
+        "average": 132,
+        "average_end": 61,
+        "average_start": 61,
+        "carpool": 29,
+        "crossing": 83,
+        "discriminant": 562,
+        "fixed": 3914,
+        "redlight": 963,
+        "temporary": 15689,
+        "turret": 1492,
+        "urban": 27,
+        "variable": 1,
+        "works": 1415
+      },
+      "sha256": "79e3e8e9b18ef1e22c6ed9e74a69884f0cffdd2cd580b993edb9f781208015d0",
+      "app_usage": "full inventory active after one-time 179 migration; historical switch remains available"
+    },
+    "CH": {
+      "file": "radars_embedded_ch.csv",
+      "count": 1777,
+      "static_count": 1583,
+      "historical_count": 194,
+      "categories": {
+        "average": 5,
+        "average_end": 2,
+        "average_start": 2,
+        "fixed": 1007,
+        "mobile": 194,
+        "redlight": 523,
+        "tunnel": 33,
+        "variable": 11
+      },
+      "sha256": "6ae499183f4f4b69191384da5060cf0bc1b065124b93f37cd5806b9aea126da1",
+      "app_usage": "active; Swiss historical locations enabled by default, independently switchable"
+    }
+  },
+  "default_radar_selection": {
+    "french_historical": true,
+    "swiss_historical": true,
+    "FR": 24429,
+    "CH": 1777,
+    "total": 26206
+  },
+  "validation_11_14_173": {
+    "reference_panels_reviewed": 10,
+    "secondary_screens_implemented": 8,
+    "ui_interaction_test": true,
+    "java_source_compile": true,
+    "apk_assembled": false,
+    "xiaomi_tested": false,
+    "pixel_identical_established": false
+  },
+  "validation_11_14_174": {
+    "java_source_compile": true,
+    "apk_assembled": false,
+    "xiaomi_tested": false,
+    "pixel_identical_established": false,
+    "browser_rendered": false
+  },
+  "global_formula": "Somme des estimations de réalisation pondérées, arrondie. Les poids de la 179 conservés hors chantier retiré sont divisés par 82 puis multipliés par 100. Les pourcentages ne sont ni un audit ni des mesures de fiabilité.",
+  "validation_11_14_175": {
+    "java_source_compile": true,
+    "resources_linked": true,
+    "dex_generated": true,
+    "apk_assembled": true,
+    "signature_v2_v3_verified": true,
+    "apk_executed": false,
+    "xiaomi_tested": false,
+    "browser_rendered": true,
+    "screen_count": 11,
+    "pixel_identical_established": false
+  },
+  "global_percent_exact": 95.356098,
+  "global_previous_exact": 95.356098,
+  "global_android_historical": 94,
+  "global_scope": "Application Android, interface, GPS, cache, radars, navigation, site et communauté, Android Auto",
+  "global_scope_rebased": true,
+  "validation_11_14_177": {
+    "java_source_compile": true,
+    "resources_linked": true,
+    "dex_generated": true,
+    "apk_assembled": true,
+    "signature_v2_v3_verified": true,
+    "apk_executed": false,
+    "xiaomi_tested": false,
+    "browser_rendered": false,
+    "ui_scripts_node_vm": true,
+    "pixel_identical_established": false
+  },
+  "validation_11_14_178": {
+    "java_source_compile": true,
+    "resources_linked": true,
+    "dex_generated": true,
+    "apk_assembled": true,
+    "signature_v2_v3_verified": true,
+    "apk_executed": false,
+    "xiaomi_tested": false,
+    "http_unit_test_passed": true,
+    "mapatlas_fr_ch_host_download_passed": true,
+    "browser_rendered": false
+  },
+  "validation_11_14_179": {
+    "java_source_compile": true,
+    "resources_linked": true,
+    "dex_generated": true,
+    "apk_assembled": true,
+    "signature_v2_v3_verified": true,
+    "apk_executed": false,
+    "xiaomi_tested": false,
+    "android_auto_dhu_tested": false,
+    "android_auto_vehicle_tested": false,
+    "android_auto_play_approved": false,
+    "motion_java_test_passed": true,
+    "full_radar_java_test_passed": true,
+    "camera_motion_vm_passed": true,
+    "browser_rendered": false
+  },
+  "scope_change_note": "Le chantier de charge est retiré du périmètre à la demande de Nathan. Les poids restants sont renormalisés sur 100. Comparaison de progression à périmètre identique : 90 % → 95 %; l’ancienne valeur globale affichée 76 % comprenait le chantier retiré.",
+  "validation_11_14_180": {
+    "java_source_compile": true,
+    "resources_linked": true,
+    "dex_generated": true,
+    "apk_assembled": true,
+    "signature_v2_v3_verified": true,
+    "apk_executed_emulator": false,
+    "xiaomi_tested": false,
+    "android_auto_dhu_tested": false,
+    "android_auto_vehicle_tested": false,
+    "android_auto_play_approved": false,
+    "android_simulated_test_count": 87,
+    "android_simulated_sdks": [
+      26,
+      28,
+      34
+    ],
+    "android_simulated_failures": 0,
+    "intermediate_apk_installed_emulator": true,
+    "intermediate_apk_launcher_started_emulator": true,
+    "emulator_map_ui_validated": false
+  },
+  "validation_11_14_181": {
+    "java_source_compile": false,
+    "resources_linked": false,
+    "dex_generated": false,
+    "apk_assembled": false,
+    "signature_v2_v3_verified": false,
+    "xiaomi_waze_tested": false,
+    "actual_country_download_tested": false,
+    "android_auto_vehicle_tested": false,
+    "static_regression_groups": 0,
+    "android_simulated_tests_this_version": 0
+  },
+  "validation_11_14_191": {
+    "apk_assembled": true,
+    "signature_v2_v3_verified": true,
+    "android_auto_test_count": 45,
+    "android_auto_simulated_sdks": [
+      26,
+      28,
+      34
+    ],
+    "android_auto_test_failures": 0,
+    "android_auto_dhu_tested": false,
+    "android_auto_vehicle_tested": false,
+    "xiaomi_tested": false,
+    "play_uploaded": false,
+    "phone_only_assembled": true,
+    "phone_only_tests_compiled": true
+  },
+  "global_delta_points_exact": 0,
+  "validation_11_14_192": {
+    "apk_assembled": true,
+    "target_sdk": 36,
+    "compile_sdk": 36,
+    "android_simulated_test_count": 156,
+    "android_auto_suite_test_count": 95,
+    "android_simulated_sdks": [
+      26,
+      28,
+      34,
+      36
+    ],
+    "android_simulated_failures": 0,
+    "lint_blocking_errors": 0,
+    "android_auto_dhu_tested": false,
+    "android_auto_vehicle_tested": false,
+    "xiaomi_tested": false,
+    "play_uploaded": false,
+    "public_place_search_verified": true,
+    "phone_only_assembled": true,
+    "phone_only_tests_compiled": true
+  },
+  "validation_11_14_193": {
+    "apk_assembled": true,
+    "target_sdk": 36,
+    "android_simulated_test_count": 188,
+    "cache_test_count": 52,
+    "android_auto_suite_test_count": 95,
+    "android_simulated_sdks": [
+      26,
+      28,
+      34,
+      36
+    ],
+    "android_simulated_failures": 0,
+    "lint_blocking_errors": 0,
+    "cache_limit_bytes": 4294967296,
+    "cache_min_free_bytes": 536870912,
+    "cache_filled_with_4gib_real_tiles": false,
+    "android_auto_dhu_tested": false,
+    "android_auto_vehicle_tested": false,
+    "xiaomi_tested": false,
+    "play_uploaded": false
+  },
+  "validation_11_14_194": {
+    "apk_assembled": true,
+    "target_sdk": 36,
+    "android_simulated_test_count": 206,
+    "android_auto_suite_test_count": 99,
+    "android_simulated_failures": 0,
+    "lint_blocking_errors": 0,
+    "lint_warnings": 37,
+    "android_auto_dhu_tested": false,
+    "android_auto_vehicle_tested": false,
+    "xiaomi_tested": false,
+    "play_uploaded": false
+  },
+  "validation_11_14_195": {
+    "apk_assembled": true,
+    "target_sdk": 36,
+    "android_simulated_test_count": 256,
+    "control_memory_test_count": 50,
+    "android_auto_suite_test_count": 99,
+    "android_simulated_failures": 0,
+    "lint_blocking_errors": 0,
+    "lint_warnings": 47,
+    "external_api_authenticated_tested": false,
+    "android_auto_dhu_tested": false,
+    "android_auto_vehicle_tested": false,
+    "xiaomi_tested": false,
+    "play_uploaded": false
+  },
+  "validation_11_14_196": {
+    "apk_assembled": true,
+    "target_sdk": 36,
+    "android_simulated_test_count": 300,
+    "control_memory_test_count": 54,
+    "drive_auto_test_count": 28,
+    "spotify_local_session_test_count": 12,
+    "android_auto_suite_test_count": 99,
+    "android_simulated_failures": 0,
+    "lint_blocking_errors": 0,
+    "lint_warnings": 55,
+    "external_api_authenticated_tested": false,
+    "spotify_real_app_tested": false,
+    "android_auto_dhu_tested": false,
+    "android_auto_vehicle_tested": false,
+    "xiaomi_tested": false,
+    "play_uploaded": false
+  },
+  "validation_11_14_197": {
+    "apk_assembled": true,
+    "target_sdk": 36,
+    "android_simulated_test_count": 326,
+    "radar_alert_test_count": 26,
+    "android_auto_suite_test_count": 99,
+    "android_simulated_failures": 0,
+    "lint_blocking_errors": 0,
+    "lint_warnings": 55,
+    "map_camera_unchanged": true,
+    "xiaomi_tested": false,
+    "android_auto_vehicle_tested": false,
+    "android_auto_dhu_tested": false,
+    "play_uploaded": false
+  }
+}
