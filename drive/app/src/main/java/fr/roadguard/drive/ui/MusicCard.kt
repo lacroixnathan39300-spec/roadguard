@@ -53,44 +53,48 @@ fun MusicCard(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    Row(modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
-        Box(
-            Modifier.size(64.dp).clip(RoundedCornerShape(10.dp)).background(DriveColors.Track),
-            contentAlignment = Alignment.Center,
-        ) {
-            nowPlaying?.artwork?.let {
-                Image(it.asImageBitmap(), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
-            } ?: Text("♪", color = DriveColors.TextSecondary, fontSize = 28.sp)
-        }
-        Column(Modifier.weight(1f).padding(horizontal = 12.dp)) {
-            when {
-                !hasAccess -> {
-                    Text("Musique", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                    Text(
-                        "Toucher pour autoriser l'accès",
-                        color = DriveColors.Accent, fontSize = 14.sp,
-                        modifier = Modifier.clickable {
-                            context.startActivity(
-                                Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            )
-                        },
-                    )
-                }
-                nowPlaying == null -> Text("Aucune musique", color = DriveColors.TextSecondary, fontSize = 16.sp)
-                else -> {
-                    Text(nowPlaying.title, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold,
-                        maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text(listOf(nowPlaying.artist, nowPlaying.app).filter { it.isNotBlank() }.joinToString(" · "),
-                        color = DriveColors.TextSecondary, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    Column(modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalArrangement = Arrangement.SpaceBetween) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                Modifier.size(56.dp).clip(RoundedCornerShape(10.dp)).background(DriveColors.Track),
+                contentAlignment = Alignment.Center,
+            ) {
+                nowPlaying?.artwork?.let {
+                    Image(it.asImageBitmap(), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                } ?: Text("♪", color = DriveColors.TextSecondary, fontSize = 26.sp)
+            }
+            Column(Modifier.weight(1f).padding(start = 12.dp)) {
+                when {
+                    !hasAccess -> {
+                        Text("Musique", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        Text(
+                            "Toucher pour autoriser l'accès",
+                            color = DriveColors.Accent, fontSize = 14.sp,
+                            modifier = Modifier.clickable {
+                                context.startActivity(
+                                    Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                )
+                            },
+                        )
+                    }
+                    nowPlaying == null -> Text("Aucune musique", color = DriveColors.TextSecondary, fontSize = 16.sp)
+                    else -> {
+                        Text(nowPlaying.title, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold,
+                            maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(listOf(nowPlaying.artist, nowPlaying.app).filter { it.isNotBlank() }.joinToString(" · "),
+                            color = DriveColors.TextSecondary, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
                 }
             }
         }
-        if (hasAccess) {
-            ControlButton("⏮", onPrevious)
-            ControlButton(if (nowPlaying?.playing == true) "⏸" else "▶", onPlayPause)
-            ControlButton("⏭", onNext)
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
+            if (hasAccess) {
+                ControlButton("⏮", onPrevious)
+                ControlButton(if (nowPlaying?.playing == true) "⏸" else "▶", onPlayPause)
+                ControlButton("⏭", onNext)
+            }
+            ControlButton("EQ", onEqualizer)
         }
-        ControlButton("EQ", onEqualizer)
     }
 }
 

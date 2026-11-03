@@ -47,6 +47,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import fr.roadguard.drive.map.DriveMap
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import fr.roadguard.drive.media.DriveEqualizer
 import fr.roadguard.drive.media.MediaHub
 import fr.roadguard.drive.ui.EqualizerPanel
@@ -73,8 +76,23 @@ import java.util.Date
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) hideSystemBars()
+    }
+
+    /** Plein écran façon tableau de bord : barres d'Android masquées, un glissement les fait revenir. */
+    private fun hideSystemBars() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            hide(WindowInsetsCompat.Type.systemBars())
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        hideSystemBars()
         setContent { DriveHome() }
     }
 }
@@ -146,7 +164,7 @@ private fun DriveHome() {
                         modifier = Modifier.padding(16.dp),
                     )
                 }
-                Panel(Modifier.fillMaxWidth().height(84.dp)) {
+                Panel(Modifier.fillMaxWidth().height(132.dp)) {
                     MusicCard(
                         nowPlaying = nowPlaying,
                         hasAccess = hasMediaAccess,
