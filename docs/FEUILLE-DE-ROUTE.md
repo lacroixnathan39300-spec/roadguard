@@ -27,18 +27,20 @@ et essai sur l'appareil réel.
 - [ ] Un seul exemplaire du code utilisé par GPS et DRIVE (fin de la copie `DRIVE/roadguard`).
 - [ ] Découper `MainActivity.java` (460 Ko) en écrans et services lisibles, avec tests.
 
-## Phase 3 — ROADGUARD Link : l'écran du téléphone sur l'autoradio (type CarbitLink)
-Pas d'Android Auto : le téléphone fait tourner les applis (Waze, GPS ROADGUARD, musique…),
-le poste affiche et renvoie le tactile.
-- [ ] Téléphone (appli GPS) : capture d'écran autorisée (MediaProjection), encodage vidéo H.264
-      matériel, débit et images/s adaptés au Wi-Fi.
-- [ ] Autoradio (DRIVE) : réception et décodage matériel plein écran, faible latence.
-- [ ] Tactile inverse : les appuis et glissés sur le poste pilotent le téléphone
-      (service d'accessibilité du téléphone, avec accord explicite).
-- [ ] Connexion : partage de connexion du téléphone ou Wi-Fi du poste, association par QR,
-      canal chiffré, reconnexion automatique au démarrage de la voiture.
-- [ ] Son par le Bluetooth du poste ; orientation paysage forcée pendant la projection.
-- [ ] Alertes radars ROADGUARD superposées par-dessus Waze projeté.
+## Phase 3 — ROADGUARD Link : « notre Android Auto »
+Le téléphone (appli GPS) fait tout le travail ; le poste (DRIVE) affiche et renvoie le tactile.
+- [ ] Mode voiture ROADGUARD : écrans conçus pour le poste (paysage, gros boutons) dessinés par le
+      téléphone sur un écran virtuel à la résolution du poste, puis envoyés en vidéo H.264.
+      Le téléphone peut rester verrouillé dans la poche.
+- [ ] Écrans : carte et guidage, radars et vitesse moyenne, musique de n'importe quelle appli
+      (Spotify, YouTube Music… via la session média), appels, messages lus à voix haute.
+- [ ] Tactile : les appuis sur le poste reviennent directement dans les écrans ROADGUARD.
+- [ ] Mode miroir (secours) : l'écran du téléphone tel quel, pour Waze et les autres applis
+      (capture d'écran autorisée + service d'accessibilité pour le tactile).
+- [ ] Connexion : câble USB (protocole accessoire ouvert, recharge le téléphone) ou Wi-Fi
+      (partage de connexion), association par QR, canal chiffré, reconnexion automatique.
+- [ ] Son par le Bluetooth du poste ou dans le flux USB.
+
 ## Phase 4 — Navigation de haut niveau
 - [ ] Calcul d'itinéraire hors ligne (moteur embarqué) au lieu du serveur de démonstration OSRM.
 - [ ] Recherche d'adresses hors ligne, Maison/Travail, favoris.
