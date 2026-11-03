@@ -13,6 +13,10 @@ data class Radar(
     val kind: RadarKind,
     val label: String,
     val speedKmh: Int?,
+    /** Sens contrôlé (cap en degrés), si connu. */
+    val directionDeg: Int? = null,
+    /** Catégorie brute de la base (average_start, average_end…). */
+    val category: String = "",
 )
 
 /**
@@ -37,6 +41,7 @@ object RadarCatalog {
         val iCat = col["category"]
         val iStatus = col["status"]
         val iSpeed = col["speed_kmh"]
+        val iDir = col["direction_deg"]
 
         val out = ArrayList<Radar>()
         reader.lineSequence().forEach { line ->
@@ -52,6 +57,8 @@ object RadarCatalog {
             out += Radar(
                 id = f[iId], lat = lat, lon = lon, kind = kind, label = type,
                 speedKmh = iSpeed?.let { f.getOrNull(it)?.toIntOrNull() },
+                directionDeg = iDir?.let { f.getOrNull(it)?.toIntOrNull() }?.takeIf { it in 0..360 },
+                category = iCat?.let { f.getOrNull(it) }.orEmpty(),
             )
         }
         return out

@@ -7,6 +7,7 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.Looper
+import fr.roadguard.drive.radar.Fix
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -15,17 +16,17 @@ import kotlinx.coroutines.flow.callbackFlow
 data class SpeedFix(val kmh: Int, val accuracyMeters: Float, val timeMillis: Long)
 
 /**
- * Vitesse lue directement sur le GPS de l'autoradio (LocationManager, sans Google Play Services,
- * absent sur beaucoup de postes chinois). L'appelant vérifie la permission avant de collecter.
+ * Positions lues directement sur le GPS de l'autoradio (LocationManager, sans Google Play Services,
+ * absent sur beaucoup de postes). L'appelant vérifie la permission avant de collecter.
  */
 class SpeedSource(private val context: Context) {
 
     @SuppressLint("MissingPermission")
-    fun fixes(): Flow<SpeedFix> = callbackFlow {
+    fun locations(): Flow<Location> = callbackFlow {
         val manager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val listener = object : LocationListener {
             override fun onLocationChanged(location: Location) {
-                trySend(SpeedMath.toFix(location.hasSpeed(), location.speed, location.accuracy, location.time))
+                trySend(location)
             }
             @Deprecated("Requis pour API < 29")
             override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) = Unit
@@ -33,7 +34,7 @@ class SpeedSource(private val context: Context) {
             override fun onProviderDisabled(provider: String) = Unit
         }
         if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500L, 0f, listener, Looper.getMainLooper())
+            manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L, 0f, listener, Looper.getMainLooper())
         }
         awaitClose { manager.removeUpdates(listener) }
     }
@@ -55,3 +56,14 @@ object SpeedMath {
     fun needleSweep(kmh: Int, maxKmh: Int = 200): Float =
         240f * (kmh.coerceIn(0, maxKmh).toFloat() / maxKmh)
 }
+
+fun Location.toSpeedFix(): SpeedFix = SpeedMath.toFix(hasSpeed(), speed, accuracy, time)
+
+fun Location.toAlertFix(): Fix = Fix(
+    lat = latitude,
+    lon = longitude,
+    speedKmh = if (hasSpeed()) speed * 3.6 else 0.0,
+    bearing = if (hasBearing() && hasSpeed() && speed > 2f) bearing.toDouble() else Double.NaN,
+    accuracyM = if (hasAccuracy()) accuracy.toDouble() else 99.0,
+    timeMs = time,
+)

@@ -14,7 +14,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import fr.roadguard.drive.radar.Radar
-import fr.roadguard.drive.radar.RadarCatalog
+import fr.roadguard.drive.radar.RadarRepository
 import fr.roadguard.drive.radar.RadarKind
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -72,7 +72,7 @@ fun DriveMap(hasLocation: Boolean, modifier: Modifier = Modifier) {
     }
 
     LaunchedEffect(mapView) {
-        val radars = withContext(Dispatchers.IO) { runCatching { RadarCatalog.loadAll(context.assets) }.getOrDefault(emptyList()) }
+        val radars = RadarRepository.radars(context)
         val collection = withContext(Dispatchers.Default) { radars.toFeatureCollection() }
         mapView.getMapAsync { map ->
             holder.map = map

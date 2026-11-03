@@ -13,6 +13,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,8 +29,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,11 +47,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import fr.roadguard.drive.map.DriveMap
+import fr.roadguard.drive.radar.AlertEngine
+import fr.roadguard.drive.radar.AlertVoice
+import fr.roadguard.drive.radar.AverageSpeedTracker
+import fr.roadguard.drive.radar.AverageStatus
+import fr.roadguard.drive.radar.RadarAlert
+import fr.roadguard.drive.radar.RadarRepository
+import fr.roadguard.drive.ui.AlertBanners
 import fr.roadguard.drive.ui.DriveColors
 import fr.roadguard.drive.ui.Speedometer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -75,14 +82,36 @@ private fun DriveHome() {
     val askLocation = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { hasLocation = it }
     LaunchedEffect(Unit) { if (!hasLocation) askLocation.launch(Manifest.permission.ACCESS_FINE_LOCATION) }
 
-    val speedFlow = remember(hasLocation) { if (hasLocation) SpeedSource(context).fixes() else emptyFlow() }
-    val fix by speedFlow.collectAsState(initial = null)
+    var fix by remember { mutableStateOf<SpeedFix?>(null) }
+    var alert by remember { mutableStateOf<RadarAlert?>(null) }
+    var average by remember { mutableStateOf<AverageStatus?>(null) }
     var showApps by remember { mutableStateOf(false) }
+    val voice = remember { AlertVoice(context) }
+    DisposableEffect(Unit) { onDispose { voice.release() } }
+
+    // Une seule boucle GPS : compteur, alertes radars et vitesse moyenne.
+    LaunchedEffect(hasLocation) {
+        if (!hasLocation) return@LaunchedEffect
+        val index = RadarRepository.index(context)
+        val alerts = AlertEngine(index)
+        val averages = AverageSpeedTracker(index)
+        SpeedSource(context).locations().collect { location ->
+            fix = location.toSpeedFix()
+            val f = location.toAlertFix()
+            val newAlert = alerts.update(f)
+            if (newAlert?.isNew == true) voice.announce(newAlert)
+            alert = newAlert
+            val newAverage = averages.update(f)
+            if (newAverage?.finished == true && average?.finished != true) voice.announceAverageResult(newAverage)
+            average = newAverage
+        }
+    }
 
     Box(Modifier.fillMaxSize().background(DriveColors.Background)) {
         Row(Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Panel(Modifier.weight(0.62f).fillMaxHeight()) {
                 DriveMap(hasLocation = hasLocation, modifier = Modifier.fillMaxSize())
+                AlertBanners(alert, average, Modifier.align(Alignment.TopCenter))
             }
             Column(Modifier.weight(0.38f).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Clock()
@@ -107,7 +136,7 @@ private fun DriveHome() {
 }
 
 @Composable
-private fun Panel(modifier: Modifier, content: @Composable () -> Unit) {
+private fun Panel(modifier: Modifier, content: @Composable BoxScope.() -> Unit) {
     Box(
         modifier.clip(RoundedCornerShape(20.dp)).background(DriveColors.Panel),
         contentAlignment = Alignment.Center,
