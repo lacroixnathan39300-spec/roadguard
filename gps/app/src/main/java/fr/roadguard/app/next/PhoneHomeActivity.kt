@@ -139,7 +139,7 @@ private fun PhoneHome() {
     var showReport by remember { mutableStateOf(false) }
     var showCommunity by remember { mutableStateOf(false) }
     var showTrip by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) { runCatching { fr.roadguard.core.map.OfflineRegions.clearCacheOnce(context, 1) } }
+    LaunchedEffect(Unit) { runCatching { fr.roadguard.core.map.OfflineRegions.clearCacheOnce(context, 2) } }
     var showEqualizer by remember { mutableStateOf(false) }
 
     // Carte hors ligne : packs téléchargés dans « Plus → Cartes hors ligne », utilisés sans Internet.

@@ -54,7 +54,13 @@ object OfflineRegions {
     suspend fun clearCacheOnce(context: Context, version: Int) {
         val prefs = context.getSharedPreferences("map_cache", Context.MODE_PRIVATE)
         if (prefs.getInt("cleared", 0) >= version) return
-        clearCache(context)
+        // Remise à zéro complète (mémoire + zones enregistrées pendant le défaut d'affichage).
+        suspendCancellableCoroutine<Unit> { cont ->
+            manager(context).resetDatabase(object : OfflineManager.FileSourceCallback {
+                override fun onSuccess() { cont.resume(Unit) }
+                override fun onError(message: String) { cont.resume(Unit) }
+            })
+        }
         prefs.edit().putInt("cleared", version).apply()
     }
 
