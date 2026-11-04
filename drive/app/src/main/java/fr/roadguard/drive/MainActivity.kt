@@ -18,6 +18,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -323,9 +324,7 @@ private fun DriveHome() {
                         modifier = Modifier.fillMaxSize(),
                     )
                 }
-                Panel(Modifier.fillMaxWidth().height(64.dp).clickable { showApps = true }) {
-                    Text(stringResource(R.string.apps), color = Color.White, fontSize = 20.sp)
-                }
+                FavoritesDock(refresh = showApps, onAll = { showApps = true })
             }
             }
             if (settings.mapRight) { sidePart(); mapPart() } else { mapPart(); sidePart() }
@@ -417,11 +416,13 @@ private fun Clock() {
     Text(format.format(now), color = Color.White, fontSize = 40.sp, modifier = Modifier.padding(start = 8.dp))
 }
 
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 private fun AppDrawer(onClose: () -> Unit) {
     val context = LocalContext.current
     val catalog = remember { AppCatalog(context) }
     var apps by remember { mutableStateOf<List<LaunchableApp>>(emptyList()) }
+    var favorites by remember { mutableStateOf(catalog.favorites()) }
     LaunchedEffect(Unit) { apps = withContext(Dispatchers.IO) { catalog.load() } }
     BackHandler(onBack = onClose)
 
@@ -432,16 +433,52 @@ private fun AppDrawer(onClose: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
+                Text("Appui long sur une appli : l'ajouter ou la retirer des favoris de l'accueil (★).",
+                    color = DriveColors.TextSecondary, fontSize = 15.sp)
+            }
             items(apps, key = { it.packageName + "/" + it.activity }) { app ->
+                val fav = app.packageName + "/" + app.activity in favorites
                 Column(
-                    Modifier.clip(RoundedCornerShape(16.dp)).clickable { catalog.launch(app); onClose() }.padding(8.dp),
+                    Modifier.clip(RoundedCornerShape(16.dp))
+                        .combinedClickable(onClick = { catalog.launch(app); onClose() }, onLongClick = { favorites = catalog.toggleFavorite(app) })
+                        .padding(8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
+                    if (fav) Text("★", color = Color(0xFFFFC107), fontSize = 16.sp)
                     app.icon?.let { Image(it.asImageBitmap(), contentDescription = null, modifier = Modifier.size(64.dp)) }
                         ?: Spacer(Modifier.size(64.dp))
                     Text(app.label, color = Color.White, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
+        }
+    }
+}
+
+/** Raccourcis favoris sur l'accueil (choisis par appui long dans la liste des applis) + « Toutes ». */
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+@Composable
+private fun FavoritesDock(refresh: Boolean, onAll: () -> Unit) {
+    val context = LocalContext.current
+    val catalog = remember { AppCatalog(context) }
+    var apps by remember { mutableStateOf<List<LaunchableApp>>(emptyList()) }
+    LaunchedEffect(refresh) {
+        if (refresh) return@LaunchedEffect
+        val favs = catalog.favorites()
+        apps = withContext(Dispatchers.IO) { catalog.load() }.filter { it.packageName + "/" + it.activity in favs }
+            .sortedBy { favs.indexOf(it.packageName + "/" + it.activity) }
+    }
+    Row(
+        Modifier.fillMaxWidth().height(72.dp).clip(RoundedCornerShape(18.dp)).background(DriveColors.Panel).padding(horizontal = 8.dp),
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        apps.take(4).forEach { app ->
+            Box(Modifier.size(56.dp).clip(RoundedCornerShape(14.dp)).clickable { catalog.launch(app) }, contentAlignment = Alignment.Center) {
+                app.icon?.let { Image(it.asImageBitmap(), contentDescription = app.label, modifier = Modifier.size(44.dp)) }
+            }
+        }
+        Box(Modifier.weight(1f).height(56.dp).clip(RoundedCornerShape(14.dp)).clickable(onClick = onAll), contentAlignment = Alignment.Center) {
+            Text(if (apps.isEmpty()) stringResource(R.string.apps) else "⋯", color = Color.White, fontSize = 20.sp)
         }
     }
 }

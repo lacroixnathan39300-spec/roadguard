@@ -31,6 +31,18 @@ class AppCatalog(private val context: Context) {
             .toList()
     }
 
+    private val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+
+    /** Applis favorites (raccourcis de l'accueil), dans l'ordre d'ajout. */
+    fun favorites(): List<String> = prefs.getString("favorite_apps", "").orEmpty().split('|').filter { it.isNotBlank() }
+
+    fun toggleFavorite(app: LaunchableApp): List<String> {
+        val key = app.packageName + "/" + app.activity
+        val list = favorites().let { if (key in it) it - key else (it + key).takeLast(8) }
+        prefs.edit().putString("favorite_apps", list.joinToString("|")).apply()
+        return list
+    }
+
     fun launch(app: LaunchableApp) {
         val intent = Intent(Intent.ACTION_MAIN)
             .addCategory(Intent.CATEGORY_LAUNCHER)
