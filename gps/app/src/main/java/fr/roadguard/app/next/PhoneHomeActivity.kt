@@ -212,7 +212,7 @@ private fun PhoneHome() {
                 fun open(tab: Int) { offlineTab = tab; showOffline = true; showMenu = false }
                 MenuEntry("📍", "Mes radars", "Ajouter un radar ici, importer un fichier CSV") { open(2) }
                 MenuEntry("🗺", "Cartes hors ligne", "Télécharger les cartes pour rouler sans Internet") { open(0) }
-                MenuEntry("🌍", "Radars d'autres pays", "Pays-Bas, Autriche, Royaume-Uni…") { open(1) }
+                MenuEntry("🌍", "Radars par pays", "France et Suisse incluses ; autres pays à télécharger") { open(1) }
                 MenuEntry("🚗", "ROADGUARD Link", "Relier le téléphone à l'autoradio (Wi-Fi ou câble)") {
                     showMenu = false; context.startActivity(Intent(context, LinkActivity::class.java))
                 }

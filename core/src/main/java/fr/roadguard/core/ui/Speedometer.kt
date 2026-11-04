@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CircleShape
@@ -27,7 +28,15 @@ import fr.roadguard.core.SpeedMath
 /** Compteur rond : arc de fond, arc de vitesse, chiffre au centre. */
 @Composable
 fun Speedometer(kmh: Int?, unit: String, waiting: String, limit: Int?, over: Boolean, modifier: Modifier = Modifier) {
-    Box(modifier.aspectRatio(1f), contentAlignment = Alignment.Center) {
+    androidx.compose.foundation.layout.BoxWithConstraints(modifier.aspectRatio(1f), contentAlignment = Alignment.Center) {
+        // Tailles calculées sur le compteur lui-même : lisible même avec une grande police système.
+        val density = androidx.compose.ui.platform.LocalDensity.current
+        val side = minOf(maxWidth, maxHeight)
+        val digits = if ((kmh ?: 0) >= 100) 0.34f else 0.42f
+        val numberSize = with(density) { (side * digits).toSp() }
+        val unitSize = with(density) { (side * 0.12f).toSp() }
+        val badge = side * 0.36f
+        val badgeText = with(density) { (badge * 0.40f).toSp() }
         Canvas(Modifier.fillMaxSize()) {
             val stroke = size.minDimension * 0.07f
             val inset = stroke / 2f
@@ -48,17 +57,18 @@ fun Speedometer(kmh: Int?, unit: String, waiting: String, limit: Int?, over: Boo
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = kmh?.toString() ?: "--",
-                color = if (over) Color(0xFFFF5252) else Color.White, fontSize = 64.sp, fontWeight = FontWeight.Bold,
+                color = if (over) Color(0xFFFF5252) else Color.White, fontSize = numberSize, fontWeight = FontWeight.Bold,
+                maxLines = 1, softWrap = false,
             )
-            Text(text = if (kmh == null) waiting else unit, color = DriveColors.TextSecondary, fontSize = 18.sp)
+            Text(text = if (kmh == null) waiting else unit, color = DriveColors.TextSecondary, fontSize = unitSize, maxLines = 1)
         }
         // Panneau de limitation (rond rouge) en haut à droite du compteur.
         if (limit != null) {
             Box(
-                Modifier.align(Alignment.TopEnd).size(58.dp).clip(CircleShape).background(Color.White)
-                    .border(6.dp, Color(0xFFD32F2F), CircleShape),
+                Modifier.align(Alignment.TopEnd).offset(x = badge * 0.2f, y = -badge * 0.12f).size(badge).clip(CircleShape).background(Color.White)
+                    .border(badge * 0.1f, Color(0xFFD32F2F), CircleShape),
                 contentAlignment = Alignment.Center,
-            ) { Text(limit.toString(), color = Color.Black, fontSize = 22.sp, fontWeight = FontWeight.Bold) }
+            ) { Text(limit.toString(), color = Color.Black, fontSize = badgeText, fontWeight = FontWeight.Bold, maxLines = 1) }
         }
     }
 }

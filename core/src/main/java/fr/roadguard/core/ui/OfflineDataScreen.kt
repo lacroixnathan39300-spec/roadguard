@@ -84,6 +84,19 @@ fun OfflineDataScreen(nearCountries: Set<String>, onClose: () -> Unit, here: Pai
                 color = DriveColors.TextSecondary, fontSize = 15.sp,
             )
             LazyColumn(Modifier.padding(top = 10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Pays déjà dans l'appli : rien à télécharger, toujours à jour avec l'appli.
+                items(listOf("France", "Suisse", "Belgique", "Allemagne", "Italie", "Espagne", "Luxembourg"), key = { "in-$it" }) { name ->
+                    Row(
+                        Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(DriveColors.Panel).padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            Text(name, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                            Text("Inclus dans l'appli · mis à jour avec elle", color = DriveColors.TextSecondary, fontSize = 14.sp)
+                        }
+                        Text("✓", color = Color(0xFF22C55E), fontSize = 26.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
                 items(RadarCountries.available, key = { it.first }) { (code, label) ->
                     val installed = remember(radarRefresh) { RadarCountries.installed(context, code) }
                     Row(

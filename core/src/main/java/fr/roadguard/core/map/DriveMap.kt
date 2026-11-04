@@ -124,6 +124,9 @@ fun DriveMap(
         mapView.getMapAsync { map ->
             holder.map = map
             map.uiSettings.isRotateGesturesEnabled = false
+            // Carte épurée : logo et bouton d'information masqués (crédits OpenStreetMap dans Réglages → À propos).
+            map.uiSettings.isLogoEnabled = false
+            map.uiSettings.isAttributionEnabled = false
             map.uiSettings.isTiltGesturesEnabled = false
             map.cameraPosition = CameraPosition.Builder().target(LatLng(46.67, 5.55)).zoom(12.0).build()
             styleVersion = -1 // carte prête : le style est chargé par l'effet ci-dessous

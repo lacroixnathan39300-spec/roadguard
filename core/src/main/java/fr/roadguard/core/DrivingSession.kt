@@ -142,6 +142,8 @@ class DrivingSession(
         }
         if (newAlert != null) alertAt = f.timeMs
         alert = newAlert ?: held
+        voice.proximityBeeps = settings.proximityBeeps
+        voice.proximity(alert?.distanceM)
         val newAverage = averages?.update(f)
         if (newAverage?.finished == true && average?.finished != true) voice.announceAverageResult(newAverage)
         average = newAverage

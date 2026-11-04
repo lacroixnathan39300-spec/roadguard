@@ -16,7 +16,31 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     /** Réglages : voix et bip (modifiables à tout moment). */
     var voiceEnabled = true
     var beepEnabled = true
+    /** Bips de proximité façon détecteur de métaux (sinon : la distance est dite à voix haute). */
+    var proximityBeeps = true
     private val tone = runCatching { ToneGenerator(AudioManager.STREAM_MUSIC, 90) }.getOrNull()
+    private val beeper = android.os.Handler(android.os.Looper.getMainLooper())
+    @Volatile private var proximityM: Int? = null
+    private var beeping = false
+
+    /**
+     * Distance au radar annoncé (null quand il n'y en a plus) : les bips s'accélèrent en approchant,
+     * jusqu'à devenir continus dans les derniers mètres.
+     */
+    fun proximity(distanceM: Int?) {
+        proximityM = if (beepEnabled && proximityBeeps) distanceM else null
+        if (proximityM != null && !beeping) { beeping = true; beeper.post(beepTick) }
+    }
+
+    private val beepTick = object : Runnable {
+        override fun run() {
+            val d = proximityM
+            if (d == null) { beeping = false; return }
+            val interval = BeepCadence.intervalMs(d)
+            tone?.startTone(ToneGenerator.TONE_PROP_BEEP, BeepCadence.toneMs(d))
+            beeper.postDelayed(this, interval)
+        }
+    }
 
     override fun onInit(status: Int) {
         if (status != TextToSpeech.SUCCESS) return
@@ -26,7 +50,8 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
 
     fun announce(alert: RadarAlert) {
         if (beepEnabled) tone?.startTone(ToneGenerator.TONE_PROP_BEEP2, 300)
-        if (ttsReady && voiceEnabled) tts.speak(AlertText.spoken(alert), TextToSpeech.QUEUE_ADD, null, "rg-${alert.radar.id}")
+        val text = if (proximityBeeps) AlertText.spokenShort(alert) else AlertText.spoken(alert)
+        if (ttsReady && voiceEnabled) tts.speak(text, TextToSpeech.QUEUE_ADD, null, "rg-${alert.radar.id}")
     }
 
     fun announceAverageResult(status: AverageStatus) {
@@ -40,6 +65,8 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     }
 
     fun release() {
+        proximityM = null
+        beeper.removeCallbacksAndMessages(null)
         tts.shutdown()
         tone?.release()
     }
@@ -62,6 +89,12 @@ object AlertText {
     fun banner(alert: RadarAlert): String {
         val limit = alert.radar.speedKmh?.let { " · $it km/h" }.orEmpty()
         return "${kindLabel(alert.radar.kind)}$limit · ${roundedDistance(alert.distanceM)} m"
+    }
+
+    /** Annonce sans distance (les bips de proximité indiquent l'approche). */
+    fun spokenShort(alert: RadarAlert): String {
+        val limit = alert.radar.speedKmh?.let { ", limité à $it" }.orEmpty()
+        return "${kindLabel(alert.radar.kind)}$limit"
     }
 
     fun spoken(alert: RadarAlert): String {
@@ -88,4 +121,17 @@ object AlertText {
         }
         return "Fin du tronçon, moyenne ${status.averageKmh} kilomètres heure$verdict"
     }
+}
+
+/** Rythme des bips de proximité (pur, testable). */
+object BeepCadence {
+    /** Délai entre deux bips : ~1,5 s à 500 m, de plus en plus court, continu sous 40 m. */
+    fun intervalMs(distanceM: Int): Long = when {
+        distanceM <= 40 -> 160
+        distanceM >= 500 -> 1500
+        else -> (160 + (distanceM - 40) * (1500 - 160) / (500 - 40)).toLong()
+    }
+
+    /** Durée du bip : il remplit tout l'intervalle quand on est sur le radar (son continu). */
+    fun toneMs(distanceM: Int): Int = if (distanceM <= 40) 170 else 90
 }

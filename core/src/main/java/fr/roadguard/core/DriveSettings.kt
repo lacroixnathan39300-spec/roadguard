@@ -39,6 +39,9 @@ class DriveSettings(context: Context) {
     fun changeNorthUp(v: Boolean) { northUp = v; prefs.edit().putBoolean("north_up", v).apply() }
     fun changeAdaptiveZoom(v: Boolean) { adaptiveZoom = v; prefs.edit().putBoolean("adaptive_zoom", v).apply() }
 
+    var proximityBeeps by mutableStateOf(prefs.getBoolean("proximity_beeps", true)); private set
+    fun changeProximityBeeps(v: Boolean) { proximityBeeps = v; prefs.edit().putBoolean("proximity_beeps", v).apply() }
+
     fun changeAutostart(v: Boolean) { autostart = v; prefs.edit().putBoolean("autostart", v).apply() }
     fun changeAccent(v: Long) {
         accent = v; prefs.edit().putLong("accent", v).apply()

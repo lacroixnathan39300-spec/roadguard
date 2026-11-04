@@ -19,4 +19,11 @@ class AlertTextTest {
         assertEquals("Tronçon terminé · moyenne 86/80 km/h · trop vite", AlertText.average(AverageStatus(86, 80, 4000, true)))
         assertEquals("Moyenne 70 km/h", AlertText.average(AverageStatus(70, null, 900, false)))
     }
+
+    @Test fun proximityBeepsSpeedUp() {
+        assertEquals(1500L, BeepCadence.intervalMs(800))
+        assertEquals(160L, BeepCadence.intervalMs(20))
+        assertEquals(true, BeepCadence.intervalMs(100) < BeepCadence.intervalMs(300))
+        assertEquals("Radar fixe, limité à 80", AlertText.spokenShort(RadarAlert(radar, 512, true)))
+    }
 }
