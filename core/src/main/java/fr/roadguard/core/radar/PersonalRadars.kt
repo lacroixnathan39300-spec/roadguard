@@ -73,7 +73,7 @@ object PersonalRadars {
      * Sans en-tête : latitude, longitude, vitesse (inversées si la latitude est hors limites).
      */
     fun parseCsv(text: String): Pair<List<Radar>, Int> {
-        val lines = text.removePrefix("﻿").lines().map { it.trim() }.filter { it.isNotEmpty() && !it.startsWith("#") }
+        val lines = text.removePrefix(BOM).lines().map { it.trim() }.filter { it.isNotEmpty() && !it.startsWith("#") }
         if (lines.isEmpty()) return emptyList<Radar>() to 0
         val sep = listOf('\t', ';', '|', ',').maxByOrNull { c -> lines.take(5).sumOf { l -> l.count { it == c } } } ?: ','
         fun split(l: String) = l.split(sep).map { it.trim().trim('"').trim() }
@@ -116,6 +116,8 @@ object PersonalRadars {
         }
     }
 
+    /** Marque d'encodage UTF-8 laissée par Excel en tête de fichier. */
+    private val BOM = 0xFEFF.toChar().toString()
     private val LAT = setOf("lat", "latitude", "y")
     private val LON = setOf("lon", "lng", "long", "longitude", "x")
     private val SPEED = setOf("speed", "vitesse", "speed_kmh", "limit", "limite", "vmax", "kmh")
