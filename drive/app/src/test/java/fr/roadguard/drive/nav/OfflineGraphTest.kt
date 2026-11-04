@@ -41,7 +41,7 @@ class OfflineGraphTest {
         assertFalse(rsp.errors.toString(), rsp.hasErrors())
         val km = rsp.best.distance / 1000
         assertTrue("distance $km km", km in 25.0..55.0)
-        assertTrue(rsp.best.instructions.size() > 3)
+        assertTrue(rsp.best.instructions.size > 3)
         val tr = hopper.translationMap.getWithFallBack(Locale.FRENCH)
         println("Hors ligne : %.1f km, %d min, 1re consigne : %s".format(km, rsp.best.time / 60000, rsp.best.instructions[0].getTurnDescription(tr)))
         hopper.close()
