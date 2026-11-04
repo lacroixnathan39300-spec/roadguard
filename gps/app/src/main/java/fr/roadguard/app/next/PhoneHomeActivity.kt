@@ -133,6 +133,8 @@ private fun PhoneHome() {
     var showSearch by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
     var showOffline by remember { mutableStateOf(false) }
+    var offlineTab by remember { mutableStateOf(0) }
+    var showMenu by remember { mutableStateOf(false) }
     var showEqualizer by remember { mutableStateOf(false) }
 
     // Carte hors ligne : packs téléchargés dans « Plus → Cartes hors ligne », utilisés sans Internet.
@@ -178,9 +180,7 @@ private fun PhoneHome() {
                 Action("🔍 Où aller", Modifier.weight(1.4f), primary = true) { showSearch = true }
                 Action("🚗 Link", Modifier.weight(1f)) { context.startActivity(Intent(context, LinkActivity::class.java)) }
                 Action("⚙", Modifier.weight(0.6f)) { showSettings = true }
-                Action("☰ Plus", Modifier.weight(0.9f)) {
-                    context.startActivity(Intent(context, fr.roadguard.app.MainActivity::class.java))
-                }
+                Action("☰ Menu", Modifier.weight(0.9f)) { showMenu = true }
             }
         }
         MapButton("◎", onClick = { s.recenter++ },
@@ -196,9 +196,34 @@ private fun PhoneHome() {
                 onClose = { showSearch = false },
             )
         }
+        if (showMenu) {
+            BackHandler { showMenu = false }
+            Column(
+                Modifier.fillMaxSize().background(DriveColors.Background).statusBarsPadding().navigationBarsPadding().padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    androidx.compose.material3.Text("Menu", color = androidx.compose.ui.graphics.Color.White,
+                        fontSize = 28.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, modifier = Modifier.weight(1f))
+                    fr.roadguard.core.ui.BigButton("Fermer", DriveColors.Panel) { showMenu = false }
+                }
+                fun open(tab: Int) { offlineTab = tab; showOffline = true; showMenu = false }
+                MenuEntry("📍", "Mes radars", "Ajouter un radar ici, importer un fichier CSV") { open(2) }
+                MenuEntry("🗺", "Cartes hors ligne", "Télécharger les cartes pour rouler sans Internet") { open(0) }
+                MenuEntry("🌍", "Radars d'autres pays", "Pays-Bas, Autriche, Royaume-Uni…") { open(1) }
+                MenuEntry("🚗", "ROADGUARD Link", "Relier le téléphone à l'autoradio (Wi-Fi ou câble)") {
+                    showMenu = false; context.startActivity(Intent(context, LinkActivity::class.java))
+                }
+                MenuEntry("⚙", "Réglages", "Voix, alertes, itinéraire, couleurs") { showMenu = false; showSettings = true }
+                MenuEntry("🧰", "Ancienne version", "Fonctions de l'ancienne appli, en attendant leur reprise") {
+                    showMenu = false; context.startActivity(Intent(context, fr.roadguard.app.MainActivity::class.java))
+                }
+            }
+        }
         if (showOffline) {
             BackHandler { showOffline = false }
-            fr.roadguard.core.ui.OfflineDataScreen(setOf("FR", "CH"), onClose = { showOffline = false }, here = s.here?.let { it.lat to it.lon })
+            fr.roadguard.core.ui.OfflineDataScreen(setOf("FR", "CH"), onClose = { showOffline = false },
+                here = s.here?.let { it.lat to it.lon }, startTab = offlineTab)
         } else if (showSettings) {
             BackHandler { showSettings = false }
             var radarCount by remember { mutableStateOf(0) }
@@ -219,4 +244,21 @@ private fun Action(label: String, modifier: Modifier, primary: Boolean = false, 
             .background(if (primary) DriveColors.Accent else DriveColors.Track).clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) { Text(label, color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold, maxLines = 1) }
+}
+
+/** Ligne du menu : icône, titre, explication courte. */
+@Composable
+private fun MenuEntry(icon: String, title: String, detail: String, onClick: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(DriveColors.Panel)
+            .clickable(onClick = onClick).padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        androidx.compose.material3.Text(icon, fontSize = 28.sp)
+        Column(Modifier.padding(start = 14.dp)) {
+            androidx.compose.material3.Text(title, color = androidx.compose.ui.graphics.Color.White, fontSize = 19.sp,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+            androidx.compose.material3.Text(detail, color = DriveColors.TextSecondary, fontSize = 14.sp)
+        }
+    }
 }
