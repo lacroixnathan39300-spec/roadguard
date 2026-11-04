@@ -211,7 +211,9 @@ fun DriveMap(
         val p = position ?: return@LaunchedEffect
         val comp = holder.map?.locationComponent?.takeIf { it.isLocationComponentActivated } ?: return@LaunchedEffect
         val loc = android.location.Location("roadguard").apply {
-            latitude = p.lat; longitude = p.lon; time = p.timeMs
+            latitude = p.lat; longitude = p.lon
+            // Horloge actuelle : sinon le point peut être affiché « périmé » (gris) avec une horloge GPS décalée.
+            time = System.currentTimeMillis(); elapsedRealtimeNanos = android.os.SystemClock.elapsedRealtimeNanos()
             accuracy = p.accuracyM.toFloat()
             if (p.speedKmh > 0) speed = (p.speedKmh / 3.6).toFloat()
             if (!p.bearing.isNaN()) bearing = p.bearing.toFloat()
