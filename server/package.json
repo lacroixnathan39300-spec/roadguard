@@ -1,0 +1,13 @@
+{
+  "name": "roadguard-server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-strip-types --test test/rules.test.ts"
+  },
+  "devDependencies": {
+    "wrangler": "3.114.1",
+    "@cloudflare/workers-types": "4.20250124.0",
+    "typescript": "5.7.3"
+  }
+}

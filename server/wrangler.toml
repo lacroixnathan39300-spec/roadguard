@@ -1,0 +1,14 @@
+name = "roadguard"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+workers_dev = true
+
+# Nettoyage des signalements expirés et des positions anciennes.
+[triggers]
+crons = ["*/15 * * * *"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "roadguard"
+database_id = "REMPLACE_PAR_LA_CI"
+migrations_dir = "migrations"

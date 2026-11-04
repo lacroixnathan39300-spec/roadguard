@@ -1,0 +1,44 @@
+name: Serveur communauté
+
+on:
+  push:
+    branches: [main]
+    paths: ["server/**", ".github/workflows/server.yml"]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - name: Dépendances
+        run: npm install --no-audit --no-fund
+      - name: Vérifications (types et règles)
+        run: npx tsc -p . && npm test
+      - name: Mise en ligne (Cloudflare)
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::warning::Secrets CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID absents : serveur non mis en ligne."; exit 0
+          fi
+          id=$(npx wrangler d1 list --json | python3 -c "import json,sys; print(next((d['uuid'] for d in json.load(sys.stdin) if d['name']=='roadguard'),''))")
+          if [ -z "$id" ]; then
+            npx wrangler d1 create roadguard
+            id=$(npx wrangler d1 list --json | python3 -c "import json,sys; print(next(d['uuid'] for d in json.load(sys.stdin) if d['name']=='roadguard'))")
+          fi
+          sed -i "s/REMPLACE_PAR_LA_CI/$id/" wrangler.toml
+          npx wrangler d1 migrations apply roadguard --remote
+          npx wrangler deploy
+          sub=$(curl -fsS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/subdomain" | python3 -c "import json,sys; print(json.load(sys.stdin)['result']['subdomain'])")
+          url="https://roadguard.$sub.workers.dev"
+          echo "ADRESSE DU SERVEUR : $url"
+          curl -fsS "$url/v1" | head -c 300; echo
+          echo "### Serveur en ligne : $url" >> "$GITHUB_STEP_SUMMARY"
