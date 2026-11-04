@@ -19,6 +19,15 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: "22" }
+      - name: Accès Cloudflare (chiffré dans le dépôt, déchiffré ici)
+        env:
+          RG_KEYS_PASSPHRASE: ${{ secrets.RG_KEYS_PASSPHRASE }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] && [ -n "$RG_KEYS_PASSPHRASE" ] && [ -f ../keys/cloudflare.env.enc ]; then
+            openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in ../keys/cloudflare.env.enc -pass env:RG_KEYS_PASSPHRASE > "$RUNNER_TEMP/cf.env"
+            while IFS='=' read -r k v; do [ -n "$k" ] && echo "::add-mask::$v" && echo "$k=$v" >> "$GITHUB_ENV"; done < "$RUNNER_TEMP/cf.env"
+            rm -f "$RUNNER_TEMP/cf.env"
+          fi
       - name: Dépendances
         run: npm install --no-audit --no-fund
       - name: Vérifications (types et règles)
