@@ -54,7 +54,8 @@ dist = 0.0
 shots = {600: "02-approche-600m", 300: "03-approche-300m"}
 while dist < 1650:
     lat, lon = offset(*start, HEADING, dist)
-    adb("emu", "geo", "nmea", nmea(lat, lon, SPEED_KMH, HEADING))
+    # « geo fix » : longitude, latitude, altitude, satellites, vitesse (nœuds). Le cap est déduit par l'appli.
+    adb("emu", "geo", "fix", f"{lon:.6f}", f"{lat:.6f}", "400", "8", f"{SPEED_KMH / 1.852:.1f}")
     remaining = 1500 - dist
     for at, name in list(shots.items()):
         if remaining <= at:
