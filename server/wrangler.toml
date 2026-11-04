@@ -9,7 +9,7 @@ crons = ["*/15 * * * *"]
 
 [[d1_databases]]
 binding = "DB"
-database_name = "roadguard"
+database_name = "roadguard-eu"
 database_id = "REMPLACE_PAR_LA_CI"
 migrations_dir = "migrations"
 
