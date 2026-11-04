@@ -1,0 +1,40 @@
+name: Communes hors ligne
+
+# Fabrique la liste des communes (nom, code postal, position, population) pour la recherche sans Internet.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Communes de France (geo.api.gouv.fr, Licence Ouverte)
+        run: |
+          curl -fsSL "https://geo.api.gouv.fr/communes?fields=nom,codesPostaux,centre,population&format=json" -o communes.json
+          python3 - <<'PY'
+          import json, csv, gzip
+          rows = []
+          for c in json.load(open("communes.json")):
+              centre = (c.get("centre") or {}).get("coordinates")
+              if not centre: continue
+              cp = (c.get("codesPostaux") or [""])[0]
+              rows.append((c["nom"].replace(";", " "), cp, round(centre[1], 5), round(centre[0], 5), c.get("population") or 0))
+          rows.sort(key=lambda r: -r[4])
+          out = "gps/app/src/main/assets/places/communes_fr.csv.gz"
+          import os; os.makedirs(os.path.dirname(out), exist_ok=True)
+          with gzip.open(out, "wt", encoding="utf-8") as f:
+              f.write("nom;cp;lat;lon;population\n")
+              for r in rows: f.write(";".join(map(str, r)) + "\n")
+          print(len(rows), "communes")
+          PY
+          ls -la gps/app/src/main/assets/places
+      - name: Enregistrer dans le dépôt
+        run: |
+          git config user.name "ROADGUARD CI"; git config user.email "ci@roadguard.local"
+          git add gps/app/src/main/assets/places/communes_fr.csv.gz
+          git commit -m "Communes de France pour la recherche hors ligne (geo.api.gouv.fr)" || exit 0
+          git push

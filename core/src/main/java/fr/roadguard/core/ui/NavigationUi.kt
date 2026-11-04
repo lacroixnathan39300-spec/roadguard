@@ -67,6 +67,7 @@ fun SearchScreen(
     var message by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val context = androidx.compose.ui.platform.LocalContext.current
     val focus = remember { FocusRequester() }
     LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
 
@@ -77,7 +78,15 @@ fun SearchScreen(
         scope.launch {
             runCatching { NavApi.search(query, near) }
                 .onSuccess { results = it; message = if (it.isEmpty()) "Aucun résultat" else null }
-                .onFailure { message = "Recherche impossible : vérifie la connexion (${it.message})" }
+                .onFailure {
+                    // Sans Internet : communes embarquées.
+                    val offline = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
+                        fr.roadguard.core.nav.OfflinePlaces.search(context, query)
+                    }
+                    results = offline
+                    message = if (offline.isNotEmpty()) "Sans Internet : villes et villages seulement"
+                        else "Recherche impossible : vérifie la connexion (${it.message})"
+                }
             busy = false
         }
     }

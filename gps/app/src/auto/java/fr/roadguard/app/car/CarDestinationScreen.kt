@@ -89,7 +89,8 @@ class CarSearchScreen(carContext: CarContext) : Screen(carContext) {
             delay(debounceMs)
             loading = true; invalidate()
             val here = DriveService.session?.here?.let { LatLon(it.lat, it.lon) }
-            results = runCatching { NavApi.search(text, here) }.getOrDefault(emptyList()).take(6)
+            results = runCatching { NavApi.search(text, here) }
+                .getOrElse { fr.roadguard.core.nav.OfflinePlaces.search(carContext, text) }.take(6)
             loading = false; invalidate()
         }
     }
