@@ -14,6 +14,7 @@ class DriveSettings(context: Context) {
 
     var voice by mutableStateOf(prefs.getBoolean("voice", true)); private set
     var beep by mutableStateOf(prefs.getBoolean("beep", true)); private set
+    var readMessages by mutableStateOf(prefs.getBoolean("read_messages", true)); private set
     var speedLimitWarning by mutableStateOf(prefs.getBoolean("speed_limit_warning", true)); private set
     var theme by mutableStateOf(runCatching { ThemeMode.valueOf(prefs.getString("theme", "AUTO")!!) }.getOrDefault(ThemeMode.AUTO)); private set
     var alertKinds by mutableStateOf(
@@ -22,6 +23,7 @@ class DriveSettings(context: Context) {
     ); private set
 
     fun changeVoice(v: Boolean) { voice = v; prefs.edit().putBoolean("voice", v).apply() }
+    fun changeReadMessages(v: Boolean) { readMessages = v; prefs.edit().putBoolean("read_messages", v).apply() }
     fun changeBeep(v: Boolean) { beep = v; prefs.edit().putBoolean("beep", v).apply() }
     fun changeSpeedLimitWarning(v: Boolean) { speedLimitWarning = v; prefs.edit().putBoolean("speed_limit_warning", v).apply() }
     fun changeTheme(v: ThemeMode) { theme = v; prefs.edit().putString("theme", v.name).apply() }

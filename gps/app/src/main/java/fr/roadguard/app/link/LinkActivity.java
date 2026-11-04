@@ -84,6 +84,21 @@ public final class LinkActivity extends Activity {
         root.addView(button("Ouvrir l'accès aux notifications",
             v -> startActivity(new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))));
 
+        root.addView(section("Notifications sur l'autoradio"));
+        root.addView(text("Messages (SMS, WhatsApp…) et appels s'affichent sur le poste, avec leurs boutons (répondre, refuser…). "
+            + "Nécessite le même accès aux notifications que la musique.", 15, MUTED, false));
+        android.widget.Switch notif = new android.widget.Switch(this);
+        notif.setText("Transmettre messages et appels");
+        notif.setTextColor(Color.WHITE);
+        notif.setTextSize(17);
+        notif.setChecked(LinkService.notificationsEnabled(this));
+        notif.setOnCheckedChangeListener((b, on) -> LinkService.prefs(this).edit().putBoolean("forward_notifications", on).apply());
+        notif.setPadding(0, dp(8), 0, dp(8));
+        root.addView(notif);
+
+        root.addView(section("Envoyer une destination"));
+        root.addView(text("Dans Google Maps, Waze ou Contacts : « Partager » → « ROADGUARD Link ». L'autoradio lance le guidage.", 15, MUTED, false));
+
         root.addView(section("Autoradios associés"));
         peers = new LinearLayout(this);
         peers.setOrientation(LinearLayout.VERTICAL);
@@ -93,6 +108,23 @@ public final class LinkActivity extends Activity {
         scroll.setBackgroundColor(BG);
         scroll.addView(root);
         setContentView(scroll);
+        handleShare(getIntent());
+    }
+
+    @Override protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleShare(intent);
+    }
+
+    /** Partage reçu : envoyer la destination à l'autoradio connecté. */
+    private void handleShare(Intent intent) {
+        if (intent == null || !Intent.ACTION_SEND.equals(intent.getAction())) return;
+        String text = intent.getStringExtra(Intent.EXTRA_TEXT);
+        String subject = intent.getStringExtra(Intent.EXTRA_SUBJECT);
+        String all = (subject == null ? "" : subject + "\n") + (text == null ? "" : text);
+        if (LinkService.sendDestination(all)) toast("Destination envoyée à l'autoradio.");
+        else toast("L'autoradio n'est pas connecté : démarre la liaison puis partage à nouveau.");
+        setIntent(new Intent(this, LinkActivity.class));
     }
 
     @Override protected void onResume() {

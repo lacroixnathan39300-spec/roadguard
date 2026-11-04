@@ -29,6 +29,16 @@ import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Socket
 
+/** Message ou appel reçu sur le téléphone. [actions] : boutons proposés (vide = pas de bouton). */
+data class PhoneNotification(
+    val key: String,
+    val isCall: Boolean,
+    val app: String,
+    val title: String,
+    val text: String,
+    val actions: List<String>,
+)
+
 /** État de la liaison avec le téléphone, affiché par DRIVE. */
 sealed class LinkState(val label: String) {
     object Off : LinkState("Téléphone non associé")
@@ -57,6 +67,20 @@ class LinkClient(private val context: Context) {
     private val _media = MutableStateFlow<NowPlaying?>(null)
     /** Musique en cours sur le téléphone. */
     val media: StateFlow<NowPlaying?> = _media
+
+    private val _notifications = MutableStateFlow<List<PhoneNotification>>(emptyList())
+    /** Notifications en cours (la plus récente en premier). */
+    val notifications: StateFlow<List<PhoneNotification>> = _notifications
+    private val _destinations = MutableSharedFlow<String>(extraBufferCapacity = 4)
+    /** Texte de destination partagé depuis le téléphone. */
+    val destinations: SharedFlow<String> = _destinations
+
+    fun dismissNotification(key: String) { _notifications.value = _notifications.value.filterNot { it.key == key } }
+
+    fun notificationAction(key: String, index: Int) {
+        send(JSONObject().put("t", "notif_action").put("key", key).put("index", index))
+        dismissNotification(key)
+    }
 
     val phoneName: String? get() = prefs.getString("phone_name", null)
     fun isPaired(): Boolean = prefs.getString("secret", null) != null
@@ -144,6 +168,7 @@ class LinkClient(private val context: Context) {
             } finally {
                 session = null
                 _media.value = null
+                _notifications.value = emptyList()
             }
         }
     }
@@ -157,6 +182,20 @@ class LinkClient(private val context: Context) {
                 if (m.has("bearing")) bearing = m.getDouble("bearing").toFloat()
                 if (m.has("acc")) accuracy = m.getDouble("acc").toFloat()
             })
+            "notif" -> {
+                val list = m.optJSONArray("actions")
+                val n = PhoneNotification(
+                    key = m.getString("key"),
+                    isCall = m.optString("kind") == "call",
+                    app = m.optString("app"),
+                    title = m.optString("title"),
+                    text = m.optString("text"),
+                    actions = (0 until (list?.length() ?: 0)).map { list!!.optString(it) },
+                )
+                _notifications.value = (listOf(n) + _notifications.value.filterNot { it.key == n.key }).take(5)
+            }
+            "notif_removed" -> dismissNotification(m.optString("key"))
+            "dest" -> _destinations.tryEmit(m.optString("text"))
             "media" -> _media.value = if (!m.has("title")) null else NowPlaying(
                 title = m.getString("title"),
                 artist = m.optString("artist"),

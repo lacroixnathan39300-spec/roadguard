@@ -56,6 +56,10 @@ public final class LinkService extends Service {
     /** État lisible par l'écran ROADGUARD Link. */
     public static volatile String status = "Arrêtée";
     public static volatile boolean running;
+    /** Service en cours, pour le relais des notifications. */
+    public static volatile LinkService instance;
+    /** Actions des notifications transmises (clé → actions), pour les exécuter depuis l'autoradio. */
+    private final java.util.Map<String, Notification.Action[]> actions = new java.util.concurrent.ConcurrentHashMap<>();
 
     private final Handler main = new Handler(Looper.getMainLooper());
     private final AtomicReference<LinkProtocol.Session> current = new AtomicReference<>();
@@ -117,6 +121,7 @@ public final class LinkService extends Service {
 
     private void start() {
         running = true;
+        instance = this;
         setStatus("En attente de l'autoradio…");
         acceptThread = new Thread(this::acceptLoop, "roadguard-link-accept");
         acceptThread.start();
@@ -174,6 +179,13 @@ public final class LinkService extends Service {
                 default: break;
             }
         }
+        if ("notif_action".equals(type)) {
+            Notification.Action[] list = actions.get(m.optString("key"));
+            int i = m.optInt("index", -1);
+            if (list != null && i >= 0 && i < list.length && list[i].actionIntent != null) {
+                try { list[i].actionIntent.send(); } catch (PendingIntent.CanceledException ignored) {}
+            }
+        }
         // "ping" : rien à faire, la réception suffit à garder la connexion vivante.
     }
 
@@ -199,6 +211,66 @@ public final class LinkService extends Service {
         LinkProtocol.Session s = current.get();
         if (s == null) return;
         try { s.send(m); } catch (IOException e) { closeQuietly(s); current.compareAndSet(s, null); }
+    }
+
+    // ---- Notifications : messages et appels ----------------------------------------------
+
+    public static boolean notificationsEnabled(Context c) { return prefs(c).getBoolean("forward_notifications", true); }
+
+    /** Appelé par le service d'accès aux notifications. */
+    public void onNotificationPosted(android.service.notification.StatusBarNotification sbn) {
+        if (current.get() == null || !notificationsEnabled(this)) return;
+        Notification n = sbn.getNotification();
+        if (sbn.getPackageName().equals(getPackageName())) return;
+        if ((n.flags & Notification.FLAG_GROUP_SUMMARY) != 0) return;
+        String category = n.category == null ? "" : n.category;
+        boolean call = Notification.CATEGORY_CALL.equals(category);
+        boolean message = Notification.CATEGORY_MESSAGE.equals(category) || Notification.CATEGORY_EMAIL.equals(category)
+            || n.extras.containsKey(Notification.EXTRA_MESSAGES);
+        if (!call && !message) return;
+        CharSequence title = n.extras.getCharSequence(Notification.EXTRA_TITLE);
+        CharSequence text = n.extras.getCharSequence(Notification.EXTRA_TEXT);
+        if (title == null && text == null) return;
+        try {
+            JSONObject m = new JSONObject().put("t", "notif").put("key", sbn.getKey())
+                .put("kind", call ? "call" : "message")
+                .put("app", appLabel(sbn.getPackageName()))
+                .put("title", title == null ? "" : title.toString())
+                .put("text", text == null ? "" : text.toString());
+            org.json.JSONArray labels = new org.json.JSONArray();
+            Notification.Action[] list = n.actions;
+            if (list != null) {
+                for (Notification.Action a : list) {
+                    // Les actions qui demandent une saisie (répondre par écrit) ne sont pas proposées en voiture.
+                    boolean needsText = a.getRemoteInputs() != null && a.getRemoteInputs().length > 0;
+                    labels.put(needsText || a.title == null ? "" : a.title.toString());
+                }
+                actions.put(sbn.getKey(), list);
+            }
+            m.put("actions", labels);
+            sender.execute(() -> send(m));
+        } catch (org.json.JSONException ignored) {}
+    }
+
+    public void onNotificationRemoved(android.service.notification.StatusBarNotification sbn) {
+        if (actions.remove(sbn.getKey()) == null || current.get() == null) return;
+        try {
+            JSONObject m = new JSONObject().put("t", "notif_removed").put("key", sbn.getKey());
+            sender.execute(() -> send(m));
+        } catch (org.json.JSONException ignored) {}
+    }
+
+    /** Destination partagée depuis une autre appli (Google Maps, Waze, contact…). */
+    public static boolean sendDestination(String text) {
+        LinkService s = instance;
+        if (s == null || s.current.get() == null || text == null || text.trim().isEmpty()) return false;
+        try {
+            JSONObject m = new JSONObject().put("t", "dest").put("text", text.trim());
+            s.sender.execute(() -> s.send(m));
+            return true;
+        } catch (org.json.JSONException e) {
+            return false;
+        }
     }
 
     // ---- Position GPS du téléphone -------------------------------------------------------
@@ -322,6 +394,7 @@ public final class LinkService extends Service {
 
     @Override public void onDestroy() {
         running = false;
+        instance = null;
         status = "Arrêtée";
         try { if (server != null) server.close(); } catch (IOException ignored) {}
         LinkProtocol.Session s = current.getAndSet(null);

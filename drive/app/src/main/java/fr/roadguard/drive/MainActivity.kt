@@ -62,6 +62,8 @@ import fr.roadguard.drive.nav.SpeedLimits
 import fr.roadguard.drive.ui.DayNight
 import fr.roadguard.drive.ui.SettingsScreen
 import fr.roadguard.drive.ui.LinkScreen
+import fr.roadguard.drive.ui.PhoneNotificationCard
+import fr.roadguard.drive.nav.SharedDestination
 import fr.roadguard.drive.link.LinkClient
 import fr.roadguard.drive.link.LinkState
 import android.os.SystemClock
@@ -166,6 +168,7 @@ private fun DriveHome() {
     val linkState by link.state.collectAsState()
     val phoneMedia by link.media.collectAsState()
     var showLink by remember { mutableStateOf(false) }
+    val phoneNotifications by link.notifications.collectAsState()
 
     // Navigation
     val scope = rememberCoroutineScope()
@@ -221,6 +224,25 @@ private fun DriveHome() {
         pendingDestination = place.point
         navStatus = "Calcul du trajet vers ${place.name}…"
         computeRoute(place.point, announce = true)
+    }
+
+    // Messages et appels du téléphone : annonce vocale à l'arrivée.
+    var announcedKeys by remember { mutableStateOf(setOf<String>()) }
+    LaunchedEffect(phoneNotifications) {
+        phoneNotifications.firstOrNull()?.let { n ->
+            if (n.key in announcedKeys) return@let
+            announcedKeys = announcedKeys + n.key
+            if (n.isCall) voice.speak("Appel de ${n.title}")
+            else if (settings.readMessages) voice.speak("Message de ${n.title} : ${n.text.take(200)}")
+        }
+    }
+    // Destination envoyée depuis le téléphone (Partager → ROADGUARD Link).
+    LaunchedEffect(Unit) {
+        link.destinations.collect { text ->
+            val place = runCatching { SharedDestination.resolve(text, here?.let { LatLon(it.lat, it.lon) }) }.getOrNull()
+            if (place != null) { voice.speak("Destination reçue du téléphone"); startNavigation(place) }
+            else voice.speak("Destination du téléphone introuvable")
+        }
     }
 
     // Une seule boucle GPS : compteur, alertes radars et vitesse moyenne.
@@ -326,6 +348,16 @@ private fun DriveHome() {
                     Text(stringResource(R.string.apps), color = Color.White, fontSize = 20.sp)
                 }
             }
+        }
+        phoneNotifications.firstOrNull()?.let { n ->
+            // Les messages s'effacent seuls après 12 s ; les appels restent jusqu'à leur fin.
+            if (!n.isCall) LaunchedEffect(n.key) { delay(12_000); link.dismissNotification(n.key) }
+            PhoneNotificationCard(
+                n,
+                onAction = { link.notificationAction(n.key, it) },
+                onDismiss = { link.dismissNotification(n.key) },
+                modifier = Modifier.align(Alignment.TopCenter).padding(top = 16.dp),
+            )
         }
         if (showApps) AppDrawer(onClose = { showApps = false })
         if (showLink) {
