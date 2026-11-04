@@ -40,9 +40,9 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Section("Annonces")
-            ToggleRow("Voix (radars, guidage, vitesse moyenne)", settings.voice, settings::setVoice)
-            ToggleRow("Bip d'alerte", settings.beep, settings::setBeep)
-            ToggleRow("Avertir en cas de dépassement de la limite", settings.speedLimitWarning, settings::setSpeedLimitWarning)
+            ToggleRow("Voix (radars, guidage, vitesse moyenne)", settings.voice, settings::changeVoice)
+            ToggleRow("Bip d'alerte", settings.beep, settings::changeBeep)
+            ToggleRow("Avertir en cas de dépassement de la limite", settings.speedLimitWarning, settings::changeSpeedLimitWarning)
 
             Section("Alertes affichées et annoncées")
             listOf(RadarKind.FIXED, RadarKind.REDLIGHT, RadarKind.AVERAGE, RadarKind.MOBILE).forEach { kind ->
@@ -52,7 +52,7 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
             Section("Thème de la carte")
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 ThemeMode.entries.forEach { mode ->
-                    BigButton(mode.label, if (settings.theme == mode) DriveColors.Accent else DriveColors.Panel) { settings.setTheme(mode) }
+                    BigButton(mode.label, if (settings.theme == mode) DriveColors.Accent else DriveColors.Panel) { settings.changeTheme(mode) }
                 }
             }
 

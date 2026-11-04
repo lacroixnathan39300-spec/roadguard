@@ -21,10 +21,10 @@ class DriveSettings(context: Context) {
             ?: setOf(RadarKind.FIXED, RadarKind.REDLIGHT, RadarKind.AVERAGE, RadarKind.SECTION, RadarKind.MOBILE)
     ); private set
 
-    fun setVoice(v: Boolean) { voice = v; prefs.edit().putBoolean("voice", v).apply() }
-    fun setBeep(v: Boolean) { beep = v; prefs.edit().putBoolean("beep", v).apply() }
-    fun setSpeedLimitWarning(v: Boolean) { speedLimitWarning = v; prefs.edit().putBoolean("speed_limit_warning", v).apply() }
-    fun setTheme(v: ThemeMode) { theme = v; prefs.edit().putString("theme", v.name).apply() }
+    fun changeVoice(v: Boolean) { voice = v; prefs.edit().putBoolean("voice", v).apply() }
+    fun changeBeep(v: Boolean) { beep = v; prefs.edit().putBoolean("beep", v).apply() }
+    fun changeSpeedLimitWarning(v: Boolean) { speedLimitWarning = v; prefs.edit().putBoolean("speed_limit_warning", v).apply() }
+    fun changeTheme(v: ThemeMode) { theme = v; prefs.edit().putString("theme", v.name).apply() }
     fun toggleKind(kind: RadarKind) {
         alertKinds = if (kind in alertKinds) alertKinds - kind else alertKinds + kind
         prefs.edit().putStringSet("alert_kinds", alertKinds.map { it.name }.toSet()).apply()
