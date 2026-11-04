@@ -45,6 +45,8 @@ class DrivingSession(
     var autoNight by mutableStateOf(false); private set
 
     var route by mutableStateOf<Route?>(null); private set
+    /** Trajets proposés au départ (le premier est le plus rapide) ; vide une fois le choix fait. */
+    var alternatives by mutableStateOf<List<Route>>(emptyList()); private set
     var guidanceState by mutableStateOf<GuidanceState?>(null); private set
     var navStatus by mutableStateOf<String?>(null); private set
     var navigating by mutableStateOf(false); private set
@@ -110,6 +112,8 @@ class DrivingSession(
         }
         guidance?.let { g ->
             val state = g.update(f.lat, f.lon, f.speedKmh)
+            // Choix du trajet proposé au départ seulement : retiré après 1 km parcouru.
+            if (alternatives.isNotEmpty() && g.route.lengthM - state.remainingM > 1000) alternatives = emptyList()
             guidanceState = state
             state.speak?.let(voice::speak)
             // Sortie du trajet : nouveau calcul, au plus toutes les 15 s.
@@ -130,8 +134,17 @@ class DrivingSession(
 
     fun stopNavigation() {
         navigating = false; route = null; guidance = null; guidanceState = null; navStatus = null
+        alternatives = emptyList()
         pendingDestination = null
     }
+
+    /** Passe sur une autre des variantes proposées. */
+    fun chooseRoute(r: Route) {
+        if (!navigating || route === r) return
+        route = r; guidance = Guidance(r); guidanceState = null
+    }
+
+    fun dismissAlternatives() { alternatives = emptyList() }
 
     fun saveSlot(slot: String, place: Place) {
         recentStore.save(slot, place)
@@ -146,16 +159,21 @@ class DrivingSession(
             val start = LatLon(from.lat, from.lon)
             val heading = from.bearing.takeUnless { it.isNaN() }
             runCatching {
-                // En ligne d'abord (Valhalla) ; sans réseau ou en cas d'échec, graphe routier installé.
-                runCatching { NavApi.route(start, heading, destination) }.getOrElse { online ->
-                    fr.roadguard.core.nav.OfflineRouter.route(context, start, heading, destination)
+                // En ligne d'abord (Valhalla, avec variantes au départ) ; sans réseau, graphe routier installé.
+                runCatching {
+                    NavApi.routes(start, heading, destination, if (announce) 2 else 0, settings.avoidTolls, settings.avoidHighways)
+                }.getOrElse { online ->
+                    val offline = fr.roadguard.core.nav.OfflineRouter.route(context, start, heading, destination)
                         ?: throw java.io.IOException(
                             if (fr.roadguard.core.nav.OfflineRouter.installed(context).isEmpty()) online.message ?: "pas de réseau"
                             else "pas de réseau et région non couverte par les itinéraires hors ligne"
                         )
+                    listOf(offline)
                 }
-            }.onSuccess { r ->
+            }.onSuccess { all ->
                 if (!navigating) return@onSuccess
+                val r = all.first()
+                alternatives = if (announce && all.size > 1) all else emptyList()
                 route = r; guidance = Guidance(r); guidanceState = null; navStatus = null
                 if (!announce) voice.speak("Nouvel itinéraire")
             }.onFailure {

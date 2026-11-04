@@ -142,13 +142,15 @@ private fun PhoneHome() {
 
     Box(Modifier.fillMaxSize().background(DriveColors.Background)) {
         DriveMap(
+            alternatives = s.alternatives,
             offlinePack = offlinePack,
             hasLocation = hasLocation, route = s.route, recenterRequest = s.recenter,
             night = s.night, visibleKinds = settings.alertKinds, modifier = Modifier.fillMaxSize(),
         )
         Column(Modifier.align(Alignment.TopCenter).statusBarsPadding().fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             if (s.navigating) {
-                GuidanceBanner(s.guidanceState, s.navStatus, onStop = { s.stopNavigation() })
+                GuidanceBanner(s.guidanceState, s.navStatus, onStop = { s.stopNavigation() },
+                    choices = s.alternatives, current = s.route, onChoose = s::chooseRoute, onDismissChoices = s::dismissAlternatives)
             }
             AlertBanners(s.alert, s.average)
         }

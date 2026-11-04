@@ -157,7 +157,11 @@ private fun SlotChip(label: String, place: Place?, active: Boolean, onGo: () -> 
 
 /** Bandeau de guidage : flèche, distance, consigne ; en bas, arrivée estimée et bouton Arrêter. */
 @Composable
-fun GuidanceBanner(state: GuidanceState?, status: String?, onStop: () -> Unit, modifier: Modifier = Modifier) {
+fun GuidanceBanner(
+    state: GuidanceState?, status: String?, onStop: () -> Unit, modifier: Modifier = Modifier,
+    choices: List<fr.roadguard.core.nav.Route> = emptyList(), current: fr.roadguard.core.nav.Route? = null,
+    onChoose: (fr.roadguard.core.nav.Route) -> Unit = {}, onDismissChoices: () -> Unit = {},
+) {
     Column(modifier.padding(12.dp)) {
         Row(
             Modifier.clip(RoundedCornerShape(18.dp)).background(Color(0xF00B3D66)).padding(horizontal = 16.dp, vertical = 12.dp),
@@ -194,6 +198,42 @@ fun GuidanceBanner(state: GuidanceState?, status: String?, onStop: () -> Unit, m
             Spacer(Modifier.height(8.dp))
             BigButton("Terminer", DriveColors.Accent, onStop)
         }
+        if (choices.size > 1) {
+            Spacer(Modifier.height(8.dp))
+            RouteChoices(choices, current, onChoose, onDismissChoices)
+        }
+    }
+}
+
+/** Choix entre le trajet le plus rapide et ses variantes (durée, distance, écart). */
+@Composable
+fun RouteChoices(
+    choices: List<fr.roadguard.core.nav.Route>, current: fr.roadguard.core.nav.Route?,
+    onChoose: (fr.roadguard.core.nav.Route) -> Unit, onDismiss: () -> Unit,
+) {
+    val fastest = choices.minOf { it.durationS }
+    Column(
+        Modifier.width(360.dp).clip(RoundedCornerShape(14.dp)).background(DriveColors.Panel.copy(alpha = 0.95f)).padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        choices.forEachIndexed { i, r ->
+            val selected = r === current
+            Row(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp))
+                    .background(if (selected) DriveColors.Accent else DriveColors.Track)
+                    .clickable { onChoose(r) }.padding(horizontal = 12.dp, vertical = 8.dp * DriveColors.Scale),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                val min = ((r.durationS + 59) / 60).toInt()
+                val dur = if (min >= 60) "${min / 60} h ${"%02d".format(min % 60)}" else "$min min"
+                Text("${i + 1}. $dur", color = Color.White, fontSize = 18.sp * DriveColors.Scale, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.width(10.dp))
+                val extra = ((r.durationS - fastest) / 60).toInt()
+                Text("%.0f km".format(r.lengthM / 1000) + if (extra > 0) " · +$extra min" else " · le plus rapide",
+                    color = Color.White.copy(alpha = 0.85f), fontSize = 15.sp * DriveColors.Scale)
+            }
+        }
+        BigButton("OK", DriveColors.Panel, onDismiss)
     }
 }
 

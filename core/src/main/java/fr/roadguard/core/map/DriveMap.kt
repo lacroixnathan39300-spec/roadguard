@@ -65,6 +65,8 @@ fun DriveMap(
     modifier: Modifier = Modifier,
     /** Pack hors ligne à utiliser (pas d'Internet), ou null pour la carte en ligne. */
     offlinePack: OfflinePack? = null,
+    /** Variantes du trajet proposées au départ, dessinées en gris. */
+    alternatives: List<Route> = emptyList(),
 ) {
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current.lifecycle
@@ -127,7 +129,9 @@ fun DriveMap(
         map.setStyle(builder) { style ->
             holder.style = style
             style.addSource(GeoJsonSource(ROUTE_SOURCE))
-            style.addLayerBelow(routeCasingLayer(), firstSymbolLayer(style))
+            style.addSource(GeoJsonSource(ALT_SOURCE))
+            style.addLayerBelow(altLayer(), firstSymbolLayer(style))
+            style.addLayerAbove(routeCasingLayer(), ALT_LAYER)
             style.addLayerAbove(routeLayer(), ROUTE_CASING_LAYER)
             style.addSource(GeoJsonSource(RADAR_SOURCE, collection))
             style.addLayer(radarLayer())
@@ -157,6 +161,17 @@ fun DriveMap(
         holder.map?.locationComponent?.takeIf { it.isLocationComponentActivated }?.let {
             it.cameraMode = if (route != null) CameraMode.TRACKING_GPS else CameraMode.TRACKING_GPS_NORTH
             it.zoomWhileTracking(if (route != null) 16.0 else 15.0)
+        }
+    }
+
+    // Variantes : toutes sauf celle suivie, en gris sous le trajet.
+    LaunchedEffect(alternatives, route, styleVersion) {
+        val style = holder.style ?: return@LaunchedEffect
+        runCatching {
+            val lines = alternatives.filter { it !== route }.map { r ->
+                Feature.fromGeometry(LineString.fromLngLats(r.points.map { Point.fromLngLat(it.lon, it.lat) }))
+            }
+            style.getSourceAs<GeoJsonSource>(ALT_SOURCE)?.setGeoJson(FeatureCollection.fromFeatures(lines))
         }
     }
 
@@ -199,6 +214,16 @@ private fun enableLocation(context: Context, map: MapLibreMap, style: Style) {
 }
 
 private const val ROUTE_SOURCE = "roadguard-route"
+private const val ALT_SOURCE = "roadguard-route-alternatives"
+private const val ALT_LAYER = "roadguard-route-alternatives-layer"
+
+private fun altLayer() = LineLayer(ALT_LAYER, ALT_SOURCE).withProperties(
+    PropertyFactory.lineColor(android.graphics.Color.parseColor("#8A97A6")),
+    PropertyFactory.lineOpacity(0.85f),
+    PropertyFactory.lineWidth(Expression.interpolate(Expression.linear(), Expression.zoom(), Expression.stop(10, 4f), Expression.stop(17, 10f))),
+    PropertyFactory.lineCap(Property.LINE_CAP_ROUND),
+    PropertyFactory.lineJoin(Property.LINE_JOIN_ROUND),
+)
 private const val ROUTE_LAYER = "roadguard-route-layer"
 private const val ROUTE_CASING_LAYER = "roadguard-route-casing"
 

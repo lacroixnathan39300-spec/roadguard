@@ -113,4 +113,18 @@ class NavTest {
         while (x >= 0x20) { sb.append(((0x20 or (x and 0x1f).toInt()) + 63).toChar()); x = x shr 5 }
         sb.append((x + 63).toInt().toChar())
     }
+
+    @Test fun parsesAlternatesAndOptions() {
+        val shape = encode6(listOf(LatLon(46.0, 5.0), LatLon(46.002, 5.0))).replace("\\", "\\\\")
+        fun trip(t: Int) = """{"legs":[{"shape":"$shape","maneuvers":[{"type":4,"instruction":"Arrivé","begin_shape_index":1}]}],"summary":{"length":1.5,"time":$t}}"""
+        val json = """{"trip":${trip(60)},"alternates":[{"trip":${trip(90)}},{"trip":${trip(120)}}]}"""
+        val all = ValhallaParser.parseAll(json, LatLon(46.002, 5.0))
+        assertEquals(3, all.size)
+        assertEquals(120.0, all[2].durationS, 1e-9)
+        val req = org.json.JSONObject(ValhallaParser.request(LatLon(46.0, 5.0), null, LatLon(46.1, 5.1), 2, avoidTolls = true))
+        assertEquals(2, req.getInt("alternates"))
+        assertEquals(0.0, req.getJSONObject("costing_options").getJSONObject("auto").getDouble("use_tolls"), 1e-9)
+        val plain = org.json.JSONObject(ValhallaParser.request(LatLon(46.0, 5.0), null, LatLon(46.1, 5.1)))
+        assertEquals(false, plain.has("alternates") || plain.has("costing_options"))
+    }
 }

@@ -29,6 +29,11 @@ class DriveSettings(context: Context) {
 
     init { fr.roadguard.core.ui.DriveColors.Accent = androidx.compose.ui.graphics.Color(accent); fr.roadguard.core.ui.DriveColors.Scale = scale }
 
+    var avoidTolls by mutableStateOf(prefs.getBoolean("avoid_tolls", false)); private set
+    var avoidHighways by mutableStateOf(prefs.getBoolean("avoid_highways", false)); private set
+    fun changeAvoidTolls(v: Boolean) { avoidTolls = v; prefs.edit().putBoolean("avoid_tolls", v).apply() }
+    fun changeAvoidHighways(v: Boolean) { avoidHighways = v; prefs.edit().putBoolean("avoid_highways", v).apply() }
+
     fun changeAutostart(v: Boolean) { autostart = v; prefs.edit().putBoolean("autostart", v).apply() }
     fun changeAccent(v: Long) {
         accent = v; prefs.edit().putLong("accent", v).apply()

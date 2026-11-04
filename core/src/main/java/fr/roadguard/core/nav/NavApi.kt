@@ -26,9 +26,15 @@ object NavApi {
         PlaceParser.parse(get("$SEARCH_URL?q=$q&lang=fr&limit=10$bias"))
     }
 
-    suspend fun route(from: LatLon, headingDeg: Double?, to: LatLon): Route = withContext(Dispatchers.IO) {
-        val body = URLEncoder.encode(ValhallaParser.request(from, headingDeg, to), "UTF-8")
-        ValhallaParser.parse(get("$ROUTE_URL?json=$body"), to)
+    suspend fun route(from: LatLon, headingDeg: Double?, to: LatLon): Route = routes(from, headingDeg, to).first()
+
+    /** Trajet le plus rapide puis jusqu'à 2 variantes ; options péages / autoroutes. */
+    suspend fun routes(
+        from: LatLon, headingDeg: Double?, to: LatLon,
+        alternates: Int = 0, avoidTolls: Boolean = false, avoidHighways: Boolean = false,
+    ): List<Route> = withContext(Dispatchers.IO) {
+        val body = URLEncoder.encode(ValhallaParser.request(from, headingDeg, to, alternates, avoidTolls, avoidHighways), "UTF-8")
+        ValhallaParser.parseAll(get("$ROUTE_URL?json=$body"), to)
     }
 
     private fun get(url: String): String {

@@ -49,6 +49,10 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
             ToggleRow("Lire à voix haute les messages du téléphone", settings.readMessages, settings::changeReadMessages)
             ToggleRow("Avertir en cas de dépassement de la limite", settings.speedLimitWarning, settings::changeSpeedLimitWarning)
 
+            Section("Itinéraire")
+            ToggleRow("Éviter les péages", settings.avoidTolls, settings::changeAvoidTolls)
+            ToggleRow("Éviter les autoroutes", settings.avoidHighways, settings::changeAvoidHighways)
+
             Section("Alertes affichées et annoncées")
             listOf(RadarKind.FIXED, RadarKind.REDLIGHT, RadarKind.AVERAGE, RadarKind.MOBILE).forEach { kind ->
                 ToggleRow(AlertText.kindLabel(kind), kind in settings.alertKinds) { settings.toggleKind(kind) }

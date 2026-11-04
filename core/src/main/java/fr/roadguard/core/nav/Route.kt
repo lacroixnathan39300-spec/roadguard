@@ -30,8 +30,21 @@ data class Route(
 
 /** Lecture de la réponse du calculateur d'itinéraire Valhalla (consignes en français). */
 object ValhallaParser {
-    fun parse(json: String, destination: LatLon): Route {
-        val trip = JSONObject(json).getJSONObject("trip")
+    fun parse(json: String, destination: LatLon): Route = parseTrip(JSONObject(json).getJSONObject("trip"), destination)
+
+    /** Trajet principal puis variantes proposées par Valhalla (« alternates »). */
+    fun parseAll(json: String, destination: LatLon): List<Route> {
+        val root = JSONObject(json)
+        val out = mutableListOf(parseTrip(root.getJSONObject("trip"), destination))
+        root.optJSONArray("alternates")?.let { alts ->
+            for (i in 0 until alts.length()) {
+                alts.optJSONObject(i)?.optJSONObject("trip")?.let { t -> runCatching { out += parseTrip(t, destination) } }
+            }
+        }
+        return out
+    }
+
+    private fun parseTrip(trip: JSONObject, destination: LatLon): Route {
         val leg = trip.getJSONArray("legs").getJSONObject(0)
         val points = Polyline.decode(leg.getString("shape"), precision = 6)
         val list = leg.getJSONArray("maneuvers")
@@ -60,15 +73,23 @@ object ValhallaParser {
     }
 
     /** Requête Valhalla : voiture, kilomètres, consignes en français, départ dans le sens de roulage. */
-    fun request(from: LatLon, headingDeg: Double?, to: LatLon): String {
+    fun request(
+        from: LatLon, headingDeg: Double?, to: LatLon,
+        alternates: Int = 0, avoidTolls: Boolean = false, avoidHighways: Boolean = false,
+    ): String {
         val start = JSONObject().put("lat", from.lat).put("lon", from.lon)
         if (headingDeg != null && !headingDeg.isNaN()) start.put("heading", headingDeg.toInt()).put("heading_tolerance", 60)
         val locations = org.json.JSONArray()
             .put(start)
             .put(JSONObject().put("lat", to.lat).put("lon", to.lon))
+        val auto = JSONObject()
+        if (avoidTolls) auto.put("use_tolls", 0.0)
+        if (avoidHighways) auto.put("use_highways", 0.0)
         return JSONObject()
             .put("locations", locations)
             .put("costing", "auto")
+            .apply { if (alternates > 0) put("alternates", alternates) }
+            .apply { if (auto.length() > 0) put("costing_options", JSONObject().put("auto", auto)) }
             .put("directions_options", JSONObject().put("units", "kilometers").put("language", "fr-FR"))
             .toString()
     }
