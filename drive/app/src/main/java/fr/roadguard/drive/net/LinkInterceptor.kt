@@ -22,7 +22,15 @@ class LinkInterceptor : Interceptor {
         val link = LinkClient.current
         if (Net.hasDirectInternet() || link == null || !link.isConnected()) return chain.proceed(request)
         val body = request.body?.let { b -> Buffer().also { b.writeTo(it) }.readByteArray() }
-        val r = runBlocking { link.http(request.url.toString(), request.method, body, request.body?.contentType()?.toString(), true) }
+        val r = try {
+            runBlocking { link.http(request.url.toString(), request.method, body, request.body?.contentType()?.toString(), true) }
+                .also { if (it.code in 200..299) fr.roadguard.core.net.NetStats.relayOk.incrementAndGet()
+                        else { fr.roadguard.core.net.NetStats.relayFail.incrementAndGet(); fr.roadguard.core.net.NetStats.lastError = "code ${it.code}" } }
+        } catch (e: Exception) {
+            fr.roadguard.core.net.NetStats.relayFail.incrementAndGet()
+            fr.roadguard.core.net.NetStats.lastError = e.message ?: e.javaClass.simpleName
+            throw java.io.IOException(e.message, e)
+        }
         return Response.Builder()
             .request(request)
             .protocol(Protocol.HTTP_1_1)

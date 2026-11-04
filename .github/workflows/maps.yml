@@ -1,0 +1,52 @@
+name: Cartes hors ligne
+
+# Fabrique un pack de carte (extrait Protomaps, OpenStreetMap) et le publie sur Cloudflare R2 (téléchargement public gratuit).
+on:
+  workflow_dispatch:
+    inputs:
+      id: { description: "Identifiant du pack", default: "france_northeast" }
+      bbox: { description: "Limites ouest,sud,est,nord", default: "1.9,46.1,8.3,51.2" }
+      maxzoom: { description: "Zoom maximal", default: "15" }
+
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Accès Cloudflare
+        env: { RG_KEYS_PASSPHRASE: "${{ secrets.RG_KEYS_PASSPHRASE }}" }
+        run: |
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in keys/cloudflare.env.enc -pass env:RG_KEYS_PASSPHRASE > "$RUNNER_TEMP/cf.env"
+          while IFS='=' read -r k v; do [ -n "$k" ] && echo "::add-mask::$v" && echo "$k=$v" >> "$GITHUB_ENV"; done < "$RUNNER_TEMP/cf.env"
+          rm -f "$RUNNER_TEMP/cf.env"
+      - name: Espace de stockage R2 (créé et rendu public si besoin)
+        run: |
+          api="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/r2/buckets"
+          H="Authorization: Bearer $CLOUDFLARE_API_TOKEN"
+          curl -sS -H "$H" "$api/roadguard-cartes" | tee b.json | head -c 400; echo
+          if ! grep -q '"success":true' b.json; then
+            curl -sS -X POST -H "$H" -H "Content-Type: application/json" --data '{"name":"roadguard-cartes","locationHint":"weur"}' "$api" | tee c.json; echo
+            grep -q '"success":true' c.json || { echo "::error::R2 n'est pas activé sur le compte Cloudflare (tableau de bord → R2 → Activer)."; exit 1; }
+          fi
+          curl -sS -X PUT -H "$H" -H "Content-Type: application/json" --data '{"enabled":true}' "$api/roadguard-cartes/domains/managed" | tee d.json; echo
+          dom=$(python3 -c "import json;print(json.load(open('d.json'))['result']['domain'])")
+          echo "R2_PUBLIC=https://$dom" >> "$GITHUB_ENV"
+      - name: Extrait de la carte
+        run: |
+          curl -fsSL https://github.com/protomaps/go-pmtiles/releases/download/v1.22.3/go-pmtiles_1.22.3_Linux_x86_64.tar.gz | tar xz pmtiles
+          build=$(curl -fsSL https://build-metadata.pmtiles.com/builds.json | python3 -c "import json,sys; b=json.load(sys.stdin); print(sorted(x['key'] for x in b)[-1])")
+          echo "Source : $build"
+          ./pmtiles extract "https://build.protomaps.com/$build" "${{ inputs.id }}.pmtiles" --bbox="${{ inputs.bbox }}" --maxzoom=${{ inputs.maxzoom }} --download-threads=8
+          ./pmtiles show "${{ inputs.id }}.pmtiles" | head -20
+          ls -la "${{ inputs.id }}.pmtiles"
+      - name: Envoi sur R2
+        run: |
+          export AWS_ACCESS_KEY_ID="$CLOUDFLARE_TOKEN_ID"
+          export AWS_SECRET_ACCESS_KEY=$(printf %s "$CLOUDFLARE_API_TOKEN" | sha256sum | cut -d' ' -f1)
+          export AWS_DEFAULT_REGION=auto
+          aws s3 cp "${{ inputs.id }}.pmtiles" "s3://roadguard-cartes/${{ inputs.id }}.pmtiles" \
+            --endpoint-url "https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com" --content-type application/octet-stream
+          size=$(stat -c %s "${{ inputs.id }}.pmtiles"); sha=$(sha256sum "${{ inputs.id }}.pmtiles" | cut -d' ' -f1)
+          echo "PACK ${{ inputs.id }} URL=$R2_PUBLIC/${{ inputs.id }}.pmtiles SIZE=$size SHA256=$sha"
+          curl -fsSI "$R2_PUBLIC/${{ inputs.id }}.pmtiles" | head -5

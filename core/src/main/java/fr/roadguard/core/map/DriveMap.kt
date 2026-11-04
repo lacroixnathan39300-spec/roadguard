@@ -6,6 +6,10 @@ import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -96,6 +100,15 @@ fun DriveMap(
     }
     val holder = remember { MapHolder() }
     var styleVersion by remember { mutableStateOf(0) }
+    /** Diagnostic : dernière erreur de chargement et heure du dernier style chargé. */
+    var mapError by remember { mutableStateOf<String?>(null) }
+    var styleLoadedAt by remember { mutableStateOf(0L) }
+    var retry by remember { mutableStateOf(0) }
+    androidx.compose.runtime.DisposableEffect(mapView) {
+        val fail = MapView.OnDidFailLoadingMapListener { msg -> mapError = msg ?: "erreur inconnue" }
+        mapView.addOnDidFailLoadingMapListener(fail)
+        onDispose { mapView.removeOnDidFailLoadingMapListener(fail) }
+    }
     var radarCollection by remember { mutableStateOf<FeatureCollection?>(null) }
 
     DisposableEffect(lifecycle, mapView) {
@@ -137,7 +150,7 @@ fun DriveMap(
     }
 
     // Style jour/nuit ; à chaque changement, les couches ROADGUARD sont remises.
-    LaunchedEffect(night, styleVersion < 0 || styleVersion > 0, radarCollection, offlinePack?.file?.path) {
+    LaunchedEffect(night, styleVersion < 0 || styleVersion > 0, radarCollection, offlinePack?.file?.path, retry) {
         val map = holder.map ?: return@LaunchedEffect
         val collection = radarCollection ?: return@LaunchedEffect
         val uri = offlinePack?.let { "offline:${it.file.path}:$night" } ?: if (night) NIGHT_STYLE_URL else STYLE_URL
@@ -151,6 +164,8 @@ fun DriveMap(
         holder.style = null
         map.setStyle(builder) { style ->
             holder.style = style
+            mapError = null
+            styleLoadedAt = System.currentTimeMillis()
             style.addSource(GeoJsonSource(ROUTE_SOURCE))
             style.addSource(GeoJsonSource(ALT_SOURCE))
             style.addLayerBelow(altLayer(), firstSymbolLayer(style))
@@ -256,7 +271,28 @@ fun DriveMap(
         }
     }
 
-    AndroidView(factory = { mapView }, modifier = modifier)
+    // Style pas chargé après 12 s (réseau lent ou coupé) : nouvel essai, et explication à l'écran.
+    LaunchedEffect(styleVersion, retry, mapError) {
+        kotlinx.coroutines.delay(12_000)
+        if (holder.style == null || mapError != null) { holder.styleUri = null; retry++ }
+    }
+
+    androidx.compose.foundation.layout.Box(modifier) {
+        AndroidView(factory = { mapView }, modifier = Modifier.fillMaxSize())
+        if (holder.style == null && retry > 0 || mapError != null) {
+            val direct = fr.roadguard.core.net.Net.hasDirectInternet()
+            val s = fr.roadguard.core.net.NetStats
+            androidx.compose.material3.Text(
+                "Carte non chargée" + (mapError?.let { " : $it" } ?: "") +
+                    "\nInternet direct : ${if (direct) "oui" else "non"} · par le téléphone : ${s.relayOk.get()} ok / ${s.relayFail.get()} échecs" +
+                    (s.lastError?.let { " ($it)" } ?: "") + " · essai ${retry + 1}",
+                color = androidx.compose.ui.graphics.Color.White, fontSize = androidx.compose.ui.unit.TextUnit(13f, androidx.compose.ui.unit.TextUnitType.Sp),
+                modifier = Modifier.align(androidx.compose.ui.Alignment.BottomStart).padding(8.dp)
+                    .background(androidx.compose.ui.graphics.Color(0xE0101820), androidx.compose.foundation.shape.RoundedCornerShape(10.dp))
+                    .padding(horizontal = 10.dp, vertical = 6.dp),
+            )
+        }
+    }
 }
 
 private class MapHolder {
