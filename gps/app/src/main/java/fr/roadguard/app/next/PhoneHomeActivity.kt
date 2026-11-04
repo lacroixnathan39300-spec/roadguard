@@ -83,7 +83,7 @@ class PhoneHomeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         Net.init(this)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        setContent { PhoneHome() }
+        setContent { fr.roadguard.core.ui.CarFontScale { PhoneHome() } }
     }
 }
 

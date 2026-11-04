@@ -133,7 +133,7 @@ class MainActivity : ComponentActivity() {
         // MapLibre doit être prêt avant de lui confier le client HTTP (sinon plantage au lancement).
         org.maplibre.android.MapLibre.getInstance(this)
         fr.roadguard.drive.net.LinkInterceptor.install()
-        setContent { DriveHome() }
+        setContent { fr.roadguard.core.ui.CarFontScale { DriveHome() } }
     }
 }
 
