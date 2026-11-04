@@ -24,8 +24,9 @@ et essai sur l'appareil réel.
 - [ ] Waze ou autre appli dans une fenêtre à côté de la carte (écran partagé / superposition).
 - [x] Navigation dans DRIVE : recherche d'adresse (Photon), itinéraire (Valhalla FOSSGIS, consignes en français), tracé, flèche + distance, voix à l'approche et au moment de tourner, recalcul automatique, destinations récentes (build 20).
 - [x] Plein écran façon tableau de bord, bouton recentrer.
-- [ ] Maison / Travail / favoris, choix entre plusieurs itinéraires, limites de vitesse affichées.
-- [ ] Réglages, thèmes jour/nuit automatiques, couleurs, taille des boutons.
+- [x] Maison / Travail, limite de vitesse de la route + alerte de dépassement, thème de nuit automatique (build 23).
+- [x] Réglages : voix, bip, types d'alertes, dépassement, thème (build 25).
+- [ ] Choix entre plusieurs itinéraires, favoris illimités, couleurs et taille des boutons.
 - [ ] Démarrage automatique avec le poste, retour à l'accueil.
 
 ## Phase 2 — Cœur partagé `core`
