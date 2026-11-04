@@ -37,7 +37,7 @@ et essai sur l'appareil réel.
 - [x] Écran « Hors ligne » natif (GPS et DRIVE) : 93 packs de cartes, téléchargement avec pause/reprise, vérification SHA-256, contrôle de l'espace, suppression ; le poste peut télécharger à travers le téléphone (build 50).
 - [x] Radars de 20 pays supplémentaires (MapAtlas, CC BY 4.0), rechargés à chaud dans la carte et les alertes.
 - [x] Radars perso : ajout à ma position, import CSV (iGO, tableur), liste, suppression.
-- [ ] Signalements communautaires, compte du site.
+- [x] Communauté : serveur Cloudflare (Worker + D1, Europe), signalements façon Waze avec « toujours là ? », expiration, gardés à vie si confirmés, points, classement, conducteurs proches et coucous (build 97).
 - [ ] Découper `MainActivity.java` (460 Ko) en écrans et services lisibles, avec tests.
 
 ## Phase 3 — ROADGUARD Link : « notre Android Auto »
@@ -74,10 +74,19 @@ Le téléphone (appli GPS) fait tout le travail ; le poste (DRIVE) affiche et re
 
 ## Phase 5 — Extensions
 - [x] Android Auto (Car App Library) réécrit sur le cœur commun : carte MapLibre, guidage, radars, vitesse, Où aller (maison, travail, récents, recherche). À essayer en voiture (appli hors Play Store : activer « sources inconnues » dans les réglages développeur d Android Auto).
-- [ ] Signalements communautaires synchronisés avec le site.
+- [x] Signalements communautaires (sans site, tout dans les applis).
 - [ ] Mises à jour des applis depuis le site.
 
 ## Phase 6 — Validation réelle
 - [x] Essai automatique en émulateur (GitHub Actions, lancement manuel) : poste API 27 1024×600 et téléphone, trajet simulé vers un radar, captures et journal. A trouvé 2 plantages (DRIVE au lancement, carte au changement de style), corrigés.
 - [ ] Essais sur le poste et le téléphone : démarrage, GPS, carte, radars, liaison, musique.
 - [ ] Mesures mémoire et fluidité sur 2 Go / ARM 32 bits, corrections.
+
+## Phase 7 — Retours des essais en voiture (4 novembre)
+- [x] Bips de proximité façon détecteur, accélération progressive ; musique baissée pendant annonces et bips.
+- [x] Compteur lisible avec grande police ; logo de carte masqué ; pays inclus affichés.
+- [x] Liaison : réponse aux pings (fin des déconnexions), position prioritaire, meilleur GPS automatique, miroir faible latence.
+- [x] Lecteur de musique du poste choisi et lancé au démarrage.
+- [x] Cartes hors ligne « Ma région » sans hébergement ; cache de 1 Go ; diagnostic de carte à l'écran.
+- [x] Repris de Car Launcher : ordinateur de bord, météo/adresse, économiseur d'écran, disposition réglable, volume, favoris, tableau de bord à blocs.
+- [ ] Carte blanche sur le poste : à confirmer avec le cadre de diagnostic.
