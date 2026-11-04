@@ -1,6 +1,7 @@
 package fr.roadguard.drive
 
 import fr.roadguard.core.DriveSettings
+import fr.roadguard.core.DrivingSession
 import fr.roadguard.core.SpeedFix
 import fr.roadguard.core.SpeedSource
 import fr.roadguard.core.toAlertFix
@@ -146,9 +147,6 @@ private fun DriveHome() {
     val askLocation = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { hasLocation = it }
     LaunchedEffect(Unit) { if (!hasLocation) askLocation.launch(Manifest.permission.ACCESS_FINE_LOCATION) }
 
-    var fix by remember { mutableStateOf<SpeedFix?>(null) }
-    var alert by remember { mutableStateOf<RadarAlert?>(null) }
-    var average by remember { mutableStateOf<AverageStatus?>(null) }
     var showApps by remember { mutableStateOf(false) }
     var showEqualizer by remember { mutableStateOf(false) }
     val media = remember { MediaHub(context, android.content.ComponentName(context, fr.roadguard.drive.media.MediaAccessService::class.java)) }
@@ -169,6 +167,9 @@ private fun DriveHome() {
     val settings = remember { DriveSettings(context) }
     voice.voiceEnabled = settings.voice
     voice.beepEnabled = settings.beep
+    val scope = rememberCoroutineScope()
+    // Cœur de conduite commun avec l'appli GPS du téléphone.
+    val session = remember { DrivingSession(context, scope, voice, settings) }
     var showSettings by remember { mutableStateOf(false) }
 
     // ROADGUARD Link : liaison avec le téléphone.
@@ -182,61 +183,8 @@ private fun DriveHome() {
     var mirrorHidden by remember { mutableStateOf(false) }
     LaunchedEffect(mirror) { if (mirror != null) mirrorHidden = false }
 
-    // Navigation
-    val scope = rememberCoroutineScope()
-    val recentStore = remember { RecentPlaces(context) }
-    var recents by remember { mutableStateOf(recentStore.load()) }
     var showSearch by remember { mutableStateOf(false) }
-    var route by remember { mutableStateOf<Route?>(null) }
-    var guidance by remember { mutableStateOf<Guidance?>(null) }
-    var guidanceState by remember { mutableStateOf<GuidanceState?>(null) }
-    var navStatus by remember { mutableStateOf<String?>(null) }
-    var navigating by remember { mutableStateOf(false) }
-    var recenter by remember { mutableIntStateOf(0) }
-    var here by remember { mutableStateOf<Fix?>(null) }
-    var rerouting by remember { mutableStateOf(false) }
-    var lastRerouteAt by remember { mutableLongStateOf(0L) }
-    var pendingDestination by remember { mutableStateOf<LatLon?>(null) }
-    var home by remember { mutableStateOf(recentStore.saved("home")) }
-    var work by remember { mutableStateOf(recentStore.saved("work")) }
-
-    // Limite de vitesse de la route et thème de nuit.
-    val limitTracker = remember { SpeedLimitTracker() }
-    var speedLimit by remember { mutableStateOf<Int?>(null) }
-    var lastOverWarning by remember { mutableLongStateOf(0L) }
-    var night by remember { mutableStateOf(false) }
-
-    fun stopNavigation() {
-        navigating = false; route = null; guidance = null; guidanceState = null; navStatus = null
-        pendingDestination = null
-    }
-
-    fun computeRoute(destination: LatLon, announce: Boolean) {
-        val from = here
-        if (from == null) { navStatus = "En attente du GPS…"; return }
-        rerouting = true
-        scope.launch {
-            runCatching {
-                NavApi.route(LatLon(from.lat, from.lon), from.bearing.takeUnless { it.isNaN() }, destination)
-            }.onSuccess { r ->
-                if (!navigating) return@onSuccess
-                route = r; guidance = Guidance(r); guidanceState = null; navStatus = null
-                if (!announce) voice.speak("Nouvel itinéraire")
-            }.onFailure {
-                if (navigating) navStatus = "Trajet impossible : ${it.message ?: "pas de réseau"}"
-            }
-            rerouting = false
-        }
-    }
-
-    fun startNavigation(place: Place) {
-        showSearch = false
-        recents = recentStore.add(place)
-        navigating = true; route = null; guidance = null; guidanceState = null
-        pendingDestination = place.point
-        navStatus = "Calcul du trajet vers ${place.name}…"
-        computeRoute(place.point, announce = true)
-    }
+    fun startNavigation(place: Place) { showSearch = false; session.startNavigation(place) }
 
     // Messages et appels du téléphone : annonce vocale à l'arrivée.
     var announcedKeys by remember { mutableStateOf(setOf<String>()) }
@@ -251,7 +199,7 @@ private fun DriveHome() {
     // Destination envoyée depuis le téléphone (Partager → ROADGUARD Link).
     LaunchedEffect(Unit) {
         link.destinations.collect { text ->
-            val place = runCatching { SharedDestination.resolve(text, here?.let { LatLon(it.lat, it.lon) }) }.getOrNull()
+            val place = runCatching { SharedDestination.resolve(text, session.here?.let { LatLon(it.lat, it.lon) }) }.getOrNull()
             if (place != null) { voice.speak("Destination reçue du téléphone"); startNavigation(place) }
             else voice.speak("Destination du téléphone introuvable")
         }
@@ -260,64 +208,29 @@ private fun DriveHome() {
     // Une seule boucle GPS : compteur, alertes radars et vitesse moyenne.
     LaunchedEffect(hasLocation) {
         if (!hasLocation) return@LaunchedEffect
-        val index = RadarRepository.index(context)
-        val alerts = AlertEngine(index)
-        val averages = AverageSpeedTracker(index)
+        session.prepare()
         // GPS du téléphone (ROADGUARD Link) en priorité ; GPS du poste s'il se tait plus de 3 s.
         var lastPhoneFixAt = 0L
         merge(
             SpeedSource(context).locations().filter { SystemClock.elapsedRealtime() - lastPhoneFixAt > 3_000 },
             link.locations.onEach { lastPhoneFixAt = SystemClock.elapsedRealtime() },
-        ).collect { location ->
-            fix = location.toSpeedFix()
-            val f = location.toAlertFix()
-            val newAlert = alerts.update(f)?.takeIf { it.radar.kind in settings.alertKinds }
-            if (newAlert?.isNew == true) voice.announce(newAlert)
-            alert = newAlert
-            val newAverage = averages.update(f)
-            if (newAverage?.finished == true && average?.finished != true) voice.announceAverageResult(newAverage)
-            average = newAverage
-
-            here = f
-            night = DayNight.isNight(f.lat, f.lon, System.currentTimeMillis())
-            limitTracker.add(f.lat, f.lon, f.timeMs, f.speedKmh)?.let { trail ->
-                scope.launch { SpeedLimits.current(trail)?.let { speedLimit = it } }
-            }
-            val kmh = fix?.kmh ?: 0
-            if (settings.speedLimitWarning && SpeedLimitTracker.isOver(kmh, speedLimit) && f.timeMs - lastOverWarning > 30_000) {
-                lastOverWarning = f.timeMs
-                voice.speak("Attention, limité à $speedLimit")
-            }
-            if (navigating && route == null && !rerouting && navStatus?.startsWith("En attente du GPS") == true) {
-                pendingDestination?.let { computeRoute(it, announce = true) }
-            }
-            guidance?.let { g ->
-                val state = g.update(f.lat, f.lon, f.speedKmh)
-                guidanceState = state
-                state.speak?.let(voice::speak)
-                // Sortie du trajet : nouveau calcul, au plus toutes les 15 s.
-                if (state.offRoute && !rerouting && f.timeMs - lastRerouteAt > 15_000) {
-                    lastRerouteAt = f.timeMs
-                    computeRoute(g.route.destination, announce = false)
-                }
-            }
-        }
+        ).collect { session.onLocation(it) }
     }
 
     Box(Modifier.fillMaxSize().background(DriveColors.Background)) {
         Row(Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Panel(Modifier.weight(0.62f).fillMaxHeight()) {
-                DriveMap(hasLocation = hasLocation, route = route, recenterRequest = recenter, night = settings.isNight(night), visibleKinds = settings.alertKinds, modifier = Modifier.fillMaxSize())
-                if (navigating) {
-                    GuidanceBanner(guidanceState, navStatus, onStop = { stopNavigation() }, modifier = Modifier.align(Alignment.TopStart))
-                    AlertBanners(alert, average, Modifier.align(Alignment.BottomCenter).padding(bottom = 8.dp))
+                DriveMap(hasLocation = hasLocation, route = session.route, recenterRequest = session.recenter, night = session.night, visibleKinds = settings.alertKinds, modifier = Modifier.fillMaxSize())
+                if (session.navigating) {
+                    GuidanceBanner(session.guidanceState, session.navStatus, onStop = { session.stopNavigation() }, modifier = Modifier.align(Alignment.TopStart))
+                    AlertBanners(session.alert, session.average, Modifier.align(Alignment.BottomCenter).padding(bottom = 8.dp))
                 } else {
-                    AlertBanners(alert, average, Modifier.align(Alignment.TopCenter))
+                    AlertBanners(session.alert, session.average, Modifier.align(Alignment.TopCenter))
                 }
                 Column(Modifier.align(Alignment.BottomEnd).padding(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     MapButton("⚙", onClick = { showSettings = true })
-                    MapButton("◎", onClick = { recenter++ })
-                    if (!navigating) MapButton("🔍", onClick = { showSearch = true })
+                    MapButton("◎", onClick = { session.recenter++ })
+                    if (!session.navigating) MapButton("🔍", onClick = { showSearch = true })
                 }
             }
             Column(Modifier.weight(0.38f).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -333,9 +246,9 @@ private fun DriveHome() {
                 }
                 Panel(Modifier.fillMaxWidth().weight(1f)) {
                     Speedometer(
-                        limit = speedLimit,
-                        over = SpeedLimitTracker.isOver(fix?.kmh ?: 0, speedLimit),
-                        kmh = fix?.kmh,
+                        limit = session.speedLimit,
+                        over = session.overSpeed,
+                        kmh = session.fix?.kmh,
                         unit = stringResource(R.string.speed_unit),
                         waiting = if (hasLocation) stringResource(R.string.gps_waiting) else stringResource(R.string.location_needed),
                         modifier = Modifier.padding(16.dp),
@@ -393,14 +306,11 @@ private fun DriveHome() {
         if (showSearch) {
             BackHandler { showSearch = false }
             SearchScreen(
-                near = here?.let { LatLon(it.lat, it.lon) },
-                favorites = recents,
-                home = home,
-                work = work,
-                onSave = { slot, place ->
-                    recentStore.save(slot, place)
-                    if (slot == "home") home = place else work = place
-                },
+                near = session.here?.let { LatLon(it.lat, it.lon) },
+                favorites = session.recents,
+                home = session.home,
+                work = session.work,
+                onSave = session::saveSlot,
                 onPick = { startNavigation(it) },
                 onClose = { showSearch = false },
             )
