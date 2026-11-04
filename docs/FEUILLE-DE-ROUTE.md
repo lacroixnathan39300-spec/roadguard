@@ -39,7 +39,9 @@ Le téléphone (appli GPS) fait tout le travail ; le poste (DRIVE) affiche et re
 - [x] Protocole commun chiffré (association par code à 6 chiffres, AES-256-GCM, anti-rejeu), testé (build 30).
 - [x] Téléphone : écran « ROADGUARD Link », service en arrière-plan, envoi position GPS et musique, commandes musique.
 - [x] Autoradio : recherche du téléphone (partage de connexion / réseau local), reconnexion automatique, GPS et musique du téléphone utilisés par DRIVE.
-- [ ] Notifications, messages lus à voix haute, appels, destinations envoyées du téléphone.
+- [x] Messages et appels du téléphone sur le poste, avec leurs boutons (répondre, refuser…), lecture vocale, destination partagée depuis Google Maps / Waze / Contacts.
+- [x] Mode miroir : écran du téléphone (Waze…) en H.264 matériel, tactile renvoyé par service d'accessibilité, adaptation à la rotation (build 34).
+- [ ] Liaison par câble USB, son dans la liaison.
 - [ ] Mode voiture ROADGUARD : écrans conçus pour le poste (paysage, gros boutons) dessinés par le
       téléphone sur un écran virtuel à la résolution du poste, puis envoyés en vidéo H.264.
       Le téléphone peut rester verrouillé dans la poche.
