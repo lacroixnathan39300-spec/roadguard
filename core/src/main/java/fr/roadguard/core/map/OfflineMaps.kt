@@ -22,8 +22,16 @@ object OfflineMaps {
     fun packs(dir: File): List<OfflinePack> =
         dir.listFiles { f -> f.isFile && f.name.endsWith(".pmtiles") }.orEmpty().mapNotNull(::readHeader)
 
-    fun packFor(packs: List<OfflinePack>, lat: Double?, lon: Double?): OfflinePack? =
-        if (lat == null || lon == null) packs.firstOrNull() else packs.firstOrNull { it.contains(lat, lon) }
+    /**
+     * Pack à afficher à cette position. Si plusieurs packs se chevauchent (frontière), on prend celui
+     * dont on est le plus loin du bord, pour ne pas sortir de la carte au moindre virage.
+     */
+    fun packFor(packs: List<OfflinePack>, lat: Double?, lon: Double?): OfflinePack? {
+        if (lat == null || lon == null) return packs.firstOrNull()
+        return packs.filter { it.contains(lat, lon) }.maxByOrNull {
+            minOf(lat - it.minLat, it.maxLat - lat, lon - it.minLon, it.maxLon - lon)
+        }
+    }
 
     /** En-tête PMTiles v3 : « PMTiles », version 3, puis limites en degrés × 10⁷ aux octets 102 à 117. */
     fun readHeader(file: File): OfflinePack? = runCatching {
