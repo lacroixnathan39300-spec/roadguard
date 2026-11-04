@@ -30,8 +30,9 @@ et essai sur l'appareil réel.
 - [ ] Démarrage automatique avec le poste, retour à l'accueil.
 
 ## Phase 2 — Cœur partagé `core`
-- [ ] Extraire du GPS : radars, vitesse moyenne, alertes, packs de cartes, recherche, favoris.
-- [ ] Un seul exemplaire du code utilisé par GPS et DRIVE (fin de la copie `DRIVE/roadguard`).
+- [x] Cœur commun `core/` (Kotlin) : carte native, radars, alertes, vitesse moyenne, limites, navigation vocale, musique, réglages, et `DrivingSession` qui pilote tout. Utilisé par DRIVE et par le nouvel accueil du GPS (build 43).
+- [x] Nouvel accueil de l'appli GPS sur ce cœur ; anciennes fonctions accessibles par « Plus ».
+- [ ] Reprendre dans le nouvel accueil : packs de cartes hors ligne, radars par pays, import CSV, signalements, compte.
 - [ ] Découper `MainActivity.java` (460 Ko) en écrans et services lisibles, avec tests.
 
 ## Phase 3 — ROADGUARD Link : « notre Android Auto »
