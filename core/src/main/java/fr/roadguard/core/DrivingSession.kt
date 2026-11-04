@@ -77,6 +77,7 @@ class DrivingSession(
     }
 
     private var radarVersion = -1
+    private var lastLogAt = 0L
 
     fun onLocation(location: Location) {
         // Pays de radars ajouté ou retiré : on recharge les bases en arrière-plan.
@@ -98,6 +99,13 @@ class DrivingSession(
         average = newAverage
 
         autoNight = DayNight.isNight(f.lat, f.lon, System.currentTimeMillis())
+        // Journal de diagnostic (essais émulateur et poste) : une ligne toutes les 5 s au plus.
+        if (f.timeMs - lastLogAt > 5_000) {
+            lastLogAt = f.timeMs
+            android.util.Log.i("RoadguardSession", "pos=%.5f,%.5f v=%.0f cap=%.0f prec=%.0f nuit=%b alerte=%s radars=%b".format(
+                java.util.Locale.US, f.lat, f.lon, f.speedKmh, f.bearing, f.accuracyM, night,
+                newAlert?.let { "${it.radar.id}@${it.distanceM.toInt()}m" } ?: "-", alerts != null))
+        }
         limitTracker.add(f.lat, f.lon, f.timeMs, f.speedKmh)?.let { trail ->
             scope.launch { SpeedLimits.current(trail)?.let { speedLimit = it } }
         }

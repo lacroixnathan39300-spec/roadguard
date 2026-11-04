@@ -64,9 +64,14 @@ while dist < 1650:
 shot("04-apres-radar")
 
 log = adb("logcat", "-d")
+pid = adb("shell", "pidof", PKG).strip()
+with open(os.path.join(OUT, "journal-appli.txt"), "w") as f:
+    f.write(adb("logcat", "-d", f"--pid={pid}") if pid else "processus absent\n")
+with open(os.path.join(OUT, "position.txt"), "w") as f:
+    f.write(adb("shell", "dumpsys", "location")[:20000])
 crash = [l for l in log.splitlines() if "FATAL EXCEPTION" in l or ("AndroidRuntime" in l and " E " in l)]
 with open(os.path.join(OUT, "rapport.txt"), "w") as f:
     f.write(f"Appli : {PKG}\n")
     f.write("Plantage : " + ("OUI" if crash else "non") + "\n\n")
-    f.write("\n".join(l for l in log.splitlines() if "AndroidRuntime" in l or "roadguard" in l.lower())[-20000:])
+    f.write("\n".join(l for l in log.splitlines() if "AndroidRuntime" in l or "roadguard" in l.lower() or "Roadguard" in l)[-20000:])
 print("Plantage :", "OUI" if crash else "non")
