@@ -51,6 +51,21 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import fr.roadguard.drive.media.DriveEqualizer
+import fr.roadguard.drive.nav.Guidance
+import fr.roadguard.drive.nav.GuidanceState
+import fr.roadguard.drive.nav.LatLon
+import fr.roadguard.drive.nav.NavApi
+import fr.roadguard.drive.nav.Place
+import fr.roadguard.drive.nav.RecentPlaces
+import fr.roadguard.drive.nav.Route
+import fr.roadguard.drive.radar.Fix
+import fr.roadguard.drive.ui.GuidanceBanner
+import fr.roadguard.drive.ui.MapButton
+import fr.roadguard.drive.ui.SearchScreen
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import fr.roadguard.drive.media.MediaHub
 import fr.roadguard.drive.ui.EqualizerPanel
 import fr.roadguard.drive.ui.MusicCard
@@ -130,6 +145,54 @@ private fun DriveHome() {
     val voice = remember { AlertVoice(context) }
     DisposableEffect(Unit) { onDispose { voice.release() } }
 
+    // Navigation
+    val scope = rememberCoroutineScope()
+    val recentStore = remember { RecentPlaces(context) }
+    var recents by remember { mutableStateOf(recentStore.load()) }
+    var showSearch by remember { mutableStateOf(false) }
+    var route by remember { mutableStateOf<Route?>(null) }
+    var guidance by remember { mutableStateOf<Guidance?>(null) }
+    var guidanceState by remember { mutableStateOf<GuidanceState?>(null) }
+    var navStatus by remember { mutableStateOf<String?>(null) }
+    var navigating by remember { mutableStateOf(false) }
+    var recenter by remember { mutableIntStateOf(0) }
+    var here by remember { mutableStateOf<Fix?>(null) }
+    var rerouting by remember { mutableStateOf(false) }
+    var lastRerouteAt by remember { mutableLongStateOf(0L) }
+    var pendingDestination by remember { mutableStateOf<LatLon?>(null) }
+
+    fun stopNavigation() {
+        navigating = false; route = null; guidance = null; guidanceState = null; navStatus = null
+        pendingDestination = null
+    }
+
+    fun computeRoute(destination: LatLon, announce: Boolean) {
+        val from = here
+        if (from == null) { navStatus = "En attente du GPS…"; return }
+        rerouting = true
+        scope.launch {
+            runCatching {
+                NavApi.route(LatLon(from.lat, from.lon), from.bearing.takeUnless { it.isNaN() }, destination)
+            }.onSuccess { r ->
+                if (!navigating) return@onSuccess
+                route = r; guidance = Guidance(r); guidanceState = null; navStatus = null
+                if (!announce) voice.speak("Nouvel itinéraire")
+            }.onFailure {
+                if (navigating) navStatus = "Trajet impossible : ${it.message ?: "pas de réseau"}"
+            }
+            rerouting = false
+        }
+    }
+
+    fun startNavigation(place: Place) {
+        showSearch = false
+        recents = recentStore.add(place)
+        navigating = true; route = null; guidance = null; guidanceState = null
+        pendingDestination = place.point
+        navStatus = "Calcul du trajet vers ${place.name}…"
+        computeRoute(place.point, announce = true)
+    }
+
     // Une seule boucle GPS : compteur, alertes radars et vitesse moyenne.
     LaunchedEffect(hasLocation) {
         if (!hasLocation) return@LaunchedEffect
@@ -145,14 +208,38 @@ private fun DriveHome() {
             val newAverage = averages.update(f)
             if (newAverage?.finished == true && average?.finished != true) voice.announceAverageResult(newAverage)
             average = newAverage
+
+            here = f
+            if (navigating && route == null && !rerouting && navStatus?.startsWith("En attente du GPS") == true) {
+                pendingDestination?.let { computeRoute(it, announce = true) }
+            }
+            guidance?.let { g ->
+                val state = g.update(f.lat, f.lon, f.speedKmh)
+                guidanceState = state
+                state.speak?.let(voice::speak)
+                // Sortie du trajet : nouveau calcul, au plus toutes les 15 s.
+                if (state.offRoute && !rerouting && f.timeMs - lastRerouteAt > 15_000) {
+                    lastRerouteAt = f.timeMs
+                    computeRoute(g.route.destination, announce = false)
+                }
+            }
         }
     }
 
     Box(Modifier.fillMaxSize().background(DriveColors.Background)) {
         Row(Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Panel(Modifier.weight(0.62f).fillMaxHeight()) {
-                DriveMap(hasLocation = hasLocation, modifier = Modifier.fillMaxSize())
-                AlertBanners(alert, average, Modifier.align(Alignment.TopCenter))
+                DriveMap(hasLocation = hasLocation, route = route, recenterRequest = recenter, modifier = Modifier.fillMaxSize())
+                if (navigating) {
+                    GuidanceBanner(guidanceState, navStatus, onStop = { stopNavigation() }, modifier = Modifier.align(Alignment.TopStart))
+                    AlertBanners(alert, average, Modifier.align(Alignment.BottomCenter).padding(bottom = 8.dp))
+                } else {
+                    AlertBanners(alert, average, Modifier.align(Alignment.TopCenter))
+                }
+                Column(Modifier.align(Alignment.BottomEnd).padding(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    MapButton("◎", onClick = { recenter++ })
+                    if (!navigating) MapButton("🔍", onClick = { showSearch = true })
+                }
             }
             Column(Modifier.weight(0.38f).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Clock()
@@ -181,6 +268,15 @@ private fun DriveHome() {
             }
         }
         if (showApps) AppDrawer(onClose = { showApps = false })
+        if (showSearch) {
+            BackHandler { showSearch = false }
+            SearchScreen(
+                near = here?.let { LatLon(it.lat, it.lon) },
+                favorites = recents,
+                onPick = { startNavigation(it) },
+                onClose = { showSearch = false },
+            )
+        }
         if (showEqualizer) {
             BackHandler { showEqualizer = false }
             EqualizerPanel(equalizer, onClose = { showEqualizer = false })

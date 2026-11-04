@@ -23,12 +23,17 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
 
     fun announce(alert: RadarAlert) {
         tone?.startTone(ToneGenerator.TONE_PROP_BEEP2, 300)
-        if (ttsReady) tts.speak(AlertText.spoken(alert), TextToSpeech.QUEUE_FLUSH, null, "rg-${alert.radar.id}")
+        if (ttsReady) tts.speak(AlertText.spoken(alert), TextToSpeech.QUEUE_ADD, null, "rg-${alert.radar.id}")
     }
 
     fun announceAverageResult(status: AverageStatus) {
         if (status.over) tone?.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 400)
         if (ttsReady) tts.speak(AlertText.averageSpoken(status), TextToSpeech.QUEUE_ADD, null, "rg-average")
+    }
+
+    /** Consigne de guidage ou message libre, à la suite des annonces en cours. */
+    fun speak(text: String) {
+        if (ttsReady && text.isNotBlank()) tts.speak(text, TextToSpeech.QUEUE_ADD, null, "rg-nav-${text.hashCode()}")
     }
 
     fun release() {

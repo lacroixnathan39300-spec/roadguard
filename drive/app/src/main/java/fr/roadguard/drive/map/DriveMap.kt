@@ -29,6 +29,14 @@ import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.Style
 import org.maplibre.android.style.expressions.Expression
 import org.maplibre.android.style.layers.CircleLayer
+import org.maplibre.android.style.layers.LineLayer
+import org.maplibre.android.style.layers.Property
+import org.maplibre.android.style.layers.SymbolLayer
+import org.maplibre.geojson.LineString
+import fr.roadguard.drive.nav.Route
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import org.maplibre.android.style.layers.PropertyFactory
 import org.maplibre.android.style.sources.GeoJsonSource
 import org.maplibre.geojson.Feature
@@ -45,7 +53,12 @@ private const val RADAR_LAYER = "roadguard-radars-layer"
  * [hasLocation] : la permission de localisation est accordée.
  */
 @Composable
-fun DriveMap(hasLocation: Boolean, modifier: Modifier = Modifier) {
+fun DriveMap(
+    hasLocation: Boolean,
+    route: Route?,
+    recenterRequest: Int,
+    modifier: Modifier = Modifier,
+) {
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val mapView = remember {
@@ -53,6 +66,7 @@ fun DriveMap(hasLocation: Boolean, modifier: Modifier = Modifier) {
         MapView(context).apply { onCreate(Bundle()) }
     }
     val holder = remember { MapHolder() }
+    var styleReady by remember { mutableStateOf(false) }
 
     DisposableEffect(lifecycle, mapView) {
         val observer = LifecycleEventObserver { _, event ->
@@ -81,9 +95,13 @@ fun DriveMap(hasLocation: Boolean, modifier: Modifier = Modifier) {
             map.cameraPosition = CameraPosition.Builder().target(LatLng(46.67, 5.55)).zoom(12.0).build()
             map.setStyle(Style.Builder().fromUri(STYLE_URL)) { style ->
                 holder.style = style
+                style.addSource(GeoJsonSource(ROUTE_SOURCE))
+                style.addLayerBelow(routeCasingLayer(), firstSymbolLayer(style))
+                style.addLayerAbove(routeLayer(), ROUTE_CASING_LAYER)
                 style.addSource(GeoJsonSource(RADAR_SOURCE, collection))
                 style.addLayer(radarLayer())
                 if (hasLocation) enableLocation(context, map, style)
+                styleReady = true
             }
         }
     }
@@ -92,6 +110,31 @@ fun DriveMap(hasLocation: Boolean, modifier: Modifier = Modifier) {
         val map = holder.map
         val style = holder.style
         if (hasLocation && map != null && style != null) enableLocation(context, map, style)
+    }
+
+    // Trajet : tracé sur la carte et carte orientée dans le sens de la marche pendant le guidage.
+    LaunchedEffect(route, styleReady) {
+        val style = holder.style ?: return@LaunchedEffect
+        val source = style.getSourceAs<GeoJsonSource>(ROUTE_SOURCE) ?: return@LaunchedEffect
+        if (route == null) {
+            source.setGeoJson(FeatureCollection.fromFeatures(emptyList()))
+        } else {
+            val line = LineString.fromLngLats(route.points.map { Point.fromLngLat(it.lon, it.lat) })
+            source.setGeoJson(Feature.fromGeometry(line))
+        }
+        holder.map?.locationComponent?.takeIf { it.isLocationComponentActivated }?.let {
+            it.cameraMode = if (route != null) CameraMode.TRACKING_GPS else CameraMode.TRACKING_GPS_NORTH
+            it.zoomWhileTracking(if (route != null) 16.0 else 15.0)
+        }
+    }
+
+    // Bouton « recentrer » : reprendre le suivi après un déplacement de la carte au doigt.
+    LaunchedEffect(recenterRequest) {
+        if (recenterRequest == 0) return@LaunchedEffect
+        holder.map?.locationComponent?.takeIf { it.isLocationComponentActivated }?.let {
+            it.cameraMode = if (route != null) CameraMode.TRACKING_GPS else CameraMode.TRACKING_GPS_NORTH
+            it.zoomWhileTracking(if (route != null) 16.0 else 15.0)
+        }
     }
 
     AndroidView(factory = { mapView }, modifier = modifier)
@@ -110,10 +153,32 @@ private fun enableLocation(context: Context, map: MapLibreMap, style: Style) {
         LocationComponentActivationOptions.builder(context, style).useDefaultLocationEngine(true).build()
     )
     component.isLocationComponentEnabled = true
-    component.cameraMode = CameraMode.TRACKING_GPS
+    component.cameraMode = CameraMode.TRACKING_GPS_NORTH
     component.renderMode = RenderMode.GPS
     component.zoomWhileTracking(15.0)
 }
+
+private const val ROUTE_SOURCE = "roadguard-route"
+private const val ROUTE_LAYER = "roadguard-route-layer"
+private const val ROUTE_CASING_LAYER = "roadguard-route-casing"
+
+/** Le trajet passe sous les noms de rues et les radars. */
+private fun firstSymbolLayer(style: Style): String =
+    style.layers.firstOrNull { it is SymbolLayer }?.id ?: style.layers.last().id
+
+private fun routeCasingLayer() = LineLayer(ROUTE_CASING_LAYER, ROUTE_SOURCE).withProperties(
+    PropertyFactory.lineColor(android.graphics.Color.parseColor("#0B4F8A")),
+    PropertyFactory.lineWidth(Expression.interpolate(Expression.linear(), Expression.zoom(), Expression.stop(10, 6f), Expression.stop(17, 16f))),
+    PropertyFactory.lineCap(Property.LINE_CAP_ROUND),
+    PropertyFactory.lineJoin(Property.LINE_JOIN_ROUND),
+)
+
+private fun routeLayer() = LineLayer(ROUTE_LAYER, ROUTE_SOURCE).withProperties(
+    PropertyFactory.lineColor(android.graphics.Color.parseColor("#1E9BFF")),
+    PropertyFactory.lineWidth(Expression.interpolate(Expression.linear(), Expression.zoom(), Expression.stop(10, 4f), Expression.stop(17, 11f))),
+    PropertyFactory.lineCap(Property.LINE_CAP_ROUND),
+    PropertyFactory.lineJoin(Property.LINE_JOIN_ROUND),
+)
 
 private fun radarLayer(): CircleLayer = CircleLayer(RADAR_LAYER, RADAR_SOURCE).withProperties(
     PropertyFactory.circleRadius(
