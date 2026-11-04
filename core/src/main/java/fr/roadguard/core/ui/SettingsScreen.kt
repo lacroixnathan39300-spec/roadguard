@@ -2,6 +2,7 @@ package fr.roadguard.core.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,7 +30,7 @@ import fr.roadguard.core.radar.RadarKind
 
 /** Réglages : annonces, types d'alertes, limite de vitesse, thème. Gros boutons, lisibles en voiture. */
 @Composable
-fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit, onOfflineData: (() -> Unit)? = null) {
+fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit, onOfflineData: (() -> Unit)? = null, showAutostart: Boolean = false) {
     Column(Modifier.fillMaxSize().background(DriveColors.Background).padding(20.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Réglages", color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
@@ -58,6 +59,22 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                 ThemeMode.entries.forEach { mode ->
                     BigButton(mode.label, if (settings.theme == mode) DriveColors.Accent else DriveColors.Panel) { settings.changeTheme(mode) }
                 }
+            }
+
+            Section("Apparence")
+            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                DriveColors.accents.forEach { (name, argb) ->
+                    BigButton(if (settings.accent == argb) "● $name" else name, Color(argb)) { settings.changeAccent(argb) }
+                }
+            }
+            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                DriveColors.scales.forEach { (name, v) ->
+                    BigButton("Boutons : $name", if (settings.scale == v) DriveColors.Accent else DriveColors.Panel) { settings.changeScale(v) }
+                }
+            }
+            if (showAutostart) {
+                Section("Démarrage")
+                ToggleRow("Ouvrir DRIVE à l'allumage du poste", settings.autostart, settings::changeAutostart)
             }
 
             Section("À propos")

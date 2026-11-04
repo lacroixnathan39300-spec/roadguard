@@ -12,6 +12,7 @@
     <!-- ROADGUARD Link par câble USB : le poste est l'hôte USB du téléphone. -->
     <uses-feature android:name="android.hardware.usb.host" android:required="false" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
 
@@ -39,6 +40,18 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <!-- Ouverture automatique à l'allumage (démarrage normal ou sortie de veille des autoradios). -->
+        <receiver android:name=".BootReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="autochips.intent.action.QB_POWERON" />
+                <action android:name="com.fyt.boot.ACCON" />
+                <action android:name="com.microntek.bootcheck" />
+            </intent-filter>
+        </receiver>
 
         <!-- Accès aux lecteurs de musique (titre, pochette, commandes). -->
         <service

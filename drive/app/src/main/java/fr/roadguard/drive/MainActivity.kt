@@ -311,7 +311,7 @@ private fun DriveHome() {
             BackHandler { showSettings = false }
             var radarCount by remember { mutableStateOf(0) }
             LaunchedEffect(Unit) { radarCount = RadarRepository.radars(context).size }
-            SettingsScreen(settings, radarCount, onClose = { showSettings = false }, onOfflineData = { showOffline = true })
+            SettingsScreen(settings, radarCount, onClose = { showSettings = false }, onOfflineData = { showOffline = true }, showAutostart = true)
         }
         if (showSearch) {
             BackHandler { showSearch = false }

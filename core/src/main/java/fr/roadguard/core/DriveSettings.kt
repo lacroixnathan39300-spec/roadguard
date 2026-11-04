@@ -22,6 +22,23 @@ class DriveSettings(context: Context) {
             ?: setOf(RadarKind.FIXED, RadarKind.REDLIGHT, RadarKind.AVERAGE, RadarKind.SECTION, RadarKind.MOBILE)
     ); private set
 
+    /** DRIVE : s'ouvre tout seul au démarrage ou au réveil du poste. */
+    var autostart by mutableStateOf(prefs.getBoolean("autostart", true)); private set
+    var accent by mutableStateOf(prefs.getLong("accent", 0xFF00B8FF)); private set
+    var scale by mutableStateOf(prefs.getFloat("scale", 1f)); private set
+
+    init { fr.roadguard.core.ui.DriveColors.Accent = androidx.compose.ui.graphics.Color(accent); fr.roadguard.core.ui.DriveColors.Scale = scale }
+
+    fun changeAutostart(v: Boolean) { autostart = v; prefs.edit().putBoolean("autostart", v).apply() }
+    fun changeAccent(v: Long) {
+        accent = v; prefs.edit().putLong("accent", v).apply()
+        fr.roadguard.core.ui.DriveColors.Accent = androidx.compose.ui.graphics.Color(v)
+    }
+    fun changeScale(v: Float) {
+        scale = v; prefs.edit().putFloat("scale", v).apply()
+        fr.roadguard.core.ui.DriveColors.Scale = v
+    }
+
     fun changeVoice(v: Boolean) { voice = v; prefs.edit().putBoolean("voice", v).apply() }
     fun changeReadMessages(v: Boolean) { readMessages = v; prefs.edit().putBoolean("read_messages", v).apply() }
     fun changeBeep(v: Boolean) { beep = v; prefs.edit().putBoolean("beep", v).apply() }

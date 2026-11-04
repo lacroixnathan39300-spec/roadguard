@@ -201,18 +201,18 @@ fun GuidanceBanner(state: GuidanceState?, status: String?, onStop: () -> Unit, m
 fun BigButton(label: String, color: Color, onClick: () -> Unit) {
     Box(
         Modifier.clip(RoundedCornerShape(12.dp)).background(color).clickable(onClick = onClick)
-            .padding(horizontal = 18.dp, vertical = 12.dp),
+            .padding(horizontal = 18.dp * DriveColors.Scale, vertical = 12.dp * DriveColors.Scale),
         contentAlignment = Alignment.Center,
-    ) { Text(label, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold) }
+    ) { Text(label, color = Color.White, fontSize = 18.sp * DriveColors.Scale, fontWeight = FontWeight.Bold) }
 }
 
 /** Rond « Où aller ? » posé sur la carte. */
 @Composable
 fun MapButton(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Box(
-        modifier.size(64.dp).clip(RoundedCornerShape(32.dp)).background(DriveColors.Panel.copy(alpha = 0.92f)).clickable(onClick = onClick),
+        modifier.size(64.dp * DriveColors.Scale).clip(RoundedCornerShape(32.dp * DriveColors.Scale)).background(DriveColors.Panel.copy(alpha = 0.92f)).clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
-    ) { Text(label, color = Color.White, fontSize = 26.sp) }
+    ) { Text(label, color = Color.White, fontSize = 26.sp * DriveColors.Scale) }
 }
 
 /** Arrivée estimée (heure) et durée restante. */
