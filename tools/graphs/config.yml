@@ -1,0 +1,22 @@
+# Graphe routier hors ligne ROADGUARD (GraphHopper 5.3, voiture, contraction hierarchies).
+# Doit rester identique a la configuration lue par l'appli (core/nav/OfflineRouter.kt).
+graphhopper:
+  datareader.file: region.osm.pbf
+  graph.location: graph-cache
+  graph.flag_encoders: car
+  profiles:
+    - name: car
+      vehicle: car
+      weighting: fastest
+  profiles_ch:
+    - profile: car
+  prepare.min_network_size: 200
+  import.osm.ignored_highways: footway,cycleway,path,pedestrian,steps,bridleway,construction
+  graph.dataaccess: RAM_STORE
+server:
+  application_connectors:
+    - type: http
+      port: 8989
+  admin_connectors:
+    - type: http
+      port: 8990

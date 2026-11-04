@@ -1,0 +1,43 @@
+name: Graphes hors ligne
+
+# Fabrique les graphes routiers hors ligne (GraphHopper 5.3) à partir d'OpenStreetMap (Geofabrik)
+# et les publie dans la version GitHub « graphs ». Lancement manuel : onglet Actions → « Run workflow ».
+on:
+  workflow_dispatch:
+    inputs:
+      regions:
+        description: "Régions Geofabrik séparées par des espaces (ex. europe/france/franche-comte)"
+        default: "europe/france/franche-comte"
+
+permissions:
+  contents: write
+
+jobs:
+  graph:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Télécharger GraphHopper 5.3
+        run: curl -fsSL -o gh.jar https://github.com/graphhopper/graphhopper/releases/download/5.3/graphhopper-web-5.3.jar
+      - name: Construire et publier
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          REGIONS: ${{ github.event.inputs.regions }}
+        run: |
+          gh release view graphs -R "$REPO" >/dev/null 2>&1 || gh release create graphs -R "$REPO" --title "Graphes hors ligne" --notes "Graphes routiers GraphHopper 5.3 (© OpenStreetMap, ODbL)"
+          for region in $REGIONS; do
+            name=$(basename "$region")
+            rm -rf graph-cache region.osm.pbf
+            curl -fsSL -o region.osm.pbf "https://download.geofabrik.de/${region}-latest.osm.pbf"
+            ls -la region.osm.pbf
+            java -Xmx5g -Ddw.graphhopper.datareader.file=region.osm.pbf -jar gh.jar import tools/graphs/config.yml
+            du -sh graph-cache
+            (cd graph-cache && zip -q -r ../graph-$name.zip .)
+            ls -la graph-$name.zip
+            gh release upload graphs -R "$REPO" graph-$name.zip --clobber
+          done
