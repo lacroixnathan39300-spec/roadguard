@@ -12,6 +12,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -176,7 +177,8 @@ private fun PhoneHome() {
 
         Column(
             Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(10.dp).fillMaxWidth()
-                .clip(RoundedCornerShape(24.dp)).background(DriveColors.Panel.copy(alpha = 0.96f)).padding(10.dp),
+                .clip(RoundedCornerShape(26.dp)).background(fr.roadguard.core.ui.DriveStyle.panelBrush)
+                .border(1.dp, fr.roadguard.core.ui.DriveStyle.panelBorder, RoundedCornerShape(26.dp)).padding(10.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {

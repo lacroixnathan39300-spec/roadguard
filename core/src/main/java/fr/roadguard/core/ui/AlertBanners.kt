@@ -1,6 +1,9 @@
 package fr.roadguard.core.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,9 +24,7 @@ import fr.roadguard.core.radar.RadarKind
 @Composable
 fun AlertBanners(alert: RadarAlert?, average: AverageStatus?, modifier: Modifier = Modifier) {
     Column(modifier.padding(12.dp)) {
-        alert?.let {
-            Banner(AlertText.banner(it), colorFor(it.radar.kind))
-        }
+        alert?.let { RadarBanner(it) }
         average?.let {
             val color = when {
                 it.limitKmh == null -> Color(0xFF3A4654)
@@ -31,6 +32,45 @@ fun AlertBanners(alert: RadarAlert?, average: AverageStatus?, modifier: Modifier
                 else -> Color(0xFF2E7D32)
             }
             Banner(AlertText.average(it), color, Modifier.padding(top = 8.dp))
+        }
+    }
+}
+
+/**
+ * Alerte radar : pastille « limitation » façon panneau, type et distance en gros chiffres,
+ * barre de couleur qui pulse doucement sous 300 m.
+ */
+@Composable
+private fun RadarBanner(a: RadarAlert) {
+    val color = colorFor(a.radar.kind)
+    val pulse = androidx.compose.animation.core.rememberInfiniteTransition(label = "radar")
+    val glow by pulse.animateFloat(
+        initialValue = 0.55f, targetValue = 1f, label = "glow",
+        animationSpec = androidx.compose.animation.core.infiniteRepeatable(
+            androidx.compose.animation.core.tween(if (a.distanceM < 300) 450 else 900),
+            androidx.compose.animation.core.RepeatMode.Reverse,
+        ),
+    )
+    androidx.compose.foundation.layout.Row(
+        Modifier.clip(RoundedCornerShape(18.dp)).background(Color(0xF00E141B))
+            .border(2.dp, color.copy(alpha = glow), RoundedCornerShape(18.dp))
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+    ) {
+        // Panneau de limitation (ou triangle si la vitesse n'est pas connue).
+        a.radar.speedKmh?.let { v ->
+            androidx.compose.foundation.layout.Box(
+                Modifier.size(48.dp).clip(androidx.compose.foundation.shape.CircleShape).background(Color.White)
+                    .border(5.dp, Color(0xFFD32F2F), androidx.compose.foundation.shape.CircleShape),
+                contentAlignment = androidx.compose.ui.Alignment.Center,
+            ) { Text("$v", color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight.Bold, fontFamily = DriveStyle.Numbers) }
+        } ?: DriveIcon("⚠", 40.dp, color)
+        androidx.compose.foundation.layout.Spacer(Modifier.size(12.dp))
+        Column {
+            Text(AlertText.kindLabel(a.radar.kind), color = color.copy(alpha = 0.6f + 0.4f * glow), fontSize = 16.sp,
+                fontWeight = FontWeight.Bold, fontFamily = DriveStyle.Titles)
+            Text("${AlertText.roundedDistance(a.distanceM)} m", color = Color.White, fontSize = 30.sp,
+                fontWeight = FontWeight.Bold, fontFamily = DriveStyle.Numbers)
         }
     }
 }

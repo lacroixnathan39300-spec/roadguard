@@ -17,6 +17,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -446,7 +447,8 @@ private fun DriveHome() {
 @Composable
 private fun Panel(modifier: Modifier, content: @Composable BoxScope.() -> Unit) {
     Box(
-        modifier.clip(RoundedCornerShape(20.dp)).background(DriveColors.Panel.copy(alpha = 0.88f)),
+        modifier.clip(RoundedCornerShape(22.dp)).background(fr.roadguard.core.ui.DriveStyle.panelBrush)
+            .border(1.dp, fr.roadguard.core.ui.DriveStyle.panelBorder, RoundedCornerShape(22.dp)),
         contentAlignment = Alignment.Center,
     ) { content() }
 }
@@ -456,7 +458,8 @@ private fun Clock() {
     var now by remember { mutableStateOf(Date()) }
     LaunchedEffect(Unit) { while (true) { now = Date(); delay(1_000) } }
     val format = remember { SimpleDateFormat("HH:mm", Locale.FRANCE) }
-    Text(format.format(now), color = Color.White, fontSize = 40.sp, modifier = Modifier.padding(start = 8.dp))
+    Text(format.format(now), color = Color.White, fontSize = 46.sp, fontFamily = fr.roadguard.core.ui.DriveStyle.Numbers,
+        modifier = Modifier.padding(start = 8.dp))
 }
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)

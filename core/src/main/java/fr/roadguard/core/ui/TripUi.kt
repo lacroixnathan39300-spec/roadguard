@@ -113,9 +113,9 @@ fun TripScreen(trip: TripComputer, onClose: () -> Unit, tracks: fr.roadguard.cor
 
 @Composable
 private fun Tile(label: String, value: String, modifier: Modifier) {
-    Column(modifier.clip(RoundedCornerShape(16.dp)).background(DriveColors.Panel).padding(14.dp)) {
+    Column(modifier.clip(RoundedCornerShape(16.dp)).background(DriveStyle.panelBrush).padding(14.dp)) {
         Text(label, color = DriveColors.TextSecondary, fontSize = 14.sp)
-        Text(value, color = Color.White, fontSize = 24.sp * DriveColors.Scale, fontWeight = FontWeight.Bold, maxLines = 1)
+        Text(value, color = Color.White, fontSize = 28.sp * DriveColors.Scale, fontWeight = FontWeight.Bold, maxLines = 1, fontFamily = DriveStyle.Numbers)
     }
 }
 

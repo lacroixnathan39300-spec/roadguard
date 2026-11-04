@@ -1,6 +1,7 @@
 package fr.roadguard.core.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -200,7 +201,7 @@ fun GuidanceBanner(
                     state == null -> Text("Calcul du trajet…", color = Color.White, fontSize = 20.sp)
                     state.arrived -> Text("Vous êtes arrivé", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
                     else -> {
-                        Text(Guidance.shortDistance(state.toNextM), color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold)
+                        Text(Guidance.shortDistance(state.toNextM), color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.Bold, fontFamily = DriveStyle.Numbers)
                         Text(next?.instruction.orEmpty(), color = Color(0xFFD6ECFF), fontSize = 17.sp, maxLines = 2,
                             overflow = TextOverflow.Ellipsis)
                         state.then?.let { t ->
@@ -268,20 +269,25 @@ fun RouteChoices(
 
 @Composable
 fun BigButton(label: String, color: Color, onClick: () -> Unit) {
+    // Léger relief : reflet en haut du bouton et liseré.
     Box(
-        Modifier.clip(RoundedCornerShape(12.dp)).background(color).clickable(onClick = onClick)
+        Modifier.clip(RoundedCornerShape(14.dp)).background(color)
+            .background(androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color(0x1AFFFFFF), Color.Transparent)))
+            .border(1.dp, DriveStyle.panelBorder, RoundedCornerShape(14.dp))
+            .clickable(onClick = onClick)
             .padding(horizontal = 18.dp * DriveColors.Scale, vertical = 12.dp * DriveColors.Scale),
         contentAlignment = Alignment.Center,
-    ) { Text(label, color = Color.White, fontSize = 18.sp * DriveColors.Scale, fontWeight = FontWeight.Bold) }
+    ) { Text(label, color = Color.White, fontSize = 18.sp * DriveColors.Scale, fontWeight = FontWeight.Bold, fontFamily = DriveStyle.Titles) }
 }
 
 /** Rond « Où aller ? » posé sur la carte. */
 @Composable
 fun MapButton(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Box(
-        modifier.size(64.dp * DriveColors.Scale).clip(RoundedCornerShape(32.dp * DriveColors.Scale)).background(DriveColors.Panel.copy(alpha = 0.92f)).clickable(onClick = onClick),
+        modifier.size(60.dp * DriveColors.Scale).clip(androidx.compose.foundation.shape.CircleShape).background(DriveStyle.glass)
+            .border(1.dp, Color(0x26FFFFFF), androidx.compose.foundation.shape.CircleShape).clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
-    ) { Text(label, color = Color.White, fontSize = 26.sp * DriveColors.Scale) }
+    ) { if (!DriveIcon(label, 28.dp * DriveColors.Scale)) Text(label, color = Color.White, fontSize = 24.sp * DriveColors.Scale) }
 }
 
 /** Arrivée estimée (heure) et durée restante. */

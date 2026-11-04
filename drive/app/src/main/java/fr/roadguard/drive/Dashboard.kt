@@ -110,7 +110,7 @@ fun DashboardPage(
         rows.forEach { row ->
             Row(Modifier.fillMaxWidth().weight(1f), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 row.forEach { item ->
-                    Box(Modifier.weight(if (item.wide) 2f else 1f).fillMaxHeight().clip(RoundedCornerShape(22.dp)).background(DriveColors.Panel)
+                    Box(Modifier.weight(if (item.wide) 2f else 1f).fillMaxHeight().clip(RoundedCornerShape(22.dp)).background(fr.roadguard.core.ui.DriveStyle.panelBrush)
                         .clickable(enabled = item.widget == DashWidget.TRIP || item.widget == DashWidget.TODAY, onClick = onTrip)
                         .padding(14.dp)) {
                         Widget(item.widget, session, music, onPlayPause, onNext, onPrevious)
@@ -178,7 +178,7 @@ private fun Big(value: String, caption: String, color: Color = Color.White) {
         val captionSize = with(density) { (maxHeight * 0.16f).toSp() }.let { if (it.value > 16f) 16.sp else it }
         Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
             Text(caption, color = DriveColors.TextSecondary, fontSize = captionSize, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(value, color = color, fontSize = valueSize, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(value, color = color, fontSize = valueSize, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, fontFamily = fr.roadguard.core.ui.DriveStyle.Numbers)
         }
     }
 }
