@@ -1,4 +1,4 @@
-package fr.roadguard.drive
+package fr.roadguard.core
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

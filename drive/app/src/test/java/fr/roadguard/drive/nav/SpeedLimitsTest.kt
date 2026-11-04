@@ -1,4 +1,4 @@
-package fr.roadguard.drive.nav
+package fr.roadguard.core.nav
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

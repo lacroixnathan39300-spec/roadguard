@@ -1,4 +1,4 @@
-package fr.roadguard.drive.radar
+package fr.roadguard.core.radar
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

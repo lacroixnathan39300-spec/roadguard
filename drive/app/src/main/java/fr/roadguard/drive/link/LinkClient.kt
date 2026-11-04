@@ -9,7 +9,7 @@ import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.net.wifi.WifiManager
 import android.os.Build
-import fr.roadguard.drive.media.NowPlaying
+import fr.roadguard.core.media.NowPlaying
 import fr.roadguard.link.LinkProtocol
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,23 +52,23 @@ sealed class LinkState(val label: String) {
  * ou annonce réseau), s'authentifie, reçoit position et musique, envoie les commandes.
  * Se reconnecte tout seul tant qu'un téléphone est associé.
  */
-class LinkClient(private val context: Context) {
-    init { current = this }
+class LinkClient(private val context: Context) : fr.roadguard.core.net.NetRelay {
+    init { current = this; fr.roadguard.core.net.Net.relay = this }
 
     companion object {
         /** Liaison active de l'appli (pour l'accès Internet par le téléphone). */
         @Volatile var current: LinkClient? = null; private set
     }
 
-    fun isConnected(): Boolean = session != null
+    override fun isConnected(): Boolean = session != null
 
-    private val httpWaiting = java.util.concurrent.ConcurrentHashMap<Int, CompletableDeferred<fr.roadguard.drive.net.NetResponse>>()
+    private val httpWaiting = java.util.concurrent.ConcurrentHashMap<Int, CompletableDeferred<fr.roadguard.core.net.NetResponse>>()
     private val httpIds = java.util.concurrent.atomic.AtomicInteger()
 
     /** Requête Internet faite par le téléphone (le poste n'a pas Internet lui-même). */
-    suspend fun http(url: String, method: String, body: ByteArray?, contentType: String?, follow: Boolean): fr.roadguard.drive.net.NetResponse {
+    override suspend fun http(url: String, method: String, body: ByteArray?, contentType: String?, follow: Boolean): fr.roadguard.core.net.NetResponse {
         val id = httpIds.incrementAndGet()
-        val waiter = CompletableDeferred<fr.roadguard.drive.net.NetResponse>()
+        val waiter = CompletableDeferred<fr.roadguard.core.net.NetResponse>()
         httpWaiting[id] = waiter
         try {
             val m = JSONObject().put("t", "http").put("id", id).put("url", url).put("method", method).put("follow", follow)
@@ -271,7 +271,7 @@ class LinkClient(private val context: Context) {
             }
             "http_resp" -> httpWaiting[m.optInt("id")]?.let { w ->
                 if (m.has("error")) w.completeExceptionally(java.io.IOException(m.getString("error")))
-                else w.complete(fr.roadguard.drive.net.NetResponse(m.optInt("code"),
+                else w.complete(fr.roadguard.core.net.NetResponse(m.optInt("code"),
                     m.optString("body").takeIf { it.isNotEmpty() }?.let(LinkProtocol::unb64) ?: ByteArray(0),
                     m.optString("ctype").ifEmpty { null }))
             }

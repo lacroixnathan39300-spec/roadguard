@@ -1,0 +1,229 @@
+package fr.roadguard.core.map
+
+import android.annotation.SuppressLint
+import android.content.Context
+import android.os.Bundle
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import fr.roadguard.core.radar.Radar
+import fr.roadguard.core.radar.RadarRepository
+import fr.roadguard.core.radar.RadarKind
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.maplibre.android.MapLibre
+import org.maplibre.android.camera.CameraPosition
+import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.location.LocationComponentActivationOptions
+import org.maplibre.android.location.modes.CameraMode
+import org.maplibre.android.location.modes.RenderMode
+import org.maplibre.android.maps.MapLibreMap
+import org.maplibre.android.maps.MapView
+import org.maplibre.android.maps.Style
+import org.maplibre.android.style.expressions.Expression
+import org.maplibre.android.style.layers.CircleLayer
+import org.maplibre.android.style.layers.LineLayer
+import org.maplibre.android.style.layers.Property
+import org.maplibre.android.style.layers.SymbolLayer
+import org.maplibre.geojson.LineString
+import fr.roadguard.core.nav.Route
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import org.maplibre.android.style.layers.PropertyFactory
+import org.maplibre.android.style.sources.GeoJsonSource
+import org.maplibre.geojson.Feature
+import org.maplibre.geojson.FeatureCollection
+import org.maplibre.geojson.Point
+
+/** Style vectoriel libre (OpenFreeMap, données © OpenStreetMap), sans clé. */
+private const val STYLE_URL = "https://tiles.openfreemap.org/styles/liberty"
+/** Style de nuit (CARTO Dark Matter, données © OpenStreetMap, © CARTO). */
+private const val NIGHT_STYLE_URL = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
+private const val RADAR_SOURCE = "roadguard-radars"
+private const val RADAR_LAYER = "roadguard-radars-layer"
+
+/**
+ * Carte native MapLibre : position du poste (suivi en mode conduite) et radars embarqués.
+ * [hasLocation] : la permission de localisation est accordée.
+ */
+@Composable
+fun DriveMap(
+    hasLocation: Boolean,
+    route: Route?,
+    recenterRequest: Int,
+    night: Boolean,
+    visibleKinds: Set<RadarKind>,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    val mapView = remember {
+        MapLibre.getInstance(context)
+        MapView(context).apply { onCreate(Bundle()) }
+    }
+    val holder = remember { MapHolder() }
+    var styleVersion by remember { mutableStateOf(0) }
+    var radarCollection by remember { mutableStateOf<FeatureCollection?>(null) }
+
+    DisposableEffect(lifecycle, mapView) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_START -> mapView.onStart()
+                Lifecycle.Event.ON_RESUME -> mapView.onResume()
+                Lifecycle.Event.ON_PAUSE -> mapView.onPause()
+                Lifecycle.Event.ON_STOP -> mapView.onStop()
+                else -> Unit
+            }
+        }
+        lifecycle.addObserver(observer)
+        onDispose {
+            lifecycle.removeObserver(observer)
+            mapView.onDestroy()
+        }
+    }
+
+    LaunchedEffect(mapView) {
+        val radars = RadarRepository.radars(context)
+        radarCollection = withContext(Dispatchers.Default) { radars.toFeatureCollection() }
+        mapView.getMapAsync { map ->
+            holder.map = map
+            map.uiSettings.isRotateGesturesEnabled = false
+            map.uiSettings.isTiltGesturesEnabled = false
+            map.cameraPosition = CameraPosition.Builder().target(LatLng(46.67, 5.55)).zoom(12.0).build()
+            styleVersion = -1 // carte prête : le style est chargé par l'effet ci-dessous
+        }
+    }
+
+    // Style jour/nuit ; à chaque changement, les couches ROADGUARD sont remises.
+    LaunchedEffect(night, styleVersion < 0 || styleVersion > 0, radarCollection) {
+        val map = holder.map ?: return@LaunchedEffect
+        val collection = radarCollection ?: return@LaunchedEffect
+        val uri = if (night) NIGHT_STYLE_URL else STYLE_URL
+        if (holder.styleUri == uri) return@LaunchedEffect
+        holder.styleUri = uri
+        map.setStyle(Style.Builder().fromUri(uri)) { style ->
+            holder.style = style
+            style.addSource(GeoJsonSource(ROUTE_SOURCE))
+            style.addLayerBelow(routeCasingLayer(), firstSymbolLayer(style))
+            style.addLayerAbove(routeLayer(), ROUTE_CASING_LAYER)
+            style.addSource(GeoJsonSource(RADAR_SOURCE, collection))
+            style.addLayer(radarLayer())
+            if (hasLocation) enableLocation(context, map, style)
+            styleVersion = if (styleVersion < 0) 1 else styleVersion + 1
+        }
+    }
+
+    LaunchedEffect(hasLocation) {
+        val map = holder.map
+        val style = holder.style
+        if (hasLocation && map != null && style != null) enableLocation(context, map, style)
+    }
+
+    // Trajet : tracé sur la carte et carte orientée dans le sens de la marche pendant le guidage.
+    LaunchedEffect(route, styleVersion) {
+        val style = holder.style ?: return@LaunchedEffect
+        val source = style.getSourceAs<GeoJsonSource>(ROUTE_SOURCE) ?: return@LaunchedEffect
+        if (route == null) {
+            source.setGeoJson(FeatureCollection.fromFeatures(emptyList()))
+        } else {
+            val line = LineString.fromLngLats(route.points.map { Point.fromLngLat(it.lon, it.lat) })
+            source.setGeoJson(Feature.fromGeometry(line))
+        }
+        holder.map?.locationComponent?.takeIf { it.isLocationComponentActivated }?.let {
+            it.cameraMode = if (route != null) CameraMode.TRACKING_GPS else CameraMode.TRACKING_GPS_NORTH
+            it.zoomWhileTracking(if (route != null) 16.0 else 15.0)
+        }
+    }
+
+    // Types de radars affichés (réglages).
+    LaunchedEffect(visibleKinds, styleVersion) {
+        val layer = holder.style?.getLayerAs<CircleLayer>(RADAR_LAYER) ?: return@LaunchedEffect
+        val stops = RadarKind.entries.map { Expression.stop(it.name, Expression.literal(it in visibleKinds)) }.toTypedArray()
+        layer.setFilter(Expression.match(Expression.get("kind"), Expression.literal(false), *stops))
+    }
+
+    // Bouton « recentrer » : reprendre le suivi après un déplacement de la carte au doigt.
+    LaunchedEffect(recenterRequest) {
+        if (recenterRequest == 0) return@LaunchedEffect
+        holder.map?.locationComponent?.takeIf { it.isLocationComponentActivated }?.let {
+            it.cameraMode = if (route != null) CameraMode.TRACKING_GPS else CameraMode.TRACKING_GPS_NORTH
+            it.zoomWhileTracking(if (route != null) 16.0 else 15.0)
+        }
+    }
+
+    AndroidView(factory = { mapView }, modifier = modifier)
+}
+
+private class MapHolder {
+    var map: MapLibreMap? = null
+    var style: Style? = null
+    var styleUri: String? = null
+}
+
+@SuppressLint("MissingPermission")
+private fun enableLocation(context: Context, map: MapLibreMap, style: Style) {
+    val component = map.locationComponent
+    if (component.isLocationComponentActivated) return
+    component.activateLocationComponent(
+        LocationComponentActivationOptions.builder(context, style).useDefaultLocationEngine(true).build()
+    )
+    component.isLocationComponentEnabled = true
+    component.cameraMode = CameraMode.TRACKING_GPS_NORTH
+    component.renderMode = RenderMode.GPS
+    component.zoomWhileTracking(15.0)
+}
+
+private const val ROUTE_SOURCE = "roadguard-route"
+private const val ROUTE_LAYER = "roadguard-route-layer"
+private const val ROUTE_CASING_LAYER = "roadguard-route-casing"
+
+/** Le trajet passe sous les noms de rues et les radars. */
+private fun firstSymbolLayer(style: Style): String =
+    style.layers.firstOrNull { it is SymbolLayer }?.id ?: style.layers.last().id
+
+private fun routeCasingLayer() = LineLayer(ROUTE_CASING_LAYER, ROUTE_SOURCE).withProperties(
+    PropertyFactory.lineColor(android.graphics.Color.parseColor("#0B4F8A")),
+    PropertyFactory.lineWidth(Expression.interpolate(Expression.linear(), Expression.zoom(), Expression.stop(10, 6f), Expression.stop(17, 16f))),
+    PropertyFactory.lineCap(Property.LINE_CAP_ROUND),
+    PropertyFactory.lineJoin(Property.LINE_JOIN_ROUND),
+)
+
+private fun routeLayer() = LineLayer(ROUTE_LAYER, ROUTE_SOURCE).withProperties(
+    PropertyFactory.lineColor(android.graphics.Color.parseColor("#1E9BFF")),
+    PropertyFactory.lineWidth(Expression.interpolate(Expression.linear(), Expression.zoom(), Expression.stop(10, 4f), Expression.stop(17, 11f))),
+    PropertyFactory.lineCap(Property.LINE_CAP_ROUND),
+    PropertyFactory.lineJoin(Property.LINE_JOIN_ROUND),
+)
+
+private fun radarLayer(): CircleLayer = CircleLayer(RADAR_LAYER, RADAR_SOURCE).withProperties(
+    PropertyFactory.circleRadius(
+        Expression.interpolate(Expression.linear(), Expression.zoom(), Expression.stop(8, 2f), Expression.stop(15, 7f))
+    ),
+    PropertyFactory.circleColor(
+        Expression.match(
+            Expression.get("kind"), Expression.color(android.graphics.Color.parseColor("#FF3B30")),
+            Expression.stop(RadarKind.REDLIGHT.name, Expression.color(android.graphics.Color.parseColor("#FF9500"))),
+            Expression.stop(RadarKind.AVERAGE.name, Expression.color(android.graphics.Color.parseColor("#AF52DE"))),
+            Expression.stop(RadarKind.MOBILE.name, Expression.color(android.graphics.Color.parseColor("#FFCC00"))),
+        )
+    ),
+    PropertyFactory.circleStrokeColor(android.graphics.Color.WHITE),
+    PropertyFactory.circleStrokeWidth(1.5f),
+).apply { minZoom = 8f }
+
+private fun List<Radar>.toFeatureCollection(): FeatureCollection = FeatureCollection.fromFeatures(
+    map { r ->
+        Feature.fromGeometry(Point.fromLngLat(r.lon, r.lat)).apply {
+            addStringProperty("kind", r.kind.name)
+            addStringProperty("id", r.id)
+        }
+    }
+)

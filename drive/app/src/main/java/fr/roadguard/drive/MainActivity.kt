@@ -1,5 +1,11 @@
 package fr.roadguard.drive
 
+import fr.roadguard.core.DriveSettings
+import fr.roadguard.core.SpeedFix
+import fr.roadguard.core.SpeedSource
+import fr.roadguard.core.toAlertFix
+import fr.roadguard.core.toSpeedFix
+
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -46,57 +52,57 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import fr.roadguard.drive.map.DriveMap
+import fr.roadguard.core.map.DriveMap
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import fr.roadguard.drive.media.DriveEqualizer
-import fr.roadguard.drive.nav.Guidance
-import fr.roadguard.drive.nav.GuidanceState
-import fr.roadguard.drive.nav.LatLon
-import fr.roadguard.drive.nav.NavApi
-import fr.roadguard.drive.nav.Place
-import fr.roadguard.drive.nav.RecentPlaces
-import fr.roadguard.drive.nav.SpeedLimitTracker
-import fr.roadguard.drive.nav.SpeedLimits
-import fr.roadguard.drive.ui.DayNight
-import fr.roadguard.drive.ui.SettingsScreen
+import fr.roadguard.core.media.DriveEqualizer
+import fr.roadguard.core.nav.Guidance
+import fr.roadguard.core.nav.GuidanceState
+import fr.roadguard.core.nav.LatLon
+import fr.roadguard.core.nav.NavApi
+import fr.roadguard.core.nav.Place
+import fr.roadguard.core.nav.RecentPlaces
+import fr.roadguard.core.nav.SpeedLimitTracker
+import fr.roadguard.core.nav.SpeedLimits
+import fr.roadguard.core.ui.DayNight
+import fr.roadguard.core.ui.SettingsScreen
 import fr.roadguard.drive.ui.LinkScreen
 import fr.roadguard.drive.ui.PhoneNotificationCard
 import fr.roadguard.drive.ui.MirrorScreen
-import fr.roadguard.drive.nav.SharedDestination
+import fr.roadguard.core.nav.SharedDestination
 import fr.roadguard.drive.link.LinkClient
 import fr.roadguard.drive.link.LinkState
 import android.os.SystemClock
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
-import fr.roadguard.drive.nav.Route
-import fr.roadguard.drive.radar.Fix
-import fr.roadguard.drive.ui.GuidanceBanner
-import fr.roadguard.drive.ui.MapButton
-import fr.roadguard.drive.ui.SearchScreen
+import fr.roadguard.core.nav.Route
+import fr.roadguard.core.radar.Fix
+import fr.roadguard.core.ui.GuidanceBanner
+import fr.roadguard.core.ui.MapButton
+import fr.roadguard.core.ui.SearchScreen
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
-import fr.roadguard.drive.media.MediaHub
-import fr.roadguard.drive.ui.EqualizerPanel
-import fr.roadguard.drive.ui.MusicCard
+import fr.roadguard.core.media.MediaHub
+import fr.roadguard.core.ui.EqualizerPanel
+import fr.roadguard.core.ui.MusicCard
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.coroutines.flow.flowOf
-import fr.roadguard.drive.radar.AlertEngine
-import fr.roadguard.drive.radar.AlertVoice
-import fr.roadguard.drive.radar.AverageSpeedTracker
-import fr.roadguard.drive.radar.AverageStatus
-import fr.roadguard.drive.radar.RadarAlert
-import fr.roadguard.drive.radar.RadarRepository
-import fr.roadguard.drive.ui.AlertBanners
-import fr.roadguard.drive.ui.DriveColors
-import fr.roadguard.drive.ui.Speedometer
+import fr.roadguard.core.radar.AlertEngine
+import fr.roadguard.core.radar.AlertVoice
+import fr.roadguard.core.radar.AverageSpeedTracker
+import fr.roadguard.core.radar.AverageStatus
+import fr.roadguard.core.radar.RadarAlert
+import fr.roadguard.core.radar.RadarRepository
+import fr.roadguard.core.ui.AlertBanners
+import fr.roadguard.core.ui.DriveColors
+import fr.roadguard.core.ui.Speedometer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -122,7 +128,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         hideSystemBars()
-        fr.roadguard.drive.net.Net.init(this)
+        fr.roadguard.core.net.Net.init(this)
         fr.roadguard.drive.net.LinkInterceptor.install()
         setContent { DriveHome() }
     }
@@ -145,7 +151,7 @@ private fun DriveHome() {
     var average by remember { mutableStateOf<AverageStatus?>(null) }
     var showApps by remember { mutableStateOf(false) }
     var showEqualizer by remember { mutableStateOf(false) }
-    val media = remember { MediaHub(context) }
+    val media = remember { MediaHub(context, android.content.ComponentName(context, fr.roadguard.drive.media.MediaAccessService::class.java)) }
     var hasMediaAccess by remember { mutableStateOf(media.hasAccess()) }
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(lifecycle) {
