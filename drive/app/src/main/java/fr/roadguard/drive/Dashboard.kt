@@ -116,7 +116,7 @@ fun DashboardPage(
                     }
                 }
                 // Ligne incomplète : place vide pour garder la grille.
-                val span = row.sumOf { if (it.wide) 2 else 1 }
+                val span = row.fold(0) { acc, it -> acc + if (it.wide) 2 else 1 }
                 if (span < 3) Spacer(Modifier.weight((3 - span).toFloat()))
             }
         }
