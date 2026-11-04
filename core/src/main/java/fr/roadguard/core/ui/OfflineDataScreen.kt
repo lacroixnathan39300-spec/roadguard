@@ -1,6 +1,8 @@
 package fr.roadguard.core.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,16 +35,18 @@ import androidx.compose.ui.unit.sp
 import fr.roadguard.core.map.CatalogPack
 import fr.roadguard.core.map.MapPackManager
 import fr.roadguard.core.map.PackState
+import fr.roadguard.core.radar.PersonalRadars
 import fr.roadguard.core.radar.RadarCountries
+import fr.roadguard.core.radar.RadarKind
 import kotlinx.coroutines.launch
 
 /** « Cartes et radars hors ligne » : packs de cartes à télécharger et radars des autres pays. */
 @Composable
-fun OfflineDataScreen(nearCountries: Set<String>, onClose: () -> Unit) {
+fun OfflineDataScreen(nearCountries: Set<String>, onClose: () -> Unit, here: Pair<Double, Double>? = null, startTab: Int = 0) {
     val context = LocalContext.current
     val manager = remember { MapPackManager.get(context) }
     val states by manager.states.collectAsState()
-    var tab by remember { mutableStateOf(0) }
+    var tab by remember { mutableStateOf(startTab) }
     val scope = rememberCoroutineScope()
     val radarStatus = remember { mutableStateMapOf<String, String>() }
     var radarRefresh by remember { mutableStateOf(0) }
@@ -55,7 +59,9 @@ fun OfflineDataScreen(nearCountries: Set<String>, onClose: () -> Unit) {
         Row(Modifier.padding(vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             BigButton("Cartes", if (tab == 0) DriveColors.Accent else DriveColors.Panel) { tab = 0 }
             BigButton("Radars par pays", if (tab == 1) DriveColors.Accent else DriveColors.Panel) { tab = 1 }
+            BigButton("Mes radars", if (tab == 2) DriveColors.Accent else DriveColors.Panel) { tab = 2 }
         }
+        if (tab == 2) { PersonalRadarsTab(here); return@Column }
         if (tab == 0) {
             Text(
                 "Installé : ${manager.installedBytes() / 1_000_000} Mo · libre : ${manager.freeBytes() / 1_000_000} Mo. " +
@@ -144,6 +150,83 @@ private fun PackRow(pack: CatalogPack, state: PackState, manager: MapPackManager
                     modifier = Modifier.fillMaxWidth().height(6.dp),
                     color = DriveColors.Accent, trackColor = DriveColors.Track,
                 )
+            }
+        }
+    }
+}
+
+/** Radars perso : ajout à la position actuelle, import d'un fichier CSV, liste avec suppression. */
+@Composable
+private fun PersonalRadarsTab(here: Pair<Double, Double>?) {
+    val context = LocalContext.current
+    var refresh by remember { mutableStateOf(0) }
+    var message by remember { mutableStateOf<String?>(null) }
+    var kind by remember { mutableStateOf(RadarKind.FIXED) }
+    var speed by remember { mutableStateOf<Int?>(50) }
+    val radars = remember(refresh) { PersonalRadars.list(context) }
+    val scope = rememberCoroutineScope()
+    val picker = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            message = "Import en cours…"
+            message = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                runCatching {
+                    val text = context.contentResolver.openInputStream(uri)!!.use { it.readBytes() }
+                        .also { if (it.size > 20_000_000) throw java.io.IOException("fichier trop gros") }
+                        .toString(Charsets.UTF_8)
+                    val (added, skipped) = PersonalRadars.import(context, text)
+                    "$added radar(s) importé(s)" + if (skipped > 0) ", $skipped ligne(s) ignorée(s) (doublons ou illisibles)" else ""
+                }.getOrElse { "Import impossible : ${it.message}" }
+            }
+            refresh++
+        }
+    }
+    LazyColumn(Modifier.padding(top = 4.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        item {
+            Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(DriveColors.Panel).padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Ajouter un radar à ma position", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf(RadarKind.FIXED, RadarKind.REDLIGHT, RadarKind.AVERAGE, RadarKind.MOBILE).forEach { k ->
+                        BigButton(fr.roadguard.core.radar.AlertText.kindLabel(k), if (kind == k) DriveColors.Accent else DriveColors.Track) { kind = k }
+                    }
+                }
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf(null, 30, 50, 70, 80, 90, 110, 130).forEach { v ->
+                        BigButton(v?.toString() ?: "?", if (speed == v) DriveColors.Accent else DriveColors.Track) { speed = v }
+                    }
+                }
+                BigButton(if (here == null) "En attente du GPS…" else "＋ Ajouter ici", if (here == null) DriveColors.Track else DriveColors.Accent) {
+                    val h = here ?: return@BigButton
+                    PersonalRadars.add(context, h.first, h.second, kind, speed, null)
+                    message = "Radar ajouté"; refresh++
+                }
+            }
+        }
+        item {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                BigButton("📄 Importer un fichier CSV", DriveColors.Accent) {
+                    runCatching { picker.launch(arrayOf("text/*", "application/csv", "application/vnd.ms-excel", "application/octet-stream")) }
+                        .onFailure { message = "Aucun gestionnaire de fichiers sur cet appareil" }
+                }
+                if (radars.isNotEmpty()) BigButton("Tout effacer", Color(0xFF7F1D1D)) { PersonalRadars.clear(context); refresh++ }
+            }
+        }
+        item {
+            Text(message ?: "Fichiers acceptés : latitude, longitude, vitesse (séparés par , ; ou tabulation), " +
+                "en-têtes lat/lon/vitesse/type, ou format iGO (X,Y,TYPE,SPEED…). ${radars.size} radar(s) perso.",
+                color = DriveColors.TextSecondary, fontSize = 15.sp)
+        }
+        items(radars.asReversed().take(300), key = { it.id }) { r ->
+            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(DriveColors.Panel).padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(r.label + (r.speedKmh?.let { " · $it km/h" } ?: ""), color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                    Text("%.5f, %.5f".format(java.util.Locale.US, r.lat, r.lon), color = DriveColors.TextSecondary, fontSize = 14.sp)
+                }
+                BigButton("Supprimer", Color(0xFF7F1D1D)) { PersonalRadars.remove(context, r.id); refresh++ }
             }
         }
     }

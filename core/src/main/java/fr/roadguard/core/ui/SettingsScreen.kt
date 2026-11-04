@@ -40,7 +40,7 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             if (onOfflineData != null) {
-                BigButton("🗺 Cartes hors ligne et radars par pays", DriveColors.Accent, onOfflineData)
+                BigButton("🗺 Cartes hors ligne, radars par pays et mes radars", DriveColors.Accent, onOfflineData)
             }
             Section("Annonces")
             ToggleRow("Voix (radars, guidage, vitesse moyenne)", settings.voice, settings::changeVoice)

@@ -306,7 +306,7 @@ private fun DriveHome() {
         }
         if (showOffline) {
             BackHandler { showOffline = false }
-            fr.roadguard.core.ui.OfflineDataScreen(setOf("FR", "CH"), onClose = { showOffline = false })
+            fr.roadguard.core.ui.OfflineDataScreen(setOf("FR", "CH"), onClose = { showOffline = false }, here = session.here?.let { it.lat to it.lon })
         } else if (showSettings) {
             BackHandler { showSettings = false }
             var radarCount by remember { mutableStateOf(0) }
