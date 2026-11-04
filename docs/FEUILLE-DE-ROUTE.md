@@ -27,7 +27,7 @@ et essai sur l'appareil réel.
 - [x] Maison / Travail, limite de vitesse de la route + alerte de dépassement, thème de nuit automatique (build 23).
 - [x] Réglages : voix, bip, types d'alertes, dépassement, thème (build 25).
 - [x] Choix entre 3 itinéraires (variantes grises sur la carte), éviter péages/autoroutes, couleur d'accent et taille des boutons.
-- [ ] Favoris illimités.
+- [x] Favoris illimités (étoile dans la recherche), aussi dans Android Auto.
 - [x] Démarrage automatique avec le poste (démarrage normal et veille rapide Autochips), DRIVE peut être l'écran d'accueil.
 
 ## Phase 2 — Cœur partagé `core`

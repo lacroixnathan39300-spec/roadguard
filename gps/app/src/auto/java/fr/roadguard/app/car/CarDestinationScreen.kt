@@ -26,9 +26,11 @@ class CarDestinationScreen(carContext: CarContext) : Screen(carContext) {
         val places = buildList {
             s?.home?.let { add("🏠 Maison" to it) }
             s?.work?.let { add("💼 Travail" to it) }
-            s?.recents.orEmpty().take(6).forEach { add(it.name to it) }
+            s?.favorites.orEmpty().forEach { add("★ ${it.name}" to it) }
+            s?.recents.orEmpty().filterNot { r -> s?.favorites.orEmpty().any { it.name == r.name } }.forEach { add(it.name to it) }
         }
-        places.forEach { (title, place) -> list.addItem(placeRow(title, place)) }
+        // Android Auto limite la longueur des listes (souvent 6) : on garde les premiers.
+        places.take(6).forEach { (title, place) -> list.addItem(placeRow(title, place)) }
         if (places.isEmpty()) list.setNoItemsMessage("Aucune destination récente. Utilise la recherche.")
         return ListTemplate.Builder()
             .setTitle("Où aller ?")

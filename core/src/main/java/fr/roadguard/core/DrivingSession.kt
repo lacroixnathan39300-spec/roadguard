@@ -56,6 +56,9 @@ class DrivingSession(
     var recents by mutableStateOf(recentStore.load()); private set
     var home by mutableStateOf(recentStore.saved("home")); private set
     var work by mutableStateOf(recentStore.saved("work")); private set
+    var favorites by mutableStateOf(recentStore.favorites()); private set
+
+    fun toggleFavorite(place: Place) { favorites = recentStore.toggleFavorite(place) }
 
     private var guidance: Guidance? = null
     private var rerouting = false

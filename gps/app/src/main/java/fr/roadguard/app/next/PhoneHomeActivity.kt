@@ -194,6 +194,7 @@ private fun PhoneHome() {
                 onSave = s::saveSlot,
                 onPick = { showSearch = false; s.startNavigation(it) },
                 onClose = { showSearch = false },
+                starred = s.favorites, onStar = s::toggleFavorite,
             )
         }
         if (showMenu) {

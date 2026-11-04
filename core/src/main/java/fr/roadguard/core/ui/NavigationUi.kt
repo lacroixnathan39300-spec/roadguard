@@ -57,6 +57,8 @@ fun SearchScreen(
     onSave: (slot: String, place: Place) -> Unit,
     onPick: (Place) -> Unit,
     onClose: () -> Unit,
+    starred: List<Place> = emptyList(),
+    onStar: ((Place) -> Unit)? = null,
 ) {
     // Choix de l'adresse « Maison » ou « Travail » : le prochain résultat touché est enregistré.
     var assigning by remember { mutableStateOf<String?>(null) }
@@ -108,14 +110,21 @@ fun SearchScreen(
                 onGo = { work?.let(onPick) }, onSet = { assigning = "work"; message = "Cherche puis touche l'adresse de ton travail" })
         }
         message?.let { Text(it, color = DriveColors.TextSecondary, fontSize = 18.sp, modifier = Modifier.padding(top = 12.dp)) }
-        val shown = if (results.isEmpty() && query.isBlank()) favorites else results
-        if (shown === favorites && favorites.isNotEmpty()) {
-            Text("Récents", color = DriveColors.TextSecondary, fontSize = 16.sp, modifier = Modifier.padding(top = 16.dp))
+        val idle = results.isEmpty() && query.isBlank()
+        val shown = if (idle) starred + favorites.filterNot { r -> starred.any { it.name == r.name && it.detail == r.detail } } else results
+        if (idle && shown.isNotEmpty()) {
+            Text(if (starred.isNotEmpty()) "Favoris ★ puis récents" else "Récents", color = DriveColors.TextSecondary,
+                fontSize = 16.sp, modifier = Modifier.padding(top = 16.dp))
         }
         LazyColumn(Modifier.fillMaxWidth().padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             items(shown) { place ->
+                val isStar = starred.any { it.name == place.name && it.detail == place.detail }
+                Row(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(DriveColors.Panel),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                 Column(
-                    Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(DriveColors.Panel)
+                    Modifier.weight(1f)
                         .clickable {
                             val slot = assigning
                             if (slot != null) {
@@ -128,6 +137,12 @@ fun SearchScreen(
                         maxLines = 1, overflow = TextOverflow.Ellipsis)
                     if (place.detail.isNotBlank()) Text(place.detail, color = DriveColors.TextSecondary, fontSize = 16.sp,
                         maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
+                if (onStar != null) {
+                    Text(if (isStar) "★" else "☆", color = if (isStar) Color(0xFFFFC107) else DriveColors.TextSecondary,
+                        fontSize = 30.sp * DriveColors.Scale,
+                        modifier = Modifier.clickable { onStar(place) }.padding(horizontal = 18.dp, vertical = 10.dp))
+                }
                 }
             }
         }

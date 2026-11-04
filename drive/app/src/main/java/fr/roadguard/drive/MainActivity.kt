@@ -326,6 +326,7 @@ private fun DriveHome() {
                 onSave = session::saveSlot,
                 onPick = { startNavigation(it) },
                 onClose = { showSearch = false },
+                starred = session.favorites, onStar = session::toggleFavorite,
             )
         }
         if (showEqualizer) {
