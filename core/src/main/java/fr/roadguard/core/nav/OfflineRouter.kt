@@ -33,6 +33,7 @@ object OfflineRouter {
     /** Itinéraire hors ligne, ou null si aucun graphe installé ne couvre le départ et l'arrivée. */
     suspend fun route(context: Context, from: LatLon, headingDeg: Double?, to: LatLon): Route? = withContext(Dispatchers.IO) {
         lock.withLock {
+            RouteGraphs.installBundled(context)
             for (dir in installed(context)) {
                 val hopper = open(dir) ?: continue
                 val bounds = hopper.graphHopperStorage.bounds

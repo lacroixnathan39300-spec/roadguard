@@ -95,7 +95,7 @@ val copyRadarAssets by tasks.registering(Copy::class) {
     into(radarAssets)
     from(gpsAssets) { include("radars_embedded_*.csv"); into("radars") }
     // Carte hors ligne : style et polices embarqués, communs avec l'appli GPS.
-    from(gpsAssets) { include("maps/local_style.json", "glyphs/**", "offline_map_catalog.json") }
+    from(gpsAssets) { include("maps/local_style.json", "glyphs/**", "offline_map_catalog.json", "graphs/**") }
 }
 android.sourceSets.getByName("main").assets.srcDir(radarAssets)
 // Protocole ROADGUARD Link : même code Java que l'appli GPS du téléphone.

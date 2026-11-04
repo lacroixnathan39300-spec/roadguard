@@ -57,4 +57,37 @@ object RouteGraphs {
     }
 
     fun remove(context: Context, id: String) { dir(context, id).deleteRecursively() }
+
+    /** Régions livrées dans l'appli (assets « graphs/graph-<id>.zip ») : installées au premier besoin. */
+    fun installBundled(context: Context) {
+        val bundled = context.assets.list("graphs").orEmpty().filter { it.startsWith("graph-") && it.endsWith(".zip") }
+        for (name in bundled) {
+            val id = name.removePrefix("graph-").removeSuffix(".zip")
+            if (installed(context, id)) continue
+            runCatching { unzip(context.assets.open("graphs/$name"), context, id) }
+        }
+    }
+
+    private fun unzip(input: java.io.InputStream, context: Context, id: String) {
+        val tmp = File(OfflineRouter.graphsDir(context), "$id.tmp")
+        tmp.deleteRecursively(); tmp.mkdirs()
+        try {
+            ZipInputStream(input.buffered()).use { z ->
+                while (true) {
+                    val e = z.nextEntry ?: break
+                    val out = File(tmp, e.name)
+                    if (!out.canonicalPath.startsWith(tmp.canonicalPath + File.separator)) throw IOException("Archive invalide")
+                    if (e.isDirectory) { out.mkdirs(); continue }
+                    out.parentFile?.mkdirs()
+                    out.outputStream().use { z.copyTo(it) }
+                }
+            }
+            if (!File(tmp, "properties").isFile) throw IOException("Graphe incomplet")
+            val target = dir(context, id)
+            target.deleteRecursively()
+            if (!tmp.renameTo(target)) throw IOException("Installation impossible")
+        } finally {
+            tmp.deleteRecursively()
+        }
+    }
 }
