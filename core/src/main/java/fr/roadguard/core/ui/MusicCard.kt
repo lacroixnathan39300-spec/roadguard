@@ -51,12 +51,16 @@ fun MusicCard(
     onNext: () -> Unit,
     onEqualizer: () -> Unit,
     modifier: Modifier = Modifier,
+    /** Ouvre le lecteur choisi (ou le choix du lecteur) ; null : pas de bouton. */
+    onOpenPlayer: (() -> Unit)? = null,
+    playerLabel: String? = null,
 ) {
     val context = LocalContext.current
     Column(modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalArrangement = Arrangement.SpaceBetween) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
-                Modifier.size(56.dp).clip(RoundedCornerShape(10.dp)).background(DriveColors.Track),
+                Modifier.size(56.dp).clip(RoundedCornerShape(10.dp)).background(DriveColors.Track)
+                    .let { m -> if (onOpenPlayer != null) m.clickable(onClick = onOpenPlayer) else m },
                 contentAlignment = Alignment.Center,
             ) {
                 nowPlaying?.artwork?.let {
@@ -77,7 +81,11 @@ fun MusicCard(
                             },
                         )
                     }
-                    nowPlaying == null -> Text("Aucune musique", color = DriveColors.TextSecondary, fontSize = 16.sp)
+                    nowPlaying == null -> if (onOpenPlayer != null) Column(Modifier.clickable(onClick = onOpenPlayer)) {
+                        Text("Aucune musique", color = DriveColors.TextSecondary, fontSize = 16.sp)
+                        Text(playerLabel?.let { "Toucher pour ouvrir $it" } ?: "Toucher pour choisir le lecteur",
+                            color = DriveColors.Accent, fontSize = 14.sp)
+                    } else Text("Aucune musique", color = DriveColors.TextSecondary, fontSize = 16.sp)
                     else -> {
                         Text(nowPlaying.title, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold,
                             maxLines = 1, overflow = TextOverflow.Ellipsis)

@@ -137,6 +137,9 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/** Le lecteur n'est lancé qu'une fois par démarrage du processus (pas à chaque retour sur l'accueil). */
+private var playerStartedThisBoot = false
+
 @Composable
 private fun DriveHome() {
     val context = LocalContext.current
@@ -174,6 +177,15 @@ private fun DriveHome() {
     val session = remember { DrivingSession(context, scope, voice, settings) }
     var showSettings by remember { mutableStateOf(false) }
     var showReport by remember { mutableStateOf(false) }
+    var showPlayer by remember { mutableStateOf(false) }
+    // Lecteur de musique choisi : ouvert une fois au démarrage, puis retour sur DRIVE.
+    LaunchedEffect(Unit) {
+        if (MusicPlayer.autoStart(context) && MusicPlayer.chosen(context) != null && !playerStartedThisBoot) {
+            playerStartedThisBoot = true
+            kotlinx.coroutines.delay(1500)
+            MusicPlayer.open(context, comeBack = true)
+        }
+    }
     var showCommunity by remember { mutableStateOf(false) }
     var showOffline by remember { mutableStateOf(false) }
 
@@ -214,11 +226,17 @@ private fun DriveHome() {
     LaunchedEffect(hasLocation) {
         if (!hasLocation) return@LaunchedEffect
         session.prepare()
-        // GPS du téléphone (ROADGUARD Link) en priorité ; GPS du poste s'il se tait plus de 3 s.
-        var lastPhoneFixAt = 0L
+        // Choix de la meilleure position : le GPS du poste arrive sans délai, celui du téléphone passe par
+        // la liaison. Automatique : le poste s'il capte bien (précision ≤ 30 m), sinon le téléphone.
+        var unitAt = 0L; var unitAcc = 999f
+        var phoneAt = 0L; var phoneAcc = 999f
         merge(
-            SpeedSource(context).locations().filter { SystemClock.elapsedRealtime() - lastPhoneFixAt > 3_000 },
-            link.locations.onEach { lastPhoneFixAt = SystemClock.elapsedRealtime() },
+            SpeedSource(context).locations().onEach { unitAt = SystemClock.elapsedRealtime(); unitAcc = if (it.hasAccuracy()) it.accuracy else 50f }
+                .filter { settings.gpsSource != "phone" || SystemClock.elapsedRealtime() - phoneAt > 3_000 }
+                .filter { settings.gpsSource == "unit" || unitAcc <= 30f || SystemClock.elapsedRealtime() - phoneAt > 3_000 || phoneAcc >= unitAcc },
+            link.locations.onEach { phoneAt = SystemClock.elapsedRealtime(); phoneAcc = if (it.hasAccuracy()) it.accuracy else 50f }
+                .filter { settings.gpsSource != "unit" || SystemClock.elapsedRealtime() - unitAt > 3_000 }
+                .filter { settings.gpsSource == "phone" || SystemClock.elapsedRealtime() - unitAt > 2_500 || (unitAcc > 30f && phoneAcc < unitAcc) },
         ).collect { session.onLocation(it) }
     }
 
@@ -283,6 +301,8 @@ private fun DriveHome() {
                         },
                         onNext = { if (fromPhone) link.mediaCommand("next") else media.next() },
                         onEqualizer = { showEqualizer = true },
+                        onOpenPlayer = { if (MusicPlayer.chosen(context) != null) MusicPlayer.open(context, comeBack = false) else showPlayer = true },
+                        playerLabel = MusicPlayer.chosen(context)?.second,
                         modifier = Modifier.fillMaxSize(),
                     )
                 }
@@ -321,6 +341,9 @@ private fun DriveHome() {
         if (showOffline) {
             BackHandler { showOffline = false }
             fr.roadguard.core.ui.OfflineDataScreen(setOf("FR", "CH"), onClose = { showOffline = false }, here = session.here?.let { it.lat to it.lon })
+        } else if (showPlayer) {
+            BackHandler { showPlayer = false }
+            MusicPlayerScreen(onClose = { showPlayer = false })
         } else if (showCommunity) {
             BackHandler { showCommunity = false }
             fr.roadguard.core.ui.CommunityScreen(session.community, session.here?.lat, session.here?.lon, onClose = { showCommunity = false })
@@ -329,7 +352,7 @@ private fun DriveHome() {
             var radarCount by remember { mutableStateOf(0) }
             LaunchedEffect(Unit) { radarCount = RadarRepository.radars(context).size }
             SettingsScreen(settings, radarCount, onClose = { showSettings = false }, onOfflineData = { showOffline = true }, showAutostart = true,
-                onCommunity = { showCommunity = true })
+                onCommunity = { showCommunity = true }, onMusicPlayer = { showPlayer = true })
         }
         if (showSearch) {
             BackHandler { showSearch = false }

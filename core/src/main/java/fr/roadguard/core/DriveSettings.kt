@@ -42,6 +42,10 @@ class DriveSettings(context: Context) {
     var proximityBeeps by mutableStateOf(prefs.getBoolean("proximity_beeps", true)); private set
     fun changeProximityBeeps(v: Boolean) { proximityBeeps = v; prefs.edit().putBoolean("proximity_beeps", v).apply() }
 
+    /** DRIVE : source GPS « auto », « unit » (poste) ou « phone » (téléphone par Link). */
+    var gpsSource by mutableStateOf(prefs.getString("gps_source", "auto") ?: "auto"); private set
+    fun changeGpsSource(v: String) { gpsSource = v; prefs.edit().putString("gps_source", v).apply() }
+
     fun changeAutostart(v: Boolean) { autostart = v; prefs.edit().putBoolean("autostart", v).apply() }
     fun changeAccent(v: Long) {
         accent = v; prefs.edit().putLong("accent", v).apply()

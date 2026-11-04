@@ -64,7 +64,33 @@ public final class LinkService extends Service {
     private final Handler main = new Handler(Looper.getMainLooper());
     private final AtomicReference<LinkProtocol.Session> current = new AtomicReference<>();
     /** Un seul fil d'envoi : l'ordre des messages est conservé et le fil principal n'attend jamais le réseau. */
-    private final java.util.concurrent.ExecutorService sender = java.util.concurrent.Executors.newSingleThreadExecutor();
+    /**
+     * Envoi vers le poste par un seul fil (une seule connexion), mais par ordre de priorité :
+     * la position GPS passe toujours avant les gros envois (tuiles de carte, vidéo), sinon elle arrive en retard.
+     */
+    private final PrioritySender sender = new PrioritySender();
+
+    static final class PrioritySender implements java.util.concurrent.Executor {
+        private final java.util.concurrent.LinkedBlockingDeque<Runnable> urgent = new java.util.concurrent.LinkedBlockingDeque<>();
+        private final java.util.concurrent.LinkedBlockingQueue<Runnable> normal = new java.util.concurrent.LinkedBlockingQueue<>();
+        private final Object signal = new Object();
+        private volatile boolean stopped;
+        private final Thread thread = new Thread(this::loop, "roadguard-link-send");
+        PrioritySender() { thread.setDaemon(true); thread.start(); }
+        @Override public void execute(Runnable r) { normal.add(r); wake(); }
+        /** Message prioritaire ; une position plus ancienne encore en attente est remplacée. */
+        void urgent(Runnable r) { urgent.clear(); urgent.add(r); wake(); }
+        private void wake() { synchronized (signal) { signal.notify(); } }
+        private void loop() {
+            while (!stopped) {
+                Runnable r = urgent.poll();
+                if (r == null) r = normal.poll();
+                if (r == null) { synchronized (signal) { try { signal.wait(200); } catch (InterruptedException e) { return; } } continue; }
+                try { r.run(); } catch (RuntimeException ignored) {}
+            }
+        }
+        void shutdownNow() { stopped = true; thread.interrupt(); }
+    }
     private ServerSocket server;
     private Thread acceptThread;
     private NsdManager.RegistrationListener nsdListener;
@@ -458,7 +484,7 @@ public final class LinkService extends Service {
             if (l.hasSpeed()) m.put("speed", l.getSpeed());
             if (l.hasBearing()) m.put("bearing", l.getBearing());
             if (l.hasAccuracy()) m.put("acc", l.getAccuracy());
-            sender.execute(() -> send(m));
+            sender.urgent(() -> send(m));
         } catch (org.json.JSONException ignored) {}
     }
 
