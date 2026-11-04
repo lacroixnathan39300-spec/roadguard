@@ -135,6 +135,8 @@ private fun PhoneHome() {
     var showOffline by remember { mutableStateOf(false) }
     var offlineTab by remember { mutableStateOf(0) }
     var showMenu by remember { mutableStateOf(false) }
+    var showReport by remember { mutableStateOf(false) }
+    var showCommunity by remember { mutableStateOf(false) }
     var showEqualizer by remember { mutableStateOf(false) }
 
     // Carte hors ligne : packs téléchargés dans « Plus → Cartes hors ligne », utilisés sans Internet.
@@ -144,6 +146,7 @@ private fun PhoneHome() {
 
     Box(Modifier.fillMaxSize().background(DriveColors.Background)) {
         DriveMap(
+            reports = s.community.reports, drivers = s.community.drivers,
             position = s.here, northUp = settings.northUp, adaptiveZoom = settings.adaptiveZoom, speedKmh = s.fix?.kmh ?: 0,
             alternatives = s.alternatives,
             offlinePack = offlinePack,
@@ -156,6 +159,8 @@ private fun PhoneHome() {
                     choices = s.alternatives, current = s.route, onChoose = s::chooseRoute, onDismissChoices = s::dismissAlternatives)
             }
             AlertBanners(s.alert, s.average)
+            s.community.prompt?.let { fr.roadguard.core.ui.VotePromptCard(it, s.community::answer) }
+            s.community.toast?.let { fr.roadguard.core.ui.CommunityToast(it, s.community::dismissToast) }
         }
 
         Column(
@@ -184,8 +189,18 @@ private fun PhoneHome() {
                 Action("☰ Menu", Modifier.weight(0.9f)) { showMenu = true }
             }
         }
-        MapButton("◎", onClick = { s.recenter++ },
-            modifier = Modifier.align(Alignment.CenterEnd).padding(end = 12.dp))
+        Column(Modifier.align(Alignment.CenterEnd).padding(end = 12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            MapButton("⚠", onClick = { showReport = true })
+            MapButton("◎", onClick = { s.recenter++ })
+        }
+        if (showReport) {
+            BackHandler { showReport = false }
+            fr.roadguard.core.ui.ReportSheet(onPick = { showReport = false; s.community.report(it) }, onClose = { showReport = false })
+        }
+        if (showCommunity) {
+            BackHandler { showCommunity = false }
+            fr.roadguard.core.ui.CommunityScreen(s.community, s.here?.lat, s.here?.lon, onClose = { showCommunity = false })
+        }
 
         if (showSearch) {
             BackHandler { showSearch = false }
@@ -210,6 +225,7 @@ private fun PhoneHome() {
                     fr.roadguard.core.ui.BigButton("Fermer", DriveColors.Panel) { showMenu = false }
                 }
                 fun open(tab: Int) { offlineTab = tab; showOffline = true; showMenu = false }
+                MenuEntry("👥", "Communauté", "Pseudo, points, classement, conducteurs autour") { showMenu = false; showCommunity = true }
                 MenuEntry("📍", "Mes radars", "Ajouter un radar ici, importer un fichier CSV") { open(2) }
                 MenuEntry("🗺", "Cartes hors ligne", "Télécharger les cartes pour rouler sans Internet") { open(0) }
                 MenuEntry("🌍", "Radars par pays", "France et Suisse incluses ; autres pays à télécharger") { open(1) }

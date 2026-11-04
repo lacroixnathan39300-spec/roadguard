@@ -77,6 +77,9 @@ fun DriveMap(
      * La carte n'interroge plus le GPS elle-même : point et carte suivent exactement la même position que les alertes.
      */
     position: fr.roadguard.core.radar.Fix? = null,
+    /** Signalements de la communauté et conducteurs visibles autour. */
+    reports: List<fr.roadguard.core.community.Report> = emptyList(),
+    drivers: List<fr.roadguard.core.community.Driver> = emptyList(),
 ) {
     val zoom = when {
         !adaptiveZoom -> if (route != null) 16.0 else 15.0
@@ -155,6 +158,10 @@ fun DriveMap(
             style.addLayerAbove(routeLayer(), ROUTE_CASING_LAYER)
             style.addSource(GeoJsonSource(RADAR_SOURCE, collection))
             style.addLayer(radarLayer())
+            style.addSource(GeoJsonSource(COMMUNITY_SOURCE))
+            style.addLayer(communityLayer())
+            style.addSource(GeoJsonSource(DRIVERS_SOURCE))
+            style.addLayer(driversLayer())
             if (hasLocation) enableLocation(context, map, style)
             styleVersion = if (styleVersion < 0) 1 else styleVersion + 1
         }
@@ -192,6 +199,22 @@ fun DriveMap(
                 Feature.fromGeometry(LineString.fromLngLats(r.points.map { Point.fromLngLat(it.lon, it.lat) }))
             }
             style.getSourceAs<GeoJsonSource>(ALT_SOURCE)?.setGeoJson(FeatureCollection.fromFeatures(lines))
+        }
+    }
+
+    // Signalements et conducteurs (mis à jour toutes les minutes en roulant).
+    LaunchedEffect(reports, drivers, styleVersion) {
+        val style = holder.style ?: return@LaunchedEffect
+        runCatching {
+            style.getSourceAs<GeoJsonSource>(COMMUNITY_SOURCE)?.setGeoJson(FeatureCollection.fromFeatures(reports.map { r ->
+                Feature.fromGeometry(Point.fromLngLat(r.lon, r.lat)).apply {
+                    addStringProperty("color", String.format("#%06X", r.type.color and 0xFFFFFF))
+                    addBooleanProperty("permanent", r.permanent)
+                }
+            }))
+            style.getSourceAs<GeoJsonSource>(DRIVERS_SOURCE)?.setGeoJson(FeatureCollection.fromFeatures(drivers.map { d ->
+                Feature.fromGeometry(Point.fromLngLat(d.lon, d.lat))
+            }))
         }
     }
 
@@ -256,6 +279,24 @@ private fun enableLocation(context: Context, map: MapLibreMap, style: Style) {
 }
 
 private const val ROUTE_SOURCE = "roadguard-route"
+private const val COMMUNITY_SOURCE = "roadguard-community"
+private const val DRIVERS_SOURCE = "roadguard-drivers"
+
+/** Signalements : pastille de la couleur du type, contour blanc épais. */
+private fun communityLayer() = CircleLayer(COMMUNITY_SOURCE, COMMUNITY_SOURCE).withProperties(
+    PropertyFactory.circleRadius(Expression.interpolate(Expression.linear(), Expression.zoom(), Expression.stop(9, 4f), Expression.stop(16, 11f))),
+    PropertyFactory.circleColor(Expression.toColor(Expression.get("color"))),
+    PropertyFactory.circleStrokeColor(android.graphics.Color.WHITE),
+    PropertyFactory.circleStrokeWidth(3f),
+).apply { minZoom = 9f }
+
+/** Autres conducteurs ROADGUARD visibles : petit rond violet. */
+private fun driversLayer() = CircleLayer(DRIVERS_SOURCE, DRIVERS_SOURCE).withProperties(
+    PropertyFactory.circleRadius(7f),
+    PropertyFactory.circleColor(android.graphics.Color.parseColor("#7C4DFF")),
+    PropertyFactory.circleStrokeColor(android.graphics.Color.WHITE),
+    PropertyFactory.circleStrokeWidth(2f),
+).apply { minZoom = 9f }
 private const val ALT_SOURCE = "roadguard-route-alternatives"
 private const val ALT_LAYER = "roadguard-route-alternatives-layer"
 

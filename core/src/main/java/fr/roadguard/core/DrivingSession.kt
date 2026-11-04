@@ -52,6 +52,9 @@ class DrivingSession(
     var navigating by mutableStateOf(false); private set
     var recenter by mutableIntStateOf(0)
 
+    /** Signalements et conducteurs de la communauté ROADGUARD. */
+    val community = fr.roadguard.core.community.Community(context, scope) { voice.speak(it) }
+
     private val recentStore = RecentPlaces(context)
     var recents by mutableStateOf(recentStore.load()); private set
     var home by mutableStateOf(recentStore.saved("home")); private set
@@ -144,6 +147,7 @@ class DrivingSession(
         alert = newAlert ?: held
         voice.proximityBeeps = settings.proximityBeeps
         voice.proximity(alert?.distanceM)
+        community.onFix(f)
         val newAverage = averages?.update(f)
         if (newAverage?.finished == true && average?.finished != true) voice.announceAverageResult(newAverage)
         average = newAverage

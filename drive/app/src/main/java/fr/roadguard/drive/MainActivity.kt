@@ -173,6 +173,8 @@ private fun DriveHome() {
     // Cœur de conduite commun avec l'appli GPS du téléphone.
     val session = remember { DrivingSession(context, scope, voice, settings) }
     var showSettings by remember { mutableStateOf(false) }
+    var showReport by remember { mutableStateOf(false) }
+    var showCommunity by remember { mutableStateOf(false) }
     var showOffline by remember { mutableStateOf(false) }
 
     // ROADGUARD Link : liaison avec le téléphone.
@@ -229,7 +231,7 @@ private fun DriveHome() {
     Box(Modifier.fillMaxSize().background(DriveColors.Background)) {
         Row(Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Panel(Modifier.weight(0.62f).fillMaxHeight()) {
-                DriveMap(position = session.here, northUp = settings.northUp, adaptiveZoom = settings.adaptiveZoom, speedKmh = session.fix?.kmh ?: 0, alternatives = session.alternatives, offlinePack = offlinePack, hasLocation = hasLocation, route = session.route, recenterRequest = session.recenter, night = session.night, visibleKinds = settings.alertKinds, modifier = Modifier.fillMaxSize())
+                DriveMap(reports = session.community.reports, drivers = session.community.drivers, position = session.here, northUp = settings.northUp, adaptiveZoom = settings.adaptiveZoom, speedKmh = session.fix?.kmh ?: 0, alternatives = session.alternatives, offlinePack = offlinePack, hasLocation = hasLocation, route = session.route, recenterRequest = session.recenter, night = session.night, visibleKinds = settings.alertKinds, modifier = Modifier.fillMaxSize())
                 if (session.navigating) {
                     GuidanceBanner(session.guidanceState, session.navStatus, onStop = { session.stopNavigation() }, modifier = Modifier.align(Alignment.TopStart),
                         choices = session.alternatives, current = session.route, onChoose = session::chooseRoute, onDismissChoices = session::dismissAlternatives)
@@ -237,7 +239,12 @@ private fun DriveHome() {
                 } else {
                     AlertBanners(session.alert, session.average, Modifier.align(Alignment.TopCenter))
                 }
+                Column(Modifier.align(Alignment.BottomStart)) {
+                    session.community.prompt?.let { fr.roadguard.core.ui.VotePromptCard(it, session.community::answer) }
+                    session.community.toast?.let { fr.roadguard.core.ui.CommunityToast(it, session.community::dismissToast) }
+                }
                 Column(Modifier.align(Alignment.BottomEnd).padding(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    MapButton("⚠", onClick = { showReport = true })
                     MapButton("⚙", onClick = { showSettings = true })
                     MapButton("◎", onClick = { session.recenter++ })
                     if (!session.navigating) MapButton("🔍", onClick = { showSearch = true })
@@ -307,14 +314,22 @@ private fun DriveHome() {
             BackHandler { showLink = false }
             LinkScreen(link, onClose = { showLink = false })
         }
+        if (showReport) {
+            BackHandler { showReport = false }
+            fr.roadguard.core.ui.ReportSheet(onPick = { showReport = false; session.community.report(it) }, onClose = { showReport = false })
+        }
         if (showOffline) {
             BackHandler { showOffline = false }
             fr.roadguard.core.ui.OfflineDataScreen(setOf("FR", "CH"), onClose = { showOffline = false }, here = session.here?.let { it.lat to it.lon })
+        } else if (showCommunity) {
+            BackHandler { showCommunity = false }
+            fr.roadguard.core.ui.CommunityScreen(session.community, session.here?.lat, session.here?.lon, onClose = { showCommunity = false })
         } else if (showSettings) {
             BackHandler { showSettings = false }
             var radarCount by remember { mutableStateOf(0) }
             LaunchedEffect(Unit) { radarCount = RadarRepository.radars(context).size }
-            SettingsScreen(settings, radarCount, onClose = { showSettings = false }, onOfflineData = { showOffline = true }, showAutostart = true)
+            SettingsScreen(settings, radarCount, onClose = { showSettings = false }, onOfflineData = { showOffline = true }, showAutostart = true,
+                onCommunity = { showCommunity = true })
         }
         if (showSearch) {
             BackHandler { showSearch = false }

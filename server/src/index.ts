@@ -120,7 +120,9 @@ interface Account {
 }
 
 async function auth(req: Request, env: Env): Promise<Account | null> {
-  const h = req.headers.get("authorization") ?? "";
+  // Clé dans l'en-tête, ou dans l'adresse (« ?key= ») : les requêtes qui passent par le téléphone
+  // (liaison ROADGUARD Link) ne transportent pas d'en-têtes personnalisés.
+  const h = req.headers.get("authorization") ?? `Bearer ${new URL(req.url).searchParams.get("key") ?? ""}`;
   const m = /^Bearer ([0-9a-f]{24})\.([0-9a-f]{64})$/.exec(h);
   if (!m) return null;
   const row = await env.DB.prepare("SELECT id, name, points, last_report_at, secret_hash FROM accounts WHERE id = ?")
@@ -268,6 +270,10 @@ async function drivers(url: URL, env: Env, me: Account): Promise<Response> {
   const lat = num(url.searchParams.get("lat"), -90, 90);
   const lon = num(url.searchParams.get("lon"), -180, 180);
   if (lat == null || lon == null) return fail(400, "lat et lon requis");
+  return driversNear(lat, lon, env, me);
+}
+
+async function driversNear(lat: number, lon: number, env: Env, me: Account): Promise<Response> {
   const b = box(lat, lon, 20_000);
   const rows = await env.DB.prepare(
     `SELECT p.account_id AS id, a.name, p.lat, p.lon, p.heading, p.speed, p.at FROM presence p JOIN accounts a ON a.id = p.account_id
@@ -294,6 +300,43 @@ async function inbox(env: Env, me: Account): Promise<Response> {
   return json({ waves: rows.results });
 }
 
+/**
+ * Une seule requête par minute et par conducteur : position envoyée (si partagée), et en retour
+ * signalements autour, conducteurs proches, coucous reçus et points. Économise le quota gratuit.
+ */
+async function sync(req: Request, env: Env, me: Account | null): Promise<Response> {
+  const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+  const lat = num(body.lat, -90, 90);
+  const lon = num(body.lon, -180, 180);
+  if (lat == null || lon == null) return fail(400, "Position invalide");
+  const q = new URL(req.url);
+  q.searchParams.set("lat", String(lat));
+  q.searchParams.set("lon", String(lon));
+  q.searchParams.set("radius", String(num(body.radius, 1000, 100_000) ?? 30_000));
+  const reports = (await (await reportsNear(q, env, me)).json()) as { reports: unknown[] };
+  if (!me) return json({ reports: reports.reports, drivers: [], waves: [], points: null });
+  let drivers: unknown[] = [];
+  if (body.share === true) {
+    await presence(new Request(req.url, { method: "POST", body: JSON.stringify({ lat, lon, heading: body.heading, speed: body.speed }) }), env, me);
+    drivers = ((await (await driversNear(lat, lon, env, me)).json()) as { drivers: unknown[] }).drivers;
+  } else if (body.share === false) {
+    await env.DB.prepare("DELETE FROM presence WHERE account_id = ?").bind(me.id).run();
+  }
+  const waves = ((await (await inbox(env, me)).json()) as { waves: unknown[] }).waves;
+  return json({ reports: reports.reports, drivers, waves, points: me.points, name: me.name });
+}
+
+/** Chiffres d'utilisation (pour suivre l'approche des limites de l'offre gratuite). */
+async function stats(env: Env): Promise<Response> {
+  const now = Date.now();
+  const [drivers, reports, accounts] = await Promise.all([
+    env.DB.prepare("SELECT COUNT(*) AS n FROM presence WHERE at > ?").bind(now - HOUR).first<{ n: number }>(),
+    env.DB.prepare("SELECT COUNT(*) AS n FROM reports WHERE permanent = 1 OR expires_at > ?").bind(now).first<{ n: number }>(),
+    env.DB.prepare("SELECT COUNT(*) AS n FROM accounts").first<{ n: number }>(),
+  ]);
+  return json({ visibleDriversLastHour: drivers?.n ?? 0, activeReports: reports?.n ?? 0, accounts: accounts?.n ?? 0 });
+}
+
 async function cleanup(env: Env) {
   const now = Date.now();
   await env.DB.batch([
@@ -316,9 +359,11 @@ export default {
       const me = await auth(req, env);
       if (req.method === "GET" && path === "/v1/reports") return reportsNear(url, env, me);
       if (req.method === "GET" && path === "/v1/leaderboard") return leaderboard(url, env, me);
+      if (req.method === "POST" && path === "/v1/sync") return sync(req, env, me);
+      if (req.method === "GET" && path === "/v1/stats") return stats(env);
       if (!me) return fail(401, "Compte requis");
       if (req.method === "GET" && path === "/v1/account") return json({ id: me.id, name: me.name, points: me.points });
-      if (req.method === "PATCH" && path === "/v1/account") {
+      if ((req.method === "PATCH" || req.method === "POST") && path === "/v1/account/name") {
         const name = cleanName(((await req.json().catch(() => ({}))) as { name?: unknown }).name);
         if (!name) return fail(400, "Pseudo de 2 à 24 caractères");
         await env.DB.prepare("UPDATE accounts SET name = ? WHERE id = ?").bind(name, me.id).run();
