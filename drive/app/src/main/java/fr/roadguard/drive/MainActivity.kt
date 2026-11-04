@@ -217,10 +217,15 @@ private fun DriveHome() {
         ).collect { session.onLocation(it) }
     }
 
+    // Carte hors ligne si le poste n'a Internet ni par lui-même ni par le téléphone.
+    val packs = remember { fr.roadguard.core.map.OfflineMaps.packs(java.io.File(context.filesDir, "pmtiles")) }
+    val offlinePack = if (fr.roadguard.core.net.Net.hasDirectInternet() || linkState is LinkState.Connected) null
+        else fr.roadguard.core.map.OfflineMaps.packFor(packs, session.here?.lat, session.here?.lon)
+
     Box(Modifier.fillMaxSize().background(DriveColors.Background)) {
         Row(Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Panel(Modifier.weight(0.62f).fillMaxHeight()) {
-                DriveMap(hasLocation = hasLocation, route = session.route, recenterRequest = session.recenter, night = session.night, visibleKinds = settings.alertKinds, modifier = Modifier.fillMaxSize())
+                DriveMap(offlinePack = offlinePack, hasLocation = hasLocation, route = session.route, recenterRequest = session.recenter, night = session.night, visibleKinds = settings.alertKinds, modifier = Modifier.fillMaxSize())
                 if (session.navigating) {
                     GuidanceBanner(session.guidanceState, session.navStatus, onStop = { session.stopNavigation() }, modifier = Modifier.align(Alignment.TopStart))
                     AlertBanners(session.alert, session.average, Modifier.align(Alignment.BottomCenter).padding(bottom = 8.dp))

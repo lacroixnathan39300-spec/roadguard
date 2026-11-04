@@ -53,6 +53,7 @@ import fr.roadguard.core.DriveSettings
 import fr.roadguard.core.DrivingSession
 import fr.roadguard.core.SpeedSource
 import fr.roadguard.core.map.DriveMap
+import fr.roadguard.core.map.OfflineMaps
 import fr.roadguard.core.media.DriveEqualizer
 import fr.roadguard.core.media.MediaHub
 import fr.roadguard.core.nav.LatLon
@@ -98,7 +99,15 @@ private fun PhoneHome() {
 
     // Le cœur de conduite vit dans un service : il continue écran éteint ou dans une autre appli.
     var session by remember { mutableStateOf(DriveService.session) }
-    LaunchedEffect(hasLocation) {
+    var restart by remember { mutableStateOf(0) }
+    val owner = LocalLifecycleOwner.current.lifecycle
+    DisposableEffect(owner) {
+        // Service arrêté depuis la notification puis appli rouverte : on le relance.
+        val obs = LifecycleEventObserver { _, e -> if (e == Lifecycle.Event.ON_RESUME && DriveService.session !== session) restart++ }
+        owner.addObserver(obs)
+        onDispose { owner.removeObserver(obs) }
+    }
+    LaunchedEffect(hasLocation, restart) {
         if (!hasLocation) return@LaunchedEffect
         if (Build.VERSION.SDK_INT >= 33) notifyAsk.launch(Manifest.permission.POST_NOTIFICATIONS)
         DriveService.start(context)
@@ -125,8 +134,14 @@ private fun PhoneHome() {
     var showSettings by remember { mutableStateOf(false) }
     var showEqualizer by remember { mutableStateOf(false) }
 
+    // Carte hors ligne : packs téléchargés dans « Plus → Cartes hors ligne », utilisés sans Internet.
+    var packs by remember { mutableStateOf(OfflineMaps.packs(java.io.File(context.filesDir, "pmtiles"))) }
+    LaunchedEffect(hasMediaAccess) { packs = OfflineMaps.packs(java.io.File(context.filesDir, "pmtiles")) }
+    val offlinePack = if (Net.hasDirectInternet()) null else OfflineMaps.packFor(packs, s.here?.lat, s.here?.lon)
+
     Box(Modifier.fillMaxSize().background(DriveColors.Background)) {
         DriveMap(
+            offlinePack = offlinePack,
             hasLocation = hasLocation, route = s.route, recenterRequest = s.recenter,
             night = s.night, visibleKinds = settings.alertKinds, modifier = Modifier.fillMaxSize(),
         )

@@ -62,6 +62,8 @@ fun DriveMap(
     night: Boolean,
     visibleKinds: Set<RadarKind>,
     modifier: Modifier = Modifier,
+    /** Pack hors ligne à utiliser (pas d'Internet), ou null pour la carte en ligne. */
+    offlinePack: OfflinePack? = null,
 ) {
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current.lifecycle
@@ -103,13 +105,17 @@ fun DriveMap(
     }
 
     // Style jour/nuit ; à chaque changement, les couches ROADGUARD sont remises.
-    LaunchedEffect(night, styleVersion < 0 || styleVersion > 0, radarCollection) {
+    LaunchedEffect(night, styleVersion < 0 || styleVersion > 0, radarCollection, offlinePack?.file?.path) {
         val map = holder.map ?: return@LaunchedEffect
         val collection = radarCollection ?: return@LaunchedEffect
-        val uri = if (night) NIGHT_STYLE_URL else STYLE_URL
+        val uri = offlinePack?.let { "offline:${it.file.path}:$night" } ?: if (night) NIGHT_STYLE_URL else STYLE_URL
         if (holder.styleUri == uri) return@LaunchedEffect
         holder.styleUri = uri
-        map.setStyle(Style.Builder().fromUri(uri)) { style ->
+        val builder = offlinePack?.let { pack ->
+            val json = withContext(Dispatchers.IO) { runCatching { OfflineMaps.style(context, pack, night) }.getOrNull() }
+            json?.let { Style.Builder().fromJson(it) }
+        } ?: Style.Builder().fromUri(if (night) NIGHT_STYLE_URL else STYLE_URL)
+        map.setStyle(builder) { style ->
             holder.style = style
             style.addSource(GeoJsonSource(ROUTE_SOURCE))
             style.addLayerBelow(routeCasingLayer(), firstSymbolLayer(style))

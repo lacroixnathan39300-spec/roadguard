@@ -75,8 +75,11 @@ dependencies {
 // Bases radars : une seule copie dans le dépôt (celle du GPS), recopiée à la compilation.
 val radarAssets = layout.buildDirectory.dir("generated/radarAssets")
 val copyRadarAssets by tasks.registering(Copy::class) {
-    from(rootProject.file("../gps/app/src/main/assets")) { include("radars_embedded_*.csv") }
-    into(radarAssets.map { it.dir("radars") })
+    val gpsAssets = rootProject.file("../gps/app/src/main/assets")
+    into(radarAssets)
+    from(gpsAssets) { include("radars_embedded_*.csv"); into("radars") }
+    // Carte hors ligne : style et polices embarqués, communs avec l'appli GPS.
+    from(gpsAssets) { include("maps/local_style.json", "glyphs/**") }
 }
 android.sourceSets.getByName("main").assets.srcDir(radarAssets)
 // Protocole ROADGUARD Link : même code Java que l'appli GPS du téléphone.
