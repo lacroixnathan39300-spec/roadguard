@@ -150,6 +150,11 @@ public final class LinkProtocol {
             }
         }
 
+        /** Ferme la connexion (les deux sens). */
+        public void close() throws IOException {
+            try { in.close(); } finally { out.close(); }
+        }
+
         public JSONObject receive() throws IOException {
             try {
                 JSONObject m = new JSONObject(new String(open(key, readFrame(in)), StandardCharsets.UTF_8));
