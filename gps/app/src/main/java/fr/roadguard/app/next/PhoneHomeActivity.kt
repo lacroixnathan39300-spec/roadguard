@@ -86,6 +86,14 @@ class PhoneHomeActivity : ComponentActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setContent { fr.roadguard.core.ui.CarFontScale { PhoneHome() } }
     }
+
+    override fun onStart() { super.onStart(); visible = true }
+    override fun onStop() { super.onStop(); visible = false }
+
+    companion object {
+        /** L'accueil est-il à l'écran ? Sinon, la bulle prend le relais par-dessus les autres applis. */
+        @Volatile var visible = false
+    }
 }
 
 @Composable

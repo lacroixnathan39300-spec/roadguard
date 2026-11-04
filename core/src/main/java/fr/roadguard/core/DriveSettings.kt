@@ -61,6 +61,10 @@ class DriveSettings(context: Context) {
     fun changeShowMusic(v: Boolean) { showMusic = v; prefs.edit().putBoolean("show_music", v).apply() }
     fun changeShowVolume(v: Boolean) { showVolume = v; prefs.edit().putBoolean("show_volume", v).apply() }
 
+    /** Bulle vitesse/radar par-dessus les autres applis. */
+    var bubble by mutableStateOf(prefs.getBoolean("bubble", true)); private set
+    fun changeBubble(v: Boolean) { bubble = v; prefs.edit().putBoolean("bubble", v).apply() }
+
     fun changeAutostart(v: Boolean) { autostart = v; prefs.edit().putBoolean("autostart", v).apply() }
     fun changeAccent(v: Long) {
         accent = v; prefs.edit().putLong("accent", v).apply()

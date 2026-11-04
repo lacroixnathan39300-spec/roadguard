@@ -197,6 +197,17 @@ private fun DriveHome() {
     var wallpaperVersion by remember { mutableStateOf(0) }
     // Mémoire de la carte remise à zéro une fois (des morceaux abîmés affichaient une image à la place de la carte).
     LaunchedEffect(Unit) { runCatching { fr.roadguard.core.map.OfflineRegions.clearCacheOnce(context, 2) } }
+    // Bulle par-dessus les autres applis (Waze…) quand DRIVE n'est plus à l'écran.
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    val bubble = remember { fr.roadguard.core.ui.RadarBubble(context) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            val foreground = lifecycleOwner.lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED)
+            if (settings.bubble && !foreground && bubble.allowed) bubble.show(session) else bubble.hide()
+            delay(1000)
+        }
+    }
+    androidx.compose.runtime.DisposableEffect(Unit) { onDispose { bubble.hide() } }
     var lastTouch by remember { mutableStateOf(System.currentTimeMillis()) }
     // Lecteur de musique choisi : ouvert une fois au démarrage, puis retour sur DRIVE.
     LaunchedEffect(Unit) {

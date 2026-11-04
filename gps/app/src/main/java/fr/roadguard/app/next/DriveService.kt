@@ -49,6 +49,15 @@ class DriveService : Service() {
             s.prepare()
             SpeedSource(this@DriveService).locations().collect { s.onLocation(it) }
         }
+        // Bulle par-dessus Waze, Google Maps… quand l'accueil ROADGUARD n'est pas affiché.
+        val bubble = fr.roadguard.core.ui.RadarBubble(this)
+        bubbleView = bubble
+        scope.launch {
+            while (true) {
+                if (s.settings.bubble && !PhoneHomeActivity.visible && bubble.allowed) bubble.show(s) else bubble.hide()
+                kotlinx.coroutines.delay(1000)
+            }
+        }
     }
 
     private fun startForegroundNow() {
@@ -68,7 +77,10 @@ class DriveService : Service() {
         else startForeground(NOTIFICATION_ID, n)
     }
 
+    private var bubbleView: fr.roadguard.core.ui.RadarBubble? = null
+
     override fun onDestroy() {
+        bubbleView?.hide()
         session = null
         scope.cancel()
         voice?.release()

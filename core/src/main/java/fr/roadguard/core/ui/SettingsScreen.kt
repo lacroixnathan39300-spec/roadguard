@@ -32,6 +32,7 @@ import fr.roadguard.core.radar.RadarKind
 @Composable
 fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit, onOfflineData: (() -> Unit)? = null, showAutostart: Boolean = false,
     onCommunity: (() -> Unit)? = null, onMusicPlayer: (() -> Unit)? = null, onPersonalize: (() -> Unit)? = null) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     Column(Modifier.fillMaxSize().background(DriveColors.Background).padding(20.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Réglages", color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
@@ -58,6 +59,16 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
             Section("Itinéraire")
             ToggleRow("Éviter les péages", settings.avoidTolls, settings::changeAvoidTolls)
             ToggleRow("Éviter les autoroutes", settings.avoidHighways, settings::changeAvoidHighways)
+
+            Section("Par-dessus les autres applis")
+            val bubbleHelper = androidx.compose.runtime.remember { RadarBubble(context) }
+            ToggleRow("Bulle vitesse et radars sur Waze, Google Maps…", settings.bubble) { v ->
+                settings.changeBubble(v)
+                if (v && !bubbleHelper.allowed) bubbleHelper.requestPermission()
+            }
+            if (settings.bubble && !bubbleHelper.allowed) {
+                BigButton("Autoriser l'affichage par-dessus les autres applis", DriveColors.Accent) { bubbleHelper.requestPermission() }
+            }
 
             Section("Alertes affichées et annoncées")
             listOf(RadarKind.FIXED, RadarKind.REDLIGHT, RadarKind.AVERAGE, RadarKind.MOBILE).forEach { kind ->
