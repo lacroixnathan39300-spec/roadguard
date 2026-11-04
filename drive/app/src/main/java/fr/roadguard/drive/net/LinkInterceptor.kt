@@ -1,6 +1,7 @@
 package fr.roadguard.drive.net
 
 import fr.roadguard.drive.link.LinkClient
+import fr.roadguard.core.net.Net
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
