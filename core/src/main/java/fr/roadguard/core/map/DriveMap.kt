@@ -45,9 +45,9 @@ import org.maplibre.geojson.FeatureCollection
 import org.maplibre.geojson.Point
 
 /** Style vectoriel libre (OpenFreeMap, données © OpenStreetMap), sans clé. */
-private const val STYLE_URL = "https://tiles.openfreemap.org/styles/liberty"
+internal const val STYLE_URL = "https://tiles.openfreemap.org/styles/liberty"
 /** Style de nuit (CARTO Dark Matter, données © OpenStreetMap, © CARTO). */
-private const val NIGHT_STYLE_URL = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
+internal const val NIGHT_STYLE_URL = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
 private const val RADAR_SOURCE = "roadguard-radars"
 private const val RADAR_LAYER = "roadguard-radars-layer"
 

@@ -26,8 +26,9 @@ et essai sur l'appareil réel.
 - [x] Plein écran façon tableau de bord, bouton recentrer.
 - [x] Maison / Travail, limite de vitesse de la route + alerte de dépassement, thème de nuit automatique (build 23).
 - [x] Réglages : voix, bip, types d'alertes, dépassement, thème (build 25).
-- [ ] Choix entre plusieurs itinéraires, favoris illimités, couleurs et taille des boutons.
-- [ ] Démarrage automatique avec le poste, retour à l'accueil.
+- [x] Choix entre 3 itinéraires (variantes grises sur la carte), éviter péages/autoroutes, couleur d'accent et taille des boutons.
+- [ ] Favoris illimités.
+- [x] Démarrage automatique avec le poste (démarrage normal et veille rapide Autochips), DRIVE peut être l'écran d'accueil.
 
 ## Phase 2 — Cœur partagé `core`
 - [x] Cœur commun `core/` (Kotlin) : carte native, radars, alertes, vitesse moyenne, limites, navigation vocale, musique, réglages, et `DrivingSession` qui pilote tout. Utilisé par DRIVE et par le nouvel accueil du GPS (build 43).
@@ -35,7 +36,8 @@ et essai sur l'appareil réel.
 - [x] Alertes, vitesse moyenne et guidage vocal écran éteint (service en arrière-plan, build 47).
 - [x] Écran « Hors ligne » natif (GPS et DRIVE) : 93 packs de cartes, téléchargement avec pause/reprise, vérification SHA-256, contrôle de l'espace, suppression ; le poste peut télécharger à travers le téléphone (build 50).
 - [x] Radars de 20 pays supplémentaires (MapAtlas, CC BY 4.0), rechargés à chaud dans la carte et les alertes.
-- [ ] Reprendre : import CSV de radars perso, signalements communautaires, compte du site.
+- [x] Radars perso : ajout à ma position, import CSV (iGO, tableur), liste, suppression.
+- [ ] Signalements communautaires, compte du site.
 - [ ] Découper `MainActivity.java` (460 Ko) en écrans et services lisibles, avec tests.
 
 ## Phase 3 — ROADGUARD Link : « notre Android Auto »
@@ -69,10 +71,11 @@ Le téléphone (appli GPS) fait tout le travail ; le poste (DRIVE) affiche et re
 - [ ] Vitesse moyenne sur les tronçons, indication bon/pas bon jusqu'à la fin de la zone.
 
 ## Phase 5 — Extensions
-- [ ] Android Auto (Car App Library) dans l'appli GPS.
+- [x] Android Auto (Car App Library) réécrit sur le cœur commun : carte MapLibre, guidage, radars, vitesse, Où aller (maison, travail, récents, recherche). À essayer en voiture (appli hors Play Store : activer « sources inconnues » dans les réglages développeur d Android Auto).
 - [ ] Signalements communautaires synchronisés avec le site.
 - [ ] Mises à jour des applis depuis le site.
 
 ## Phase 6 — Validation réelle
+- [x] Essai automatique en émulateur (GitHub Actions, lancement manuel) : poste API 27 1024×600 et téléphone, trajet simulé vers un radar, captures et journal. A trouvé 2 plantages (DRIVE au lancement, carte au changement de style), corrigés.
 - [ ] Essais sur le poste et le téléphone : démarrage, GPS, carte, radars, liaison, musique.
 - [ ] Mesures mémoire et fluidité sur 2 Go / ARM 32 bits, corrections.

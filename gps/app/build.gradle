@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'org.jetbrains.kotlin.android'
 apply plugin: 'org.jetbrains.kotlin.plugin.compose'
 // Keep the phone build independent of AndroidX Car when CodeAssist cannot resolve it.
-def roadguardAndroidAuto = project.findProperty('roadguardAndroidAuto') == 'true'
+def roadguardAndroidAuto = project.findProperty('roadguardAndroidAuto') != 'false'
 android { lint { if (project.hasProperty('roadguardApiLint')) checkOnly 'NewApi', 'InlinedApi' }; buildFeatures { aidl true; compose true }; namespace 'fr.roadguard.app'; compileSdk 36
  defaultConfig { applicationId 'fr.roadguard.gps'; minSdk 26; targetSdk 36; versionCode 600+(System.getenv('VERSION_CODE')?:'0').toInteger(); versionName '11.15.'+(System.getenv('VERSION_CODE')?:'0') }
  signingConfigs { debug { if (System.getenv('ROADGUARD_GPS_DEBUG_KEYSTORE')) storeFile file(System.getenv('ROADGUARD_GPS_DEBUG_KEYSTORE')); v1SigningEnabled true; v2SigningEnabled true } }
