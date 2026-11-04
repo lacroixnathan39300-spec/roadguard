@@ -66,6 +66,8 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
 
     testImplementation("junit:junit:4.13.2")
+    // Vrai lecteur JSON pour les tests JVM (celui d Android n existe que sur l appareil).
+    testImplementation("org.json:json:20240303")
 }
 
 // Bases radars : une seule copie dans le dépôt (celle du GPS), recopiée à la compilation.
