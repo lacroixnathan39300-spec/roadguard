@@ -44,7 +44,7 @@ for perm in ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCE
              "android.permission.POST_NOTIFICATIONS", "android.permission.RECORD_AUDIO"]:
     adb("shell", "pm", "grant", PKG, perm)
 adb("shell", "am", "start", "-n", f"{PKG}/{ACTIVITY}")
-time.sleep(12)
+time.sleep(25)
 shot("01-demarrage")
 
 # Trajet : de 1 500 m avant le radar jusqu'à 150 m après, à 70 km/h (une position par seconde).
