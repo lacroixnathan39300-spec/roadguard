@@ -22,6 +22,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     private val beeper = android.os.Handler(android.os.Looper.getMainLooper())
     @Volatile private var proximityM: Int? = null
     private var beeping = false
+    @Volatile private var startM = 0
 
     /**
      * Distance au radar annoncé (null quand il n'y en a plus) : les bips s'accélèrent en approchant,
@@ -29,6 +30,8 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
      */
     fun proximity(distanceM: Int?) {
         proximityM = if (beepEnabled && proximityBeeps) distanceM else null
+        // Distance de départ de l'alerte : l'accélération s'étale de ce point jusqu'au radar.
+        if (distanceM == null) startM = 0 else if (distanceM > startM || startM == 0) startM = distanceM
         if (proximityM != null && !beeping) { beeping = true; beeper.post(beepTick) }
     }
 
@@ -36,7 +39,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
         override fun run() {
             val d = proximityM
             if (d == null) { beeping = false; return }
-            val interval = BeepCadence.intervalMs(d)
+            val interval = BeepCadence.intervalMs(d, startM)
             tone?.startTone(ToneGenerator.TONE_PROP_BEEP, BeepCadence.toneMs(d))
             beeper.postDelayed(this, interval)
         }
@@ -125,11 +128,16 @@ object AlertText {
 
 /** Rythme des bips de proximité (pur, testable). */
 object BeepCadence {
-    /** Délai entre deux bips : ~1,5 s à 500 m, de plus en plus court, continu sous 40 m. */
-    fun intervalMs(distanceM: Int): Long = when {
-        distanceM <= 40 -> 160
-        distanceM >= 500 -> 1500
-        else -> (160 + (distanceM - 40) * (1500 - 160) / (500 - 40)).toLong()
+    /**
+     * Délai entre deux bips : 1,5 s au début de l'alerte (à [startM]), puis de plus en plus court
+     * de façon régulière jusqu'au son continu sur le radar (sous 40 m).
+     */
+    fun intervalMs(distanceM: Int, startM: Int = 500): Long {
+        if (distanceM <= 40) return 160
+        val span = (startM.coerceAtLeast(100) - 40).toDouble()
+        val ratio = ((distanceM - 40) / span).coerceIn(0.0, 1.0)
+        // Courbe douce : l'accélération se sent dès le début et s'intensifie à l'approche.
+        return (160 + (1500 - 160) * Math.pow(ratio, 0.8)).toLong()
     }
 
     /** Durée du bip : il remplit tout l'intervalle quand on est sur le radar (son continu). */

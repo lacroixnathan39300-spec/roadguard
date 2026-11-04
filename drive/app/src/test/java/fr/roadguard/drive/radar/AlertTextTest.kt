@@ -21,7 +21,8 @@ class AlertTextTest {
     }
 
     @Test fun proximityBeepsSpeedUp() {
-        assertEquals(1500L, BeepCadence.intervalMs(800))
+        assertEquals(1500L, BeepCadence.intervalMs(800, 800))
+        assertEquals(true, BeepCadence.intervalMs(700, 800) < 1500L)
         assertEquals(160L, BeepCadence.intervalMs(20))
         assertEquals(true, BeepCadence.intervalMs(100) < BeepCadence.intervalMs(300))
         assertEquals("Radar fixe, limité à 80", AlertText.spokenShort(RadarAlert(radar, 512, true)))
