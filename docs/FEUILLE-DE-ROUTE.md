@@ -19,7 +19,7 @@ et essai sur l'appareil réel.
 - [x] Carte native MapLibre Android (pas de WebView) avec radars et position (build 9).
 - [x] Alertes radars à l’approche (bip + voix + bandeau), dans l’axe et dans le bon sens (build 14).
 - [x] Vitesse moyenne reconnue en roulant, verdict OK / trop vite en fin de tronçon (build 14). Corrigé aussi dans le GPS : 0 tronçon français n’était reconnu.
-- [ ] Carte hors ligne (packs du GPS).
+- [x] Carte hors ligne native : packs PMTiles (téléchargés via « Plus »), style et polices embarqués, jour/nuit, choix du pack à la frontière (build 47).
 - [x] Musique : lecteur en cours (MediaSession), pochette, commandes, égaliseur mémorisé (build 15).
 - [ ] Waze ou autre appli dans une fenêtre à côté de la carte (écran partagé / superposition).
 - [x] Navigation dans DRIVE : recherche d'adresse (Photon), itinéraire (Valhalla FOSSGIS, consignes en français), tracé, flèche + distance, voix à l'approche et au moment de tourner, recalcul automatique, destinations récentes (build 20).
@@ -32,7 +32,8 @@ et essai sur l'appareil réel.
 ## Phase 2 — Cœur partagé `core`
 - [x] Cœur commun `core/` (Kotlin) : carte native, radars, alertes, vitesse moyenne, limites, navigation vocale, musique, réglages, et `DrivingSession` qui pilote tout. Utilisé par DRIVE et par le nouvel accueil du GPS (build 43).
 - [x] Nouvel accueil de l'appli GPS sur ce cœur ; anciennes fonctions accessibles par « Plus ».
-- [ ] Reprendre dans le nouvel accueil : packs de cartes hors ligne, radars par pays, import CSV, signalements, compte.
+- [x] Alertes, vitesse moyenne et guidage vocal écran éteint (service en arrière-plan, build 47).
+- [ ] Reprendre dans le nouvel accueil : écran de téléchargement des packs, radars par pays, import CSV, signalements, compte.
 - [ ] Découper `MainActivity.java` (460 Ko) en écrans et services lisibles, avec tests.
 
 ## Phase 3 — ROADGUARD Link : « notre Android Auto »
