@@ -95,8 +95,13 @@ class DrivingSession(
         if (d < 6) return f // trop près : on garde la référence pour mesurer un vrai déplacement
         previous = f
         val speed = if (f.speedKmh > 0) f.speedKmh else d / dt * 3.6
-        val bearing = if (!f.bearing.isNaN()) f.bearing
-            else if (speed > 7) fr.roadguard.core.radar.Geo.bearing(p.lat, p.lon, f.lat, f.lon) else Double.NaN
+        val moved = if (speed > 7) fr.roadguard.core.radar.Geo.bearing(p.lat, p.lon, f.lat, f.lon) else Double.NaN
+        // Certaines puces renvoient un cap figé à 0 : le sens réel du déplacement l'emporte alors.
+        val bearing = when {
+            f.bearing.isNaN() -> moved
+            f.bearing == 0.0 && !moved.isNaN() && fr.roadguard.core.radar.Geo.headingDelta(0.0, moved) > 30 -> moved
+            else -> f.bearing
+        }
         return f.copy(speedKmh = speed, bearing = bearing)
     }
 
