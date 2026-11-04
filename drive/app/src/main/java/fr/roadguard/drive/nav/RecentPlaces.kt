@@ -16,6 +16,17 @@ class RecentPlaces(context: Context) {
         }
     }.getOrDefault(emptyList())
 
+    /** Adresses enregistrées « Maison » et « Travail » (clé : "home" ou "work"). */
+    fun saved(slot: String): Place? = runCatching {
+        val o = JSONObject(prefs.getString(slot, null) ?: return null)
+        Place(o.getString("name"), o.optString("detail"), LatLon(o.getDouble("lat"), o.getDouble("lon")))
+    }.getOrNull()
+
+    fun save(slot: String, place: Place) {
+        prefs.edit().putString(slot, JSONObject().put("name", place.name).put("detail", place.detail)
+            .put("lat", place.point.lat).put("lon", place.point.lon).toString()).apply()
+    }
+
     fun add(place: Place): List<Place> {
         val list = (listOf(place) + load().filterNot { it.name == place.name && it.detail == place.detail }).take(8)
         val array = JSONArray()

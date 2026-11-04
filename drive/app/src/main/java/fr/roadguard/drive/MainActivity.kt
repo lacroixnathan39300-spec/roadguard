@@ -57,6 +57,9 @@ import fr.roadguard.drive.nav.LatLon
 import fr.roadguard.drive.nav.NavApi
 import fr.roadguard.drive.nav.Place
 import fr.roadguard.drive.nav.RecentPlaces
+import fr.roadguard.drive.nav.SpeedLimitTracker
+import fr.roadguard.drive.nav.SpeedLimits
+import fr.roadguard.drive.ui.DayNight
 import fr.roadguard.drive.nav.Route
 import fr.roadguard.drive.radar.Fix
 import fr.roadguard.drive.ui.GuidanceBanner
@@ -160,6 +163,14 @@ private fun DriveHome() {
     var rerouting by remember { mutableStateOf(false) }
     var lastRerouteAt by remember { mutableLongStateOf(0L) }
     var pendingDestination by remember { mutableStateOf<LatLon?>(null) }
+    var home by remember { mutableStateOf(recentStore.saved("home")) }
+    var work by remember { mutableStateOf(recentStore.saved("work")) }
+
+    // Limite de vitesse de la route et thème de nuit.
+    val limitTracker = remember { SpeedLimitTracker() }
+    var speedLimit by remember { mutableStateOf<Int?>(null) }
+    var lastOverWarning by remember { mutableLongStateOf(0L) }
+    var night by remember { mutableStateOf(false) }
 
     fun stopNavigation() {
         navigating = false; route = null; guidance = null; guidanceState = null; navStatus = null
@@ -210,6 +221,15 @@ private fun DriveHome() {
             average = newAverage
 
             here = f
+            night = DayNight.isNight(f.lat, f.lon, System.currentTimeMillis())
+            limitTracker.add(f.lat, f.lon, f.timeMs, f.speedKmh)?.let { trail ->
+                scope.launch { SpeedLimits.current(trail)?.let { speedLimit = it } }
+            }
+            val kmh = fix?.kmh ?: 0
+            if (SpeedLimitTracker.isOver(kmh, speedLimit) && f.timeMs - lastOverWarning > 30_000) {
+                lastOverWarning = f.timeMs
+                voice.speak("Attention, limité à $speedLimit")
+            }
             if (navigating && route == null && !rerouting && navStatus?.startsWith("En attente du GPS") == true) {
                 pendingDestination?.let { computeRoute(it, announce = true) }
             }
@@ -229,7 +249,7 @@ private fun DriveHome() {
     Box(Modifier.fillMaxSize().background(DriveColors.Background)) {
         Row(Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Panel(Modifier.weight(0.62f).fillMaxHeight()) {
-                DriveMap(hasLocation = hasLocation, route = route, recenterRequest = recenter, modifier = Modifier.fillMaxSize())
+                DriveMap(hasLocation = hasLocation, route = route, recenterRequest = recenter, night = night, modifier = Modifier.fillMaxSize())
                 if (navigating) {
                     GuidanceBanner(guidanceState, navStatus, onStop = { stopNavigation() }, modifier = Modifier.align(Alignment.TopStart))
                     AlertBanners(alert, average, Modifier.align(Alignment.BottomCenter).padding(bottom = 8.dp))
@@ -245,6 +265,8 @@ private fun DriveHome() {
                 Clock()
                 Panel(Modifier.fillMaxWidth().weight(1f)) {
                     Speedometer(
+                        limit = speedLimit,
+                        over = SpeedLimitTracker.isOver(fix?.kmh ?: 0, speedLimit),
                         kmh = fix?.kmh,
                         unit = stringResource(R.string.speed_unit),
                         waiting = if (hasLocation) stringResource(R.string.gps_waiting) else stringResource(R.string.location_needed),
@@ -273,6 +295,12 @@ private fun DriveHome() {
             SearchScreen(
                 near = here?.let { LatLon(it.lat, it.lon) },
                 favorites = recents,
+                home = home,
+                work = work,
+                onSave = { slot, place ->
+                    recentStore.save(slot, place)
+                    if (slot == "home") home = place else work = place
+                },
                 onPick = { startNavigation(it) },
                 onClose = { showSearch = false },
             )

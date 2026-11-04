@@ -45,6 +45,8 @@ import org.maplibre.geojson.Point
 
 /** Style vectoriel libre (OpenFreeMap, données © OpenStreetMap), sans clé. */
 private const val STYLE_URL = "https://tiles.openfreemap.org/styles/liberty"
+/** Style de nuit (CARTO Dark Matter, données © OpenStreetMap, © CARTO). */
+private const val NIGHT_STYLE_URL = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
 private const val RADAR_SOURCE = "roadguard-radars"
 private const val RADAR_LAYER = "roadguard-radars-layer"
 
@@ -57,6 +59,7 @@ fun DriveMap(
     hasLocation: Boolean,
     route: Route?,
     recenterRequest: Int,
+    night: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -66,7 +69,8 @@ fun DriveMap(
         MapView(context).apply { onCreate(Bundle()) }
     }
     val holder = remember { MapHolder() }
-    var styleReady by remember { mutableStateOf(false) }
+    var styleVersion by remember { mutableStateOf(0) }
+    var radarCollection by remember { mutableStateOf<FeatureCollection?>(null) }
 
     DisposableEffect(lifecycle, mapView) {
         val observer = LifecycleEventObserver { _, event ->
@@ -87,22 +91,32 @@ fun DriveMap(
 
     LaunchedEffect(mapView) {
         val radars = RadarRepository.radars(context)
-        val collection = withContext(Dispatchers.Default) { radars.toFeatureCollection() }
+        radarCollection = withContext(Dispatchers.Default) { radars.toFeatureCollection() }
         mapView.getMapAsync { map ->
             holder.map = map
             map.uiSettings.isRotateGesturesEnabled = false
             map.uiSettings.isTiltGesturesEnabled = false
             map.cameraPosition = CameraPosition.Builder().target(LatLng(46.67, 5.55)).zoom(12.0).build()
-            map.setStyle(Style.Builder().fromUri(STYLE_URL)) { style ->
-                holder.style = style
-                style.addSource(GeoJsonSource(ROUTE_SOURCE))
-                style.addLayerBelow(routeCasingLayer(), firstSymbolLayer(style))
-                style.addLayerAbove(routeLayer(), ROUTE_CASING_LAYER)
-                style.addSource(GeoJsonSource(RADAR_SOURCE, collection))
-                style.addLayer(radarLayer())
-                if (hasLocation) enableLocation(context, map, style)
-                styleReady = true
-            }
+            styleVersion = -1 // carte prête : le style est chargé par l'effet ci-dessous
+        }
+    }
+
+    // Style jour/nuit ; à chaque changement, les couches ROADGUARD sont remises.
+    LaunchedEffect(night, styleVersion < 0 || styleVersion > 0, radarCollection) {
+        val map = holder.map ?: return@LaunchedEffect
+        val collection = radarCollection ?: return@LaunchedEffect
+        val uri = if (night) NIGHT_STYLE_URL else STYLE_URL
+        if (holder.styleUri == uri) return@LaunchedEffect
+        holder.styleUri = uri
+        map.setStyle(Style.Builder().fromUri(uri)) { style ->
+            holder.style = style
+            style.addSource(GeoJsonSource(ROUTE_SOURCE))
+            style.addLayerBelow(routeCasingLayer(), firstSymbolLayer(style))
+            style.addLayerAbove(routeLayer(), ROUTE_CASING_LAYER)
+            style.addSource(GeoJsonSource(RADAR_SOURCE, collection))
+            style.addLayer(radarLayer())
+            if (hasLocation) enableLocation(context, map, style)
+            styleVersion = if (styleVersion < 0) 1 else styleVersion + 1
         }
     }
 
@@ -113,7 +127,7 @@ fun DriveMap(
     }
 
     // Trajet : tracé sur la carte et carte orientée dans le sens de la marche pendant le guidage.
-    LaunchedEffect(route, styleReady) {
+    LaunchedEffect(route, styleVersion) {
         val style = holder.style ?: return@LaunchedEffect
         val source = style.getSourceAs<GeoJsonSource>(ROUTE_SOURCE) ?: return@LaunchedEffect
         if (route == null) {
@@ -143,6 +157,7 @@ fun DriveMap(
 private class MapHolder {
     var map: MapLibreMap? = null
     var style: Style? = null
+    var styleUri: String? = null
 }
 
 @SuppressLint("MissingPermission")

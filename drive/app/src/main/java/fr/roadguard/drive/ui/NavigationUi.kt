@@ -49,7 +49,17 @@ import kotlinx.coroutines.launch
 
 /** Écran « Où aller ? » : recherche d'adresse ou de lieu, résultats triés autour de la position. */
 @Composable
-fun SearchScreen(near: LatLon?, favorites: List<Place>, onPick: (Place) -> Unit, onClose: () -> Unit) {
+fun SearchScreen(
+    near: LatLon?,
+    favorites: List<Place>,
+    home: Place?,
+    work: Place?,
+    onSave: (slot: String, place: Place) -> Unit,
+    onPick: (Place) -> Unit,
+    onClose: () -> Unit,
+) {
+    // Choix de l'adresse « Maison » ou « Travail » : le prochain résultat touché est enregistré.
+    var assigning by remember { mutableStateOf<String?>(null) }
     var query by remember { mutableStateOf("") }
     var results by remember { mutableStateOf<List<Place>>(emptyList()) }
     var message by remember { mutableStateOf<String?>(null) }
@@ -91,6 +101,12 @@ fun SearchScreen(near: LatLon?, favorites: List<Place>, onPick: (Place) -> Unit,
             Spacer(Modifier.width(12.dp))
             BigButton("Fermer", DriveColors.Panel, onClose)
         }
+        Row(Modifier.padding(top = 14.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            SlotChip("🏠 Maison", home, assigning == "home",
+                onGo = { home?.let(onPick) }, onSet = { assigning = "home"; message = "Cherche puis touche l'adresse de ta maison" })
+            SlotChip("💼 Travail", work, assigning == "work",
+                onGo = { work?.let(onPick) }, onSet = { assigning = "work"; message = "Cherche puis touche l'adresse de ton travail" })
+        }
         message?.let { Text(it, color = DriveColors.TextSecondary, fontSize = 18.sp, modifier = Modifier.padding(top = 12.dp)) }
         val shown = if (results.isEmpty() && query.isBlank()) favorites else results
         if (shown === favorites && favorites.isNotEmpty()) {
@@ -100,7 +116,13 @@ fun SearchScreen(near: LatLon?, favorites: List<Place>, onPick: (Place) -> Unit,
             items(shown) { place ->
                 Column(
                     Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(DriveColors.Panel)
-                        .clickable { onPick(place) }.padding(horizontal = 16.dp, vertical = 12.dp)
+                        .clickable {
+                            val slot = assigning
+                            if (slot != null) {
+                                onSave(slot, place); assigning = null
+                                message = "${if (slot == "home") "Maison" else "Travail"} enregistré : ${place.name}"
+                            } else onPick(place)
+                        }.padding(horizontal = 16.dp, vertical = 12.dp)
                 ) {
                     Text(place.name, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold,
                         maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -108,6 +130,27 @@ fun SearchScreen(near: LatLon?, favorites: List<Place>, onPick: (Place) -> Unit,
                         maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
+        }
+    }
+}
+
+/** « Maison » / « Travail » : toucher pour y aller ; « Modifier » pour changer l'adresse. */
+@Composable
+private fun SlotChip(label: String, place: Place?, active: Boolean, onGo: () -> Unit, onSet: () -> Unit) {
+    Row(
+        Modifier.clip(RoundedCornerShape(14.dp)).background(if (active) DriveColors.Accent else DriveColors.Panel),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(
+            Modifier.clickable { if (place != null) onGo() else onSet() }.padding(horizontal = 16.dp, vertical = 10.dp)
+        ) {
+            Text(label, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(place?.name ?: "Définir", color = DriveColors.TextSecondary, fontSize = 14.sp, maxLines = 1,
+                overflow = TextOverflow.Ellipsis, modifier = Modifier.width(160.dp))
+        }
+        if (place != null) {
+            Text("Modifier", color = DriveColors.Accent, fontSize = 14.sp,
+                modifier = Modifier.clickable(onClick = onSet).padding(horizontal = 12.dp, vertical = 10.dp))
         }
     }
 }
