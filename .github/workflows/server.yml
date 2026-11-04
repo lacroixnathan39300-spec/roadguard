@@ -21,8 +21,6 @@ jobs:
         with: { node-version: "22" }
       - name: Dépendances
         run: npm install --no-audit --no-fund
-      - name: Radars pour la carte du site
-        run: python3 ../tools/site/radars.py ../gps/app/src/main/assets public/radars.json
       - name: Vérifications (types et règles)
         run: npx tsc -p . && npm test
       - name: Mise en ligne (Cloudflare)
