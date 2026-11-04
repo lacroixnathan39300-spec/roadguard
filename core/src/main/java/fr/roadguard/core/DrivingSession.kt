@@ -82,6 +82,8 @@ class DrivingSession(
     private var radarVersion = -1
     private var lastLogAt = 0L
     private var previous: Fix? = null
+    private var computedKmh = 0.0
+    private var lastMovedBearing = Double.NaN
 
     /**
      * Cap et vitesse déduits des deux dernières positions quand le GPS ne les fournit pas
@@ -91,11 +93,21 @@ class DrivingSession(
         val p = previous
         val dt = p?.let { (f.timeMs - it.timeMs) / 1000.0 } ?: 0.0
         val d = p?.let { fr.roadguard.core.radar.Geo.distanceMeters(it.lat, it.lon, f.lat, f.lon) } ?: 0.0
-        if (p == null || dt > 10 || dt <= 0) { previous = f; return f }
-        if (d < 6) return f // trop près : on garde la référence pour mesurer un vrai déplacement
+        if (p == null || dt > 10 || dt <= 0) { previous = f; computedKmh = 0.0; return f }
+        if (d < 6) {
+            // Trop près pour mesurer : on garde la référence ; vitesse calculée conservée un court instant.
+            if (f.speedKmh > 0 || dt >= 3) return f
+            return f.copy(speedKmh = computedKmh, bearing = if (computedKmh > 7) lastMovedBearing else f.bearing)
+        }
         previous = f
-        val speed = if (f.speedKmh > 0) f.speedKmh else d / dt * 3.6
+        val speed = if (f.speedKmh > 0) f.speedKmh else {
+            // Vitesse calculée lissée (positions irrégulières des puces d'autoradio).
+            val raw = d / dt * 3.6
+            computedKmh = if (computedKmh <= 0) raw else computedKmh * 0.5 + raw * 0.5
+            computedKmh
+        }
         val moved = if (speed > 7) fr.roadguard.core.radar.Geo.bearing(p.lat, p.lon, f.lat, f.lon) else Double.NaN
+        if (!moved.isNaN()) lastMovedBearing = moved
         // Certaines puces renvoient un cap figé à 0 : le sens réel du déplacement l'emporte alors.
         val bearing = when {
             f.bearing.isNaN() -> moved
