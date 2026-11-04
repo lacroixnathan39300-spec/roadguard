@@ -127,4 +127,19 @@ class NavTest {
         val plain = org.json.JSONObject(ValhallaParser.request(LatLon(46.0, 5.0), null, LatLon(46.1, 5.1)))
         assertEquals(false, plain.has("alternates") || plain.has("costing_options"))
     }
+
+    @Test fun announcesCloseFollowingManeuver() {
+        val pts = (0..30).map { LatLon(46.0 + it * 0.001, 5.0) }
+        val maneuvers = listOf(
+            Maneuver(1, "Départ", "Départ", "Roulez vers le nord.", 0, "", null),
+            Maneuver(10, "Tournez à droite.", "Tournez à droite.", "Tournez à droite maintenant.", 15, "", null),
+            Maneuver(15, "Tournez à gauche.", "Tournez à gauche.", "Tournez à gauche maintenant.", 17, "", null),
+            Maneuver(4, "Arrivée", "Arrivée", "Vous êtes arrivé.", 30, "", null),
+        )
+        val g = Guidance(Route(pts, maneuvers, 3330.0, 300.0, pts.last()))
+        g.update(46.0, 5.0, 50.0)
+        val near = g.update(46.01450, 5.0, 50.0)
+        assertEquals(15, near.then?.type)
+        assertEquals("Tournez à droite maintenant., puis tournez à gauche.", near.speak)
+    }
 }

@@ -14,6 +14,8 @@ data class GuidanceState(
     val arrived: Boolean,
     /** Phrase à prononcer maintenant (une seule fois), ou null. */
     val speak: String?,
+    /** Manœuvre qui suit de près la prochaine (moins de 250 m) : « puis… ». */
+    val then: Maneuver? = null,
 )
 
 /**
@@ -68,6 +70,9 @@ class Guidance(val route: Route) {
         val nextIndex = next?.let { route.maneuvers.indexOf(it) } ?: -1
         val toNext = next?.let { (cumulative[it.shapeIndex] - bestAlong).coerceAtLeast(0.0) } ?: remaining
 
+        val following = if (nextIndex >= 0) route.maneuvers.getOrNull(nextIndex + 1) else null
+        val then = following?.takeIf { f -> next != null && !next.isArrival &&
+            cumulative[f.shapeIndex.coerceAtMost(cumulative.size - 1)] - cumulative[next.shapeIndex] < THEN_M }
         var speak: String? = null
         if (!spokeStart) {
             spokeStart = true
@@ -76,7 +81,7 @@ class Guidance(val route: Route) {
             val early = earlyDistance(speedKmh)
             if (toNext <= nowDistance(speedKmh) && spokenNow.add(nextIndex)) {
                 spokenEarly.add(nextIndex)
-                speak = next.verbalNow
+                speak = next.verbalNow + (then?.let { ", puis ${it.verbalAlert.replaceFirstChar { c -> c.lowercase() }}" } ?: "")
             } else if (toNext <= early && toNext > nowDistance(speedKmh) * 2 && spokenEarly.add(nextIndex)) {
                 speak = "Dans ${roundDistance(toNext)}, ${next.verbalAlert.replaceFirstChar { it.lowercase() }}"
             }
@@ -90,6 +95,7 @@ class Guidance(val route: Route) {
             offRoute = offCount >= OFF_ROUTE_FIXES,
             arrived = arrived,
             speak = speak,
+            then = then,
         )
     }
 
@@ -111,6 +117,7 @@ class Guidance(val route: Route) {
         const val OFF_ROUTE_M = 45.0
         const val OFF_ROUTE_FIXES = 3
         const val ARRIVAL_M = 25.0
+        const val THEN_M = 250.0
 
         /** Annonce anticipée : ~500 m en ville, ~1 km sur route rapide, ~2 km sur autoroute. */
         fun earlyDistance(speedKmh: Double): Double = when {

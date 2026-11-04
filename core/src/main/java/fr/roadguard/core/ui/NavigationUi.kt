@@ -194,6 +194,11 @@ fun GuidanceBanner(
                         Text(Guidance.shortDistance(state.toNextM), color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold)
                         Text(next?.instruction.orEmpty(), color = Color(0xFFD6ECFF), fontSize = 17.sp, maxLines = 2,
                             overflow = TextOverflow.Ellipsis)
+                        state.then?.let { t ->
+                            Text("puis ${maneuverSymbol(t)}", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(top = 4.dp).clip(RoundedCornerShape(8.dp))
+                                    .background(Color(0x33FFFFFF)).padding(horizontal = 10.dp, vertical = 2.dp))
+                        }
                     }
                 }
             }
