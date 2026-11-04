@@ -255,7 +255,9 @@ private fun DriveHome() {
         awaitPointerEventScope { while (true) { awaitPointerEvent(androidx.compose.ui.input.pointer.PointerEventPass.Initial); lastTouch = System.currentTimeMillis() } }
     }) {
         Row(Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Panel(Modifier.weight(0.62f).fillMaxHeight()) {
+            // Disposition réglable : carte à gauche ou à droite, largeur de la carte.
+            val mapPart: @Composable () -> Unit = {
+            Panel(Modifier.weight(settings.mapWeight).fillMaxHeight()) {
                 DriveMap(reports = session.community.reports, drivers = session.community.drivers, position = session.here, northUp = settings.northUp, adaptiveZoom = settings.adaptiveZoom, speedKmh = session.fix?.kmh ?: 0, alternatives = session.alternatives, offlinePack = offlinePack, hasLocation = hasLocation, route = session.route, recenterRequest = session.recenter, night = session.night, visibleKinds = settings.alertKinds, modifier = Modifier.fillMaxSize())
                 if (session.navigating) {
                     GuidanceBanner(session.guidanceState, session.navStatus, onStop = { session.stopNavigation() }, modifier = Modifier.align(Alignment.TopStart),
@@ -273,9 +275,16 @@ private fun DriveHome() {
                     MapButton("⚙", onClick = { showSettings = true })
                     MapButton("◎", onClick = { session.recenter++ })
                     if (!session.navigating) MapButton("🔍", onClick = { showSearch = true })
+                    if (settings.showVolume) {
+                        val audio = remember { context.getSystemService(android.media.AudioManager::class.java) }
+                        MapButton("🔊", onClick = { audio?.adjustStreamVolume(android.media.AudioManager.STREAM_MUSIC, android.media.AudioManager.ADJUST_RAISE, android.media.AudioManager.FLAG_SHOW_UI) })
+                        MapButton("🔉", onClick = { audio?.adjustStreamVolume(android.media.AudioManager.STREAM_MUSIC, android.media.AudioManager.ADJUST_LOWER, android.media.AudioManager.FLAG_SHOW_UI) })
+                    }
                 }
             }
-            Column(Modifier.weight(0.38f).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            }
+            val sidePart: @Composable () -> Unit = {
+            Column(Modifier.weight(1f - settings.mapWeight).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Clock()
                     Spacer(Modifier.weight(1f))
@@ -286,7 +295,7 @@ private fun DriveHome() {
                         modifier = Modifier.clip(RoundedCornerShape(12.dp)).clickable { showLink = true }.padding(10.dp),
                     )
                 }
-                fr.roadguard.core.ui.WeatherAddressLine(session.localInfo, Modifier.padding(start = 4.dp))
+                if (settings.showWeather) fr.roadguard.core.ui.WeatherAddressLine(session.localInfo, Modifier.padding(start = 4.dp))
                 Panel(Modifier.fillMaxWidth().weight(1f).clickable { showTrip = true }) {
                     Speedometer(
                         limit = session.speedLimit,
@@ -297,7 +306,7 @@ private fun DriveHome() {
                         modifier = Modifier.padding(16.dp),
                     )
                 }
-                Panel(Modifier.fillMaxWidth().height(132.dp)) {
+                if (settings.showMusic) Panel(Modifier.fillMaxWidth().height(132.dp)) {
                     // Musique du téléphone si la liaison en fournit, sinon celle du poste.
                     val fromPhone = phoneMedia != null
                     MusicCard(
@@ -318,6 +327,8 @@ private fun DriveHome() {
                     Text(stringResource(R.string.apps), color = Color.White, fontSize = 20.sp)
                 }
             }
+            }
+            if (settings.mapRight) { sidePart(); mapPart() } else { mapPart(); sidePart() }
         }
         phoneNotifications.firstOrNull()?.let { n ->
             // Les messages s'effacent seuls après 12 s ; les appels restent jusqu'à leur fin.

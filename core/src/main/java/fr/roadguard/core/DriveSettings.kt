@@ -49,6 +49,18 @@ class DriveSettings(context: Context) {
     var duckMusic by mutableStateOf(prefs.getBoolean("duck_music", true)); private set
     fun changeDuckMusic(v: Boolean) { duckMusic = v; prefs.edit().putBoolean("duck_music", v).apply() }
 
+    // Disposition de l'accueil DRIVE.
+    var mapRight by mutableStateOf(prefs.getBoolean("map_right", false)); private set
+    var mapWeight by mutableStateOf(prefs.getFloat("map_weight", 0.62f)); private set
+    var showWeather by mutableStateOf(prefs.getBoolean("show_weather", true)); private set
+    var showMusic by mutableStateOf(prefs.getBoolean("show_music", true)); private set
+    var showVolume by mutableStateOf(prefs.getBoolean("show_volume", true)); private set
+    fun changeMapRight(v: Boolean) { mapRight = v; prefs.edit().putBoolean("map_right", v).apply() }
+    fun changeMapWeight(v: Float) { mapWeight = v; prefs.edit().putFloat("map_weight", v).apply() }
+    fun changeShowWeather(v: Boolean) { showWeather = v; prefs.edit().putBoolean("show_weather", v).apply() }
+    fun changeShowMusic(v: Boolean) { showMusic = v; prefs.edit().putBoolean("show_music", v).apply() }
+    fun changeShowVolume(v: Boolean) { showVolume = v; prefs.edit().putBoolean("show_volume", v).apply() }
+
     fun changeAutostart(v: Boolean) { autostart = v; prefs.edit().putBoolean("autostart", v).apply() }
     fun changeAccent(v: Long) {
         accent = v; prefs.edit().putLong("accent", v).apply()

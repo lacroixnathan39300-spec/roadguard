@@ -86,6 +86,19 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                 }
             }
             if (showAutostart) {
+                Section("Disposition de l'accueil")
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    BigButton("Carte à gauche", if (!settings.mapRight) DriveColors.Accent else DriveColors.Panel) { settings.changeMapRight(false) }
+                    BigButton("Carte à droite", if (settings.mapRight) DriveColors.Accent else DriveColors.Panel) { settings.changeMapRight(true) }
+                }
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    listOf(0.55f to "Carte moyenne", 0.62f to "Carte grande", 0.70f to "Carte très grande").forEach { (v, l) ->
+                        BigButton(l, if (settings.mapWeight == v) DriveColors.Accent else DriveColors.Panel) { settings.changeMapWeight(v) }
+                    }
+                }
+                ToggleRow("Météo et adresse", settings.showWeather, settings::changeShowWeather)
+                ToggleRow("Carte musique", settings.showMusic, settings::changeShowMusic)
+                ToggleRow("Boutons de volume sur la carte", settings.showVolume, settings::changeShowVolume)
                 Section("Position GPS")
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     listOf("auto" to "Automatique", "unit" to "GPS du poste", "phone" to "GPS du téléphone").forEach { (v, label) ->
