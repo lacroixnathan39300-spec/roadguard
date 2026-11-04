@@ -69,6 +69,8 @@ import fr.roadguard.core.ui.SearchScreen
 import fr.roadguard.core.ui.SettingsScreen
 import fr.roadguard.core.ui.Speedometer
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.delay
+import android.os.Build
 
 /**
  * Nouvel accueil de ROADGUARD GPS sur le téléphone : même cœur que DRIVE (carte native, radars,
@@ -91,13 +93,20 @@ private fun PhoneHome() {
         mutableStateOf(ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
     }
     val ask = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { hasLocation = it }
+    val notifyAsk = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
     LaunchedEffect(Unit) { if (!hasLocation) ask.launch(Manifest.permission.ACCESS_FINE_LOCATION) }
 
-    val scope = rememberCoroutineScope()
-    val voice = remember { AlertVoice(context) }
-    val settings = remember { DriveSettings(context) }
-    val session = remember { DrivingSession(context, scope, voice, settings) }
-    DisposableEffect(Unit) { onDispose { voice.release() } }
+    // Le cœur de conduite vit dans un service : il continue écran éteint ou dans une autre appli.
+    var session by remember { mutableStateOf(DriveService.session) }
+    LaunchedEffect(hasLocation) {
+        if (!hasLocation) return@LaunchedEffect
+        if (Build.VERSION.SDK_INT >= 33) notifyAsk.launch(Manifest.permission.POST_NOTIFICATIONS)
+        DriveService.start(context)
+        while (DriveService.session == null) delay(100)
+        session = DriveService.session
+    }
+    val s = session ?: run { Box(Modifier.fillMaxSize().background(DriveColors.Background)); return }
+    val settings = s.settings
 
     val media = remember { MediaHub(context, ComponentName(context, SpotifySessionListener::class.java)) }
     var hasMediaAccess by remember { mutableStateOf(media.hasAccess()) }
@@ -116,22 +125,16 @@ private fun PhoneHome() {
     var showSettings by remember { mutableStateOf(false) }
     var showEqualizer by remember { mutableStateOf(false) }
 
-    LaunchedEffect(hasLocation) {
-        if (!hasLocation) return@LaunchedEffect
-        session.prepare()
-        SpeedSource(context).locations().collect { session.onLocation(it) }
-    }
-
     Box(Modifier.fillMaxSize().background(DriveColors.Background)) {
         DriveMap(
-            hasLocation = hasLocation, route = session.route, recenterRequest = session.recenter,
-            night = session.night, visibleKinds = settings.alertKinds, modifier = Modifier.fillMaxSize(),
+            hasLocation = hasLocation, route = s.route, recenterRequest = s.recenter,
+            night = s.night, visibleKinds = settings.alertKinds, modifier = Modifier.fillMaxSize(),
         )
         Column(Modifier.align(Alignment.TopCenter).statusBarsPadding().fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            if (session.navigating) {
-                GuidanceBanner(session.guidanceState, session.navStatus, onStop = { session.stopNavigation() })
+            if (s.navigating) {
+                GuidanceBanner(s.guidanceState, s.navStatus, onStop = { s.stopNavigation() })
             }
-            AlertBanners(session.alert, session.average)
+            AlertBanners(s.alert, s.average)
         }
 
         Column(
@@ -141,9 +144,9 @@ private fun PhoneHome() {
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Speedometer(
-                    kmh = session.fix?.kmh, unit = "km/h",
+                    kmh = s.fix?.kmh, unit = "km/h",
                     waiting = if (hasLocation) "GPS…" else "Position ?",
-                    limit = session.speedLimit, over = session.overSpeed,
+                    limit = s.speedLimit, over = s.overSpeed,
                     modifier = Modifier.size(132.dp),
                 )
                 MusicCard(
@@ -162,16 +165,16 @@ private fun PhoneHome() {
                 }
             }
         }
-        MapButton("◎", onClick = { session.recenter++ },
+        MapButton("◎", onClick = { s.recenter++ },
             modifier = Modifier.align(Alignment.CenterEnd).padding(end = 12.dp))
 
         if (showSearch) {
             BackHandler { showSearch = false }
             SearchScreen(
-                near = session.here?.let { LatLon(it.lat, it.lon) },
-                favorites = session.recents, home = session.home, work = session.work,
-                onSave = session::saveSlot,
-                onPick = { showSearch = false; session.startNavigation(it) },
+                near = s.here?.let { LatLon(it.lat, it.lon) },
+                favorites = s.recents, home = s.home, work = s.work,
+                onSave = s::saveSlot,
+                onPick = { showSearch = false; s.startNavigation(it) },
                 onClose = { showSearch = false },
             )
         }
