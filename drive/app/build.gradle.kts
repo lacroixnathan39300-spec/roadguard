@@ -16,9 +16,8 @@ android {
         versionCode = (System.getenv("VERSION_CODE") ?: "1").toInt()
         versionName = System.getenv("VERSION_NAME") ?: "2.0.0-dev"
         ndk {
-            abiFilters += listOf("armeabi-v7a", "arm64-v8a")
-            // Essais dans l'émulateur de GitHub (processeur x86_64).
-            if (project.hasProperty("emulator")) abiFilters += "x86_64"
+            // Un seul APK pour tous les appareils : autoradios 32 bits, téléphones et tablettes 64 bits, processeurs Intel.
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86_64")
         }
     }
 
@@ -34,16 +33,6 @@ android {
                 enableV1Signing = true // vieux installeurs d'autoradio
                 enableV2Signing = true
             }
-        }
-    }
-
-    // Version finale : en plus de l'APK complet, un APK allégé 32 bits pour les postes ARM (alps 8227L).
-    splits {
-        abi {
-            isEnable = gradle.startParameter.taskNames.any { it.contains("Release") }
-            reset()
-            include("armeabi-v7a", "arm64-v8a")
-            isUniversalApk = true
         }
     }
 
