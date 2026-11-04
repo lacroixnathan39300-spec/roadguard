@@ -17,6 +17,9 @@ def adb(*args, check=False):
     return subprocess.run(["adb", *args], capture_output=True, text=True, check=check).stdout
 
 def shot(name):
+    # La synthèse vocale de l'émulateur (sans son) plante parfois : on ferme sa fenêtre avant la capture.
+    adb("shell", "am", "broadcast", "-a", "android.intent.action.CLOSE_SYSTEM_DIALOGS")
+    time.sleep(0.5)
     with open(os.path.join(OUT, name + ".png"), "wb") as f:
         f.write(subprocess.run(["adb", "exec-out", "screencap", "-p"], capture_output=True).stdout)
 
@@ -40,6 +43,7 @@ def nmea(lat, lon, speed_kmh, course):
     return f"${body}*{cs:02X}"
 
 adb("logcat", "-c")
+adb("shell", "settings", "put", "global", "hide_error_dialogs", "1")
 for perm in ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION",
              "android.permission.POST_NOTIFICATIONS", "android.permission.RECORD_AUDIO"]:
     adb("shell", "pm", "grant", PKG, perm)
