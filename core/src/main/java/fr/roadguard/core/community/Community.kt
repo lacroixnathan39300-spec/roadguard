@@ -212,6 +212,6 @@ class Community(context: Context, private val scope: CoroutineScope, private val
 
     companion object {
         /** Adresse du serveur ROADGUARD (Cloudflare), renseignée après sa mise en ligne. */
-        const val DEFAULT_URL = ""
+        const val DEFAULT_URL = "https://roadguard.roadguard-app.workers.dev"
     }
 }
