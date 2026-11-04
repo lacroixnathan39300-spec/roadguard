@@ -6,8 +6,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
-import java.io.PipedInputStream
-import java.io.PipedOutputStream
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -19,18 +17,29 @@ class LinkProtocolTest {
         override fun paired(id: String, name: String, secret: ByteArray) { known[id] = secret }
     }
 
-    /** Relie un client et un serveur par deux tuyaux en mémoire. */
+    private val sockets = ArrayList<java.net.Socket>()
+
+    /** Relie un client et un serveur par une vraie connexion TCP locale. */
     private fun <C, S> connect(client: (java.io.InputStream, java.io.OutputStream) -> C,
                                server: (java.io.InputStream, java.io.OutputStream) -> S): Pair<Result<C>, Result<S>> {
-        val c2s = PipedOutputStream(); val sIn = PipedInputStream(c2s, 1 shl 20)
-        val s2c = PipedOutputStream(); val cIn = PipedInputStream(s2c, 1 shl 20)
+        val listener = java.net.ServerSocket(0, 1, java.net.InetAddress.getLoopbackAddress())
         val pool = Executors.newFixedThreadPool(2)
-        val fs = pool.submit(Callable { runCatching { server(sIn, s2c) }.also { if (it.isFailure) runCatching { s2c.close() } } })
-        val fc = pool.submit(Callable { runCatching { client(cIn, c2s) }.also { if (it.isFailure) runCatching { c2s.close() } } })
-        val r = fc.get(20, TimeUnit.SECONDS) to fs.get(20, TimeUnit.SECONDS)
-        pool.shutdownNow()
+        val fs = pool.submit(Callable {
+            val sock = listener.accept().also { sockets += it }
+            runCatching { server(sock.getInputStream(), sock.getOutputStream()) }.also { if (it.isFailure) sock.close() }
+        })
+        val fc = pool.submit(Callable {
+            val sock = java.net.Socket(java.net.InetAddress.getLoopbackAddress(), listener.localPort).also { sockets += it }
+            sock.soTimeout = 15_000
+            runCatching { client(sock.getInputStream(), sock.getOutputStream()) }.also { if (it.isFailure) sock.close() }
+        })
+        val r = fc.get(30, TimeUnit.SECONDS) to fs.get(30, TimeUnit.SECONDS)
+        pool.shutdown()
+        listener.close()
         return r
     }
+
+    @org.junit.After fun closeSockets() { sockets.forEach { runCatching { it.close() } } }
 
     @Test fun pairsWithCodeThenReconnectsWithSecretAndExchanges() {
         val peers = FakePeers("123456")
