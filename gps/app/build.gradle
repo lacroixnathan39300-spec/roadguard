@@ -13,6 +13,8 @@ android { lint { if (project.hasProperty('roadguardApiLint')) checkOnly 'NewApi'
  sourceSets {
    test { if (!roadguardAndroidAuto) java.exclude '**/AndroidRuntimeTest.java', '**/CarSearchRuntimeTest.java', '**/CarSurfaceRuntimeTest.java' }
    main {
+   // Protocole ROADGUARD Link, partagé avec DRIVE (autoradio).
+   java.srcDir '../../link-protocol/src/main/java'
    if (roadguardAndroidAuto) {
      java.srcDir 'src/auto/java'
 

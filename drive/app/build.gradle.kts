@@ -77,4 +77,6 @@ val copyRadarAssets by tasks.registering(Copy::class) {
     into(radarAssets.map { it.dir("radars") })
 }
 android.sourceSets.getByName("main").assets.srcDir(radarAssets)
+// Protocole ROADGUARD Link : même code Java que l'appli GPS du téléphone.
+android.sourceSets.getByName("main").java.srcDir(rootProject.file("../link-protocol/src/main/java"))
 tasks.named("preBuild") { dependsOn(copyRadarAssets) }
