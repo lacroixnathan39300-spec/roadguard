@@ -90,7 +90,11 @@ jobs:
           mkdir -p dist
           for app in drive gps; do
             U=$(echo $app | tr a-z A-Z)
-            f=$(find art/$app-apk-$RUN -path '*release*' -name '*.apk' | head -1)
+            f=$(find art/$app-apk-$RUN -path '*release*' -name '*universal*.apk' | head -1)
+            [ -z "$f" ] && f=$(find art/$app-apk-$RUN -path '*release*' -name '*.apk' | head -1)
+            # APK allégé pour les autoradios 32 bits (ARM v7).
+            p=$(find art/$app-apk-$RUN -path '*release*' -name '*armeabi-v7a*.apk' | head -1)
+            [ -n "$p" ] && cp "$p" "dist/ROADGUARD-$U-build$RUN-POSTE-32bits.apk"
             [ -z "$f" ] && f=$(find art/$app-apk-$RUN -path '*debug*' -name '*.apk' | head -1)
             [ -n "$f" ] && cp "$f" "dist/ROADGUARD-$U-build$RUN.apk"
             d=$(find art/$app-apk-$RUN -path '*debug*' -name '*.apk' | head -1)

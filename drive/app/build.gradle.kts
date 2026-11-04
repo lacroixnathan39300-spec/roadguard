@@ -37,6 +37,16 @@ android {
         }
     }
 
+    // Version finale : en plus de l'APK complet, un APK allégé 32 bits pour les postes ARM (alps 8227L).
+    splits {
+        abi {
+            isEnable = gradle.startParameter.taskNames.any { it.contains("Release") }
+            reset()
+            include("armeabi-v7a", "arm64-v8a")
+            isUniversalApk = true
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
