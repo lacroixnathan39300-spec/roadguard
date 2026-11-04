@@ -150,25 +150,82 @@ public final class LinkProtocol {
             }
         }
 
+        /**
+         * Message binaire (vidéo du mode miroir) : 1 octet 0x01, 1 octet de type, 8 octets de séquence,
+         * puis les données. Chiffré et authentifié comme les messages JSON.
+         */
+        public void sendBinary(int type, byte[] data, int offset, int length) throws IOException {
+            try {
+                synchronized (out) {
+                    long seq = sendSeq++;
+                    byte[] plain = new byte[10 + length];
+                    plain[0] = 1;
+                    plain[1] = (byte) type;
+                    for (int i = 0; i < 8; i++) plain[2 + i] = (byte) (seq >>> (56 - 8 * i));
+                    System.arraycopy(data, offset, plain, 10, length);
+                    writeFrame(out, seal(key, plain));
+                }
+            } catch (GeneralSecurityException e) {
+                throw new IOException("Envoi impossible", e);
+            }
+        }
+
+        /** Message reçu : JSON ou binaire. */
+        public Message receiveAny() throws IOException {
+            byte[] plain;
+            try {
+                plain = open(key, readFrame(in));
+            } catch (GeneralSecurityException e) {
+                throw new IOException("Message non authentifié", e);
+            }
+            if (plain.length >= 10 && plain[0] == 1) {
+                long seq = 0;
+                for (int i = 0; i < 8; i++) seq = (seq << 8) | (plain[2 + i] & 0xff);
+                checkSeq(seq);
+                byte[] data = new byte[plain.length - 10];
+                System.arraycopy(plain, 10, data, 0, data.length);
+                return new Message(null, plain[1] & 0xff, data);
+            }
+            try {
+                JSONObject m = new JSONObject(new String(plain, StandardCharsets.UTF_8));
+                checkSeq(m.optLong("s", -1));
+                return new Message(m, 0, null);
+            } catch (JSONException e) {
+                throw new IOException("Message illisible", e);
+            }
+        }
+
+        private void checkSeq(long seq) throws IOException {
+            if (seq <= recvSeq) throw new IOException("Message rejoué ou désordonné");
+            recvSeq = seq;
+        }
+
         /** Ferme la connexion (les deux sens). */
         public void close() throws IOException {
             try { in.close(); } finally { out.close(); }
         }
 
+        /** Prochain message JSON (les messages binaires reçus entre-temps sont ignorés). */
         public JSONObject receive() throws IOException {
-            try {
-                JSONObject m = new JSONObject(new String(open(key, readFrame(in)), StandardCharsets.UTF_8));
-                long seq = m.optLong("s", -1);
-                if (seq <= recvSeq) throw new IOException("Message rejoué ou désordonné");
-                recvSeq = seq;
-                return m;
-            } catch (GeneralSecurityException e) {
-                throw new IOException("Message non authentifié", e);
-            } catch (JSONException e) {
-                throw new IOException("Message illisible", e);
+            while (true) {
+                Message m = receiveAny();
+                if (m.json != null) return m.json;
             }
         }
     }
+
+    /** Message reçu : [json] non nul pour un message JSON, sinon [type] et [data] (binaire). */
+    public static final class Message {
+        public final JSONObject json;
+        public final int type;
+        public final byte[] data;
+        Message(JSONObject json, int type, byte[] data) { this.json = json; this.type = type; this.data = data; }
+    }
+
+    /** Types de messages binaires. */
+    public static final int BIN_VIDEO_CONFIG = 1;
+    public static final int BIN_VIDEO_FRAME = 2;
+    public static final int BIN_VIDEO_KEYFRAME = 3;
 
     // ---- Poignée de main -----------------------------------------------------------------
 

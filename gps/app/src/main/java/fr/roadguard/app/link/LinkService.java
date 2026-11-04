@@ -179,6 +179,20 @@ public final class LinkService extends Service {
                 default: break;
             }
         }
+        if ("touch".equals(type)) {
+            MirrorTouchService t = MirrorTouchService.instance;
+            if (t != null) t.touch(m.optString("a"), (float) m.optDouble("x"), (float) m.optDouble("y"), m.optLong("time"));
+            return;
+        }
+        if ("mirror_keyframe".equals(type)) {
+            MirrorService mirror = MirrorService.instance;
+            if (mirror != null) mirror.requestKeyFrame();
+            return;
+        }
+        if ("mirror_stop".equals(type)) {
+            if (MirrorService.instance != null) startService(new Intent(this, MirrorService.class).setAction(MirrorService.ACTION_STOP));
+            return;
+        }
         if ("notif_action".equals(type)) {
             Notification.Action[] list = actions.get(m.optString("key"));
             int i = m.optInt("index", -1);
@@ -256,6 +270,50 @@ public final class LinkService extends Service {
         if (actions.remove(sbn.getKey()) == null || current.get() == null) return;
         try {
             JSONObject m = new JSONObject().put("t", "notif_removed").put("key", sbn.getKey());
+            sender.execute(() -> send(m));
+        } catch (org.json.JSONException ignored) {}
+    }
+
+    // ---- Mode miroir -----------------------------------------------------------------------
+
+    private final java.util.concurrent.atomic.AtomicInteger pendingVideo = new java.util.concurrent.atomic.AtomicInteger();
+    private volatile boolean waitingKeyFrame;
+    private volatile int sentW, sentH;
+
+    /** Image vidéo à transmettre ; les images ordinaires sont sautées si le Wi-Fi n'arrive pas à suivre. */
+    public void sendVideo(int type, byte[] data, int w, int h) {
+        LinkProtocol.Session s = current.get();
+        if (s == null) return;
+        if (type == LinkProtocol.BIN_VIDEO_FRAME && (waitingKeyFrame || pendingVideo.get() > 3)) {
+            if (!waitingKeyFrame) {
+                waitingKeyFrame = true;
+                MirrorService mirror = MirrorService.instance;
+                if (mirror != null) mirror.requestKeyFrame();
+            }
+            return;
+        }
+        if (type == LinkProtocol.BIN_VIDEO_KEYFRAME) waitingKeyFrame = false;
+        pendingVideo.incrementAndGet();
+        sender.execute(() -> {
+            try {
+                if (type == LinkProtocol.BIN_VIDEO_CONFIG || w != sentW || h != sentH) {
+                    sentW = w; sentH = h;
+                    s.send(new JSONObject().put("t", "mirror_start").put("w", w).put("h", h));
+                }
+                s.sendBinary(type, data, 0, data.length);
+            } catch (Exception e) {
+                current.compareAndSet(s, null);
+                closeQuietly(s);
+            } finally {
+                pendingVideo.decrementAndGet();
+            }
+        });
+    }
+
+    public void sendMirrorStopped() {
+        sentW = 0; sentH = 0;
+        try {
+            JSONObject m = new JSONObject().put("t", "mirror_stop");
             sender.execute(() -> send(m));
         } catch (org.json.JSONException ignored) {}
     }

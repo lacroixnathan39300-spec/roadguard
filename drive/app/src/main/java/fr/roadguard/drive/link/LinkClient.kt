@@ -75,6 +75,18 @@ class LinkClient(private val context: Context) {
     /** Texte de destination partagé depuis le téléphone. */
     val destinations: SharedFlow<String> = _destinations
 
+    /** Mode miroir : taille de l'image du téléphone, ou null si l'écran n'est pas partagé. */
+    private val _mirror = MutableStateFlow<Pair<Int, Int>?>(null)
+    val mirror: StateFlow<Pair<Int, Int>?> = _mirror
+    /** Reçoit les données vidéo (type, octets) ; branché par l'écran miroir. */
+    @Volatile var videoSink: ((Int, ByteArray) -> Unit)? = null
+
+    fun requestKeyFrame() = send(JSONObject().put("t", "mirror_keyframe"))
+    fun stopMirror() { send(JSONObject().put("t", "mirror_stop")); _mirror.value = null }
+    fun touch(action: String, x: Float, y: Float) =
+        send(JSONObject().put("t", "touch").put("a", action).put("x", x.toDouble()).put("y", y.toDouble())
+            .put("time", android.os.SystemClock.uptimeMillis()))
+
     fun dismissNotification(key: String) { _notifications.value = _notifications.value.filterNot { it.key == key } }
 
     fun notificationAction(key: String, index: Int) {
@@ -123,9 +135,13 @@ class LinkClient(private val context: Context) {
 
     fun mediaCommand(cmd: String) = send(JSONObject().put("t", "media_cmd").put("cmd", cmd))
 
+    /** Envois dans l'ordre (le tactile du mode miroir en dépend), sans bloquer l'interface. */
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    private val sendDispatcher = Dispatchers.IO.limitedParallelism(1)
+
     private fun send(m: JSONObject) {
         val s = session ?: return
-        scope.launch { runCatching { s.send(m) }.onFailure { closeSession() } }
+        scope.launch(sendDispatcher) { runCatching { s.send(m) }.onFailure { closeSession() } }
     }
 
     private suspend fun loop() {
@@ -153,7 +169,10 @@ class LinkClient(private val context: Context) {
                     _state.value = LinkState.Connected(s.peerName.ifBlank { "téléphone" })
                     val pinger = scope.launch { while (isActive) { delay(5_000); runCatching { s.send(JSONObject().put("t", "ping")) } } }
                     try {
-                        while (scope.isActive) handle(s.receive())
+                        while (scope.isActive) {
+                            val msg = s.receiveAny()
+                            if (msg.json != null) handle(msg.json) else videoSink?.invoke(msg.type, msg.data)
+                        }
                     } finally {
                         pinger.cancel()
                     }
@@ -169,6 +188,7 @@ class LinkClient(private val context: Context) {
                 session = null
                 _media.value = null
                 _notifications.value = emptyList()
+                _mirror.value = null
             }
         }
     }
@@ -194,6 +214,8 @@ class LinkClient(private val context: Context) {
                 )
                 _notifications.value = (listOf(n) + _notifications.value.filterNot { it.key == n.key }).take(5)
             }
+            "mirror_start" -> _mirror.value = m.getInt("w") to m.getInt("h")
+            "mirror_stop" -> _mirror.value = null
             "notif_removed" -> dismissNotification(m.optString("key"))
             "dest" -> _destinations.tryEmit(m.optString("text"))
             "media" -> _media.value = if (!m.has("title")) null else NowPlaying(

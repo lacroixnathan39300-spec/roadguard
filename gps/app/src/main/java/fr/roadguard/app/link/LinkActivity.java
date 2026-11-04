@@ -29,6 +29,7 @@ import java.util.Map;
  */
 public final class LinkActivity extends Activity {
     private static final int BG = 0xFF05070A, PANEL = 0xFF121820, ACCENT = 0xFF00B8FF, MUTED = 0xFF9AA7B4;
+    private static final int REQUEST_MIRROR = 7;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private TextView status;
     private Button toggle;
@@ -96,6 +97,21 @@ public final class LinkActivity extends Activity {
         notif.setPadding(0, dp(8), 0, dp(8));
         root.addView(notif);
 
+        root.addView(section("Écran du téléphone sur l'autoradio"));
+        root.addView(text("Pour Waze ou toute autre appli : l'écran du téléphone s'affiche sur le poste. "
+            + "Mets le téléphone en paysage pour remplir l'écran. Pour toucher l'écran depuis le poste, active une fois "
+            + "« ROADGUARD tactile autoradio » dans les réglages d'accessibilité.", 15, MUTED, false));
+        root.addView(button("Afficher l'écran sur l'autoradio", v -> {
+            if (!LinkService.running) { toast("Démarre d'abord la liaison."); return; }
+            android.media.projection.MediaProjectionManager mpm =
+                (android.media.projection.MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
+            startActivityForResult(mpm.createScreenCaptureIntent(), REQUEST_MIRROR);
+        }));
+        root.addView(button("Arrêter l'affichage de l'écran",
+            v -> startService(new Intent(this, MirrorService.class).setAction(MirrorService.ACTION_STOP))));
+        root.addView(button("Activer le tactile depuis l'autoradio",
+            v -> startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))));
+
         root.addView(section("Envoyer une destination"));
         root.addView(text("Dans Google Maps, Waze ou Contacts : « Partager » → « ROADGUARD Link ». L'autoradio lance le guidage.", 15, MUTED, false));
 
@@ -109,6 +125,15 @@ public final class LinkActivity extends Activity {
         scroll.addView(root);
         setContentView(scroll);
         handleShare(getIntent());
+    }
+
+    @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != REQUEST_MIRROR) return;
+        if (resultCode == RESULT_OK && data != null) {
+            MirrorService.start(this, resultCode, data);
+            toast("L'écran du téléphone s'affiche sur l'autoradio.");
+        } else toast("Partage d'écran refusé.");
     }
 
     @Override protected void onNewIntent(Intent intent) {

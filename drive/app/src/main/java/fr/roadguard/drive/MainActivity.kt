@@ -63,6 +63,7 @@ import fr.roadguard.drive.ui.DayNight
 import fr.roadguard.drive.ui.SettingsScreen
 import fr.roadguard.drive.ui.LinkScreen
 import fr.roadguard.drive.ui.PhoneNotificationCard
+import fr.roadguard.drive.ui.MirrorScreen
 import fr.roadguard.drive.nav.SharedDestination
 import fr.roadguard.drive.link.LinkClient
 import fr.roadguard.drive.link.LinkState
@@ -169,6 +170,9 @@ private fun DriveHome() {
     val phoneMedia by link.media.collectAsState()
     var showLink by remember { mutableStateOf(false) }
     val phoneNotifications by link.notifications.collectAsState()
+    val mirror by link.mirror.collectAsState()
+    var mirrorHidden by remember { mutableStateOf(false) }
+    LaunchedEffect(mirror) { if (mirror != null) mirrorHidden = false }
 
     // Navigation
     val scope = rememberCoroutineScope()
@@ -358,6 +362,14 @@ private fun DriveHome() {
                 onDismiss = { link.dismissNotification(n.key) },
                 modifier = Modifier.align(Alignment.TopCenter).padding(top = 16.dp),
             )
+        }
+        // Mode miroir : l'écran du téléphone s'affiche dès que le téléphone le partage.
+        val m = mirror
+        if (m != null && !mirrorHidden) {
+            BackHandler { mirrorHidden = true }
+            MirrorScreen(link, m.first, m.second, onClose = { mirrorHidden = true })
+        } else if (m != null) {
+            MapButton("📲", onClick = { mirrorHidden = false }, modifier = Modifier.align(Alignment.BottomStart).padding(start = 24.dp, bottom = 48.dp))
         }
         if (showApps) AppDrawer(onClose = { showApps = false })
         if (showLink) {

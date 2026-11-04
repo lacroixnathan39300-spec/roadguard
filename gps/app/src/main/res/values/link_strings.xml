@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mirror_touch_description">Permet de toucher l\'écran du téléphone depuis l\'autoradio (mode miroir ROADGUARD Link). Ne lit pas le contenu de l\'écran.</string>
+</resources>

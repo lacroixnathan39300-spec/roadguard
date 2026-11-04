@@ -54,6 +54,14 @@ class LinkProtocolTest {
         assertEquals(46.7, client.receive().getDouble("lat"), 0.0)
         client.send(JSONObject().put("t", "media_cmd").put("cmd", "next"))
         assertEquals("next", server.receive().getString("cmd"))
+        // Vidéo binaire mêlée aux messages JSON, dans l'ordre.
+        val frame = ByteArray(50_000) { (it % 251).toByte() }
+        server.sendBinary(LinkProtocol.BIN_VIDEO_FRAME, frame, 0, frame.size)
+        server.send(JSONObject().put("t", "ping"))
+        val bin = client.receiveAny()
+        assertEquals(LinkProtocol.BIN_VIDEO_FRAME, bin.type)
+        assertArrayEquals(frame, bin.data)
+        assertEquals("ping", client.receiveAny().json.getString("t"))
 
         // Reconnexion sans code grâce au secret mémorisé.
         peers.code = null
