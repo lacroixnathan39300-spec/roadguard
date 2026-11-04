@@ -103,7 +103,8 @@ class DrivingSession(
         previous = f
         val speed = if (f.speedKmh > 0) f.speedKmh else {
             // Vitesse calculée lissée (positions irrégulières des puces d'autoradio).
-            val raw = d / dt * 3.6
+            // Une voiture ne gagne ou ne perd pas plus de ~15 km/h par seconde : on écarte les sauts.
+            val raw = (d / dt * 3.6).let { r -> if (computedKmh > 0) r.coerceIn(computedKmh - 15 * dt, computedKmh + 15 * dt) else r }
             computedKmh = if (computedKmh <= 0) raw else computedKmh * 0.5 + raw * 0.5
             computedKmh
         }
