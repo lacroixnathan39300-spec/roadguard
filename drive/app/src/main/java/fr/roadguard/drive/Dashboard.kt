@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -126,8 +127,11 @@ fun DashboardPage(
 @Composable
 private fun Widget(w: DashWidget, s: DrivingSession, music: NowPlaying?, onPlayPause: () -> Unit, onNext: () -> Unit, onPrevious: () -> Unit) {
     when (w) {
-        DashWidget.SPEED -> Speedometer(kmh = s.fix?.kmh, unit = "km/h", waiting = "GPS…", limit = s.speedLimit, over = s.overSpeed,
-            modifier = Modifier.fillMaxSize())
+        DashWidget.SPEED -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            // Compteur rond : toujours carré et entier, quelle que soit la forme du bloc.
+            Speedometer(kmh = s.fix?.kmh, unit = "km/h", waiting = "GPS…", limit = s.speedLimit, over = s.overSpeed,
+                modifier = Modifier.fillMaxHeight().aspectRatio(1f, matchHeightConstraintsFirst = true))
+        }
         DashWidget.CLOCK -> {
             var now by remember { mutableStateOf(Date()) }
             LaunchedEffect(Unit) { while (true) { now = Date(); delay(1000) } }
@@ -167,9 +171,15 @@ private fun Widget(w: DashWidget, s: DrivingSession, music: NowPlaying?, onPlayP
 
 @Composable
 private fun Big(value: String, caption: String, color: Color = Color.White) {
-    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
-        Text(value, color = color, fontSize = 40.sp * DriveColors.Scale, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        Text(caption, color = DriveColors.TextSecondary, fontSize = 16.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+    // Tailles calculées sur la hauteur du bloc : légende toujours visible, même sur un écran bas.
+    androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize()) {
+        val density = androidx.compose.ui.platform.LocalDensity.current
+        val valueSize = with(density) { (maxHeight * 0.42f).toSp() }.let { if (it.value > 44f) 44.sp else it }
+        val captionSize = with(density) { (maxHeight * 0.16f).toSp() }.let { if (it.value > 16f) 16.sp else it }
+        Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
+            Text(caption, color = DriveColors.TextSecondary, fontSize = captionSize, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(value, color = color, fontSize = valueSize, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
     }
 }
 

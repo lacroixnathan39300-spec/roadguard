@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -300,7 +301,7 @@ private fun DriveHome() {
                     )
                 }
                 if (settings.showWeather) fr.roadguard.core.ui.WeatherAddressLine(session.localInfo, Modifier.padding(start = 4.dp))
-                Panel(Modifier.fillMaxWidth().weight(1f).clickable { showTrip = true }) {
+                Panel(Modifier.fillMaxWidth().weight(1f).heightIn(min = 150.dp).clickable { showTrip = true }) {
                     Speedometer(
                         limit = session.speedLimit,
                         over = session.overSpeed,

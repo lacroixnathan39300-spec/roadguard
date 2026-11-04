@@ -96,7 +96,12 @@ fun DriveMap(
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val mapView = remember {
         MapLibre.getInstance(context)
-        MapView(context).apply { onCreate(Bundle()) }
+        // Rendu dans une TextureView : la carte est dessinée comme une vue normale de l'écran.
+        // Avec la surface séparée par défaut, certains postes (MediaTek) et téléphones affichaient
+        // une zone blanche ou une ancienne image à la place de la carte.
+        val options = org.maplibre.android.maps.MapLibreMapOptions.createFromAttributes(context)
+            .textureMode(true).translucentTextureSurface(false)
+        MapView(context, options).apply { onCreate(Bundle()) }
     }
     val holder = remember { MapHolder() }
     var styleVersion by remember { mutableStateOf(0) }
