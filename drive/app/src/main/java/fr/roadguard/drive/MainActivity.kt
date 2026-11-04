@@ -61,6 +61,13 @@ import fr.roadguard.drive.nav.SpeedLimitTracker
 import fr.roadguard.drive.nav.SpeedLimits
 import fr.roadguard.drive.ui.DayNight
 import fr.roadguard.drive.ui.SettingsScreen
+import fr.roadguard.drive.ui.LinkScreen
+import fr.roadguard.drive.link.LinkClient
+import fr.roadguard.drive.link.LinkState
+import android.os.SystemClock
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 import fr.roadguard.drive.nav.Route
 import fr.roadguard.drive.radar.Fix
 import fr.roadguard.drive.ui.GuidanceBanner
@@ -153,6 +160,13 @@ private fun DriveHome() {
     voice.beepEnabled = settings.beep
     var showSettings by remember { mutableStateOf(false) }
 
+    // ROADGUARD Link : liaison avec le téléphone.
+    val link = remember { LinkClient(context.applicationContext) }
+    LaunchedEffect(Unit) { link.start() }
+    val linkState by link.state.collectAsState()
+    val phoneMedia by link.media.collectAsState()
+    var showLink by remember { mutableStateOf(false) }
+
     // Navigation
     val scope = rememberCoroutineScope()
     val recentStore = remember { RecentPlaces(context) }
@@ -215,7 +229,12 @@ private fun DriveHome() {
         val index = RadarRepository.index(context)
         val alerts = AlertEngine(index)
         val averages = AverageSpeedTracker(index)
-        SpeedSource(context).locations().collect { location ->
+        // GPS du téléphone (ROADGUARD Link) en priorité ; GPS du poste s'il se tait plus de 3 s.
+        var lastPhoneFixAt = 0L
+        merge(
+            SpeedSource(context).locations().filter { SystemClock.elapsedRealtime() - lastPhoneFixAt > 3_000 },
+            link.locations.onEach { lastPhoneFixAt = SystemClock.elapsedRealtime() },
+        ).collect { location ->
             fix = location.toSpeedFix()
             val f = location.toAlertFix()
             val newAlert = alerts.update(f)?.takeIf { it.radar.kind in settings.alertKinds }
@@ -268,7 +287,16 @@ private fun DriveHome() {
                 }
             }
             Column(Modifier.weight(0.38f).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Clock()
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Clock()
+                    Spacer(Modifier.weight(1f))
+                    Text(
+                        if (linkState is LinkState.Connected) "📱 Connecté" else "📱",
+                        color = if (linkState is LinkState.Connected) Color(0xFF4CAF50) else DriveColors.TextSecondary,
+                        fontSize = 20.sp,
+                        modifier = Modifier.clip(RoundedCornerShape(12.dp)).clickable { showLink = true }.padding(10.dp),
+                    )
+                }
                 Panel(Modifier.fillMaxWidth().weight(1f)) {
                     Speedometer(
                         limit = speedLimit,
@@ -280,12 +308,16 @@ private fun DriveHome() {
                     )
                 }
                 Panel(Modifier.fillMaxWidth().height(132.dp)) {
+                    // Musique du téléphone si la liaison en fournit, sinon celle du poste.
+                    val fromPhone = phoneMedia != null
                     MusicCard(
-                        nowPlaying = nowPlaying,
-                        hasAccess = hasMediaAccess,
-                        onPrevious = media::previous,
-                        onPlayPause = media::playPause,
-                        onNext = media::next,
+                        nowPlaying = phoneMedia ?: nowPlaying,
+                        hasAccess = hasMediaAccess || fromPhone,
+                        onPrevious = { if (fromPhone) link.mediaCommand("previous") else media.previous() },
+                        onPlayPause = {
+                            if (fromPhone) link.mediaCommand(if (phoneMedia?.playing == true) "pause" else "play") else media.playPause()
+                        },
+                        onNext = { if (fromPhone) link.mediaCommand("next") else media.next() },
                         onEqualizer = { showEqualizer = true },
                         modifier = Modifier.fillMaxSize(),
                     )
@@ -296,6 +328,10 @@ private fun DriveHome() {
             }
         }
         if (showApps) AppDrawer(onClose = { showApps = false })
+        if (showLink) {
+            BackHandler { showLink = false }
+            LinkScreen(link, onClose = { showLink = false })
+        }
         if (showSettings) {
             BackHandler { showSettings = false }
             var radarCount by remember { mutableStateOf(0) }
