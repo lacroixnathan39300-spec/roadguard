@@ -98,7 +98,7 @@ fun DriveMap(
         val radars = RadarRepository.radars(context)
         val collection = withContext(Dispatchers.Default) { radars.toFeatureCollection() }
         radarCollection = collection
-        holder.style?.getSourceAs<GeoJsonSource>(RADAR_SOURCE)?.setGeoJson(collection)
+        runCatching { holder.style?.getSourceAs<GeoJsonSource>(RADAR_SOURCE)?.setGeoJson(collection) }
     }
 
     LaunchedEffect(mapView) {
@@ -122,6 +122,8 @@ fun DriveMap(
             val json = withContext(Dispatchers.IO) { runCatching { OfflineMaps.style(context, pack, night) }.getOrNull() }
             json?.let { Style.Builder().fromJson(it) }
         } ?: Style.Builder().fromUri(if (night) NIGHT_STYLE_URL else STYLE_URL)
+        // L'ancien style devient inutilisable dès ce moment : plus aucun accès jusqu'au nouveau.
+        holder.style = null
         map.setStyle(builder) { style ->
             holder.style = style
             style.addSource(GeoJsonSource(ROUTE_SOURCE))
@@ -137,18 +139,20 @@ fun DriveMap(
     LaunchedEffect(hasLocation) {
         val map = holder.map
         val style = holder.style
-        if (hasLocation && map != null && style != null) enableLocation(context, map, style)
+        if (hasLocation && map != null && style != null) runCatching { enableLocation(context, map, style) }
     }
 
     // Trajet : tracé sur la carte et carte orientée dans le sens de la marche pendant le guidage.
     LaunchedEffect(route, styleVersion) {
         val style = holder.style ?: return@LaunchedEffect
-        val source = style.getSourceAs<GeoJsonSource>(ROUTE_SOURCE) ?: return@LaunchedEffect
-        if (route == null) {
-            source.setGeoJson(FeatureCollection.fromFeatures(emptyList()))
-        } else {
-            val line = LineString.fromLngLats(route.points.map { Point.fromLngLat(it.lon, it.lat) })
-            source.setGeoJson(Feature.fromGeometry(line))
+        val source = runCatching { style.getSourceAs<GeoJsonSource>(ROUTE_SOURCE) }.getOrNull() ?: return@LaunchedEffect
+        runCatching {
+            if (route == null) {
+                source.setGeoJson(FeatureCollection.fromFeatures(emptyList()))
+            } else {
+                val line = LineString.fromLngLats(route.points.map { Point.fromLngLat(it.lon, it.lat) })
+                source.setGeoJson(Feature.fromGeometry(line))
+            }
         }
         holder.map?.locationComponent?.takeIf { it.isLocationComponentActivated }?.let {
             it.cameraMode = if (route != null) CameraMode.TRACKING_GPS else CameraMode.TRACKING_GPS_NORTH
@@ -158,9 +162,9 @@ fun DriveMap(
 
     // Types de radars affichés (réglages).
     LaunchedEffect(visibleKinds, styleVersion) {
-        val layer = holder.style?.getLayerAs<CircleLayer>(RADAR_LAYER) ?: return@LaunchedEffect
+        val layer = runCatching { holder.style?.getLayerAs<CircleLayer>(RADAR_LAYER) }.getOrNull() ?: return@LaunchedEffect
         val stops = RadarKind.entries.map { Expression.stop(it.name, Expression.literal(it in visibleKinds)) }.toTypedArray()
-        layer.setFilter(Expression.match(Expression.get("kind"), Expression.literal(false), *stops))
+        runCatching { layer.setFilter(Expression.match(Expression.get("kind"), Expression.literal(false), *stops)) }
     }
 
     // Bouton « recentrer » : reprendre le suivi après un déplacement de la carte au doigt.

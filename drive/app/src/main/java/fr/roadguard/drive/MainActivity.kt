@@ -130,6 +130,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         hideSystemBars()
         fr.roadguard.core.net.Net.init(this)
+        // MapLibre doit être prêt avant de lui confier le client HTTP (sinon plantage au lancement).
+        org.maplibre.android.MapLibre.getInstance(this)
         fr.roadguard.drive.net.LinkInterceptor.install()
         setContent { DriveHome() }
     }
