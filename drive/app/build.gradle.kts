@@ -48,6 +48,12 @@ android {
     }
     kotlinOptions { jvmTarget = "17" }
     buildFeatures { compose = true; buildConfig = true }
+    testOptions {
+        unitTests.all {
+            // Résultat de chaque test visible dans le journal de compilation (dont le trajet hors ligne).
+            it.testLogging { events("passed", "skipped", "failed"); showStandardStreams = true }
+        }
+    }
     lint {
         abortOnError = true; checkReleaseBuilds = false
         // GraphHopper référence des classes Java de bureau jamais utilisées par l'itinéraire voiture.
