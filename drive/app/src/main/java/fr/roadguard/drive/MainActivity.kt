@@ -137,7 +137,15 @@ class MainActivity : ComponentActivity() {
         org.maplibre.android.MapLibre.getInstance(this)
         fr.roadguard.core.map.OfflineRegions.enlargeAmbientCache(this)
         fr.roadguard.drive.net.LinkInterceptor.install()
-        setContent { fr.roadguard.core.ui.CarFontScale { DriveHome() } }
+        setContent {
+            fr.roadguard.core.ui.CarFontScale {
+                androidx.compose.foundation.layout.Box {
+                    DriveHome()
+                    // Logo au démarrage de l'appli (pas à chaque retour sur l'accueil).
+                    if (savedInstanceState == null) BootSplash()
+                }
+            }
+        }
     }
 }
 
@@ -185,6 +193,8 @@ private fun DriveHome() {
     var showTrip by remember { mutableStateOf(false) }
     /** Page affichée : 0 = carte, 1 = tableau de bord (la carte reste chargée dessous). */
     var page by remember { mutableStateOf(0) }
+    var showPersonalize by remember { mutableStateOf(false) }
+    var wallpaperVersion by remember { mutableStateOf(0) }
     // Mémoire de la carte remise à zéro une fois (des morceaux abîmés affichaient une image à la place de la carte).
     LaunchedEffect(Unit) { runCatching { fr.roadguard.core.map.OfflineRegions.clearCacheOnce(context, 2) } }
     var lastTouch by remember { mutableStateOf(System.currentTimeMillis()) }
@@ -260,6 +270,7 @@ private fun DriveHome() {
         // Tout appui repousse l'économiseur d'écran (l'évènement continue vers les boutons).
         awaitPointerEventScope { while (true) { awaitPointerEvent(androidx.compose.ui.input.pointer.PointerEventPass.Initial); lastTouch = System.currentTimeMillis() } }
     }) {
+        WallpaperBackground(wallpaperVersion)
         Row(Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             // Disposition réglable : carte à gauche ou à droite, largeur de la carte.
             val mapPart: @Composable () -> Unit = {
@@ -376,6 +387,9 @@ private fun DriveHome() {
         if (showOffline) {
             BackHandler { showOffline = false }
             fr.roadguard.core.ui.OfflineDataScreen(setOf("FR", "CH"), onClose = { showOffline = false }, here = session.here?.let { it.lat to it.lon })
+        } else if (showPersonalize) {
+            BackHandler { showPersonalize = false }
+            PersonalizeScreen(onChanged = { wallpaperVersion++ }, onClose = { showPersonalize = false })
         } else if (showPlayer) {
             BackHandler { showPlayer = false }
             MusicPlayerScreen(onClose = { showPlayer = false })
@@ -387,7 +401,8 @@ private fun DriveHome() {
             var radarCount by remember { mutableStateOf(0) }
             LaunchedEffect(Unit) { radarCount = RadarRepository.radars(context).size }
             SettingsScreen(settings, radarCount, onClose = { showSettings = false }, onOfflineData = { showOffline = true }, showAutostart = true,
-                onCommunity = { showCommunity = true }, onMusicPlayer = { showPlayer = true })
+                onCommunity = { showCommunity = true }, onMusicPlayer = { showPlayer = true },
+                onPersonalize = { showPersonalize = true })
         }
         if (showSearch) {
             BackHandler { showSearch = false }
@@ -404,7 +419,7 @@ private fun DriveHome() {
         }
         if (showTrip) {
             BackHandler { showTrip = false }
-            fr.roadguard.core.ui.TripScreen(session.trip, onClose = { showTrip = false })
+            fr.roadguard.core.ui.TripScreen(session.trip, onClose = { showTrip = false }, tracks = session.tracks)
         }
         fr.roadguard.core.ui.ScreenSaver(
             stopped = (session.fix?.kmh ?: 0) < 3 && !session.navigating, lastTouch = lastTouch, night = session.night,
@@ -420,7 +435,7 @@ private fun DriveHome() {
 @Composable
 private fun Panel(modifier: Modifier, content: @Composable BoxScope.() -> Unit) {
     Box(
-        modifier.clip(RoundedCornerShape(20.dp)).background(DriveColors.Panel),
+        modifier.clip(RoundedCornerShape(20.dp)).background(DriveColors.Panel.copy(alpha = 0.88f)),
         contentAlignment = Alignment.Center,
     ) { content() }
 }

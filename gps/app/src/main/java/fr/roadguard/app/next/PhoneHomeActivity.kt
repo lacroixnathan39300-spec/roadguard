@@ -202,7 +202,7 @@ private fun PhoneHome() {
         }
         if (showTrip) {
             BackHandler { showTrip = false }
-            fr.roadguard.core.ui.TripScreen(s.trip, onClose = { showTrip = false })
+            fr.roadguard.core.ui.TripScreen(s.trip, onClose = { showTrip = false }, tracks = s.tracks)
         }
         if (showCommunity) {
             BackHandler { showCommunity = false }

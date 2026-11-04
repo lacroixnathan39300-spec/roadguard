@@ -48,8 +48,20 @@ fun WeatherAddressLine(info: LocalInfo, modifier: Modifier = Modifier) {
 
 /** Ordinateur de bord plein écran. */
 @Composable
-fun TripScreen(trip: TripComputer, onClose: () -> Unit) {
+fun TripScreen(trip: TripComputer, onClose: () -> Unit, tracks: fr.roadguard.core.TrackRecorder? = null) {
     var period by remember { mutableStateOf("trip") }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    var exportDays by remember { mutableStateOf<List<String>>(emptyList()) }
+    var exportMessage by remember { mutableStateOf<String?>(null) }
+    val saver = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/gpx+xml")
+    ) { uri ->
+        if (uri == null || tracks == null) return@rememberLauncherForActivityResult
+        exportMessage = runCatching {
+            context.contentResolver.openOutputStream(uri)!!.use { it.write(tracks.gpx(exportDays).toByteArray()) }
+            "Trajets enregistrés (GPX)"
+        }.getOrElse { "Export impossible : ${it.message}" }
+    }
     val t: TripTotals = when (period) { "day" -> trip.day; "week" -> trip.week; "month" -> trip.month; "total" -> trip.total; else -> trip.trip }
     Column(Modifier.fillMaxSize().background(DriveColors.Background).padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -79,6 +91,19 @@ fun TripScreen(trip: TripComputer, onClose: () -> Unit) {
             }
             Text("Les chronos se lancent seuls au départ d'un arrêt. À faire uniquement dans un lieu sûr et autorisé.",
                 color = DriveColors.TextSecondary, fontSize = 13.sp)
+            if (tracks != null) {
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    BigButton("⤓ GPX d'aujourd'hui", DriveColors.Panel) {
+                        exportDays = tracks.days().take(1)
+                        if (exportDays.isEmpty()) exportMessage = "Aucun trajet enregistré" else runCatching { saver.launch("roadguard-${exportDays[0]}.gpx") }
+                    }
+                    BigButton("⤓ GPX des 30 derniers jours", DriveColors.Panel) {
+                        exportDays = tracks.days()
+                        if (exportDays.isEmpty()) exportMessage = "Aucun trajet enregistré" else runCatching { saver.launch("roadguard-trajets.gpx") }
+                    }
+                }
+                exportMessage?.let { Text(it, color = DriveColors.TextSecondary, fontSize = 14.sp) }
+            }
             if (period == "trip" || period == "total") {
                 BigButton(if (period == "trip") "Nouveau trajet (remise à zéro)" else "Tout remettre à zéro", Color(0xFF7F1D1D)) { trip.reset(period) }
             }

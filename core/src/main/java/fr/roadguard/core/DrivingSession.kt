@@ -54,6 +54,8 @@ class DrivingSession(
 
     /** Ordinateur de bord (distances, temps, vitesses, chronos). */
     val trip = TripComputer(context)
+    /** Trace des trajets (export GPX). */
+    val tracks = TrackRecorder(context)
     /** Météo et adresse actuelle. */
     val localInfo = LocalInfo(scope)
 
@@ -156,6 +158,7 @@ class DrivingSession(
         community.onFix(f)
         trip.onFix(f.lat, f.lon, f.speedKmh, f.accuracyM, f.timeMs, if (location.hasAltitude()) location.altitude else null)
         localInfo.onFix(f.lat, f.lon, System.currentTimeMillis())
+        tracks.onFix(f.lat, f.lon, f.speedKmh, if (location.hasAltitude()) location.altitude else null, f.timeMs)
         val newAverage = averages?.update(f)
         if (newAverage?.finished == true && average?.finished != true) voice.announceAverageResult(newAverage)
         average = newAverage
