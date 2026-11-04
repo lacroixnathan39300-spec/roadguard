@@ -47,7 +47,8 @@ public final class MirrorService extends Service {
     private Thread audioThread;
     private static final String TAG = "RoadguardMirror";
     private static final String CHANNEL = "roadguard_mirror";
-    private static final int LONG_SIDE = 1280;
+    /** Côté long de la vidéo : celui de l'écran du poste (1024 × 600), moins à coder et à décoder. */
+    private static final int LONG_SIDE = 1024;
 
     public static volatile MirrorService instance;
 
@@ -116,9 +117,16 @@ public final class MirrorService extends Service {
             computeSize();
             MediaFormat f = MediaFormat.createVideoFormat(MediaFormat.MIMETYPE_VIDEO_AVC, width, height);
             f.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
-            f.setInteger(MediaFormat.KEY_BIT_RATE, 3_000_000);
+            f.setInteger(MediaFormat.KEY_BIT_RATE, 2_500_000);
             f.setInteger(MediaFormat.KEY_FRAME_RATE, 30);
-            f.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 2);
+            f.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
+            // Faible latence : profil de base (pas d'images B à réordonner), priorité temps réel, débit constant.
+            f.setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileBaseline);
+            f.setInteger(MediaFormat.KEY_LEVEL, MediaCodecInfo.CodecProfileLevel.AVCLevel31);
+            f.setInteger(MediaFormat.KEY_PRIORITY, 0);
+            f.setInteger(MediaFormat.KEY_BITRATE_MODE, MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR);
+            if (Build.VERSION.SDK_INT >= 26) f.setInteger(MediaFormat.KEY_LATENCY, 1);
+            f.setInteger("max-bframes", 0);
             // Une image est renvoyée même si l'écran ne change pas : l'autoradio reste à jour.
             f.setLong(MediaFormat.KEY_REPEAT_PREVIOUS_FRAME_AFTER, 500_000);
             encoder = MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_VIDEO_AVC);
@@ -144,7 +152,14 @@ public final class MirrorService extends Service {
                 @Override public void onError(MediaCodec c, MediaCodec.CodecException e) { Log.w(TAG, "Encodeur", e); }
                 @Override public void onOutputFormatChanged(MediaCodec c, MediaFormat format) {}
             }, handler);
-            encoder.configure(f, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+            try {
+                encoder.configure(f, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+            } catch (Exception lowLatencyRefused) {
+                // Encodeur qui refuse les réglages faible latence : réglages de base.
+                for (String k : new String[]{MediaFormat.KEY_PROFILE, MediaFormat.KEY_LEVEL, MediaFormat.KEY_PRIORITY,
+                        MediaFormat.KEY_BITRATE_MODE, MediaFormat.KEY_LATENCY, "max-bframes"}) f.removeKey(k);
+                encoder.configure(f, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+            }
             inputSurface = encoder.createInputSurface();
             encoder.start();
             int dpi = getResources().getDisplayMetrics().densityDpi;

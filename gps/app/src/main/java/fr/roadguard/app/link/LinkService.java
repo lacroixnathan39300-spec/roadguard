@@ -72,18 +72,26 @@ public final class LinkService extends Service {
 
     static final class PrioritySender implements java.util.concurrent.Executor {
         private final java.util.concurrent.LinkedBlockingDeque<Runnable> urgent = new java.util.concurrent.LinkedBlockingDeque<>();
+        private final java.util.concurrent.LinkedBlockingQueue<Runnable> media = new java.util.concurrent.LinkedBlockingQueue<>();
         private final java.util.concurrent.LinkedBlockingQueue<Runnable> normal = new java.util.concurrent.LinkedBlockingQueue<>();
         private final Object signal = new Object();
         private volatile boolean stopped;
         private final Thread thread = new Thread(this::loop, "roadguard-link-send");
         PrioritySender() { thread.setDaemon(true); thread.start(); }
         @Override public void execute(Runnable r) { normal.add(r); wake(); }
-        /** Message prioritaire ; une position plus ancienne encore en attente est remplacée. */
-        void urgent(Runnable r) { urgent.clear(); urgent.add(r); wake(); }
+        private final java.util.concurrent.atomic.AtomicReference<Runnable> latestLocation = new java.util.concurrent.atomic.AtomicReference<>();
+        /** Message prioritaire (réponse au ping…). */
+        void urgent(Runnable r) { urgent.add(r); wake(); }
+        /** Position GPS : envoyée en premier ; une position plus ancienne encore en attente est remplacée. */
+        void location(Runnable r) { latestLocation.set(r); wake(); }
+        /** Image vidéo ou son du miroir : avant les envois ordinaires (carte, recherche). */
+        void media(Runnable r) { media.add(r); wake(); }
         private void wake() { synchronized (signal) { signal.notify(); } }
         private void loop() {
             while (!stopped) {
-                Runnable r = urgent.poll();
+                Runnable r = latestLocation.getAndSet(null);
+                if (r == null) r = urgent.poll();
+                if (r == null) r = media.poll();
                 if (r == null) r = normal.poll();
                 if (r == null) { synchronized (signal) { try { signal.wait(200); } catch (InterruptedException e) { return; } } continue; }
                 try { r.run(); } catch (RuntimeException ignored) {}
@@ -255,7 +263,12 @@ public final class LinkService extends Service {
                 try { list[i].actionIntent.send(); } catch (PendingIntent.CanceledException ignored) {}
             }
         }
-        // "ping" : rien à faire, la réception suffit à garder la connexion vivante.
+        // « ping » du poste : réponse immédiate. Sans elle, le poste coupait la liaison au bout de 20 s
+        // quand le téléphone n'avait rien d'autre à envoyer (pas de GPS à l'intérieur, pas de musique).
+        if ("ping".equals(type)) {
+            try { JSONObject pong = new JSONObject().put("t", "pong"); sender.urgent(() -> send(pong)); }
+            catch (org.json.JSONException ignored) {}
+        }
     }
 
     private LinkProtocol.Peers peers() {
@@ -401,7 +414,8 @@ public final class LinkService extends Service {
     public void sendVideo(int type, byte[] data, int w, int h) {
         LinkProtocol.Session s = current.get();
         if (s == null) return;
-        if (type == LinkProtocol.BIN_VIDEO_FRAME && (waitingKeyFrame || pendingVideo.get() > 3)) {
+        // Plus de 2 images en attente : on saute jusqu'à la prochaine image clé (pas de retard qui s'accumule).
+        if (type == LinkProtocol.BIN_VIDEO_FRAME && (waitingKeyFrame || pendingVideo.get() > 2)) {
             if (!waitingKeyFrame) {
                 waitingKeyFrame = true;
                 MirrorService mirror = MirrorService.instance;
@@ -411,7 +425,7 @@ public final class LinkService extends Service {
         }
         if (type == LinkProtocol.BIN_VIDEO_KEYFRAME) waitingKeyFrame = false;
         pendingVideo.incrementAndGet();
-        sender.execute(() -> {
+        sender.media(() -> {
             try {
                 if (type == LinkProtocol.BIN_VIDEO_CONFIG || w != sentW || h != sentH) {
                     sentW = w; sentH = h;
@@ -433,7 +447,7 @@ public final class LinkService extends Service {
         if (s == null || pendingVideo.get() > 6) return;
         byte[] copy = java.util.Arrays.copyOf(pcm, length);
         pendingVideo.incrementAndGet();
-        sender.execute(() -> {
+        sender.media(() -> {
             try { s.sendBinary(LinkProtocol.BIN_AUDIO_PCM, copy, 0, copy.length); }
             catch (Exception e) { current.compareAndSet(s, null); closeQuietly(s); }
             finally { pendingVideo.decrementAndGet(); }
@@ -484,7 +498,7 @@ public final class LinkService extends Service {
             if (l.hasSpeed()) m.put("speed", l.getSpeed());
             if (l.hasBearing()) m.put("bearing", l.getBearing());
             if (l.hasAccuracy()) m.put("acc", l.getAccuracy());
-            sender.urgent(() -> send(m));
+            sender.location(() -> send(m));
         } catch (org.json.JSONException ignored) {}
     }
 

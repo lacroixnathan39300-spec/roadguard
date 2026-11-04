@@ -28,7 +28,6 @@ class VideoDecoder(private val surface: Surface, private val width: Int, private
                 c.getInputBuffer(index)?.apply { clear(); put(data) }
                 c.queueInputBuffer(index, 0, data.size, System.nanoTime() / 1000, 0)
             }
-            drain(c)
         }
     }
 
@@ -37,10 +36,21 @@ class VideoDecoder(private val surface: Surface, private val width: Int, private
             val format = MediaFormat.createVideoFormat(MediaFormat.MIMETYPE_VIDEO_AVC, width, height)
             format.setByteBuffer("csd-0", ByteBuffer.wrap(config))
             val c = MediaCodec.createDecoderByType(MediaFormat.MIMETYPE_VIDEO_AVC)
+            // Faible latence (pris en compte par les décodeurs qui le gèrent).
+            format.setInteger("low-latency", 1)
+            format.setInteger(MediaFormat.KEY_PRIORITY, 0)
             c.configure(format, surface, null, 0)
             c.start()
             codec = c
             started = true
+            // Les images décodées sont affichées dès qu'elles sortent, sans attendre la suivante.
+            Thread({
+                val i = MediaCodec.BufferInfo()
+                while (codec === c) {
+                    val out = runCatching { c.dequeueOutputBuffer(i, 10_000) }.getOrElse { break }
+                    if (out >= 0) runCatching { c.releaseOutputBuffer(out, true) }
+                }
+            }, "roadguard-video-out").apply { isDaemon = true; start() }
         }
     }
 
