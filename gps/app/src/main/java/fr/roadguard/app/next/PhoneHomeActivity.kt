@@ -138,6 +138,7 @@ private fun PhoneHome() {
     var showMenu by remember { mutableStateOf(false) }
     var showReport by remember { mutableStateOf(false) }
     var showCommunity by remember { mutableStateOf(false) }
+    var showTrip by remember { mutableStateOf(false) }
     var showEqualizer by remember { mutableStateOf(false) }
 
     // Carte hors ligne : packs téléchargés dans « Plus → Cartes hors ligne », utilisés sans Internet.
@@ -198,6 +199,10 @@ private fun PhoneHome() {
             BackHandler { showReport = false }
             fr.roadguard.core.ui.ReportSheet(onPick = { showReport = false; s.community.report(it) }, onClose = { showReport = false })
         }
+        if (showTrip) {
+            BackHandler { showTrip = false }
+            fr.roadguard.core.ui.TripScreen(s.trip, onClose = { showTrip = false })
+        }
         if (showCommunity) {
             BackHandler { showCommunity = false }
             fr.roadguard.core.ui.CommunityScreen(s.community, s.here?.lat, s.here?.lon, onClose = { showCommunity = false })
@@ -226,6 +231,7 @@ private fun PhoneHome() {
                     fr.roadguard.core.ui.BigButton("Fermer", DriveColors.Panel) { showMenu = false }
                 }
                 fun open(tab: Int) { offlineTab = tab; showOffline = true; showMenu = false }
+                MenuEntry("📊", "Ordinateur de bord", "Distances, temps, vitesses, chronos") { showMenu = false; showTrip = true }
                 MenuEntry("👥", "Communauté", "Pseudo, points, classement, conducteurs autour") { showMenu = false; showCommunity = true }
                 MenuEntry("📍", "Mes radars", "Ajouter un radar ici, importer un fichier CSV") { open(2) }
                 MenuEntry("🗺", "Cartes hors ligne", "Télécharger les cartes pour rouler sans Internet") { open(0) }

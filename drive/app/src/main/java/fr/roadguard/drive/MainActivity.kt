@@ -44,6 +44,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -179,6 +180,8 @@ private fun DriveHome() {
     var showSettings by remember { mutableStateOf(false) }
     var showReport by remember { mutableStateOf(false) }
     var showPlayer by remember { mutableStateOf(false) }
+    var showTrip by remember { mutableStateOf(false) }
+    var lastTouch by remember { mutableStateOf(System.currentTimeMillis()) }
     // Lecteur de musique choisi : ouvert une fois au démarrage, puis retour sur DRIVE.
     LaunchedEffect(Unit) {
         if (MusicPlayer.autoStart(context) && MusicPlayer.chosen(context) != null && !playerStartedThisBoot) {
@@ -247,7 +250,10 @@ private fun DriveHome() {
     val offlinePack = if (fr.roadguard.core.net.Net.hasDirectInternet() || linkState is LinkState.Connected) null
         else fr.roadguard.core.map.OfflineMaps.packFor(packs, session.here?.lat, session.here?.lon)
 
-    Box(Modifier.fillMaxSize().background(DriveColors.Background)) {
+    Box(Modifier.fillMaxSize().background(DriveColors.Background).pointerInput(Unit) {
+        // Tout appui repousse l'économiseur d'écran (l'évènement continue vers les boutons).
+        awaitPointerEventScope { while (true) { awaitPointerEvent(androidx.compose.ui.input.pointer.PointerEventPass.Initial); lastTouch = System.currentTimeMillis() } }
+    }) {
         Row(Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Panel(Modifier.weight(0.62f).fillMaxHeight()) {
                 DriveMap(reports = session.community.reports, drivers = session.community.drivers, position = session.here, northUp = settings.northUp, adaptiveZoom = settings.adaptiveZoom, speedKmh = session.fix?.kmh ?: 0, alternatives = session.alternatives, offlinePack = offlinePack, hasLocation = hasLocation, route = session.route, recenterRequest = session.recenter, night = session.night, visibleKinds = settings.alertKinds, modifier = Modifier.fillMaxSize())
@@ -280,7 +286,8 @@ private fun DriveHome() {
                         modifier = Modifier.clip(RoundedCornerShape(12.dp)).clickable { showLink = true }.padding(10.dp),
                     )
                 }
-                Panel(Modifier.fillMaxWidth().weight(1f)) {
+                fr.roadguard.core.ui.WeatherAddressLine(session.localInfo, Modifier.padding(start = 4.dp))
+                Panel(Modifier.fillMaxWidth().weight(1f).clickable { showTrip = true }) {
                     Speedometer(
                         limit = session.speedLimit,
                         over = session.overSpeed,
@@ -368,6 +375,14 @@ private fun DriveHome() {
                 starred = session.favorites, onStar = session::toggleFavorite,
             )
         }
+        if (showTrip) {
+            BackHandler { showTrip = false }
+            fr.roadguard.core.ui.TripScreen(session.trip, onClose = { showTrip = false })
+        }
+        fr.roadguard.core.ui.ScreenSaver(
+            stopped = (session.fix?.kmh ?: 0) < 3 && !session.navigating, lastTouch = lastTouch, night = session.night,
+            onDismiss = { lastTouch = System.currentTimeMillis() },
+        )
         if (showEqualizer) {
             BackHandler { showEqualizer = false }
             EqualizerPanel(equalizer, onClose = { showEqualizer = false })

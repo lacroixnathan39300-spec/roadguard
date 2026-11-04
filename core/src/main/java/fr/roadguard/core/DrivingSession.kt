@@ -52,6 +52,11 @@ class DrivingSession(
     var navigating by mutableStateOf(false); private set
     var recenter by mutableIntStateOf(0)
 
+    /** Ordinateur de bord (distances, temps, vitesses, chronos). */
+    val trip = TripComputer(context)
+    /** Météo et adresse actuelle. */
+    val localInfo = LocalInfo(scope)
+
     /** Signalements et conducteurs de la communauté ROADGUARD. */
     val community = fr.roadguard.core.community.Community(context, scope) { voice.speak(it) }
 
@@ -148,6 +153,8 @@ class DrivingSession(
         voice.proximityBeeps = settings.proximityBeeps
         voice.proximity(alert?.distanceM)
         community.onFix(f)
+        trip.onFix(f.lat, f.lon, f.speedKmh, f.accuracyM, f.timeMs, if (location.hasAltitude()) location.altitude else null)
+        localInfo.onFix(f.lat, f.lon, System.currentTimeMillis())
         val newAverage = averages?.update(f)
         if (newAverage?.finished == true && average?.finished != true) voice.announceAverageResult(newAverage)
         average = newAverage
