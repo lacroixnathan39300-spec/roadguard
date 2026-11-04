@@ -62,7 +62,8 @@ Le téléphone (appli GPS) fait tout le travail ; le poste (DRIVE) affiche et re
 - [ ] Son par le Bluetooth du poste ou dans le flux USB.
 
 ## Phase 4 — Navigation de haut niveau
-- [ ] Calcul d'itinéraire hors ligne (moteur embarqué) au lieu du serveur de démonstration OSRM.
+- [x] Itinéraires en ligne (Valhalla FOSSGIS) et **hors ligne** (GraphHopper 5.3, graphe OSM fabriqué par GitHub Actions) avec repli automatique ; Franche-Comté embarquée, vérifiée par un vrai trajet Lons → Champagnole (35,4 km) (build 56).
+- [ ] Autres régions hors ligne : dépôt public de données à créer pour les publier.
 - [ ] Recherche d'adresses hors ligne, Maison/Travail, favoris.
 - [ ] Voix de guidage, voies conseillées, limites de vitesse affichées, recalcul automatique.
 - [ ] Vitesse moyenne sur les tronçons, indication bon/pas bon jusqu'à la fin de la zone.
