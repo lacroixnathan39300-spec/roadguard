@@ -182,6 +182,8 @@ private fun DriveHome() {
     var showReport by remember { mutableStateOf(false) }
     var showPlayer by remember { mutableStateOf(false) }
     var showTrip by remember { mutableStateOf(false) }
+    /** Page affichée : 0 = carte, 1 = tableau de bord (la carte reste chargée dessous). */
+    var page by remember { mutableStateOf(0) }
     var lastTouch by remember { mutableStateOf(System.currentTimeMillis()) }
     // Lecteur de musique choisi : ouvert une fois au démarrage, puis retour sur DRIVE.
     LaunchedEffect(Unit) {
@@ -272,6 +274,7 @@ private fun DriveHome() {
                     session.community.toast?.let { fr.roadguard.core.ui.CommunityToast(it, session.community::dismissToast) }
                 }
                 Column(Modifier.align(Alignment.BottomEnd).padding(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    MapButton("▦", onClick = { page = 1 })
                     MapButton("⚠", onClick = { showReport = true })
                     MapButton("⚙", onClick = { showSettings = true })
                     MapButton("◎", onClick = { session.recenter++ })
@@ -328,6 +331,17 @@ private fun DriveHome() {
             }
             }
             if (settings.mapRight) { sidePart(); mapPart() } else { mapPart(); sidePart() }
+        }
+        if (page == 1) {
+            BackHandler { page = 0 }
+            val fromPhone = phoneMedia != null
+            DashboardPage(
+                session, music = phoneMedia ?: nowPlaying,
+                onPlayPause = { if (fromPhone) link.mediaCommand(if (phoneMedia?.playing == true) "pause" else "play") else media.playPause() },
+                onNext = { if (fromPhone) link.mediaCommand("next") else media.next() },
+                onPrevious = { if (fromPhone) link.mediaCommand("previous") else media.previous() },
+                onMap = { page = 0 }, onTrip = { showTrip = true },
+            )
         }
         phoneNotifications.firstOrNull()?.let { n ->
             // Les messages s'effacent seuls après 12 s ; les appels restent jusqu'à leur fin.
