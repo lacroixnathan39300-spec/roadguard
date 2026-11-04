@@ -39,8 +39,8 @@ object DriveStyle {
 
 /** Icônes des boutons ronds : vraies icônes vectorielles à la place des symboles texte. */
 @Composable
-fun DriveIcon(symbol: String, size: Dp = 28.dp, tint: Color = Color.White): Boolean {
-    val m = Modifier.size(size)
+fun DriveIcon(symbol: String, iconSize: Dp = 28.dp, tint: Color = Color.White): Boolean {
+    val m = Modifier.size(iconSize)
     when (symbol) {
         "⚙" -> Icon(Icons.Filled.Settings, "Réglages", m, tint)
         "🔍" -> Icon(Icons.Filled.Search, "Rechercher", m, tint)
