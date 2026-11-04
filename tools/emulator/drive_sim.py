@@ -74,7 +74,8 @@ with open(os.path.join(OUT, "journal-appli.txt"), "w") as f:
     f.write(adb("logcat", "-d", f"--pid={pid}") if pid else "processus absent\n")
 with open(os.path.join(OUT, "position.txt"), "w") as f:
     f.write(adb("shell", "dumpsys", "location")[:20000])
-crash = [l for l in log.splitlines() if "FATAL EXCEPTION" in l or ("AndroidRuntime" in l and " E " in l)]
+# Seuls les plantages de notre appli comptent (les services Google de l'émulateur plantent parfois seuls).
+crash = [l for l in log.splitlines() if "AndroidRuntime" in l and f"Process: {PKG}" in l]
 with open(os.path.join(OUT, "rapport.txt"), "w") as f:
     f.write(f"Appli : {PKG}\n")
     f.write("Plantage : " + ("OUI" if crash else "non") + "\n\n")
