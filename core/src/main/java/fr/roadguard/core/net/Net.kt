@@ -20,7 +20,7 @@ class NetResponse(val code: Int, val body: ByteArray, val contentType: String?) 
 /** Passage par le téléphone (fourni par ROADGUARD Link sur l'autoradio). */
 interface NetRelay {
     fun isConnected(): Boolean
-    suspend fun http(url: String, method: String, body: ByteArray?, contentType: String?, follow: Boolean): NetResponse
+    suspend fun http(url: String, method: String, body: ByteArray?, contentType: String?, follow: Boolean, range: String? = null): NetResponse
 }
 
 object Net {

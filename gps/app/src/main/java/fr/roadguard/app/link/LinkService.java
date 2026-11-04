@@ -327,6 +327,8 @@ public final class LinkService extends Service {
                 c.setRequestMethod(m.optString("method", "GET"));
                 c.setRequestProperty("User-Agent", "ROADGUARD-DRIVE/2.0 (via téléphone)");
                 if (m.has("ctype")) c.setRequestProperty("Content-Type", m.getString("ctype"));
+                // Téléchargement par morceaux (cartes hors ligne du poste) : en-tête Range transmis.
+                if (m.has("range")) c.setRequestProperty("Range", m.getString("range"));
                 try {
                     if (m.has("body")) {
                         c.setDoOutput(true);

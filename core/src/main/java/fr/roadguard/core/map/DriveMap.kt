@@ -35,6 +35,7 @@ import org.maplibre.android.style.layers.SymbolLayer
 import org.maplibre.geojson.LineString
 import fr.roadguard.core.nav.Route
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import org.maplibre.android.style.layers.PropertyFactory
@@ -92,9 +93,15 @@ fun DriveMap(
         }
     }
 
-    LaunchedEffect(mapView) {
+    val radarVersion by RadarRepository.version.collectAsState()
+    LaunchedEffect(radarVersion) {
         val radars = RadarRepository.radars(context)
-        radarCollection = withContext(Dispatchers.Default) { radars.toFeatureCollection() }
+        val collection = withContext(Dispatchers.Default) { radars.toFeatureCollection() }
+        radarCollection = collection
+        holder.style?.getSourceAs<GeoJsonSource>(RADAR_SOURCE)?.setGeoJson(collection)
+    }
+
+    LaunchedEffect(mapView) {
         mapView.getMapAsync { map ->
             holder.map = map
             map.uiSettings.isRotateGesturesEnabled = false

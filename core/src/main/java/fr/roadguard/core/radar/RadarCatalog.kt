@@ -26,6 +26,12 @@ data class Radar(
  */
 object RadarCatalog {
 
+    /** Bases embarquées + pays téléchargés ([extraDir], fichiers « radars_extra_*.csv »). */
+    fun loadAll(assets: AssetManager, extraDir: java.io.File?): List<Radar> {
+        val extras = extraDir?.listFiles { f -> f.name.startsWith("radars_extra_") && f.name.endsWith(".csv") }.orEmpty()
+        return loadAll(assets) + extras.flatMap { f -> runCatching { f.bufferedReader().use { parse(it) } }.getOrDefault(emptyList()) }
+    }
+
     fun loadAll(assets: AssetManager): List<Radar> {
         // DRIVE : dossier « radars/ » ; appli GPS : racine des fichiers embarqués.
         val dir = if (assets.list("radars").orEmpty().any { it.startsWith("radars_embedded_") }) "radars/" else ""

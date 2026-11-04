@@ -66,7 +66,7 @@ class LinkClient(private val context: Context) : fr.roadguard.core.net.NetRelay 
     private val httpIds = java.util.concurrent.atomic.AtomicInteger()
 
     /** Requête Internet faite par le téléphone (le poste n'a pas Internet lui-même). */
-    override suspend fun http(url: String, method: String, body: ByteArray?, contentType: String?, follow: Boolean): fr.roadguard.core.net.NetResponse {
+    override suspend fun http(url: String, method: String, body: ByteArray?, contentType: String?, follow: Boolean, range: String?): fr.roadguard.core.net.NetResponse {
         val id = httpIds.incrementAndGet()
         val waiter = CompletableDeferred<fr.roadguard.core.net.NetResponse>()
         httpWaiting[id] = waiter
@@ -74,6 +74,7 @@ class LinkClient(private val context: Context) : fr.roadguard.core.net.NetRelay 
             val m = JSONObject().put("t", "http").put("id", id).put("url", url).put("method", method).put("follow", follow)
             if (body != null) m.put("body", LinkProtocol.b64(body))
             if (contentType != null) m.put("ctype", contentType)
+            if (range != null) m.put("range", range)
             send(m)
             return withTimeoutOrNull(25_000) { waiter.await() } ?: throw java.io.IOException("Le téléphone ne répond pas")
         } finally {

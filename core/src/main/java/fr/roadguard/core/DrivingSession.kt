@@ -74,7 +74,14 @@ class DrivingSession(
         averages = AverageSpeedTracker(index)
     }
 
+    private var radarVersion = -1
+
     fun onLocation(location: Location) {
+        // Pays de radars ajouté ou retiré : on recharge les bases en arrière-plan.
+        if (radarVersion != RadarRepository.version.value) {
+            radarVersion = RadarRepository.version.value
+            if (alerts != null) scope.launch { prepare() }
+        }
         voice.voiceEnabled = settings.voice
         voice.beepEnabled = settings.beep
         fix = location.toSpeedFix()
