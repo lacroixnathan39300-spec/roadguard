@@ -41,7 +41,10 @@ Le téléphone (appli GPS) fait tout le travail ; le poste (DRIVE) affiche et re
 - [x] Autoradio : recherche du téléphone (partage de connexion / réseau local), reconnexion automatique, GPS et musique du téléphone utilisés par DRIVE.
 - [x] Messages et appels du téléphone sur le poste, avec leurs boutons (répondre, refuser…), lecture vocale, destination partagée depuis Google Maps / Waze / Contacts.
 - [x] Mode miroir : écran du téléphone (Waze…) en H.264 matériel, tactile renvoyé par service d'accessibilité, adaptation à la rotation (build 34).
-- [ ] Liaison par câble USB, son dans la liaison.
+- [x] Liaison par câble USB (mode accessoire Android, recharge du téléphone), priorité au câble, Wi-Fi en secours (build 38).
+- [x] Internet du poste par le téléphone : carte, recherche, itinéraires, limites passent par la liaison si le poste n'a pas Internet.
+- [x] Son du téléphone par la liaison (option « Écran + son »), Bluetooth en secours.
+- [ ] Wi-Fi créé par le poste avec connexion automatique du téléphone (limité par Android 8.1 : identifiants changeants).
 - [ ] Mode voiture ROADGUARD : écrans conçus pour le poste (paysage, gros boutons) dessinés par le
       téléphone sur un écran virtuel à la résolution du poste, puis envoyés en vidéo H.264.
       Le téléphone peut rester verrouillé dans la poche.
