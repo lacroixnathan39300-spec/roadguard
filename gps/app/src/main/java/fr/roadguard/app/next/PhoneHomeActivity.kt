@@ -82,6 +82,7 @@ class PhoneHomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Net.init(this)
+        fr.roadguard.core.map.OfflineRegions.enlargeAmbientCache(this)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setContent { fr.roadguard.core.ui.CarFontScale { PhoneHome() } }
     }

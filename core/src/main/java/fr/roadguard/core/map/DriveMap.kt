@@ -153,13 +153,16 @@ fun DriveMap(
     LaunchedEffect(night, styleVersion < 0 || styleVersion > 0, radarCollection, offlinePack?.file?.path, retry) {
         val map = holder.map ?: return@LaunchedEffect
         val collection = radarCollection ?: return@LaunchedEffect
-        val uri = offlinePack?.let { "offline:${it.file.path}:$night" } ?: if (night) NIGHT_STYLE_URL else STYLE_URL
+        // Sans aucun Internet : style de jour, celui des zones enregistrées et du cache (la nuit n'est pas enregistrée).
+        val online = fr.roadguard.core.net.Net.hasDirectInternet() || fr.roadguard.core.net.Net.relay?.isConnected() == true
+        val useNight = night && online
+        val uri = offlinePack?.let { "offline:${it.file.path}:$night" } ?: if (useNight) NIGHT_STYLE_URL else STYLE_URL
         if (holder.styleUri == uri) return@LaunchedEffect
         holder.styleUri = uri
         val builder = offlinePack?.let { pack ->
             val json = withContext(Dispatchers.IO) { runCatching { OfflineMaps.style(context, pack, night) }.getOrNull() }
             json?.let { Style.Builder().fromJson(it) }
-        } ?: Style.Builder().fromUri(if (night) NIGHT_STYLE_URL else STYLE_URL)
+        } ?: Style.Builder().fromUri(if (useNight) NIGHT_STYLE_URL else STYLE_URL)
         // L'ancien style devient inutilisable dès ce moment : plus aucun accès jusqu'au nouveau.
         holder.style = null
         map.setStyle(builder) { style ->

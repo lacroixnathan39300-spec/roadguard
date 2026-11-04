@@ -75,7 +75,10 @@ fun OfflineDataScreen(nearCountries: Set<String>, onClose: () -> Unit, here: Pai
                 { it.name },
             ))
             LazyColumn(Modifier.padding(top = 10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(sorted, key = { it.id }) { pack -> PackRow(pack, states[pack.id] ?: PackState.NotInstalled, manager) }
+                item { RegionsCard(here) }
+                item { Text("Grands packs (projet extérieur)", color = DriveColors.TextSecondary, fontSize = 15.sp, modifier = Modifier.padding(top = 6.dp)) }
+                // Packs publiés cassés à la source : masqués plutôt que proposés en erreur.
+                items(sorted.filter { it.unavailable == null }, key = { it.id }) { pack -> PackRow(pack, states[pack.id] ?: PackState.NotInstalled, manager) }
             }
         } else {
             Text(
@@ -240,6 +243,57 @@ private fun PersonalRadarsTab(here: Pair<Double, Double>?) {
                     Text("%.5f, %.5f".format(java.util.Locale.US, r.lat, r.lon), color = DriveColors.TextSecondary, fontSize = 14.sp)
                 }
                 BigButton("Supprimer", Color(0xFF7F1D1D)) { PersonalRadars.remove(context, r.id); refresh++ }
+            }
+        }
+    }
+}
+
+/** « Ma région » : zone enregistrée depuis la carte en ligne (aucun fichier à héberger). */
+@Composable
+private fun RegionsCard(here: Pair<Double, Double>?) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var regions by remember { mutableStateOf<List<fr.roadguard.core.map.SavedRegion>>(emptyList()) }
+    var refresh by remember { mutableStateOf(0) }
+    var job by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
+    var message by remember { mutableStateOf<String?>(null) }
+    val progress by fr.roadguard.core.map.OfflineRegions.progress.collectAsState()
+    androidx.compose.runtime.LaunchedEffect(refresh) { regions = runCatching { fr.roadguard.core.map.OfflineRegions.list(context) }.getOrDefault(emptyList()) }
+    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(DriveColors.Panel).padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text("📍 Ma région", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("Enregistre la carte sur environ 80 km autour de toi, pour l'avoir sans réseau. " +
+            "Tout ce que tu as déjà vu en ligne reste aussi en mémoire.", color = DriveColors.TextSecondary, fontSize = 14.sp)
+        val p = progress
+        if (job != null && p != null) {
+            Text(if (p.second > 0) "Téléchargement… ${p.first} / ${p.second} éléments" else "Préparation…", color = Color.White, fontSize = 15.sp)
+            LinearProgressIndicator(
+                progress = { if (p.second > 0) (p.first.toFloat() / p.second).coerceIn(0f, 1f) else 0f },
+                modifier = Modifier.fillMaxWidth().height(6.dp), color = DriveColors.Accent, trackColor = DriveColors.Track,
+            )
+            BigButton("Arrêter", DriveColors.Track) { job?.cancel(); job = null; refresh++ }
+        } else {
+            BigButton(if (here == null) "En attente du GPS…" else "Télécharger ma région", if (here == null) DriveColors.Track else DriveColors.Accent) {
+                val h = here ?: return@BigButton
+                message = null
+                job = scope.launch {
+                    runCatching {
+                        fr.roadguard.core.map.OfflineRegions.download(context, fr.roadguard.core.map.STYLE_URL, h.first, h.second, 80.0,
+                            "Région autour de %.2f, %.2f".format(java.util.Locale.FRANCE, h.first, h.second))
+                    }.onSuccess { message = "Région enregistrée ✓" }
+                        .onFailure { if (it !is kotlinx.coroutines.CancellationException) message = "Échec : ${it.message}" }
+                    job = null; refresh++
+                }
+            }
+        }
+        message?.let { Text(it, color = DriveColors.TextSecondary, fontSize = 14.sp) }
+        regions.forEach { r ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(r.name, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text((if (r.done) "Complète" else "Incomplète") + " · ${r.bytes / 1_000_000} Mo", color = DriveColors.TextSecondary, fontSize = 13.sp)
+                }
+                BigButton("Supprimer", Color(0xFF7F1D1D)) { scope.launch { fr.roadguard.core.map.OfflineRegions.delete(context, r.id); refresh++ } }
             }
         }
     }
