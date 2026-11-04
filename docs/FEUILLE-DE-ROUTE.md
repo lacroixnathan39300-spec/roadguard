@@ -89,4 +89,5 @@ Le téléphone (appli GPS) fait tout le travail ; le poste (DRIVE) affiche et re
 - [x] Lecteur de musique du poste choisi et lancé au démarrage.
 - [x] Cartes hors ligne « Ma région » sans hébergement ; cache de 1 Go ; diagnostic de carte à l'écran.
 - [x] Repris de Car Launcher : ordinateur de bord, météo/adresse, économiseur d'écran, disposition réglable, volume, favoris, tableau de bord à blocs.
-- [ ] Carte blanche sur le poste : à confirmer avec le cadre de diagnostic.
+- [x] Carte blanche / image fantôme : rendu en TextureView + remise à zéro de la mémoire de carte (confirmé par Nathan, build 107).
+- [x] Un seul APK par appli, compatible 32 bits, 64 bits et Intel.
