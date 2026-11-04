@@ -1,46 +1,46 @@
 Appli : fr.roadguard.drive
 Plantage : non
 
-11-04 11:17:26.034  1642  1673 V BackupManagerService: restoreAtInstall pkg=fr.roadguard.drive token=1 restoreSet=0
-11-04 11:17:26.110  1642  2731 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:fr.roadguard.drive flg=0x4000010 (has extras) } to com.svox.pico/.VoiceDataInstallerReceiver
-11-04 11:17:26.334  1881  1881 D ImsResolver: maybeAddedImsService, packageName: fr.roadguard.drive
-11-04 11:17:26.423  2756  2756 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
-11-04 11:17:26.534  2756  2756 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
-11-04 11:17:26.544  2756  2756 I AndroidRuntime: VM exiting with result code 0.
-11-04 11:17:26.756  2784  2784 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
-11-04 11:17:26.800  2784  2784 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
-11-04 11:17:26.803  2784  2784 I AndroidRuntime: VM exiting with result code 0.
-11-04 11:17:26.893  2795  2795 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
-11-04 11:17:26.932  2795  2795 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
-11-04 11:17:26.943  2795  2795 I AndroidRuntime: VM exiting with result code 1.
-11-04 11:17:27.038  2806  2806 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
-11-04 11:17:27.076  2806  2806 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
-11-04 11:17:27.080  2806  2806 I AndroidRuntime: VM exiting with result code 1.
-11-04 11:17:27.096  1642  2244 I ActivityManager: START u0 {flg=0x10000000 cmp=fr.roadguard.drive/.MainActivity} from uid 2000
-11-04 11:17:27.114  1642  2205 I ActivityManager: Start proc 2821:fr.roadguard.drive/u0a59 for activity fr.roadguard.drive/.MainActivity
-11-04 11:17:29.033  1642  1664 I ActivityManager: Displayed fr.roadguard.drive/.MainActivity: +1s925ms
-11-04 11:17:36.752  2821  2821 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-04 11:17:37.133  2821  2821 W System.err: 	at fr.roadguard.core.map.DriveMapKt.enableLocation(DriveMap.kt:210)
-11-04 11:17:37.133  2821  2821 W System.err: 	at fr.roadguard.core.map.DriveMapKt.access$enableLocation(DriveMap.kt:1)
-11-04 11:17:37.133  2821  2821 W System.err: 	at fr.roadguard.core.map.DriveMapKt$DriveMap$4$1.invokeSuspend$lambda$3(DriveMap.kt:138)
-11-04 11:17:37.133  2821  2821 W System.err: 	at fr.roadguard.core.map.DriveMapKt$DriveMap$4$1.$r8$lambda$HrCx1NBqKavqRE1qQGvRLFmbJZE(Unknown Source:0)
-11-04 11:17:37.133  2821  2821 W System.err: 	at fr.roadguard.core.map.DriveMapKt$DriveMap$4$1$$ExternalSyntheticLambda0.onStyleLoaded(D8$$SyntheticClass:0)
-11-04 11:17:40.032  2821  2918 D ProfileInstaller: Installing profile for fr.roadguard.drive
-11-04 11:17:41.891  2821  2821 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-04 11:17:47.892  2821  2821 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-04 11:17:53.893  2821  2821 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-04 11:17:59.894  2821  2821 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-04 11:18:05.893  2821  2821 I chatty  : uid=10059(fr.roadguard.drive) identical 1 line
-11-04 11:18:11.894  2821  2821 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-04 11:18:17.895  2821  2821 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-04 11:18:23.895  2821  2821 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-04 11:18:29.896  2821  2821 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-04 11:18:35.900  2821  2821 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-04 11:18:41.900  2821  2821 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-04 11:18:47.899  2821  2821 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-04 11:18:53.899  2821  2821 I chatty  : uid=10059(fr.roadguard.drive) identical 1 line
-11-04 11:18:59.900  2821  2821 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-04 11:19:05.900  2821  2821 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-04 11:19:11.901  2821  2821 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-04 11:19:17.901  2821  2821 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-04 11:19:23.902  2821  2821 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
+11-04 12:41:11.917  1642  1673 V BackupManagerService: restoreAtInstall pkg=fr.roadguard.drive token=1 restoreSet=0
+11-04 12:41:12.012  1642  2723 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:fr.roadguard.drive flg=0x4000010 (has extras) } to com.svox.pico/.VoiceDataInstallerReceiver
+11-04 12:41:12.194  1891  1891 D ImsResolver: maybeAddedImsService, packageName: fr.roadguard.drive
+11-04 12:41:12.396  2787  2787 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+11-04 12:41:12.522  2787  2787 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
+11-04 12:41:12.554  2787  2787 I AndroidRuntime: VM exiting with result code 0.
+11-04 12:41:12.760  2804  2804 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+11-04 12:41:12.807  2804  2804 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
+11-04 12:41:12.809  2804  2804 I AndroidRuntime: VM exiting with result code 0.
+11-04 12:41:12.919  2815  2815 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+11-04 12:41:12.964  2815  2815 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
+11-04 12:41:12.968  2815  2815 I AndroidRuntime: VM exiting with result code 1.
+11-04 12:41:13.080  2826  2826 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+11-04 12:41:13.130  2826  2826 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
+11-04 12:41:13.134  2826  2826 I AndroidRuntime: VM exiting with result code 1.
+11-04 12:41:13.156  1642  1944 I ActivityManager: START u0 {flg=0x10000000 cmp=fr.roadguard.drive/.MainActivity} from uid 2000
+11-04 12:41:13.176  1642  1654 I ActivityManager: Start proc 2841:fr.roadguard.drive/u0a59 for activity fr.roadguard.drive/.MainActivity
+11-04 12:41:22.242  1642  1664 I ActivityManager: Displayed fr.roadguard.drive/.MainActivity: +2s353ms
+11-04 12:41:23.230  2841  2841 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
+11-04 12:41:23.673  2841  2841 W System.err: 	at fr.roadguard.core.map.DriveMapKt.enableLocation(DriveMap.kt:210)
+11-04 12:41:23.673  2841  2841 W System.err: 	at fr.roadguard.core.map.DriveMapKt.access$enableLocation(DriveMap.kt:1)
+11-04 12:41:23.673  2841  2841 W System.err: 	at fr.roadguard.core.map.DriveMapKt$DriveMap$4$1.invokeSuspend$lambda$3(DriveMap.kt:138)
+11-04 12:41:23.673  2841  2841 W System.err: 	at fr.roadguard.core.map.DriveMapKt$DriveMap$4$1.$r8$lambda$HrCx1NBqKavqRE1qQGvRLFmbJZE(Unknown Source:0)
+11-04 12:41:23.673  2841  2841 W System.err: 	at fr.roadguard.core.map.DriveMapKt$DriveMap$4$1$$ExternalSyntheticLambda0.onStyleLoaded(D8$$SyntheticClass:0)
+11-04 12:41:25.738  2841  2937 D ProfileInstaller: Installing profile for fr.roadguard.drive
+11-04 12:41:29.132  2841  2841 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
+11-04 12:41:35.128  2841  2841 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
+11-04 12:41:41.130  2841  2841 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
+11-04 12:41:48.060  2841  2841 I RoadguardSession: pos=46.72575,5.59279 v=71 cap=205 prec=20 nuit=false alerte=- radars=true
+11-04 12:41:54.086  2841  2841 I RoadguardSession: pos=46.72480,5.59215 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-04 12:42:00.130  2841  2841 I RoadguardSession: pos=46.72385,5.59150 v=136 cap=0 prec=20 nuit=false alerte=- radars=true
+11-04 12:42:06.145  2841  2841 I RoadguardSession: pos=46.72306,5.59096 v=35 cap=205 prec=20 nuit=false alerte=- radars=true
+11-04 12:42:12.146  2841  2841 I RoadguardSession: pos=46.72210,5.59031 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-04 12:42:18.148  2841  2841 I RoadguardSession: pos=46.72115,5.58967 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-04 12:42:24.148  2841  2841 I RoadguardSession: pos=46.72020,5.58902 v=71 cap=205 prec=20 nuit=false alerte=- radars=true
+11-04 12:42:30.149  2841  2841 I RoadguardSession: pos=46.71925,5.58837 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-04 12:42:36.151  2841  2841 I RoadguardSession: pos=46.71846,5.58783 v=69 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@432m radars=true
+11-04 12:42:42.150  2841  2841 I RoadguardSession: pos=46.71751,5.58719 v=136 cap=0 prec=20 nuit=false alerte=- radars=true
+11-04 12:42:48.151  2841  2841 I RoadguardSession: pos=46.71656,5.58654 v=136 cap=0 prec=20 nuit=false alerte=- radars=true
+11-04 12:42:54.151  2841  2841 I RoadguardSession: pos=46.71592,5.58611 v=70 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@122m radars=true
+11-04 12:43:00.153  2841  2841 I RoadguardSession: pos=46.71497,5.58546 v=136 cap=0 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@14m radars=true
+11-04 12:43:06.153  2841  2841 I RoadguardSession: pos=46.71402,5.58482 v=70 cap=205 prec=20 nuit=false alerte=rg-23221914238eedc5fb8a@2m radars=true
+11-04 12:43:12.156  2841  2841 I RoadguardSession: pos=46.71307,5.58417 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
