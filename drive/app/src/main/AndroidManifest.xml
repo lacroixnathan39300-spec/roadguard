@@ -9,6 +9,8 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <!-- ROADGUARD Link : trouver le téléphone sur le Wi-Fi (passerelle et annonce réseau). -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- ROADGUARD Link par câble USB : le poste est l'hôte USB du téléphone. -->
+    <uses-feature android:name="android.hardware.usb.host" android:required="false" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />

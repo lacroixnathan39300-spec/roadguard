@@ -92,6 +92,10 @@ public final class LinkService extends Service {
         if (intent != null && ACTION_STOP.equals(intent.getAction())) { stopSelf(); return START_NOT_STICKY; }
         startForegroundNow();
         if (!running) start();
+        // Câble USB : le poste a basculé le téléphone en mode accessoire.
+        android.hardware.usb.UsbAccessory accessory = intent == null ? null
+            : intent.getParcelableExtra(android.hardware.usb.UsbManager.EXTRA_ACCESSORY);
+        if (accessory != null) new Thread(() -> serveAccessory(accessory), "roadguard-link-usb").start();
         return START_STICKY;
     }
 
@@ -143,15 +147,39 @@ public final class LinkService extends Service {
     }
 
     private void serve(Socket socket) {
-        LinkProtocol.Session session = null;
         try {
             socket.setSoTimeout(20_000);
             socket.setTcpNoDelay(true);
-            session = LinkProtocol.serverHandshake(socket.getInputStream(), socket.getOutputStream(),
-                phoneId(this), Build.MODEL, peers());
+            serve(socket.getInputStream(), socket.getOutputStream(), socket, "Wi-Fi");
+        } catch (IOException e) {
+            try { socket.close(); } catch (IOException ignored) {}
+        }
+    }
+
+    private void serveAccessory(android.hardware.usb.UsbAccessory accessory) {
+        android.hardware.usb.UsbManager usb = (android.hardware.usb.UsbManager) getSystemService(USB_SERVICE);
+        android.os.ParcelFileDescriptor pfd;
+        try {
+            pfd = usb.openAccessory(accessory);
+        } catch (SecurityException e) {
+            setStatus("Câble USB : autorisation refusée");
+            return;
+        }
+        if (pfd == null) { setStatus("Câble USB : liaison impossible"); return; }
+        java.io.FileDescriptor fd = pfd.getFileDescriptor();
+        // Lectures par blocs de 16 Ko : exigé par le mode accessoire pour ne pas perdre de données.
+        java.io.InputStream in = new java.io.BufferedInputStream(new java.io.FileInputStream(fd), 16_384);
+        java.io.OutputStream out = new java.io.FileOutputStream(fd);
+        serve(in, out, pfd, "câble USB");
+    }
+
+    private void serve(java.io.InputStream input, java.io.OutputStream output, java.io.Closeable link, String via) {
+        LinkProtocol.Session session = null;
+        try {
+            session = LinkProtocol.serverHandshake(input, output, phoneId(this), Build.MODEL, peers());
             LinkProtocol.Session old = current.getAndSet(session);
             if (old != null) closeQuietly(old);
-            setStatus("Connecté à " + (session.peerName.isEmpty() ? "l'autoradio" : session.peerName));
+            setStatus("Connecté à " + (session.peerName.isEmpty() ? "l'autoradio" : session.peerName) + " (" + via + ")");
             sendMedia();
             while (running) {
                 JSONObject m = session.receive();
@@ -162,7 +190,7 @@ public final class LinkService extends Service {
             if (e instanceof LinkProtocol.AuthException) setStatus(e.getMessage());
         } finally {
             if (session != null && current.compareAndSet(session, null) && running) setStatus("En attente de l'autoradio…");
-            try { socket.close(); } catch (IOException ignored) {}
+            try { link.close(); } catch (IOException ignored) {}
         }
     }
 

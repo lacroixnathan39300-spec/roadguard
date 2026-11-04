@@ -125,6 +125,7 @@ public final class LinkActivity extends Activity {
         scroll.addView(root);
         setContentView(scroll);
         handleShare(getIntent());
+        handleUsb(getIntent());
     }
 
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -139,6 +140,18 @@ public final class LinkActivity extends Activity {
     @Override protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         handleShare(intent);
+        handleUsb(intent);
+    }
+
+    /** Câble USB branché sur l'autoradio : démarrer la liaison par USB. */
+    private void handleUsb(Intent intent) {
+        if (intent == null || !android.hardware.usb.UsbManager.ACTION_USB_ACCESSORY_ATTACHED.equals(intent.getAction())) return;
+        Intent service = new Intent(this, LinkService.class);
+        service.putExtra(android.hardware.usb.UsbManager.EXTRA_ACCESSORY,
+            (android.os.Parcelable) intent.getParcelableExtra(android.hardware.usb.UsbManager.EXTRA_ACCESSORY));
+        startForegroundService(service);
+        toast("Autoradio branché en USB : liaison en cours.");
+        setIntent(new Intent(this, LinkActivity.class));
     }
 
     /** Partage reçu : envoyer la destination à l'autoradio connecté. */

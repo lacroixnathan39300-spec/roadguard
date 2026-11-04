@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mode accessoire USB : seul l'autoradio ROADGUARD DRIVE ouvre la liaison. -->
+<resources>
+    <usb-accessory manufacturer="ROADGUARD" model="Link" />
+</resources>

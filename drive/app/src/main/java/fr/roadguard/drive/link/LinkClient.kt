@@ -148,16 +148,13 @@ class LinkClient(private val context: Context) {
         var failures = 0
         while (scope.isActive && (isPaired() || pairingCode != null)) {
             _state.value = LinkState.Searching
-            val host = findPhone()
-            if (host == null) { delay(backoff(failures++)); continue }
+            val transport = openTransport()
+            if (transport == null) { delay(backoff(failures++)); continue }
             try {
-                Socket().use { socket ->
-                    socket.connect(InetSocketAddress(host, LinkProtocol.PORT), 5_000)
-                    socket.soTimeout = 20_000
-                    socket.tcpNoDelay = true
+                transport.use { t ->
                     val secret = prefs.getString("secret", null)?.let(LinkProtocol::unb64)
                     val code = if (secret == null) pairingCode else null
-                    val s = LinkProtocol.clientHandshake(socket.getInputStream(), socket.getOutputStream(),
+                    val s = LinkProtocol.clientHandshake(t.input, t.output,
                         driveId, "ROADGUARD DRIVE (${Build.MODEL})", secret, code)
                     if (secret == null) {
                         prefs.edit().putString("secret", LinkProtocol.b64(s.secret)).putString("phone_id", s.peerId)
@@ -166,7 +163,7 @@ class LinkClient(private val context: Context) {
                     }
                     session = s
                     failures = 0
-                    _state.value = LinkState.Connected(s.peerName.ifBlank { "téléphone" })
+                    _state.value = LinkState.Connected("${s.peerName.ifBlank { "téléphone" }} (${t.label})")
                     val pinger = scope.launch { while (isActive) { delay(5_000); runCatching { s.send(JSONObject().put("t", "ping")) } } }
                     try {
                         while (scope.isActive) {
@@ -192,6 +189,29 @@ class LinkClient(private val context: Context) {
             }
         }
     }
+
+    /** Câble USB en priorité (comme Android Auto filaire), sinon Wi-Fi. */
+    private suspend fun openTransport(): LinkTransport? {
+        runCatching { UsbTransport.open(context) }.getOrNull()?.let { return it }
+        val host = findPhone() ?: return null
+        val socket = Socket()
+        return try {
+            socket.connect(InetSocketAddress(host, LinkProtocol.PORT), 5_000)
+            socket.soTimeout = 20_000
+            socket.tcpNoDelay = true
+            object : LinkTransport {
+                override val input = socket.getInputStream()
+                override val output = socket.getOutputStream()
+                override val label = "Wi-Fi"
+                override fun close() { runCatching { socket.close() } }
+            }
+        } catch (e: Exception) {
+            runCatching { socket.close() }
+            null
+        }
+    }
+
+    private inline fun <R> LinkTransport.use(block: (LinkTransport) -> R): R = try { block(this) } finally { close() }
 
     private fun handle(m: JSONObject) {
         when (m.optString("t")) {

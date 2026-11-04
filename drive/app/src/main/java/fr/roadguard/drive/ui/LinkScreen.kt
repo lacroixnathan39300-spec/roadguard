@@ -28,6 +28,7 @@ import fr.roadguard.drive.link.LinkState
 @Composable
 fun LinkScreen(link: LinkClient, onClose: () -> Unit) {
     val state by link.state.collectAsState()
+    val context = androidx.compose.ui.platform.LocalContext.current
     var code by remember { mutableStateOf<String?>(null) }
     var paired by remember { mutableStateOf(link.isPaired()) }
     if (state is LinkState.Connected) paired = true
@@ -49,6 +50,13 @@ fun LinkScreen(link: LinkClient, onClose: () -> Unit) {
                     "et que « ROADGUARD Link » est démarré sur le téléphone.", color = DriveColors.TextSecondary, fontSize = 18.sp)
                 Text("Le poste utilise alors le GPS du téléphone et affiche sa musique, que tu pilotes depuis l'accueil.",
                     color = DriveColors.TextSecondary, fontSize = 18.sp)
+                Text("Par câble : branche le téléphone sur le port USB du poste, la liaison démarre seule (et le téléphone se recharge). " +
+                    "La première fois, accepte les deux demandes d'autorisation USB, sur le poste et sur le téléphone, en cochant « toujours ».",
+                    color = DriveColors.TextSecondary, fontSize = 18.sp)
+                BigButton("Réessayer le câble USB", DriveColors.Panel) {
+                    fr.roadguard.drive.link.UsbTransport.resetRejected(context)
+                    link.connectForPairing()
+                }
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     BigButton("Oublier ce téléphone", Color(0xFFB71C1C)) { link.forget(); paired = false }
                     BigButton("Associer un autre téléphone", DriveColors.Panel) { link.forget(); paired = false; code = link.beginPairing() }
