@@ -51,7 +51,8 @@ Le téléphone (appli GPS) fait tout le travail ; le poste (DRIVE) affiche et re
 - [x] Internet du poste par le téléphone : carte, recherche, itinéraires, limites passent par la liaison si le poste n'a pas Internet.
 - [x] Son du téléphone par la liaison (option « Écran + son »), Bluetooth en secours.
 - [ ] Wi-Fi créé par le poste avec connexion automatique du téléphone (limité par Android 8.1 : identifiants changeants).
-- [ ] Mode voiture ROADGUARD : écrans conçus pour le poste (paysage, gros boutons) dessinés par le
+- [x] Mode voiture ROADGUARD : assuré par DRIVE, qui tourne sur le poste avec le GPS, Internet et la musique du téléphone (plus léger que la vidéo).
+- [ ] (Abandonné au profit de DRIVE) Écrans conçus pour le poste (paysage, gros boutons) dessinés par le
       téléphone sur un écran virtuel à la résolution du poste, puis envoyés en vidéo H.264.
       Le téléphone peut rester verrouillé dans la poche.
 - [ ] Écrans : carte et guidage, radars et vitesse moyenne, musique de n'importe quelle appli
@@ -66,8 +67,9 @@ Le téléphone (appli GPS) fait tout le travail ; le poste (DRIVE) affiche et re
 ## Phase 4 — Navigation de haut niveau
 - [x] Itinéraires en ligne (Valhalla FOSSGIS) et **hors ligne** (GraphHopper 5.3, graphe OSM fabriqué par GitHub Actions) avec repli automatique ; Franche-Comté embarquée, vérifiée par un vrai trajet Lons → Champagnole (35,4 km) (build 56).
 - [ ] Autres régions hors ligne : dépôt public de données à créer pour les publier.
-- [ ] Recherche d'adresses hors ligne, Maison/Travail, favoris.
-- [ ] Voix de guidage, voies conseillées, limites de vitesse affichées, recalcul automatique.
+- [x] Recherche hors ligne des 34 970 communes de France (geo.api.gouv.fr), Maison/Travail, favoris.
+- [x] Voix de guidage avec « puis… », limites de vitesse affichées, recalcul automatique, zoom selon la vitesse, nord en haut.
+- [ ] Voies conseillées (le calculateur en ligne ne les fournit pas encore).
 - [ ] Vitesse moyenne sur les tronçons, indication bon/pas bon jusqu'à la fin de la zone.
 
 ## Phase 5 — Extensions
