@@ -12,3 +12,7 @@ binding = "DB"
 database_name = "roadguard"
 database_id = "REMPLACE_PAR_LA_CI"
 migrations_dir = "migrations"
+
+# Site public (carte, classement, applis) : fichiers servis gratuitement, sans compter dans le quota.
+[assets]
+directory = "./public"
