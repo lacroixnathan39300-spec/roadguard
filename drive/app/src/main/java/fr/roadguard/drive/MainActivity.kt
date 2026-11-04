@@ -185,6 +185,8 @@ private fun DriveHome() {
     var showTrip by remember { mutableStateOf(false) }
     /** Page affichée : 0 = carte, 1 = tableau de bord (la carte reste chargée dessous). */
     var page by remember { mutableStateOf(0) }
+    // Mémoire de la carte remise à zéro une fois (des morceaux abîmés affichaient une image à la place de la carte).
+    LaunchedEffect(Unit) { runCatching { fr.roadguard.core.map.OfflineRegions.clearCacheOnce(context, 1) } }
     var lastTouch by remember { mutableStateOf(System.currentTimeMillis()) }
     // Lecteur de musique choisi : ouvert une fois au démarrage, puis retour sur DRIVE.
     LaunchedEffect(Unit) {

@@ -287,6 +287,9 @@ private fun RegionsCard(here: Pair<Double, Double>?) {
             }
         }
         message?.let { Text(it, color = DriveColors.TextSecondary, fontSize = 14.sp) }
+        BigButton("Vider la mémoire de la carte", DriveColors.Track) {
+            scope.launch { fr.roadguard.core.map.OfflineRegions.clearCache(context); message = "Mémoire de la carte vidée : elle se recharge." }
+        }
         regions.forEach { r ->
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {

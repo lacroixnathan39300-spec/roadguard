@@ -42,6 +42,22 @@ object OfflineRegions {
         runCatching { manager(context).setMaximumAmbientCacheSize(1_000_000_000L, null) }
     }
 
+    /** Vide la mémoire automatique de la carte (morceaux abîmés ou erronés). Les zones enregistrées restent. */
+    suspend fun clearCache(context: Context) = suspendCancellableCoroutine<Unit> { cont ->
+        manager(context).clearAmbientCache(object : OfflineManager.FileSourceCallback {
+            override fun onSuccess() { cont.resume(Unit) }
+            override fun onError(message: String) { cont.resume(Unit) }
+        })
+    }
+
+    /** Une fois après une mise à jour qui corrige le cache : on repart d'une mémoire propre. */
+    suspend fun clearCacheOnce(context: Context, version: Int) {
+        val prefs = context.getSharedPreferences("map_cache", Context.MODE_PRIVATE)
+        if (prefs.getInt("cleared", 0) >= version) return
+        clearCache(context)
+        prefs.edit().putInt("cleared", version).apply()
+    }
+
     suspend fun list(context: Context): List<SavedRegion> {
         val regions = suspendCancellableCoroutine<Array<OfflineRegion>> { cont ->
             manager(context).listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
