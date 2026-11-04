@@ -46,6 +46,27 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
         beeper.postDelayed(releaseFocus, maxOf(500L, shortSoundUntil - android.os.SystemClock.uptimeMillis() + 300))
     }
 
+    /** Voix françaises installées sur l'appareil (nom technique → libellé lisible). */
+    fun frenchVoices(): List<Pair<String, String>> = runCatching {
+        tts.voices.orEmpty().filter { it.locale.language == "fr" && !it.isNetworkConnectionRequired }
+            .sortedBy { it.name }
+            .mapIndexed { i, v -> v.name to "Voix ${i + 1}" + (if (v.locale.country.isNotBlank()) " (${v.locale.country})" else "") }
+    }.getOrDefault(emptyList())
+
+    private var appliedVoice: String? = null
+    private var appliedRate = 1f
+
+    /** Voix et débit choisis dans les réglages (appliqués seulement s'ils changent). */
+    fun configure(voiceName: String?, rate: Float) {
+        if (!ttsReady) return
+        if (rate != appliedRate) { tts.setSpeechRate(rate); appliedRate = rate }
+        if (voiceName != appliedVoice) {
+            appliedVoice = voiceName
+            if (voiceName == null) tts.language = Locale.FRANCE
+            else tts.voices?.firstOrNull { it.name == voiceName }?.let { tts.voice = it }
+        }
+    }
+
     private fun say(text: String, id: String) {
         if (!(ttsReady && voiceEnabled) || text.isBlank()) return
         speaking++

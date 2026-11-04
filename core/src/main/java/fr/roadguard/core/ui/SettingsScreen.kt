@@ -31,7 +31,8 @@ import fr.roadguard.core.radar.RadarKind
 /** Réglages : annonces, types d'alertes, limite de vitesse, thème. Gros boutons, lisibles en voiture. */
 @Composable
 fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit, onOfflineData: (() -> Unit)? = null, showAutostart: Boolean = false,
-    onCommunity: (() -> Unit)? = null, onMusicPlayer: (() -> Unit)? = null, onPersonalize: (() -> Unit)? = null) {
+    onCommunity: (() -> Unit)? = null, onMusicPlayer: (() -> Unit)? = null, onPersonalize: (() -> Unit)? = null,
+    voice: fr.roadguard.core.radar.AlertVoice? = null) {
     val context = androidx.compose.ui.platform.LocalContext.current
     Column(Modifier.fillMaxSize().background(DriveColors.Background).padding(20.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -59,6 +60,26 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
             Section("Itinéraire")
             ToggleRow("Éviter les péages", settings.avoidTolls, settings::changeAvoidTolls)
             ToggleRow("Éviter les autoroutes", settings.avoidHighways, settings::changeAvoidHighways)
+
+            if (voice != null) {
+                Section("Voix")
+                val voices = androidx.compose.runtime.remember { voice.frenchVoices() }
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    BigButton("Par défaut", if (settings.voiceName == null) DriveColors.Accent else DriveColors.Panel) { settings.changeVoiceName(null) }
+                    voices.forEach { (name, label) ->
+                        BigButton(label, if (settings.voiceName == name) DriveColors.Accent else DriveColors.Panel) {
+                            settings.changeVoiceName(name); voice.configure(name, settings.speechRate); voice.speak("Radar fixe, limité à 80")
+                        }
+                    }
+                }
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    listOf(0.85f to "Lente", 1f to "Normale", 1.2f to "Rapide").forEach { (r, label) ->
+                        BigButton("Débit : $label", if (settings.speechRate == r) DriveColors.Accent else DriveColors.Panel) {
+                            settings.changeSpeechRate(r); voice.configure(settings.voiceName, r); voice.speak("Dans 300 mètres, tournez à droite")
+                        }
+                    }
+                }
+            }
 
             Section("Par-dessus les autres applis")
             val bubbleHelper = androidx.compose.runtime.remember { RadarBubble(context) }

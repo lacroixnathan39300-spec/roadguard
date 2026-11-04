@@ -65,6 +65,11 @@ class DriveSettings(context: Context) {
     var bubble by mutableStateOf(prefs.getBoolean("bubble", true)); private set
     fun changeBubble(v: Boolean) { bubble = v; prefs.edit().putBoolean("bubble", v).apply() }
 
+    var voiceName by mutableStateOf(prefs.getString("voice_name", null)); private set
+    var speechRate by mutableStateOf(prefs.getFloat("speech_rate", 1f)); private set
+    fun changeVoiceName(v: String?) { voiceName = v; prefs.edit().putString("voice_name", v).apply() }
+    fun changeSpeechRate(v: Float) { speechRate = v; prefs.edit().putFloat("speech_rate", v).apply() }
+
     fun changeAutostart(v: Boolean) { autostart = v; prefs.edit().putBoolean("autostart", v).apply() }
     fun changeAccent(v: Long) {
         accent = v; prefs.edit().putLong("accent", v).apply()
