@@ -44,6 +44,13 @@ jobs:
             id=$(npx wrangler d1 list --json | python3 -c "import json,sys; print(next(d['uuid'] for d in json.load(sys.stdin) if d['name']=='roadguard-eu'))")
           fi
           sed -i "s/REMPLACE_PAR_LA_CI/$id/" wrangler.toml
+          # Espace « APPS » (mises à jour des applis) : créé s'il n'existe pas.
+          kv=$(npx wrangler kv namespace list | python3 -c "import json,sys; print(next((n['id'] for n in json.load(sys.stdin) if n['title'].endswith('APPS') or n['title']=='roadguard-apps'),''))")
+          if [ -z "$kv" ]; then
+            npx wrangler kv namespace create roadguard-apps || true
+            kv=$(npx wrangler kv namespace list | python3 -c "import json,sys; print(next((n['id'] for n in json.load(sys.stdin) if n['title'].endswith('roadguard-apps') or n['title'].endswith('APPS')),''))")
+          fi
+          sed -i "s/REMPLACE_KV_PAR_LA_CI/$kv/" wrangler.toml
           npx wrangler d1 migrations apply roadguard-eu --remote
           # Adresse workers.dev du compte : créée si elle n'existe pas encore.
           api="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/subdomain"

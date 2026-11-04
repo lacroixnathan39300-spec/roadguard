@@ -13,3 +13,7 @@ database_name = "roadguard-eu"
 database_id = "REMPLACE_PAR_LA_CI"
 migrations_dir = "migrations"
 
+# Applis à jour (APK en morceaux), écrites par la compilation automatique.
+[[kv_namespaces]]
+binding = "APPS"
+id = "REMPLACE_KV_PAR_LA_CI"

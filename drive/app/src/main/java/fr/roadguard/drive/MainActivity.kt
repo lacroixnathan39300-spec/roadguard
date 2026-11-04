@@ -413,7 +413,7 @@ private fun DriveHome() {
             LaunchedEffect(Unit) { radarCount = RadarRepository.radars(context).size }
             SettingsScreen(settings, radarCount, onClose = { showSettings = false }, onOfflineData = { showOffline = true }, showAutostart = true,
                 onCommunity = { showCommunity = true }, onMusicPlayer = { showPlayer = true },
-                onPersonalize = { showPersonalize = true }, voice = session.voice)
+                onPersonalize = { showPersonalize = true }, voice = session.voice, updateApp = "drive")
         }
         if (showSearch) {
             BackHandler { showSearch = false }

@@ -106,3 +106,15 @@ jobs:
           git push -f "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" apk
           gh release delete latest -R "$REPO" -y --cleanup-tag || true
           gh release create latest -R "$REPO" --title "ROADGUARD build $RUN" --notes "Compilation automatique de $SHA" *.apk SHA256SUMS.txt
+      - uses: actions/checkout@v4
+        with: { path: src, sparse-checkout: "keys\ntools/ci" }
+      - name: Mise à jour depuis les applis (serveur ROADGUARD)
+        env:
+          RG_KEYS_PASSPHRASE: ${{ secrets.RG_KEYS_PASSPHRASE }}
+          RUN: ${{ github.run_number }}
+        run: |
+          [ -n "$RG_KEYS_PASSPHRASE" ] || exit 0
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in src/keys/cloudflare.env.enc -pass env:RG_KEYS_PASSPHRASE > "$RUNNER_TEMP/cf.env"
+          while IFS='=' read -r k v; do [ -n "$k" ] && echo "::add-mask::$v" && export "$k=$v"; done < "$RUNNER_TEMP/cf.env"
+          rm -f "$RUNNER_TEMP/cf.env"
+          python3 src/tools/ci/publish_updates.py dist "$RUN" || echo "::warning::Mise à jour en ligne non publiée"

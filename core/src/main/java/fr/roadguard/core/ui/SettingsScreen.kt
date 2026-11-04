@@ -32,7 +32,7 @@ import fr.roadguard.core.radar.RadarKind
 @Composable
 fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit, onOfflineData: (() -> Unit)? = null, showAutostart: Boolean = false,
     onCommunity: (() -> Unit)? = null, onMusicPlayer: (() -> Unit)? = null, onPersonalize: (() -> Unit)? = null,
-    voice: fr.roadguard.core.radar.AlertVoice? = null) {
+    voice: fr.roadguard.core.radar.AlertVoice? = null, updateApp: String? = null) {
     val context = androidx.compose.ui.platform.LocalContext.current
     Column(Modifier.fillMaxSize().background(DriveColors.Background).padding(20.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -141,6 +141,8 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                 Section("Démarrage")
                 ToggleRow("Ouvrir DRIVE à l'allumage du poste", settings.autostart, settings::changeAutostart)
             }
+
+            if (updateApp != null) UpdateCard(updateApp)
 
             Section("À propos")
             Text(

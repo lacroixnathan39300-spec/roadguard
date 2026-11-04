@@ -15,6 +15,8 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- Bulle vitesse et radars par-dessus les autres applis (Waze…). -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- Mise à jour de l'appli depuis le serveur ROADGUARD. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
 
@@ -54,6 +56,12 @@
                 <action android:name="com.microntek.bootcheck" />
             </intent-filter>
         </receiver>
+
+        <provider
+            android:name="fr.roadguard.core.update.UpdateProvider"
+            android:authorities="${applicationId}.roadguard.updates"
+            android:exported="false"
+            android:grantUriPermissions="true" />
 
         <!-- Accès aux lecteurs de musique (titre, pochette, commandes). -->
         <service

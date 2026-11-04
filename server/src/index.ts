@@ -9,6 +9,8 @@
 
 export interface Env {
   DB: D1Database;
+  /** Applis à jour (APK découpés en morceaux de 20 Mo), déposées par la compilation automatique. */
+  APPS?: KVNamespace;
 }
 
 const MIN = 60_000;
@@ -361,6 +363,16 @@ export default {
       if (req.method === "GET" && path === "/v1/leaderboard") return leaderboard(url, env, me);
       if (req.method === "POST" && path === "/v1/sync") return sync(req, env, me);
       if (req.method === "GET" && path === "/v1/stats") return stats(env);
+      if (req.method === "GET" && path === "/v1/apps") {
+        const m = env.APPS ? await env.APPS.get("manifest") : null;
+        return new Response(m ?? "{}", { headers: { "content-type": "application/json", "cache-control": "max-age=300", ...CORS } });
+      }
+      const chunk = /^\/v1\/apps\/(gps|drive)\/(\d+)\/(\d{1,2})$/.exec(path);
+      if (req.method === "GET" && chunk && env.APPS) {
+        const data = await env.APPS.get(`${chunk[1]}:${chunk[2]}:${chunk[3]}`, "arrayBuffer");
+        if (!data) return fail(404, "Morceau introuvable");
+        return new Response(data, { headers: { "content-type": "application/octet-stream", "cache-control": "max-age=86400", ...CORS } });
+      }
       if (!me) return fail(401, "Compte requis");
       if (req.method === "GET" && path === "/v1/account") return json({ id: me.id, name: me.name, points: me.points });
       if ((req.method === "PATCH" || req.method === "POST") && path === "/v1/account/name") {
