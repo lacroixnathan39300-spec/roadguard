@@ -81,7 +81,8 @@ class Guidance(val route: Route) {
             val early = earlyDistance(speedKmh)
             if (toNext <= nowDistance(speedKmh) && spokenNow.add(nextIndex)) {
                 spokenEarly.add(nextIndex)
-                speak = next.verbalNow + (then?.let { ", puis ${it.verbalAlert.replaceFirstChar { c -> c.lowercase() }}" } ?: "")
+                speak = then?.let { "${next.verbalNow.trimEnd('.', ' ')}, puis ${it.verbalAlert.replaceFirstChar { c -> c.lowercase() }}" }
+                    ?: next.verbalNow
             } else if (toNext <= early && toNext > nowDistance(speedKmh) * 2 && spokenEarly.add(nextIndex)) {
                 speak = "Dans ${roundDistance(toNext)}, ${next.verbalAlert.replaceFirstChar { it.lowercase() }}"
             }

@@ -140,6 +140,6 @@ class NavTest {
         g.update(46.0, 5.0, 50.0)
         val near = g.update(46.01450, 5.0, 50.0)
         assertEquals(15, near.then?.type)
-        assertEquals("Tournez à droite maintenant., puis tournez à gauche.", near.speak)
+        assertEquals("Tournez à droite maintenant, puis tournez à gauche.", near.speak)
     }
 }
