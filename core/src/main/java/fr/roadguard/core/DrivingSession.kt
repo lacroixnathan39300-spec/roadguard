@@ -135,6 +135,7 @@ class DrivingSession(
         }
         voice.voiceEnabled = settings.voice
         voice.beepEnabled = settings.beep
+        voice.duckMusic = settings.duckMusic
         val f = completeFix(location.toAlertFix())
         // Vitesse calculée par ROADGUARD si le GPS ne la donne pas (certains postes).
         fix = location.toSpeedFix().let { sf -> if (!location.hasSpeed() && f.speedKmh > 0) sf.copy(kmh = f.speedKmh.toInt()) else sf }

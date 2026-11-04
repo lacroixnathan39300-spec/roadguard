@@ -46,6 +46,9 @@ class DriveSettings(context: Context) {
     var gpsSource by mutableStateOf(prefs.getString("gps_source", "auto") ?: "auto"); private set
     fun changeGpsSource(v: String) { gpsSource = v; prefs.edit().putString("gps_source", v).apply() }
 
+    var duckMusic by mutableStateOf(prefs.getBoolean("duck_music", true)); private set
+    fun changeDuckMusic(v: Boolean) { duckMusic = v; prefs.edit().putBoolean("duck_music", v).apply() }
+
     fun changeAutostart(v: Boolean) { autostart = v; prefs.edit().putBoolean("autostart", v).apply() }
     fun changeAccent(v: Long) {
         accent = v; prefs.edit().putLong("accent", v).apply()

@@ -49,6 +49,7 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
             Section("Annonces")
             ToggleRow("Voix (radars, guidage, vitesse moyenne)", settings.voice, settings::changeVoice)
             ToggleRow("Bip d'alerte", settings.beep, settings::changeBeep)
+            ToggleRow("Baisser la musique pendant les annonces et les bips", settings.duckMusic, settings::changeDuckMusic)
             ToggleRow("Bips de plus en plus rapides en approchant (détecteur)", settings.proximityBeeps, settings::changeProximityBeeps)
             ToggleRow("Lire à voix haute les messages du téléphone", settings.readMessages, settings::changeReadMessages)
             ToggleRow("Avertir en cas de dépassement de la limite", settings.speedLimitWarning, settings::changeSpeedLimitWarning)
