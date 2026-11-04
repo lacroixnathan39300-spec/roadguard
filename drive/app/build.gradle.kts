@@ -15,7 +15,11 @@ android {
         targetSdk = 36
         versionCode = (System.getenv("VERSION_CODE") ?: "1").toInt()
         versionName = System.getenv("VERSION_NAME") ?: "2.0.0-dev"
-        ndk { abiFilters += listOf("armeabi-v7a", "arm64-v8a") }
+        ndk {
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a")
+            // Essais dans l'émulateur de GitHub (processeur x86_64).
+            if (project.hasProperty("emulator")) abiFilters += "x86_64"
+        }
     }
 
     // Clé de publication fournie par la CI (secrets GitHub), jamais dans le dépôt.
