@@ -132,11 +132,12 @@ private fun PhoneHome() {
 
     var showSearch by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
+    var showOffline by remember { mutableStateOf(false) }
     var showEqualizer by remember { mutableStateOf(false) }
 
     // Carte hors ligne : packs téléchargés dans « Plus → Cartes hors ligne », utilisés sans Internet.
-    var packs by remember { mutableStateOf(OfflineMaps.packs(java.io.File(context.filesDir, "pmtiles"))) }
-    LaunchedEffect(hasMediaAccess) { packs = OfflineMaps.packs(java.io.File(context.filesDir, "pmtiles")) }
+    val packStates by fr.roadguard.core.map.MapPackManager.get(context).states.collectAsState()
+    val packs = remember(packStates) { OfflineMaps.packs(java.io.File(context.filesDir, "pmtiles")) }
     val offlinePack = if (Net.hasDirectInternet()) null else OfflineMaps.packFor(packs, s.here?.lat, s.here?.lon)
 
     Box(Modifier.fillMaxSize().background(DriveColors.Background)) {
@@ -193,11 +194,14 @@ private fun PhoneHome() {
                 onClose = { showSearch = false },
             )
         }
-        if (showSettings) {
+        if (showOffline) {
+            BackHandler { showOffline = false }
+            fr.roadguard.core.ui.OfflineDataScreen(setOf("FR", "CH"), onClose = { showOffline = false })
+        } else if (showSettings) {
             BackHandler { showSettings = false }
             var radarCount by remember { mutableStateOf(0) }
             LaunchedEffect(Unit) { radarCount = RadarRepository.radars(context).size }
-            SettingsScreen(settings, radarCount, onClose = { showSettings = false })
+            SettingsScreen(settings, radarCount, onClose = { showSettings = false }, onOfflineData = { showOffline = true })
         }
         if (showEqualizer) {
             BackHandler { showEqualizer = false }

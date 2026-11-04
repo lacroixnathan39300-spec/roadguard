@@ -171,6 +171,7 @@ private fun DriveHome() {
     // Cœur de conduite commun avec l'appli GPS du téléphone.
     val session = remember { DrivingSession(context, scope, voice, settings) }
     var showSettings by remember { mutableStateOf(false) }
+    var showOffline by remember { mutableStateOf(false) }
 
     // ROADGUARD Link : liaison avec le téléphone.
     val link = remember { LinkClient(context.applicationContext) }
@@ -218,7 +219,8 @@ private fun DriveHome() {
     }
 
     // Carte hors ligne si le poste n'a Internet ni par lui-même ni par le téléphone.
-    val packs = remember { fr.roadguard.core.map.OfflineMaps.packs(java.io.File(context.filesDir, "pmtiles")) }
+    val packStates by fr.roadguard.core.map.MapPackManager.get(context).states.collectAsState()
+    val packs = remember(packStates) { fr.roadguard.core.map.OfflineMaps.packs(java.io.File(context.filesDir, "pmtiles")) }
     val offlinePack = if (fr.roadguard.core.net.Net.hasDirectInternet() || linkState is LinkState.Connected) null
         else fr.roadguard.core.map.OfflineMaps.packFor(packs, session.here?.lat, session.here?.lon)
 
@@ -302,11 +304,14 @@ private fun DriveHome() {
             BackHandler { showLink = false }
             LinkScreen(link, onClose = { showLink = false })
         }
-        if (showSettings) {
+        if (showOffline) {
+            BackHandler { showOffline = false }
+            fr.roadguard.core.ui.OfflineDataScreen(setOf("FR", "CH"), onClose = { showOffline = false })
+        } else if (showSettings) {
             BackHandler { showSettings = false }
             var radarCount by remember { mutableStateOf(0) }
             LaunchedEffect(Unit) { radarCount = RadarRepository.radars(context).size }
-            SettingsScreen(settings, radarCount, onClose = { showSettings = false })
+            SettingsScreen(settings, radarCount, onClose = { showSettings = false }, onOfflineData = { showOffline = true })
         }
         if (showSearch) {
             BackHandler { showSearch = false }
