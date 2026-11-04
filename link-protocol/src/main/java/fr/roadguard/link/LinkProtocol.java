@@ -226,6 +226,9 @@ public final class LinkProtocol {
     public static final int BIN_VIDEO_CONFIG = 1;
     public static final int BIN_VIDEO_FRAME = 2;
     public static final int BIN_VIDEO_KEYFRAME = 3;
+    /** Son : PCM 16 bits stéréo 48 kHz, blocs de 20 ms. */
+    public static final int BIN_AUDIO_PCM = 4;
+    public static final int AUDIO_RATE = 48_000;
 
     // ---- Poignée de main -----------------------------------------------------------------
 

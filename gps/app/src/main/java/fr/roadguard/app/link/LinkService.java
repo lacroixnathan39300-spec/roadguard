@@ -399,6 +399,19 @@ public final class LinkService extends Service {
         });
     }
 
+    /** Son du téléphone : sauté si la liaison prend du retard (mieux vaut une coupure qu'un décalage). */
+    public void sendAudio(byte[] pcm, int length) {
+        LinkProtocol.Session s = current.get();
+        if (s == null || pendingVideo.get() > 6) return;
+        byte[] copy = java.util.Arrays.copyOf(pcm, length);
+        pendingVideo.incrementAndGet();
+        sender.execute(() -> {
+            try { s.sendBinary(LinkProtocol.BIN_AUDIO_PCM, copy, 0, copy.length); }
+            catch (Exception e) { current.compareAndSet(s, null); closeQuietly(s); }
+            finally { pendingVideo.decrementAndGet(); }
+        });
+    }
+
     public void sendMirrorStopped() {
         sentW = 0; sentH = 0;
         try {

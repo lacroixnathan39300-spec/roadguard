@@ -108,6 +108,7 @@ class LinkClient(private val context: Context) {
     val mirror: StateFlow<Pair<Int, Int>?> = _mirror
     /** Reçoit les données vidéo (type, octets) ; branché par l'écran miroir. */
     @Volatile var videoSink: ((Int, ByteArray) -> Unit)? = null
+    private val audio = AudioPlayer()
 
     fun requestKeyFrame() = send(JSONObject().put("t", "mirror_keyframe"))
     fun stopMirror() { send(JSONObject().put("t", "mirror_stop")); _mirror.value = null }
@@ -196,7 +197,11 @@ class LinkClient(private val context: Context) {
                     try {
                         while (scope.isActive) {
                             val msg = s.receiveAny()
-                            if (msg.json != null) handle(msg.json) else videoSink?.invoke(msg.type, msg.data)
+                            when {
+                                msg.json != null -> handle(msg.json)
+                                msg.type == LinkProtocol.BIN_AUDIO_PCM -> audio.feed(msg.data)
+                                else -> videoSink?.invoke(msg.type, msg.data)
+                            }
                         }
                     } finally {
                         pinger.cancel()
@@ -214,6 +219,7 @@ class LinkClient(private val context: Context) {
                 _media.value = null
                 _notifications.value = emptyList()
                 _mirror.value = null
+                audio.stop()
                 httpWaiting.values.forEach { it.completeExceptionally(java.io.IOException("Liaison perdue")) }
             }
         }

@@ -30,6 +30,7 @@ import java.util.Map;
 public final class LinkActivity extends Activity {
     private static final int BG = 0xFF05070A, PANEL = 0xFF121820, ACCENT = 0xFF00B8FF, MUTED = 0xFF9AA7B4;
     private static final int REQUEST_MIRROR = 7;
+    private boolean withAudio;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private TextView status;
     private Button toggle;
@@ -105,6 +106,19 @@ public final class LinkActivity extends Activity {
             if (!LinkService.running) { toast("Démarre d'abord la liaison."); return; }
             android.media.projection.MediaProjectionManager mpm =
                 (android.media.projection.MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
+            withAudio = false;
+            startActivityForResult(mpm.createScreenCaptureIntent(), REQUEST_MIRROR);
+        }));
+        root.addView(button("Écran + son sur l'autoradio", v -> {
+            if (!LinkService.running) { toast("Démarre d'abord la liaison."); return; }
+            if (checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{android.Manifest.permission.RECORD_AUDIO}, 2);
+                toast("Autorise l'enregistrement du son, puis appuie à nouveau.");
+                return;
+            }
+            withAudio = true;
+            android.media.projection.MediaProjectionManager mpm =
+                (android.media.projection.MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
             startActivityForResult(mpm.createScreenCaptureIntent(), REQUEST_MIRROR);
         }));
         root.addView(button("Arrêter l'affichage de l'écran",
@@ -132,7 +146,7 @@ public final class LinkActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode != REQUEST_MIRROR) return;
         if (resultCode == RESULT_OK && data != null) {
-            MirrorService.start(this, resultCode, data);
+            MirrorService.start(this, resultCode, data, true, withAudio);
             toast("L'écran du téléphone s'affiche sur l'autoradio.");
         } else toast("Partage d'écran refusé.");
     }

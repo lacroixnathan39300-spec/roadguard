@@ -39,6 +39,12 @@ public final class MirrorService extends Service {
     public static final String EXTRA_RESULT_CODE = "result_code";
     public static final String EXTRA_DATA = "data";
     public static final String ACTION_STOP = "fr.roadguard.app.link.MIRROR_STOP";
+    public static final String EXTRA_VIDEO = "video";
+    public static final String EXTRA_AUDIO = "audio";
+    private boolean wantVideo = true;
+    private boolean wantAudio;
+    private volatile boolean audioRunning;
+    private Thread audioThread;
     private static final String TAG = "RoadguardMirror";
     private static final String CHANNEL = "roadguard_mirror";
     private static final int LONG_SIDE = 1280;
@@ -73,8 +79,10 @@ public final class MirrorService extends Service {
             @Override public void onStop() { stopSelf(); }
         }, handler);
         instance = this;
-        handler.post(this::startEncoding);
-        watchRotation();
+        wantVideo = intent.getBooleanExtra(EXTRA_VIDEO, true);
+        wantAudio = intent.getBooleanExtra(EXTRA_AUDIO, false);
+        if (wantVideo) { handler.post(this::startEncoding); watchRotation(); }
+        if (wantAudio) startAudio();
         return START_NOT_STICKY;
     }
 
@@ -194,12 +202,56 @@ public final class MirrorService extends Service {
         });
     }
 
-    public static void start(Context c, int resultCode, Intent data) {
-        c.startForegroundService(new Intent(c, MirrorService.class).putExtra(EXTRA_RESULT_CODE, resultCode).putExtra(EXTRA_DATA, data));
+    public static void start(Context c, int resultCode, Intent data, boolean video, boolean audio) {
+        c.startForegroundService(new Intent(c, MirrorService.class).putExtra(EXTRA_RESULT_CODE, resultCode).putExtra(EXTRA_DATA, data)
+            .putExtra(EXTRA_VIDEO, video).putExtra(EXTRA_AUDIO, audio));
+    }
+
+    /**
+     * Son des applis (musique, GPS…) capté avec l'accord donné pour le partage, envoyé au poste en PCM.
+     * Les applis qui interdisent la capture restent sur le téléphone.
+     */
+    @android.annotation.SuppressLint("MissingPermission")
+    private void startAudio() {
+        if (Build.VERSION.SDK_INT < 29) return;
+        if (checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) != android.content.pm.PackageManager.PERMISSION_GRANTED) return;
+        android.media.AudioPlaybackCaptureConfiguration config = new android.media.AudioPlaybackCaptureConfiguration.Builder(projection)
+            .addMatchingUsage(android.media.AudioAttributes.USAGE_MEDIA)
+            .addMatchingUsage(android.media.AudioAttributes.USAGE_GAME)
+            .addMatchingUsage(android.media.AudioAttributes.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE)
+            .addMatchingUsage(android.media.AudioAttributes.USAGE_UNKNOWN)
+            .build();
+        android.media.AudioFormat format = new android.media.AudioFormat.Builder()
+            .setEncoding(android.media.AudioFormat.ENCODING_PCM_16BIT)
+            .setSampleRate(LinkProtocol.AUDIO_RATE)
+            .setChannelMask(android.media.AudioFormat.CHANNEL_IN_STEREO).build();
+        int chunk = LinkProtocol.AUDIO_RATE / 50 * 4; // 20 ms stéréo 16 bits
+        android.media.AudioRecord record = new android.media.AudioRecord.Builder()
+            .setAudioFormat(format)
+            .setBufferSizeInBytes(Math.max(chunk * 8, android.media.AudioRecord.getMinBufferSize(LinkProtocol.AUDIO_RATE,
+                android.media.AudioFormat.CHANNEL_IN_STEREO, android.media.AudioFormat.ENCODING_PCM_16BIT)))
+            .setAudioPlaybackCaptureConfig(config).build();
+        audioRunning = true;
+        audioThread = new Thread(() -> {
+            byte[] buf = new byte[chunk];
+            try {
+                record.startRecording();
+                while (audioRunning) {
+                    int n = record.read(buf, 0, buf.length);
+                    LinkService s = LinkService.instance;
+                    if (n > 0 && s != null) s.sendAudio(buf, n);
+                }
+            } finally {
+                try { record.stop(); } catch (IllegalStateException ignored) {}
+                record.release();
+            }
+        }, "roadguard-audio");
+        audioThread.start();
     }
 
     @Override public void onDestroy() {
         instance = null;
+        audioRunning = false;
         if (rotationListener != null) ((DisplayManager) getSystemService(DISPLAY_SERVICE)).unregisterDisplayListener(rotationListener);
         Handler h = handler;
         if (h != null) h.post(() -> {
