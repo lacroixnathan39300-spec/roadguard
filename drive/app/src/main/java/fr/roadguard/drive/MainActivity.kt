@@ -122,6 +122,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         hideSystemBars()
+        fr.roadguard.drive.net.Net.init(this)
+        fr.roadguard.drive.net.LinkInterceptor.install()
         setContent { DriveHome() }
     }
 }

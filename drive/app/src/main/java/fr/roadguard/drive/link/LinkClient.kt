@@ -53,6 +53,34 @@ sealed class LinkState(val label: String) {
  * Se reconnecte tout seul tant qu'un téléphone est associé.
  */
 class LinkClient(private val context: Context) {
+    init { current = this }
+
+    companion object {
+        /** Liaison active de l'appli (pour l'accès Internet par le téléphone). */
+        @Volatile var current: LinkClient? = null; private set
+    }
+
+    fun isConnected(): Boolean = session != null
+
+    private val httpWaiting = java.util.concurrent.ConcurrentHashMap<Int, CompletableDeferred<fr.roadguard.drive.net.NetResponse>>()
+    private val httpIds = java.util.concurrent.atomic.AtomicInteger()
+
+    /** Requête Internet faite par le téléphone (le poste n'a pas Internet lui-même). */
+    suspend fun http(url: String, method: String, body: ByteArray?, contentType: String?, follow: Boolean): fr.roadguard.drive.net.NetResponse {
+        val id = httpIds.incrementAndGet()
+        val waiter = CompletableDeferred<fr.roadguard.drive.net.NetResponse>()
+        httpWaiting[id] = waiter
+        try {
+            val m = JSONObject().put("t", "http").put("id", id).put("url", url).put("method", method).put("follow", follow)
+            if (body != null) m.put("body", LinkProtocol.b64(body))
+            if (contentType != null) m.put("ctype", contentType)
+            send(m)
+            return withTimeoutOrNull(25_000) { waiter.await() } ?: throw java.io.IOException("Le téléphone ne répond pas")
+        } finally {
+            httpWaiting.remove(id)
+        }
+    }
+
     private val prefs = context.getSharedPreferences("link", Context.MODE_PRIVATE)
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var job: Job? = null
@@ -186,6 +214,7 @@ class LinkClient(private val context: Context) {
                 _media.value = null
                 _notifications.value = emptyList()
                 _mirror.value = null
+                httpWaiting.values.forEach { it.completeExceptionally(java.io.IOException("Liaison perdue")) }
             }
         }
     }
@@ -233,6 +262,12 @@ class LinkClient(private val context: Context) {
                     actions = (0 until (list?.length() ?: 0)).map { list!!.optString(it) },
                 )
                 _notifications.value = (listOf(n) + _notifications.value.filterNot { it.key == n.key }).take(5)
+            }
+            "http_resp" -> httpWaiting[m.optInt("id")]?.let { w ->
+                if (m.has("error")) w.completeExceptionally(java.io.IOException(m.getString("error")))
+                else w.complete(fr.roadguard.drive.net.NetResponse(m.optInt("code"),
+                    m.optString("body").takeIf { it.isNotEmpty() }?.let(LinkProtocol::unb64) ?: ByteArray(0),
+                    m.optString("ctype").ifEmpty { null }))
             }
             "mirror_start" -> _mirror.value = m.getInt("w") to m.getInt("h")
             "mirror_stop" -> _mirror.value = null

@@ -2,7 +2,6 @@ package fr.roadguard.drive.nav
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLDecoder
 
@@ -65,18 +64,10 @@ object SharedDestination {
     private fun expand(start: String): String {
         var url = start
         repeat(5) {
-            val c = URL(url).openConnection() as HttpURLConnection
-            c.instanceFollowRedirects = false
-            c.connectTimeout = 8_000
-            c.readTimeout = 8_000
-            c.setRequestProperty("User-Agent", "ROADGUARD-DRIVE/2.0")
-            try {
-                val location = c.getHeaderField("Location")
-                if (c.responseCode !in 300..399 || location == null) return url
-                url = URL(URL(url), location).toString()
-            } finally {
-                c.disconnect()
-            }
+            val r = fr.roadguard.drive.net.Net.fetch(url, followRedirects = false)
+            val location = if (r.code in 300..399) r.text.ifBlank { null } else null
+            if (location == null) return url
+            url = URL(URL(url), location).toString()
         }
         return url
     }

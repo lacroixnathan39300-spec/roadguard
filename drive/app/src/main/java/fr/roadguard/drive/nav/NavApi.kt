@@ -4,8 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
 import java.net.URLEncoder
 
 /** Un résultat de recherche d'adresse ou de lieu. */
@@ -34,23 +32,12 @@ object NavApi {
     }
 
     private fun get(url: String): String {
-        val c = URL(url).openConnection() as HttpURLConnection
-        c.connectTimeout = 10_000
-        c.readTimeout = 20_000
-        c.setRequestProperty("User-Agent", USER_AGENT)
-        c.setRequestProperty("Accept", "application/json")
-        try {
-            val code = c.responseCode
-            val stream = if (code in 200..299) c.inputStream else c.errorStream
-            val text = stream?.bufferedReader()?.use { it.readText() }.orEmpty()
-            if (code !in 200..299) {
-                val reason = runCatching { JSONObject(text).optString("error") }.getOrNull().orEmpty()
-                throw IOException(if (reason.isNotBlank()) reason else "Service indisponible ($code)")
-            }
-            return text
-        } finally {
-            c.disconnect()
+        val r = fr.roadguard.drive.net.Net.fetch(url)
+        if (r.code !in 200..299) {
+            val reason = runCatching { JSONObject(r.text).optString("error") }.getOrNull().orEmpty()
+            throw IOException(if (reason.isNotBlank()) reason else "Service indisponible (${r.code})")
         }
+        return r.text
     }
 }
 

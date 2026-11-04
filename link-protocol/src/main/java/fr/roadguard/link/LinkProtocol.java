@@ -34,7 +34,7 @@ public final class LinkProtocol {
     public static final int VERSION = 1;
     public static final int PORT = 47390;
     public static final String SERVICE_TYPE = "_roadguard._tcp.";
-    public static final int MAX_FRAME = 512 * 1024;
+    public static final int MAX_FRAME = 4 * 1024 * 1024;
     static final int PAIRING_ITERATIONS = 20_000;
     private static final SecureRandom RANDOM = new SecureRandom();
 

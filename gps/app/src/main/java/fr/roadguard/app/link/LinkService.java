@@ -207,6 +207,7 @@ public final class LinkService extends Service {
                 default: break;
             }
         }
+        if ("http".equals(type)) { relayHttp(m); return; }
         if ("touch".equals(type)) {
             MirrorTouchService t = MirrorTouchService.instance;
             if (t != null) t.touch(m.optString("a"), (float) m.optDouble("x"), (float) m.optDouble("y"), m.optLong("time"));
@@ -300,6 +301,66 @@ public final class LinkService extends Service {
             JSONObject m = new JSONObject().put("t", "notif_removed").put("key", sbn.getKey());
             sender.execute(() -> send(m));
         } catch (org.json.JSONException ignored) {}
+    }
+
+    // ---- Internet de l'autoradio par le téléphone ------------------------------------------
+
+    private final java.util.concurrent.ExecutorService http = java.util.concurrent.Executors.newFixedThreadPool(4);
+    private static final int MAX_HTTP_BODY = 3 * 1024 * 1024;
+
+    /** Requête HTTPS faite pour le poste (carte, recherche, itinéraires). Jamais vers le réseau local. */
+    private void relayHttp(JSONObject m) {
+        final int id = m.optInt("id");
+        http.execute(() -> {
+            JSONObject reply = new JSONObject();
+            try {
+                reply.put("t", "http_resp").put("id", id);
+                java.net.URL url = new java.net.URL(m.getString("url"));
+                if (!"https".equals(url.getProtocol())) throw new IOException("Seul HTTPS est relayé");
+                java.net.InetAddress addr = java.net.InetAddress.getByName(url.getHost());
+                if (addr.isLoopbackAddress() || addr.isSiteLocalAddress() || addr.isLinkLocalAddress() || addr.isAnyLocalAddress())
+                    throw new IOException("Adresse locale refusée");
+                java.net.HttpURLConnection c = (java.net.HttpURLConnection) url.openConnection();
+                c.setConnectTimeout(10_000);
+                c.setReadTimeout(20_000);
+                c.setInstanceFollowRedirects(m.optBoolean("follow", true));
+                c.setRequestMethod(m.optString("method", "GET"));
+                c.setRequestProperty("User-Agent", "ROADGUARD-DRIVE/2.0 (via téléphone)");
+                if (m.has("ctype")) c.setRequestProperty("Content-Type", m.getString("ctype"));
+                try {
+                    if (m.has("body")) {
+                        c.setDoOutput(true);
+                        try (java.io.OutputStream o = c.getOutputStream()) { o.write(LinkProtocol.unb64(m.getString("body"))); }
+                    }
+                    int code = c.getResponseCode();
+                    reply.put("code", code);
+                    if (code >= 300 && code < 400 && !m.optBoolean("follow", true)) {
+                        String loc = c.getHeaderField("Location");
+                        reply.put("body", LinkProtocol.b64((loc == null ? "" : loc).getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+                    } else {
+                        java.io.InputStream in = code >= 200 && code < 300 ? c.getInputStream() : c.getErrorStream();
+                        if (in != null) {
+                            java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+                            byte[] buf = new byte[16_384];
+                            int n;
+                            try (java.io.InputStream input = in) {
+                                while ((n = input.read(buf)) > 0) {
+                                    if (out.size() + n > MAX_HTTP_BODY) throw new IOException("Réponse trop grande");
+                                    out.write(buf, 0, n);
+                                }
+                            }
+                            reply.put("body", LinkProtocol.b64(out.toByteArray()));
+                        }
+                        if (c.getContentType() != null) reply.put("ctype", c.getContentType());
+                    }
+                } finally {
+                    c.disconnect();
+                }
+            } catch (Exception e) {
+                try { reply.put("error", e.getMessage() == null ? "Erreur réseau" : e.getMessage()); } catch (org.json.JSONException ignored) {}
+            }
+            sender.execute(() -> send(reply));
+        });
     }
 
     // ---- Mode miroir -----------------------------------------------------------------------
@@ -491,6 +552,7 @@ public final class LinkService extends Service {
         }
         if (watched != null) watched.unregisterCallback(mediaCallback);
         sender.shutdownNow();
+        http.shutdownNow();
         if (nsdListener != null) {
             try { ((NsdManager) getSystemService(NSD_SERVICE)).unregisterService(nsdListener); } catch (RuntimeException ignored) {}
         }

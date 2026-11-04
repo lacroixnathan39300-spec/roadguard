@@ -4,8 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
-import java.net.HttpURLConnection
-import java.net.URL
 
 /**
  * Limite de vitesse de la route empruntée, d'après OpenStreetMap (Valhalla « trace_attributes »).
@@ -42,20 +40,9 @@ object SpeedLimits {
     }
 
     private fun post(body: String): String {
-        val c = URL(URL_TRACE).openConnection() as HttpURLConnection
-        c.connectTimeout = 8_000
-        c.readTimeout = 12_000
-        c.requestMethod = "POST"
-        c.doOutput = true
-        c.setRequestProperty("Content-Type", "application/json")
-        c.setRequestProperty("User-Agent", "ROADGUARD-DRIVE/2.0 (usage personnel)")
-        try {
-            c.outputStream.use { it.write(body.toByteArray()) }
-            if (c.responseCode !in 200..299) error("HTTP ${c.responseCode}")
-            return c.inputStream.bufferedReader().use { it.readText() }
-        } finally {
-            c.disconnect()
-        }
+        val r = fr.roadguard.drive.net.Net.fetch(URL_TRACE, "POST", body.toByteArray(), "application/json")
+        if (r.code !in 200..299) error("HTTP ${r.code}")
+        return r.text
     }
 }
 
