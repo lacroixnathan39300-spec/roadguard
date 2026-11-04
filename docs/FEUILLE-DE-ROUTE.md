@@ -36,7 +36,7 @@ et essai sur l'appareil réel.
 
 ## Phase 3 — ROADGUARD Link : « notre Android Auto »
 Le téléphone (appli GPS) fait tout le travail ; le poste (DRIVE) affiche et renvoie le tactile.
-- [x] Protocole commun chiffré (association par code à 6 chiffres, AES-256-GCM, anti-rejeu), testé (build 29).
+- [x] Protocole commun chiffré (association par code à 6 chiffres, AES-256-GCM, anti-rejeu), testé (build 30).
 - [x] Téléphone : écran « ROADGUARD Link », service en arrière-plan, envoi position GPS et musique, commandes musique.
 - [x] Autoradio : recherche du téléphone (partage de connexion / réseau local), reconnexion automatique, GPS et musique du téléphone utilisés par DRIVE.
 - [ ] Notifications, messages lus à voix haute, appels, destinations envoyées du téléphone.
