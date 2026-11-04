@@ -1,244 +1,406 @@
 --------- beginning of main
-11-04 15:18:17.322  2892  2892 I r.roadguard.gps: Late-enabling -Xcheck:jni
-11-04 15:18:17.450  2892  2892 I r.roadguard.gps: Using CollectorTypeCC GC.
-11-04 15:18:17.464  2892  2892 W r.roadguard.gps: Unexpected CPU variant for x86: x86_64.
-11-04 15:18:17.464  2892  2892 W r.roadguard.gps: Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
-11-04 15:18:18.446  2892  2892 D CompatibilityChangeReporter: Compat change id reported: 171979766; UID 10192; state: ENABLED
-11-04 15:18:18.446  2892  2892 D CompatibilityChangeReporter: Compat change id reported: 242716250; UID 10192; state: ENABLED
-11-04 15:18:18.830  2892  2892 W ziparchive: Unable to open '/data/app/~~rEVgKh41HLas4CzLiccG4Q==/fr.roadguard.gps-BbWH28KQlxk73RUQsl2KRg==/base.dm': No such file or directory
-11-04 15:18:18.841  2892  2892 W ziparchive: Unable to open '/data/app/~~rEVgKh41HLas4CzLiccG4Q==/fr.roadguard.gps-BbWH28KQlxk73RUQsl2KRg==/base.dm': No such file or directory
-11-04 15:18:19.989  2892  2892 D nativeloader: Configuring clns-6 for other apk /data/app/~~rEVgKh41HLas4CzLiccG4Q==/fr.roadguard.gps-BbWH28KQlxk73RUQsl2KRg==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~rEVgKh41HLas4CzLiccG4Q==/fr.roadguard.gps-BbWH28KQlxk73RUQsl2KRg==/lib/x86_64:/data/app/~~rEVgKh41HLas4CzLiccG4Q==/fr.roadguard.gps-BbWH28KQlxk73RUQsl2KRg==/base.apk!/lib/x86_64, permitted_path=/data:/mnt/expand:/data/user/0/fr.roadguard.gps
-11-04 15:18:20.044  2892  2892 V GraphicsEnvironment: Currently set values for:
-11-04 15:18:20.044  2892  2892 V GraphicsEnvironment:   angle_gl_driver_selection_pkgs=[]
-11-04 15:18:20.044  2892  2892 V GraphicsEnvironment:   angle_gl_driver_selection_values=[]
-11-04 15:18:20.045  2892  2892 V GraphicsEnvironment: ANGLE GameManagerService for fr.roadguard.gps: false
-11-04 15:18:20.045  2892  2892 V GraphicsEnvironment: fr.roadguard.gps is not listed in per-application setting
-11-04 15:18:20.045  2892  2892 V GraphicsEnvironment: Neither updatable production driver nor prerelease driver is supported.
-11-04 15:18:20.210  2892  3041 D libEGL  : loaded /vendor/lib64/egl/libEGL_emulation.so
-11-04 15:18:20.211  2892  3041 D libEGL  : loaded /vendor/lib64/egl/libGLESv1_CM_emulation.so
-11-04 15:18:20.213  2892  3041 D libEGL  : loaded /vendor/lib64/egl/libGLESv2_emulation.so
-11-04 15:18:20.916  2892  2892 D CompatibilityChangeReporter: Compat change id reported: 237531167; UID 10192; state: DISABLED
-11-04 15:18:20.943  2892  2892 W OpenGLRenderer: Unknown dataspace 0
-11-04 15:18:20.972  2892  2892 I Choreographer: Skipped 54 frames!  The application may be doing too much work on its main thread.
-11-04 15:18:21.829  2892  3032 W OpenGLRenderer: Failed to initialize 101010-2 format, error = EGL_SUCCESS
-11-04 15:18:22.014  2892  3032 I Gralloc4: mapper 4.x is not supported
-11-04 15:18:22.451  2892  2913 I OpenGLRenderer: Davey! duration=2365ms; Flags=1, FrameTimelineVsyncId=4444, IntendedVsync=69584446965, Vsync=70484446929, InputEventId=0, HandleInputStart=70487984870, AnimationStart=70487989059, PerformTraversalsStart=70488097590, DrawStart=71600617500, FrameDeadline=69601113631, FrameInterval=70487776730, FrameStartTime=16666666, SyncQueued=71617685702, SyncStart=71618076901, IssueDrawCommandsStart=71619551470, SwapBuffers=71665977675, FrameCompleted=71949940462, DequeueBufferDuration=5686, QueueBufferDuration=37666205, GpuCompleted=71902783102, SwapBuffersCompleted=71949940462, DisplayPresentTime=0, CommandSubmissionCompleted=71665977675, 
-11-04 15:18:23.752  2892  2892 I Choreographer: Skipped 156 frames!  The application may be doing too much work on its main thread.
-11-04 15:18:24.033  2892  2892 D CompatibilityChangeReporter: Compat change id reported: 160794467; UID 10192; state: ENABLED
-11-04 15:18:24.222  2892  2892 I TextToSpeech: Sucessfully bound to com.google.android.tts
-11-04 15:18:24.650  2892  2892 I Choreographer: Skipped 52 frames!  The application may be doing too much work on its main thread.
-11-04 15:18:24.967  2892  2892 D CompatibilityChangeReporter: Compat change id reported: 263076149; UID 10192; state: ENABLED
-11-04 15:18:24.969  2892  2892 W Equalizer: WARNING: attaching an Equalizer to global output mix is deprecated!
-11-04 15:18:25.272  2892  2892 W r.roadguard.gps: Accessing hidden field Landroid/graphics/Typeface;->sSystemFontMap:Ljava/util/Map; (unsupported, reflection, allowed)
-11-04 15:18:26.086  2892  3145 I TextToSpeech: Connected to TTS engine
-11-04 15:18:26.381  2892  3305 I Mbgl-EGLConfigChooser: In emulator: false
-11-04 15:18:26.516  2892  2892 I Choreographer: Skipped 30 frames!  The application may be doing too much work on its main thread.
-11-04 15:18:26.607  2892  3389 D ProfileInstaller: Installing profile for fr.roadguard.gps
-11-04 15:18:26.747  2892  3285 I TextToSpeech: Setting up the connection to TTS engine...
-11-04 15:18:27.427  2892  3408 I Mbgl    : {RenderThread 63}[General]: GPU Identifier: Android Emulator OpenGL ES Translator (Google SwiftShader)
-11-04 15:18:28.420  2892  3145 I OpenGLRenderer: Davey! duration=4438ms; Flags=0, FrameTimelineVsyncId=4870, IntendedVsync=73284446817, Vsync=74151113449, InputEventId=0, HandleInputStart=74179333210, AnimationStart=74179337058, PerformTraversalsStart=75549449468, DrawStart=75949772964, FrameDeadline=73301113483, FrameInterval=74166115976, FrameStartTime=16666666, SyncQueued=75972709238, SyncStart=75972735419, IssueDrawCommandsStart=75975209648, SwapBuffers=77587329395, FrameCompleted=77722601997, DequeueBufferDuration=6193, QueueBufferDuration=5286716, GpuCompleted=77722508330, SwapBuffersCompleted=77722601997, DisplayPresentTime=35192962023424, CommandSubmissionCompleted=77587329395, 
-11-04 15:18:28.841  2892  2908 I r.roadguard.gps: Background concurrent copying GC freed 115261(6375KB) AllocSpace objects, 8(348KB) LOS objects, 49% free, 6983KB/13MB, paused 32.161ms,2.616ms total 1.346s
-11-04 15:18:29.011  2892  2892 V Mbgl-ConnectivityReceiver: connected - true
-11-04 15:18:29.012  2892  2892 I Choreographer: Skipped 124 frames!  The application may be doing too much work on its main thread.
-11-04 15:18:29.308  2892  3032 D EGL_emulation: app_time_stats: avg=3443.74ms min=1100.87ms max=5786.61ms count=2
-11-04 15:18:29.421  2892  3145 I OpenGLRenderer: Davey! duration=2372ms; Flags=0, FrameTimelineVsyncId=5048, IntendedVsync=76451113357, Vsync=78517779941, InputEventId=0, HandleInputStart=78527553595, AnimationStart=78527557332, PerformTraversalsStart=78541528824, DrawStart=78541864304, FrameDeadline=77751113305, FrameInterval=78527240007, FrameStartTime=16666666, SyncQueued=78545524493, SyncStart=78545551717, IssueDrawCommandsStart=78545645779, SwapBuffers=78664510502, FrameCompleted=78823524409, DequeueBufferDuration=4995, QueueBufferDuration=4047719, GpuCompleted=78823383842, SwapBuffersCompleted=78823524409, DisplayPresentTime=72057628414509145, CommandSubmissionCompleted=78664510502, 
-11-04 15:18:31.256  2892  2908 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 150223(6974KB) AllocSpace objects, 2(40KB) LOS objects, 49% free, 5481KB/10MB, paused 30.284ms,27us total 257.859ms
-11-04 15:18:32.350  2892  2908 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 100693(4233KB) AllocSpace objects, 0(0B) LOS objects, 49% free, 6191KB/12MB, paused 43us,17us total 268.886ms
-11-04 15:18:35.005  2892  2908 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 114218(4975KB) AllocSpace objects, 1(20KB) LOS objects, 49% free, 6580KB/12MB, paused 1.034ms,19us total 1.011s
-11-04 15:18:36.050  2892  2908 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 137053(6583KB) AllocSpace objects, 1(20KB) LOS objects, 49% free, 9864KB/19MB, paused 31.562ms,19us total 391.514ms
-11-04 15:18:37.901  2892  2908 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 230935(11MB) AllocSpace objects, 0(0B) LOS objects, 49% free, 7032KB/13MB, paused 4.157ms,14us total 390.481ms
-11-04 15:18:41.934  2892  2908 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 100946(4758KB) AllocSpace objects, 0(0B) LOS objects, 49% free, 7571KB/14MB, paused 277us,16us total 1.316s
-11-04 15:18:46.399  2892  2908 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 124118(5948KB) AllocSpace objects, 0(0B) LOS objects, 49% free, 7904KB/15MB, paused 69us,22us total 445.168ms
-11-04 15:18:47.940  2892  2908 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 130608(5482KB) AllocSpace objects, 0(0B) LOS objects, 49% free, 8679KB/16MB, paused 35us,13us total 174.387ms
-11-04 15:18:49.306  2892  2908 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 130697(5647KB) AllocSpace objects, 1(20KB) LOS objects, 49% free, 10MB/20MB, paused 22.446ms,43us total 753.506ms
-11-04 15:18:50.534  2892  2892 I Choreographer: Skipped 115 frames!  The application may be doing too much work on its main thread.
-11-04 15:18:51.205  2892  2908 I r.roadguard.gps: Background young concurrent copying GC freed 74436(1294KB) AllocSpace objects, 0(0B) LOS objects, 0% free, 21MB/21MB, paused 100us,25us total 205.717ms
-11-04 15:18:51.221  2892  3295 W r.roadguard.gps: Verification of okio.BufferedSource okio.Buffer.peek() took 120.956ms (124.01 bytecodes/s) (1512B approximate peak alloc)
-11-04 15:18:51.386  2892  2908 I r.roadguard.gps: Background concurrent copying GC freed 18649(911KB) AllocSpace objects, 1(20KB) LOS objects, 49% free, 20MB/40MB, paused 131us,21us total 170.532ms
-11-04 15:18:51.501  2892  4256 D TrafficStats: tagSocket(149) with statsTag=0xffffffff, statsUid=-1
-11-04 15:18:51.687  2892  4256 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-04 15:18:51.692  2892  3295 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/styles/liberty). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-04 15:18:51.763  2892  4256 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-04 15:18:51.765  2892  3295 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-04 15:18:51.787  2892  4279 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-04 15:18:51.793  2892  3295 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/sprites/ofm_f384/ofm.png). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-04 15:18:52.126  2892  3032 D EGL_emulation: app_time_stats: avg=11409.21ms min=270.29ms max=22548.13ms count=2
-11-04 15:18:52.280  2892  3305 D EGL_emulation: app_time_stats: avg=12349.84ms min=428.84ms max=24270.85ms count=2
-11-04 15:18:53.088  2892  4278 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-04 15:18:53.327  2892  3305 D EGL_emulation: app_time_stats: avg=130.54ms min=49.47ms max=343.97ms count=8
-11-04 15:18:53.508  2892  3295 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/sprites/ofm_f384/ofm.json). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-04 15:18:54.350  2892  3305 D EGL_emulation: app_time_stats: avg=145.85ms min=41.89ms max=304.63ms count=7
-11-04 15:18:54.710  2892  4278 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-04 15:18:54.761  2892  4256 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-04 15:18:54.785  2892  3295 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/12/2111/1446.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-04 15:18:54.972  2892  4279 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-04 15:18:54.980  2892  3295 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8444/5785.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-04 15:18:55.335  2892  2892 I RoadguardSession: pos=46.72496,5.59225 v=70 cap=0 prec=5 nuit=false alerte=- radars=true
-11-04 15:18:55.409  2892  3305 D EGL_emulation: app_time_stats: avg=211.91ms min=117.69ms max=339.94ms count=5
-11-04 15:18:55.729  2892  3032 D EGL_emulation: app_time_stats: avg=1801.34ms min=619.09ms max=2983.60ms count=2
-11-04 15:18:56.693  2892  4279 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-04 15:18:56.861  2892  4256 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-04 15:18:56.951  2892  3295 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8444/5784.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-04 15:18:56.952  2892  3295 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/fonts/Noto%20Sans%20Italic/0-255.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-04 15:18:57.082  2892  4278 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-04 15:18:57.169  2892  4279 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-04 15:18:57.303  2892  3305 D EGL_emulation: app_time_stats: avg=946.54ms min=939.29ms max=953.78ms count=2
-11-04 15:18:57.900  2892  4404 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-04 15:18:58.136  2892  4413 W r.roadguard.gps: Long monitor contention with owner OkHttp https://tiles.openfreemap.org/... (4409) at void okhttp3.internal.http2.Http2Writer.flush()(Http2Writer.kt:121) waiters=3 in okhttp3.internal.http2.Http2Stream okhttp3.internal.http2.Http2Connection.newStream(int, java.util.List, boolean) for 198ms
-11-04 15:18:58.319  2892  4279 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-04 15:18:58.381  2892  4278 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-04 15:18:58.396  2892  3305 D EGL_emulation: app_time_stats: avg=109.33ms min=52.56ms max=183.70ms count=10
-11-04 15:18:58.508  2892  4411 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-04 15:18:58.519  2892  3295 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/fonts/Noto%20Sans%20Regular/0-255.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-04 15:18:58.519  2892  3295 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/fonts/Noto%20Sans%20Italic/8192-8447.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-04 15:18:58.519  2892  3295 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/11/1055/722.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-04 15:18:58.519  2892  3295 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8446/5780.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-04 15:18:58.520  2892  3295 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8445/5780.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-04 15:18:58.539  2892  4409 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-04 15:18:58.539  2892  3295 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8446/5779.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-04 15:18:58.719  2892  3295 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8446/5781.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-04 15:18:58.739  2892  3295 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8447/5781.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-04 15:18:59.034  2892  4412 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-04 15:18:59.093  2892  4413 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-04 15:18:59.095  2892  3295 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8447/5779.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-04 15:18:59.186  2892  4256 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-04 15:18:59.272  2892  4410 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-04 15:18:59.450  2892  3295 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8446/5782.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-04 15:18:59.451  2892  3295 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8447/5780.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-04 15:18:59.521  2892  2892 I RoadguardSession: pos=46.72416,5.59171 v=70 cap=205 prec=5 nuit=false alerte=- radars=true
-11-04 15:18:59.579  2892  4415 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-04 15:18:59.689  2892  3295 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8445/5781.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-04 15:18:59.730  2892  3295 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8445/5779.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-04 15:18:59.775  2892  4404 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-04 15:18:59.931  2892  3295 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8445/5782.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-04 15:18:59.934  2892  4417 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-04 15:18:59.937  2892  3240 D TrafficStats: tagSocket(145) with statsTag=0xffffffff, statsUid=-1
-11-04 15:18:59.943  2892  3295 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8447/5782.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-04 15:19:00.787  2892  3305 D EGL_emulation: app_time_stats: avg=796.82ms min=92.04ms max=1980.44ms count=3
-11-04 15:19:02.260  2892  3032 D EGL_emulation: app_time_stats: avg=6531.06ms min=6531.06ms max=6531.06ms count=1
-11-04 15:19:02.274  2892  2927 I OpenGLRenderer: Davey! duration=841ms; Flags=0, FrameTimelineVsyncId=5670, IntendedVsync=110934445311, Vsync=110951111977, InputEventId=0, HandleInputStart=110952879034, AnimationStart=110952882523, PerformTraversalsStart=111027951137, DrawStart=111028168348, FrameDeadline=110951111977, FrameInterval=110952856882, FrameStartTime=16666666, SyncQueued=111055278900, SyncStart=111055305420, IssueDrawCommandsStart=111061638473, SwapBuffers=111604503630, FrameCompleted=111776024999, DequeueBufferDuration=33278, QueueBufferDuration=3681402, GpuCompleted=111775805192, SwapBuffersCompleted=111776024999, DisplayPresentTime=72057628414509170, CommandSubmissionCompleted=111604503630, 
-11-04 15:19:03.090  2892  3305 D EGL_emulation: app_time_stats: avg=1151.69ms min=826.33ms max=1477.05ms count=2
-11-04 15:19:03.428  2892  2907 I r.roadguard.gps: JIT allocated 72KB for compiled code of void fr.roadguard.app.next.PhoneHomeActivityKt.PhoneHome(androidx.compose.runtime.Composer, int)
-11-04 15:19:03.428  2892  2907 I r.roadguard.gps: Compiler allocated 10MB to compile void fr.roadguard.app.next.PhoneHomeActivityKt.PhoneHome(androidx.compose.runtime.Composer, int)
-11-04 15:19:04.154  2892  3305 D EGL_emulation: app_time_stats: avg=1064.40ms min=1064.40ms max=1064.40ms count=1
-11-04 15:19:04.614  2892  2892 I RoadguardSession: pos=46.72337,5.59118 v=70 cap=205 prec=5 nuit=false alerte=- radars=true
-11-04 15:19:05.513  2892  3305 D EGL_emulation: app_time_stats: avg=1358.56ms min=1358.56ms max=1358.56ms count=1
-11-04 15:19:06.860  2892  3305 D EGL_emulation: app_time_stats: avg=673.19ms min=530.31ms max=816.07ms count=2
-11-04 15:19:08.032  2892  3305 D EGL_emulation: app_time_stats: avg=581.07ms min=502.54ms max=659.61ms count=2
-11-04 15:19:09.498  2892  3305 D EGL_emulation: app_time_stats: avg=733.05ms min=531.64ms max=934.45ms count=2
-11-04 15:19:10.516  2892  3305 D EGL_emulation: app_time_stats: avg=507.23ms min=494.79ms max=519.67ms count=2
-11-04 15:19:10.626  2892  2892 I RoadguardSession: pos=46.72242,5.59053 v=70 cap=205 prec=5 nuit=false alerte=- radars=true
-11-04 15:19:12.512  2892  3305 D EGL_emulation: app_time_stats: avg=665.25ms min=390.69ms max=1066.25ms count=3
-11-04 15:19:13.976  2892  3305 D EGL_emulation: app_time_stats: avg=730.18ms min=725.91ms max=734.45ms count=2
-11-04 15:19:15.275  2892  3305 D EGL_emulation: app_time_stats: avg=649.21ms min=546.05ms max=752.36ms count=2
-11-04 15:19:15.622  2892  2892 I RoadguardSession: pos=46.72179,5.59010 v=70 cap=205 prec=5 nuit=false alerte=- radars=true
-11-04 15:19:16.399  2892  3305 D EGL_emulation: app_time_stats: avg=561.37ms min=456.70ms max=666.04ms count=2
-11-04 15:19:17.508  2892  3305 D EGL_emulation: app_time_stats: avg=369.42ms min=286.69ms max=442.88ms count=3
-11-04 15:19:19.087  2892  3305 D EGL_emulation: app_time_stats: avg=789.60ms min=380.77ms max=1198.43ms count=2
-11-04 15:19:20.387  2892  3305 D EGL_emulation: app_time_stats: avg=650.00ms min=646.93ms max=653.06ms count=2
-11-04 15:19:21.710  2892  2892 I RoadguardSession: pos=46.72084,5.58945 v=70 cap=205 prec=5 nuit=false alerte=- radars=true
-11-04 15:19:22.285  2892  3305 D EGL_emulation: app_time_stats: avg=948.78ms min=824.81ms max=1072.75ms count=2
-11-04 15:19:23.421  2892  3305 D EGL_emulation: app_time_stats: avg=568.11ms min=550.53ms max=585.68ms count=2
-11-04 15:19:24.537  2892  3305 D EGL_emulation: app_time_stats: avg=371.95ms min=193.56ms max=546.19ms count=3
-11-04 15:19:25.605  2892  3305 D EGL_emulation: app_time_stats: avg=355.83ms min=319.61ms max=378.65ms count=3
-11-04 15:19:27.239  2892  3305 D EGL_emulation: app_time_stats: avg=544.65ms min=366.60ms max=689.02ms count=3
-11-04 15:19:27.700  2892  2892 I RoadguardSession: pos=46.71973,5.58870 v=70 cap=205 prec=5 nuit=false alerte=- radars=true
-11-04 15:19:28.347  2892  3305 D EGL_emulation: app_time_stats: avg=545.30ms min=456.05ms max=634.55ms count=2
-11-04 15:19:29.413  2892  3305 D EGL_emulation: app_time_stats: avg=355.08ms min=251.94ms max=474.39ms count=3
-11-04 15:19:30.922  2892  3305 D EGL_emulation: app_time_stats: avg=377.29ms min=220.96ms max=585.24ms count=4
-11-04 15:19:32.125  2892  3305 D EGL_emulation: app_time_stats: avg=299.36ms min=207.58ms max=473.62ms count=4
-11-04 15:19:33.314  2892  3305 D EGL_emulation: app_time_stats: avg=297.14ms min=192.62ms max=417.38ms count=4
-11-04 15:19:33.620  2892  2892 I RoadguardSession: pos=46.71894,5.58816 v=70 cap=205 prec=5 nuit=false alerte=- radars=true
-11-04 15:19:34.370  2892  3305 D EGL_emulation: app_time_stats: avg=351.95ms min=240.32ms max=451.67ms count=3
-11-04 15:19:35.389  2892  3305 D EGL_emulation: app_time_stats: avg=509.26ms min=488.65ms max=529.87ms count=2
-11-04 15:19:35.775  2892  3032 D EGL_emulation: app_time_stats: avg=16757.30ms min=97.04ms max=33417.55ms count=2
-11-04 15:19:36.201  2892  3194 D AudioTrack: stop(16): called with 14400 frames delivered
-11-04 15:19:37.338  2892  3305 D EGL_emulation: app_time_stats: avg=974.79ms min=813.11ms max=1136.48ms count=2
-11-04 15:19:38.367  2892  3305 D EGL_emulation: app_time_stats: avg=514.50ms min=454.72ms max=574.29ms count=2
-11-04 15:19:39.602  2892  2892 I RoadguardSession: pos=46.71878,5.58805 v=70 cap=0 prec=5 nuit=false alerte=- radars=true
-11-04 15:19:39.655  2892  3032 D EGL_emulation: app_time_stats: avg=1939.87ms min=88.91ms max=3790.82ms count=2
-11-04 15:19:40.140  2892  3305 D EGL_emulation: app_time_stats: avg=886.01ms min=353.34ms max=1418.68ms count=2
-11-04 15:19:41.947  2892  3305 D EGL_emulation: app_time_stats: avg=903.95ms min=330.16ms max=1477.74ms count=2
-11-04 15:19:43.768  2892  3305 D EGL_emulation: app_time_stats: avg=908.15ms min=405.19ms max=1411.10ms count=2
-11-04 15:19:45.037  2892  3305 D EGL_emulation: app_time_stats: avg=423.18ms min=270.90ms max=577.82ms count=3
-11-04 15:19:46.593  2892  2892 I RoadguardSession: pos=46.71878,5.58805 v=70 cap=0 prec=5 nuit=false alerte=- radars=true
-11-04 15:19:46.751  2892  3305 D EGL_emulation: app_time_stats: avg=571.08ms min=244.11ms max=1200.19ms count=3
-11-04 15:19:48.049  2892  3305 D EGL_emulation: app_time_stats: avg=324.44ms min=240.57ms max=414.12ms count=4
-11-04 15:19:49.217  2892  3305 D EGL_emulation: app_time_stats: avg=583.95ms min=293.47ms max=874.43ms count=2
-11-04 15:19:50.739  2892  3305 D EGL_emulation: app_time_stats: avg=507.20ms min=282.96ms max=627.13ms count=3
-11-04 15:19:51.618  2892  2892 I RoadguardSession: pos=46.71878,5.58805 v=70 cap=0 prec=5 nuit=false alerte=- radars=true
-11-04 15:19:52.143  2892  3305 D EGL_emulation: app_time_stats: avg=467.89ms min=355.86ms max=673.95ms count=3
-11-04 15:19:53.304  2892  3305 D EGL_emulation: app_time_stats: avg=386.90ms min=328.63ms max=429.07ms count=3
-11-04 15:19:54.357  2892  3305 D EGL_emulation: app_time_stats: avg=526.59ms min=407.76ms max=645.42ms count=2
-11-04 15:19:56.289  2892  3305 D EGL_emulation: app_time_stats: avg=959.03ms min=568.15ms max=1349.91ms count=2
-11-04 15:19:56.651  2892  2892 I RoadguardSession: pos=46.71878,5.58805 v=70 cap=0 prec=5 nuit=false alerte=- radars=true
-11-04 15:19:58.138  2892  3305 D EGL_emulation: app_time_stats: avg=924.33ms min=872.77ms max=975.90ms count=2
-11-04 15:19:58.227  2892  3032 D EGL_emulation: app_time_stats: avg=18572.75ms min=18572.75ms max=18572.75ms count=1
-11-04 15:19:59.266  2892  3032 D EGL_emulation: app_time_stats: avg=467.83ms min=71.56ms max=864.10ms count=2
-11-04 15:19:59.730  2892  3305 D EGL_emulation: app_time_stats: avg=1592.46ms min=1592.46ms max=1592.46ms count=1
-11-04 15:20:00.844  2892  3305 D EGL_emulation: app_time_stats: avg=1113.71ms min=1113.71ms max=1113.71ms count=1
-11-04 15:20:01.696  2892  3032 D EGL_emulation: app_time_stats: avg=2426.92ms min=2426.92ms max=2426.92ms count=1
-11-04 15:20:02.123  2892  3305 D EGL_emulation: app_time_stats: avg=426.38ms min=318.29ms max=611.45ms count=3
-11-04 15:20:02.771  2892  2892 I RoadguardSession: pos=46.71783,5.58740 v=70 cap=205 prec=5 nuit=false alerte=rg-119a4aa4e999628a4815@354m radars=true
-11-04 15:20:03.475  2892  3305 D EGL_emulation: app_time_stats: avg=450.04ms min=402.90ms max=489.82ms count=3
-11-04 15:20:04.200  2892  3032 D EGL_emulation: app_time_stats: avg=2503.91ms min=2503.91ms max=2503.91ms count=1
-11-04 15:20:04.539  2892  3305 D EGL_emulation: app_time_stats: avg=532.10ms min=390.19ms max=674.02ms count=2
-11-04 15:20:05.877  2892  3305 D EGL_emulation: app_time_stats: avg=446.11ms min=326.60ms max=551.27ms count=3
-11-04 15:20:06.912  2892  3305 D EGL_emulation: app_time_stats: avg=344.74ms min=298.96ms max=396.39ms count=3
-11-04 15:20:07.094  2892  3032 D EGL_emulation: app_time_stats: avg=2889.99ms min=2889.99ms max=2889.99ms count=1
-11-04 15:20:08.034  2892  2892 I RoadguardSession: pos=46.71688,5.58676 v=70 cap=205 prec=5 nuit=false alerte=rg-119a4aa4e999628a4815@238m radars=true
-11-04 15:20:08.358  2892  3305 D EGL_emulation: app_time_stats: avg=482.09ms min=373.15ms max=588.07ms count=3
-11-04 15:20:09.093  2892  3032 D EGL_emulation: app_time_stats: avg=1998.96ms min=1998.96ms max=1998.96ms count=1
-11-04 15:20:09.652  2892  3305 D EGL_emulation: app_time_stats: avg=431.12ms min=351.65ms max=531.42ms count=3
-11-04 15:20:10.860  2892  3305 D EGL_emulation: app_time_stats: avg=402.94ms min=338.94ms max=489.28ms count=3
-11-04 15:20:11.866  2892  3305 D EGL_emulation: app_time_stats: avg=501.91ms min=434.60ms max=569.22ms count=2
-11-04 15:20:13.030  2892  3305 D EGL_emulation: app_time_stats: avg=581.97ms min=504.80ms max=659.15ms count=2
-11-04 15:20:14.429  2892  3305 D EGL_emulation: app_time_stats: avg=466.26ms min=368.47ms max=518.64ms count=3
-11-04 15:20:14.613  2892  2892 I RoadguardSession: pos=46.71640,5.58643 v=70 cap=0 prec=5 nuit=false alerte=- radars=true
-11-04 15:20:15.682  2892  3032 D EGL_emulation: app_time_stats: avg=6588.74ms min=6588.74ms max=6588.74ms count=1
-11-04 15:20:15.759  2892  3305 D EGL_emulation: app_time_stats: avg=664.86ms min=586.89ms max=742.83ms count=2
-11-04 15:20:17.294  2892  3305 D EGL_emulation: app_time_stats: avg=511.72ms min=408.02ms max=576.41ms count=3
-11-04 15:20:18.354  2892  3305 D EGL_emulation: app_time_stats: avg=529.76ms min=516.08ms max=543.44ms count=2
-11-04 15:20:19.628  2892  3305 D EGL_emulation: app_time_stats: avg=637.17ms min=543.33ms max=731.01ms count=2
-11-04 15:20:20.610  2892  2892 I RoadguardSession: pos=46.71640,5.58643 v=70 cap=0 prec=5 nuit=false alerte=- radars=true
-11-04 15:20:20.960  2892  3305 D EGL_emulation: app_time_stats: avg=665.89ms min=516.51ms max=815.27ms count=2
-11-04 15:20:22.087  2892  3305 D EGL_emulation: app_time_stats: avg=563.56ms min=445.48ms max=681.63ms count=2
-11-04 15:20:23.088  2892  3305 D EGL_emulation: app_time_stats: avg=333.62ms min=258.12ms max=403.38ms count=3
-11-04 15:20:24.038  2892  3032 D EGL_emulation: app_time_stats: avg=8341.49ms min=8341.49ms max=8341.49ms count=1
-11-04 15:20:24.324  2892  3305 D EGL_emulation: app_time_stats: avg=411.96ms min=306.65ms max=600.75ms count=3
-11-04 15:20:25.601  2892  3305 D EGL_emulation: app_time_stats: avg=425.51ms min=336.22ms max=584.84ms count=3
-11-04 15:20:26.623  2892  2892 I RoadguardSession: pos=46.71592,5.58611 v=70 cap=205 prec=5 nuit=false alerte=rg-119a4aa4e999628a4815@122m radars=true
-11-04 15:20:26.705  2892  3032 D EGL_emulation: app_time_stats: avg=1325.91ms min=31.99ms max=2619.84ms count=2
-11-04 15:20:26.835  2892  3305 D EGL_emulation: app_time_stats: avg=411.36ms min=346.16ms max=512.20ms count=3
-11-04 15:20:28.043  2892  3305 D EGL_emulation: app_time_stats: avg=604.01ms min=354.19ms max=853.83ms count=2
-11-04 15:20:29.099  2892  3032 D EGL_emulation: app_time_stats: avg=2393.89ms min=2393.89ms max=2393.89ms count=1
-11-04 15:20:29.392  2892  3305 D EGL_emulation: app_time_stats: avg=337.26ms min=274.77ms max=477.21ms count=4
-11-04 15:20:30.446  2892  3305 D EGL_emulation: app_time_stats: avg=351.39ms min=263.40ms max=441.15ms count=3
-11-04 15:20:31.609  2892  3305 D EGL_emulation: app_time_stats: avg=387.54ms min=347.89ms max=410.54ms count=3
-11-04 15:20:31.656  2892  2892 I RoadguardSession: pos=46.71513,5.58557 v=70 cap=205 prec=5 nuit=false alerte=rg-119a4aa4e999628a4815@27m radars=true
-11-04 15:20:33.026  2892  3305 D EGL_emulation: app_time_stats: avg=472.21ms min=291.89ms max=587.85ms count=3
-11-04 15:20:33.264  2892  3032 D EGL_emulation: app_time_stats: avg=2082.77ms min=78.49ms max=4087.06ms count=2
-11-04 15:20:34.031  2892  3305 D EGL_emulation: app_time_stats: avg=502.39ms min=247.70ms max=757.07ms count=2
-11-04 15:20:34.551  2892  3032 D EGL_emulation: app_time_stats: avg=643.49ms min=93.83ms max=1193.15ms count=2
-11-04 15:20:35.322  2892  3305 D EGL_emulation: app_time_stats: avg=430.34ms min=323.04ms max=563.75ms count=3
-11-04 15:20:35.855  2892  3194 D AudioTrack: stop(16): called with 15240 frames delivered
-11-04 15:20:36.554  2892  3305 D EGL_emulation: app_time_stats: avg=410.53ms min=359.08ms max=477.56ms count=3
-11-04 15:20:37.081  2892  2892 I RoadguardSession: pos=46.71418,5.58493 v=70 cap=205 prec=5 nuit=false alerte=rg-23221914238eedc5fb8a@22m radars=true
-11-04 15:20:37.168  2892  3032 D EGL_emulation: app_time_stats: avg=1308.24ms min=40.17ms max=2576.31ms count=2
-11-04 15:20:37.810  2892  3305 D EGL_emulation: app_time_stats: avg=628.07ms min=392.10ms max=864.04ms count=2
-11-04 15:20:39.158  2892  3305 D EGL_emulation: app_time_stats: avg=449.35ms min=311.78ms max=629.62ms count=3
-11-04 15:20:40.196  2892  3032 D EGL_emulation: app_time_stats: avg=1514.04ms min=90.29ms max=2937.79ms count=2
-11-04 15:20:40.354  2892  3194 D AudioTrack: stop(16): called with 14400 frames delivered
-11-04 15:20:40.515  2892  3305 D EGL_emulation: app_time_stats: avg=677.58ms min=465.62ms max=889.53ms count=2
-11-04 15:20:41.233  2892  3032 D EGL_emulation: app_time_stats: avg=343.82ms min=48.92ms max=612.65ms count=3
-11-04 15:20:41.894  2892  2908 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 173944(7805KB) AllocSpace objects, 26(1388KB) LOS objects, 49% free, 21MB/42MB, paused 80us,23us total 694.129ms
-11-04 15:20:41.918  2892  3305 D EGL_emulation: app_time_stats: avg=675.13ms min=459.36ms max=890.89ms count=2
-11-04 15:20:42.160  2892  2892 I RoadguardSession: pos=46.71339,5.58439 v=70 cap=205 prec=5 nuit=false alerte=rg-c93dbc586205a1440bcf@24m radars=true
-11-04 15:20:43.065  2892  3305 D EGL_emulation: app_time_stats: avg=573.81ms min=526.15ms max=621.47ms count=2
-11-04 15:20:43.259  2892  3032 D EGL_emulation: app_time_stats: avg=1012.77ms min=75.35ms max=1950.20ms count=2
-11-04 15:20:44.364  2892  3305 D EGL_emulation: app_time_stats: avg=432.85ms min=396.43ms max=474.12ms count=3
-11-04 15:20:45.581  2892  3305 D EGL_emulation: app_time_stats: avg=405.64ms min=279.93ms max=556.01ms count=3
-11-04 15:20:46.940  2892  3305 D EGL_emulation: app_time_stats: avg=339.85ms min=226.64ms max=540.20ms count=4
-11-04 15:20:47.699  2892  2892 I RoadguardSession: pos=46.71291,5.58406 v=70 cap=0 prec=5 nuit=false alerte=rg-c93dbc586205a1440bcf@78m radars=true
-11-04 15:20:47.794  2892  3032 D EGL_emulation: app_time_stats: avg=4535.05ms min=4535.05ms max=4535.05ms count=1
-11-04 15:20:48.128  2892  3305 D EGL_emulation: app_time_stats: avg=593.69ms min=454.74ms max=732.64ms count=2
+11-04 16:58:55.110  3648  3648 I r.roadguard.gps: Late-enabling -Xcheck:jni
+11-04 16:58:55.341  3648  3648 I r.roadguard.gps: Using CollectorTypeCC GC.
+11-04 16:58:55.341  3648  3648 W r.roadguard.gps: Unexpected CPU variant for x86: x86_64.
+11-04 16:58:55.341  3648  3648 W r.roadguard.gps: Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
+11-04 16:58:55.737  3648  3648 D CompatibilityChangeReporter: Compat change id reported: 171979766; UID 10192; state: ENABLED
+11-04 16:58:55.737  3648  3648 D CompatibilityChangeReporter: Compat change id reported: 242716250; UID 10192; state: ENABLED
+11-04 16:58:55.830  3648  3648 W ziparchive: Unable to open '/data/app/~~lxlqc7d0Y5NJVe1827HN-A==/fr.roadguard.gps-JRZB494jZufiUWzI6cPeuA==/base.dm': No such file or directory
+11-04 16:58:55.830  3648  3648 W ziparchive: Unable to open '/data/app/~~lxlqc7d0Y5NJVe1827HN-A==/fr.roadguard.gps-JRZB494jZufiUWzI6cPeuA==/base.dm': No such file or directory
+11-04 16:58:56.792  3648  3648 D nativeloader: Configuring clns-6 for other apk /data/app/~~lxlqc7d0Y5NJVe1827HN-A==/fr.roadguard.gps-JRZB494jZufiUWzI6cPeuA==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~lxlqc7d0Y5NJVe1827HN-A==/fr.roadguard.gps-JRZB494jZufiUWzI6cPeuA==/lib/x86_64:/data/app/~~lxlqc7d0Y5NJVe1827HN-A==/fr.roadguard.gps-JRZB494jZufiUWzI6cPeuA==/base.apk!/lib/x86_64, permitted_path=/data:/mnt/expand:/data/user/0/fr.roadguard.gps
+11-04 16:58:56.799  3648  3648 V GraphicsEnvironment: Currently set values for:
+11-04 16:58:56.799  3648  3648 V GraphicsEnvironment:   angle_gl_driver_selection_pkgs=[]
+11-04 16:58:56.799  3648  3648 V GraphicsEnvironment:   angle_gl_driver_selection_values=[]
+11-04 16:58:56.802  3648  3648 V GraphicsEnvironment: ANGLE GameManagerService for fr.roadguard.gps: false
+11-04 16:58:56.802  3648  3648 V GraphicsEnvironment: fr.roadguard.gps is not listed in per-application setting
+11-04 16:58:56.802  3648  3648 V GraphicsEnvironment: Neither updatable production driver nor prerelease driver is supported.
+11-04 16:58:56.893  3648  3737 D libEGL  : loaded /vendor/lib64/egl/libEGL_emulation.so
+11-04 16:58:56.894  3648  3737 D libEGL  : loaded /vendor/lib64/egl/libGLESv1_CM_emulation.so
+11-04 16:58:56.897  3648  3737 D libEGL  : loaded /vendor/lib64/egl/libGLESv2_emulation.so
+11-04 16:58:57.213  3648  3648 D CompatibilityChangeReporter: Compat change id reported: 237531167; UID 10192; state: DISABLED
+11-04 16:58:57.219  3648  3648 W OpenGLRenderer: Unknown dataspace 0
+11-04 16:58:57.893  3648  3736 W OpenGLRenderer: Failed to initialize 101010-2 format, error = EGL_SUCCESS
+11-04 16:58:58.017  3648  3736 I Gralloc4: mapper 4.x is not supported
+11-04 16:58:58.460  3648  3787 I OpenGLRenderer: Davey! duration=1582ms; Flags=1, FrameTimelineVsyncId=5868, IntendedVsync=97263771375, Vsync=97647104693, InputEventId=0, HandleInputStart=97668749967, AnimationStart=97668758429, PerformTraversalsStart=97668932959, DrawStart=98478461142, FrameDeadline=97280438041, FrameInterval=97658210275, FrameStartTime=16666666, SyncQueued=98505134925, SyncStart=98505529272, IssueDrawCommandsStart=98513162397, SwapBuffers=98533195773, FrameCompleted=98846470411, DequeueBufferDuration=4627, QueueBufferDuration=24035205, GpuCompleted=98846380928, SwapBuffersCompleted=98846470411, DisplayPresentTime=0, CommandSubmissionCompleted=98533195773, 
+11-04 16:58:58.846  3648  3648 I Choreographer: Skipped 84 frames!  The application may be doing too much work on its main thread.
+11-04 16:58:58.894  3648  3648 D CompatibilityChangeReporter: Compat change id reported: 160794467; UID 10192; state: ENABLED
+11-04 16:58:59.259  3648  3648 I TextToSpeech: Sucessfully bound to com.google.android.tts
+11-04 16:58:59.503  3648  3648 D CompatibilityChangeReporter: Compat change id reported: 263076149; UID 10192; state: ENABLED
+11-04 16:58:59.504  3648  3648 W Equalizer: WARNING: attaching an Equalizer to global output mix is deprecated!
+11-04 16:58:59.724  3648  3787 I TextToSpeech: Connected to TTS engine
+11-04 16:58:59.805  3648  3648 W r.roadguard.gps: Accessing hidden field Landroid/graphics/Typeface;->sSystemFontMap:Ljava/util/Map; (unsupported, reflection, allowed)
+11-04 16:59:00.197  3648  3752 I TextToSpeech: Setting up the connection to TTS engine...
+11-04 16:59:00.383  3648  3854 I Mbgl-EGLConfigChooser: In emulator: false
+11-04 16:59:00.508  3648  3648 V Mbgl-ConnectivityReceiver: connected - true
+11-04 16:59:00.783  3648  3891 I Mbgl    : {RenderThread 67}[General]: GPU Identifier: Android Emulator OpenGL ES Translator (Google SwiftShader)
+11-04 16:59:02.123  3648  3691 I OpenGLRenderer: Davey! duration=2583ms; Flags=0, FrameTimelineVsyncId=6142, IntendedVsync=99797104607, Vsync=99797104607, InputEventId=0, HandleInputStart=99798399617, AnimationStart=99798403423, PerformTraversalsStart=100516074464, DrawStart=100833394485, FrameDeadline=99813771273, FrameInterval=99798385145, FrameStartTime=16666666, SyncQueued=100853380471, SyncStart=100853409454, IssueDrawCommandsStart=100853568531, SwapBuffers=102227968861, FrameCompleted=102380695398, DequeueBufferDuration=2884, QueueBufferDuration=183323, GpuCompleted=102380695398, SwapBuffersCompleted=102368286443, DisplayPresentTime=0, CommandSubmissionCompleted=102227968861, 
+11-04 16:59:03.284  3648  3854 D EGL_emulation: app_time_stats: avg=1115.53ms min=48.18ms max=2182.88ms count=2
+11-04 16:59:03.484  3648  3988 D ProfileInstaller: Installing profile for fr.roadguard.gps
+11-04 16:59:03.727  3648  3736 D EGL_emulation: app_time_stats: avg=2641.88ms min=1761.93ms max=3521.83ms count=2
+11-04 16:59:06.041  3648  3679 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 174314(9184KB) AllocSpace objects, 8(348KB) LOS objects, 49% free, 5037KB/10074KB, paused 32us,29us total 696.323ms
+11-04 16:59:08.617  3648  3679 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 96961(4430KB) AllocSpace objects, 2(40KB) LOS objects, 49% free, 5519KB/10MB, paused 16us,14us total 443.905ms
+11-04 16:59:10.449  3648  3679 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 98207(4136KB) AllocSpace objects, 0(0B) LOS objects, 49% free, 6104KB/11MB, paused 3.352ms,15us total 280.835ms
+11-04 16:59:11.173  3648  3679 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 120198(5336KB) AllocSpace objects, 2(40KB) LOS objects, 49% free, 6928KB/13MB, paused 16.862ms,13us total 269.203ms
+11-04 16:59:13.016  3648  3679 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 102190(4848KB) AllocSpace objects, 0(0B) LOS objects, 49% free, 6482KB/12MB, paused 6.395ms,18us total 156.213ms
+11-04 16:59:15.992  3648  3736 D EGL_emulation: app_time_stats: avg=12265.26ms min=12265.26ms max=12265.26ms count=1
+11-04 16:59:16.146  3648  3679 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 105807(5145KB) AllocSpace objects, 0(0B) LOS objects, 49% free, 6683KB/13MB, paused 26us,17us total 280.485ms
+11-04 16:59:16.774  3648  3679 I r.roadguard.gps: Background young concurrent copying GC freed 116492(5803KB) AllocSpace objects, 0(0B) LOS objects, 36% free, 8543KB/13MB, paused 18us,16us total 111.780ms
+11-04 16:59:17.693  3648  3679 I r.roadguard.gps: Background young concurrent copying GC freed 98291(4900KB) AllocSpace objects, 0(0B) LOS objects, 34% free, 8698KB/13MB, paused 44us,22us total 160.682ms
+11-04 16:59:19.129  3648  3679 I r.roadguard.gps: Background concurrent copying GC freed 130389(5588KB) AllocSpace objects, 1(20KB) LOS objects, 49% free, 9061KB/17MB, paused 100us,11us total 472.879ms
+11-04 16:59:20.744  3648  3736 D EGL_emulation: app_time_stats: avg=2375.99ms min=46.09ms max=4705.88ms count=2
+11-04 16:59:21.679  3648  3679 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 142726(6094KB) AllocSpace objects, 0(0B) LOS objects, 49% free, 9239KB/18MB, paused 64us,24us total 1.691s
+11-04 16:59:22.070  3648  3736 D EGL_emulation: app_time_stats: avg=441.79ms min=57.49ms max=879.17ms count=3
+11-04 16:59:26.095  3648  3648 I Choreographer: Skipped 160 frames!  The application may be doing too much work on its main thread.
+11-04 16:59:26.392  3648  3679 I r.roadguard.gps: Background young concurrent copying GC freed 185662(6521KB) AllocSpace objects, 1(20KB) LOS objects, 28% free, 12MB/18MB, paused 20us,15us total 590.544ms
+11-04 16:59:27.519  3648  3679 I r.roadguard.gps: Background concurrent copying GC freed 40575(1449KB) AllocSpace objects, 1(20KB) LOS objects, 49% free, 20MB/40MB, paused 19us,22us total 765.135ms
+11-04 16:59:27.533  3648  3757 W r.roadguard.gps: Verification of long okhttp3.internal.Util.headersContentLength(okhttp3.Response) took 167.107ms (143.62 bytecodes/s) (1856B approximate peak alloc)
+11-04 16:59:27.782  3648  4880 D TrafficStats: tagSocket(127) with statsTag=0xffffffff, statsUid=-1
+11-04 16:59:27.850  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/styles/liberty). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:27.856  3648  3736 D EGL_emulation: app_time_stats: avg=5786.20ms min=5786.20ms max=5786.20ms count=1
+11-04 16:59:27.887  3648  4887 D TrafficStats: tagSocket(146) with statsTag=0xffffffff, statsUid=-1
+11-04 16:59:28.000  3648  4880 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-04 16:59:28.439  3648  4887 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:28.447  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/styles/liberty). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:29.496  3648  3648 I Choreographer: Skipped 59 frames!  The application may be doing too much work on its main thread.
+11-04 16:59:29.587  3648  3736 D EGL_emulation: app_time_stats: avg=1730.77ms min=1730.77ms max=1730.77ms count=1
+11-04 16:59:29.610  3648  4673 I OpenGLRenderer: Davey! duration=1084ms; Flags=0, FrameTimelineVsyncId=7010, IntendedVsync=128913770109, Vsync=129897103403, InputEventId=0, HandleInputStart=129902137737, AnimationStart=129902141903, PerformTraversalsStart=129960513971, DrawStart=129960755240, FrameDeadline=128930436775, FrameInterval=129898981438, FrameStartTime=16666666, SyncQueued=129971419898, SyncStart=129971444084, IssueDrawCommandsStart=129975529396, SwapBuffers=129976992595, FrameCompleted=129998341320, DequeueBufferDuration=2944, QueueBufferDuration=172517, GpuCompleted=129998341320, SwapBuffersCompleted=129990285776, DisplayPresentTime=0, CommandSubmissionCompleted=129976992595, 
+11-04 16:59:29.669  3648  4917 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:29.734  3648  3854 D EGL_emulation: app_time_stats: avg=2860.91ms min=41.23ms max=8338.31ms count=3
+11-04 16:59:29.782  3648  4887 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:29.783  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:29.786  3648  4880 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:29.790  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/sprites/ofm_f384/ofm.json). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:29.822  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/sprites/ofm_f384/ofm.png). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:30.924  3648  4917 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:30.936  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/12/2111/1446.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:30.957  3648  3736 D EGL_emulation: app_time_stats: avg=456.69ms min=339.16ms max=519.59ms count=3
+11-04 16:59:31.218  3648  4887 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:31.224  3648  4880 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:31.281  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8444/5785.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:31.302  3648  3648 I RoadguardSession: pos=46.72512,5.59236 v=70 cap=0 prec=5 nuit=true alerte=- radars=true
+11-04 16:59:31.752  3648  3827 D TrafficStats: tagSocket(142) with statsTag=0xffffffff, statsUid=-1
+11-04 16:59:31.766  3648  3828 D TrafficStats: tagSocket(145) with statsTag=0xffffffff, statsUid=-1
+11-04 16:59:31.988  3648  3736 D EGL_emulation: app_time_stats: avg=1030.86ms min=1030.86ms max=1030.86ms count=1
+11-04 16:59:32.144  3648  3854 D EGL_emulation: app_time_stats: avg=361.84ms min=99.38ms max=770.35ms count=4
+11-04 16:59:32.145  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8444/5784.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:33.203  3648  3854 D EGL_emulation: app_time_stats: avg=529.24ms min=142.77ms max=915.72ms count=2
+11-04 16:59:33.474  3648  3736 D EGL_emulation: app_time_stats: avg=495.42ms min=99.85ms max=1096.48ms count=3
+11-04 16:59:33.523  3648  4880 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:34.396  3648  4887 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:34.424  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/fonts/Noto%20Sans%20Italic/0-255.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:34.424  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/fonts/Noto%20Sans%20Italic/8192-8447.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:34.444  3648  4880 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:34.478  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/fonts/Noto%20Sans%20Regular/0-255.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:34.549  3648  4917 D TrafficStats: tagSocket(149) with statsTag=0xffffffff, statsUid=-1
+11-04 16:59:34.677  3648  3827 D TrafficStats: tagSocket(153) with statsTag=0xffffffff, statsUid=-1
+11-04 16:59:34.795  3648  3826 D TrafficStats: tagSocket(152) with statsTag=0xffffffff, statsUid=-1
+11-04 16:59:35.244  3648  4917 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:35.661  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:35.927  3648  4917 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:36.085  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/fonts/Noto%20Sans%20Italic/256-511.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:36.745  3648  3648 I RoadguardSession: pos=46.72416,5.59171 v=70 cap=205 prec=5 nuit=true alerte=- radars=true
+11-04 16:59:36.788  3648  3648 I Choreographer: Skipped 54 frames!  The application may be doing too much work on its main thread.
+11-04 16:59:37.456  3648  3679 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 160073(6776KB) AllocSpace objects, 19(1288KB) LOS objects, 50% free, 22MB/44MB, paused 34us,32us total 2.186s
+11-04 16:59:38.774  3648  4880 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:39.057  3648  4917 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:39.066  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/gl/dark-matter-gl-style/sprite.png). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:39.219  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/gl/dark-matter-gl-style/sprite.json). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:39.672  3648  3678 I r.roadguard.gps: JIT allocated 87KB for compiled code of void fr.roadguard.app.next.PhoneHomeActivityKt.PhoneHome(androidx.compose.runtime.Composer, int)
+11-04 16:59:39.672  3648  3678 I r.roadguard.gps: JIT allocated 52KB for stack maps of void fr.roadguard.app.next.PhoneHomeActivityKt.PhoneHome(androidx.compose.runtime.Composer, int)
+11-04 16:59:39.672  3648  3678 I r.roadguard.gps: Compiler allocated 12MB to compile void fr.roadguard.app.next.PhoneHomeActivityKt.PhoneHome(androidx.compose.runtime.Composer, int)
+11-04 16:59:40.305  3648  3854 D EGL_emulation: app_time_stats: avg=2172.34ms min=151.79ms max=6145.08ms count=3
+11-04 16:59:40.775  3648  3736 D EGL_emulation: app_time_stats: avg=2433.58ms min=201.72ms max=6629.12ms count=3
+11-04 16:59:40.828  3648  3691 I OpenGLRenderer: Davey! duration=4898ms; Flags=0, FrameTimelineVsyncId=7970, IntendedVsync=136280436481, Vsync=137180436445, InputEventId=0, HandleInputStart=137246322718, AnimationStart=137246327355, PerformTraversalsStart=137325561933, DrawStart=141137455265, FrameDeadline=136297103147, FrameInterval=137191730008, FrameStartTime=16666666, SyncQueued=141139580139, SyncStart=141139598927, IssueDrawCommandsStart=141139720107, SwapBuffers=141155240915, FrameCompleted=141178604360, DequeueBufferDuration=2884, QueueBufferDuration=404262, GpuCompleted=141178349841, SwapBuffersCompleted=141178604360, DisplayPresentTime=0, CommandSubmissionCompleted=141155240915, 
+11-04 16:59:41.022  3648  3648 I Choreographer: Skipped 245 frames!  The application may be doing too much work on its main thread.
+11-04 16:59:41.741  3648  3798 E SurfaceSyncGroup: Failed to receive transaction ready in 1000ms. Marking SurfaceSyncGroup(wmsSync-VRI[PhoneHomeActivity]#17) as ready
+11-04 16:59:41.741  3648  3798 E SurfaceSyncGroup: Failed to receive transaction ready in 1000ms. Marking SurfaceSyncGroup(VRI[PhoneHomeActivity]#18) as ready
+11-04 16:59:41.741  3648  3798 E SurfaceSyncGroup: Failed to receive transaction ready in 1000ms. Marking SurfaceSyncGroup(SurfaceView[fr.roadguard.gps/fr.roadguard.app.next.PhoneHomeActivity]#16) as ready
+11-04 16:59:41.885  3648  3736 D EGL_emulation: app_time_stats: avg=1110.40ms min=1110.40ms max=1110.40ms count=1
+11-04 16:59:41.915  3648  4938 I OpenGLRenderer: Davey! duration=4946ms; Flags=0, FrameTimelineVsyncId=8091, IntendedVsync=137330436439, Vsync=141413769609, InputEventId=0, HandleInputStart=141438437872, AnimationStart=141438441467, PerformTraversalsStart=141505108945, DrawStart=141505323845, FrameDeadline=141197102951, FrameInterval=141425606848, FrameStartTime=16666666, SyncQueued=141536748761, SyncStart=141548258678, IssueDrawCommandsStart=141548307471, SwapBuffers=142004482415, FrameCompleted=142288880370, DequeueBufferDuration=4817, QueueBufferDuration=3878965, GpuCompleted=142288787121, SwapBuffersCompleted=142288880370, DisplayPresentTime=0, CommandSubmissionCompleted=142004482415, 
+11-04 16:59:42.042  3648  3854 D EGL_emulation: app_time_stats: avg=724.39ms min=431.81ms max=1016.96ms count=2
+11-04 16:59:42.077  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/12/2111/1445.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:42.080  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16892/11561.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:42.080  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16892/11562.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:42.080  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16893/11561.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:42.080  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16893/11562.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:42.372  3648  4887 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-04 16:59:42.373  3648  4894 W r.roadguard.gps: Long monitor contention with owner OkHttp Dispatcher (4887) at void okhttp3.internal.http2.Http2Writer.flush()(Http2Writer.kt:121) waiters=1 in void okhttp3.internal.http2.Http2Writer.rstStream(int, okhttp3.internal.http2.ErrorCode) for 267ms
+11-04 16:59:42.455  3648  4880 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-04 16:59:42.460  3648  4938 I OpenGLRenderer: Davey! duration=1320ms; Flags=0, FrameTimelineVsyncId=8460, IntendedVsync=141513769605, Vsync=141780436261, InputEventId=0, HandleInputStart=141788422936, AnimationStart=141788426210, PerformTraversalsStart=141796266343, DrawStart=142605057338, FrameDeadline=142313769573, FrameInterval=141786196501, FrameStartTime=16666666, SyncQueued=142606383002, SyncStart=142606609790, IssueDrawCommandsStart=142606822687, SwapBuffers=142821324297, FrameCompleted=142834191404, DequeueBufferDuration=2584, QueueBufferDuration=306947, GpuCompleted=142834130583, SwapBuffersCompleted=142834191404, DisplayPresentTime=0, CommandSubmissionCompleted=142821324297, 
+11-04 16:59:42.464  3648  3648 I Choreographer: Skipped 63 frames!  The application may be doing too much work on its main thread.
+11-04 16:59:42.478  3648  5097 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-04 16:59:42.652  3648  4917 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-04 16:59:42.671  3648  5096 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-04 16:59:42.755  3648  3854 E BLASTBufferQueue: [SurfaceView[fr.roadguard.gps/fr.roadguard.app.next.PhoneHomeActivity]#1](f:0,a:1) rejecting buffer:active_size=1080x2316, requested_size=1080x2316 buffer{size=1080x2376 transform=0}
+11-04 16:59:42.852  3648  4938 I OpenGLRenderer: Davey! duration=1422ms; Flags=0, FrameTimelineVsyncId=8505, IntendedVsync=141813769593, Vsync=142863769551, InputEventId=0, HandleInputStart=142882422913, AnimationStart=142882427189, PerformTraversalsStart=142883019151, DrawStart=143199530307, FrameDeadline=142863769551, FrameInterval=142867355410, FrameStartTime=16666666, SyncQueued=143200901258, SyncStart=143200917743, IssueDrawCommandsStart=143201027246, SwapBuffers=143207466914, FrameCompleted=143236141295, DequeueBufferDuration=2053, QueueBufferDuration=356441, GpuCompleted=143236141295, SwapBuffersCompleted=143223309210, DisplayPresentTime=0, CommandSubmissionCompleted=143207466914, 
+11-04 16:59:42.915  3648  3736 D EGL_emulation: app_time_stats: avg=343.18ms min=95.12ms max=545.30ms count=3
+11-04 16:59:42.917  3648  3648 I RoadguardSession: pos=46.72321,5.59107 v=70 cap=205 prec=5 nuit=true alerte=- radars=true
+11-04 16:59:43.207  3648  3798 E SurfaceSyncGroup: Failed to receive transaction ready in 1000ms. Marking SurfaceSyncGroup(wmsSync-VRI[PhoneHomeActivity]#20) as ready
+11-04 16:59:43.207  3648  3798 E SurfaceSyncGroup: Failed to receive transaction ready in 1000ms. Marking SurfaceSyncGroup(VRI[PhoneHomeActivity]#21) as ready
+11-04 16:59:43.216  3648  3798 E SurfaceSyncGroup: Failed to receive transaction ready in 1000ms. Marking SurfaceSyncGroup(SurfaceView[fr.roadguard.gps/fr.roadguard.app.next.PhoneHomeActivity]#19) as ready
+11-04 16:59:43.414  3648  4887 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:44.012  3648  5096 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:44.682  3648  4917 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:44.698  3648  5096 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:44.826  3648  5097 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:44.855  3648  3854 D EGL_emulation: app_time_stats: avg=196.08ms min=57.38ms max=344.77ms count=7
+11-04 16:59:44.881  3648  5124 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:45.000  3648  5136 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:45.007  3648  4880 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:45.286  3648  4887 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:45.430  3648  4880 W r.roadguard.gps: Long monitor contention with owner OkHttp https://tiles.basemaps.cartocdn.com/... (5137) at boolean okhttp3.internal.connection.RealConnectionPool.callAcquirePooledConnection(okhttp3.Address, okhttp3.internal.connection.RealCall, java.util.List, boolean)(RealConnectionPool.kt:88) waiters=2 in void okhttp3.internal.connection.RealConnection.incrementSuccessCount$okhttp() for 402ms
+11-04 16:59:45.448  3648  5124 W r.roadguard.gps: Long monitor contention with owner OkHttp https://tiles.basemaps.cartocdn.com/... (5137) at boolean okhttp3.internal.connection.RealConnectionPool.callAcquirePooledConnection(okhttp3.Address, okhttp3.internal.connection.RealCall, java.util.List, boolean)(RealConnectionPool.kt:88) waiters=3 in void okhttp3.internal.connection.RealConnection.incrementSuccessCount$okhttp() for 420ms
+11-04 16:59:45.459  3648  5132 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:45.464  3648  5097 W r.roadguard.gps: Long monitor contention with owner OkHttp https://tiles.basemaps.cartocdn.com/... (5137) at boolean okhttp3.internal.connection.RealConnectionPool.callAcquirePooledConnection(okhttp3.Address, okhttp3.internal.connection.RealCall, java.util.List, boolean)(RealConnectionPool.kt:88) waiters=1 in void okhttp3.internal.connection.RealConnection.incrementSuccessCount$okhttp() for 435ms
+11-04 16:59:45.479  3648  5136 W r.roadguard.gps: Long monitor contention with owner OkHttp https://tiles.basemaps.cartocdn.com/... (5137) at boolean okhttp3.internal.connection.RealConnectionPool.callAcquirePooledConnection(okhttp3.Address, okhttp3.internal.connection.RealCall, java.util.List, boolean)(RealConnectionPool.kt:88) waiters=4 in void okhttp3.internal.connection.RealConnection.incrementSuccessCount$okhttp() for 451ms
+11-04 16:59:45.479  3648  4917 W r.roadguard.gps: Long monitor contention with owner OkHttp https://tiles.basemaps.cartocdn.com/... (5137) at boolean okhttp3.internal.connection.RealConnectionPool.callAcquirePooledConnection(okhttp3.Address, okhttp3.internal.connection.RealCall, java.util.List, boolean)(RealConnectionPool.kt:88) waiters=0 in boolean okhttp3.internal.connection.RealConnectionPool.callAcquirePooledConnection(okhttp3.Address, okhttp3.internal.connection.RealCall, java.util.List, boolean) for 455ms
+11-04 16:59:45.532  3648  5137 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:45.645  3648  4917 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:45.860  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16891/11559.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:45.860  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16892/11559.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:45.860  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16893/11559.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:45.860  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16892/11561.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:45.860  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/11/1055/722.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:45.860  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16893/11561.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:45.861  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16891/11562.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:45.861  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16892/11560.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:45.861  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16893/11562.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:45.861  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16893/11563.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:45.861  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16892/11563.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:45.861  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16891/11561.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:45.861  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16892/11562.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:45.864  3648  4880 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:45.933  3648  5136 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-04 16:59:45.934  3648  5137 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-04 16:59:45.936  3648  5097 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:45.937  3648  5096 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:45.953  3648  3854 D EGL_emulation: app_time_stats: avg=182.86ms min=27.33ms max=703.00ms count=6
+11-04 16:59:45.996  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16893/11560.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:45.996  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16891/11560.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:45.996  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16892/11564.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:45.996  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16893/11564.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:45.996  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16891/11563.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:46.047  3648  5124 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-04 16:59:46.136  3648  4917 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:46.143  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16891/11564.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:46.925  3648  4917 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:46.999  3648  5124 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:47.101  3648  5096 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 16:59:47.126  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/fonts/Montserrat%20Medium%2cOpen%20Sans%20Regular%2cNoto%20Sans%20Regular%2cNoto%20Sans%20CJK%20JP%20Regular/0-255.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:47.131  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/fonts/Montserrat%20SemiBold%2cOpen%20Sans%20Bold%2cNoto%20Sans%20Regular%2cNoto%20Sans%20CJK%20JP%20Regular/0-255.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:47.131  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/fonts/Montserrat%20Regular%20Italic%2cOpen%20Sans%20Italic%2cNoto%20Sans%20Regular%2cNoto%20Sans%20CJK%20JP%20Regular/0-255.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 16:59:47.159  3648  3679 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 86964(3582KB) AllocSpace objects, 10(292KB) LOS objects, 49% free, 22MB/44MB, paused 557us,23us total 636.820ms
+11-04 16:59:47.219  3648  3648 I RoadguardSession: pos=46.72242,5.59053 v=70 cap=205 prec=5 nuit=true alerte=- radars=true
+11-04 16:59:48.509  3648  3854 D EGL_emulation: app_time_stats: avg=511.16ms min=53.90ms max=1795.89ms count=5
+11-04 16:59:49.565  3648  3854 D EGL_emulation: app_time_stats: avg=527.67ms min=383.15ms max=672.19ms count=2
+11-04 16:59:50.911  3648  3854 D EGL_emulation: app_time_stats: avg=448.56ms min=350.23ms max=539.96ms count=3
+11-04 16:59:51.869  3648  3648 I RoadguardSession: pos=46.72163,5.58999 v=70 cap=205 prec=5 nuit=true alerte=- radars=true
+11-04 16:59:52.042  3648  3854 D EGL_emulation: app_time_stats: avg=376.89ms min=321.18ms max=433.99ms count=3
+11-04 16:59:53.572  3648  3854 D EGL_emulation: app_time_stats: avg=764.07ms min=498.89ms max=1029.25ms count=2
+11-04 16:59:55.366  3648  3854 D EGL_emulation: app_time_stats: avg=896.94ms min=803.73ms max=990.16ms count=2
+11-04 16:59:56.683  3648  3854 D EGL_emulation: app_time_stats: avg=658.28ms min=510.49ms max=806.07ms count=2
+11-04 16:59:57.070  3648  3648 I RoadguardSession: pos=46.72084,5.58945 v=70 cap=205 prec=5 nuit=true alerte=- radars=true
+11-04 16:59:58.077  3648  3854 D EGL_emulation: app_time_stats: avg=464.67ms min=336.06ms max=604.56ms count=3
+11-04 16:59:59.632  3648  3854 D EGL_emulation: app_time_stats: avg=518.34ms min=312.75ms max=720.65ms count=3
+11-04 17:00:00.647  3648  3854 D EGL_emulation: app_time_stats: avg=507.46ms min=354.50ms max=660.42ms count=2
+11-04 17:00:01.927  3648  3854 D EGL_emulation: app_time_stats: avg=426.44ms min=307.06ms max=623.31ms count=3
+11-04 17:00:02.065  3648  3648 I RoadguardSession: pos=46.72004,5.58891 v=70 cap=205 prec=5 nuit=true alerte=- radars=true
+11-04 17:00:03.434  3648  3854 D EGL_emulation: app_time_stats: avg=496.74ms min=333.88ms max=725.52ms count=3
+11-04 17:00:04.478  3648  3854 D EGL_emulation: app_time_stats: avg=347.96ms min=337.46ms max=358.54ms count=3
+11-04 17:00:05.524  3648  3854 D EGL_emulation: app_time_stats: avg=523.00ms min=455.65ms max=590.36ms count=2
+11-04 17:00:07.059  3648  3854 D EGL_emulation: app_time_stats: avg=767.38ms min=682.87ms max=851.90ms count=2
+11-04 17:00:07.997  3648  3648 I RoadguardSession: pos=46.71909,5.58827 v=70 cap=205 prec=5 nuit=true alerte=- radars=true
+11-04 17:00:08.173  3648  3854 D EGL_emulation: app_time_stats: avg=371.50ms min=358.29ms max=396.88ms count=3
+11-04 17:00:08.837  3648  5096 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 17:00:08.848  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16892/11565.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 17:00:08.867  3648  5124 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 17:00:08.878  3648  4917 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-04 17:00:08.891  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16893/11565.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 17:00:08.892  3648  3757 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/16891/11565.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-04 17:00:09.501  3648  3854 D EGL_emulation: app_time_stats: avg=442.48ms min=414.15ms max=483.57ms count=3
+11-04 17:00:10.280  3648  3736 D EGL_emulation: app_time_stats: avg=9121.73ms min=114.55ms max=26416.61ms count=3
+11-04 17:00:10.719  3648  3817 D AudioTrack: stop(15): called with 7680 frames delivered
+11-04 17:00:11.106  3648  3854 D EGL_emulation: app_time_stats: avg=802.25ms min=594.76ms max=1009.74ms count=2
+11-04 17:00:11.976  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:12.451  3648  3854 D EGL_emulation: app_time_stats: avg=1344.80ms min=1344.80ms max=1344.80ms count=1
+11-04 17:00:13.227  3648  3648 I RoadguardSession: pos=46.71878,5.58805 v=70 cap=0 prec=5 nuit=true alerte=- radars=true
+11-04 17:00:13.529  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:13.646  3648  3854 D EGL_emulation: app_time_stats: avg=1195.38ms min=1195.38ms max=1195.38ms count=1
+11-04 17:00:14.720  3648  3736 D EGL_emulation: app_time_stats: avg=2219.80ms min=237.82ms max=4201.79ms count=2
+11-04 17:00:15.429  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:15.663  3648  3854 D EGL_emulation: app_time_stats: avg=1008.45ms min=991.77ms max=1025.12ms count=2
+11-04 17:00:16.929  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:17.169  3648  3854 D EGL_emulation: app_time_stats: avg=501.93ms min=429.63ms max=572.25ms count=3
+11-04 17:00:17.521  3648  3736 D EGL_emulation: app_time_stats: avg=933.67ms min=89.69ms max=1957.54ms count=3
+11-04 17:00:18.275  3648  3854 D EGL_emulation: app_time_stats: avg=552.95ms min=465.21ms max=640.70ms count=2
+11-04 17:00:18.413  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:18.441  3648  3648 I RoadguardSession: pos=46.71814,5.58762 v=70 cap=205 prec=5 nuit=true alerte=rg-119a4aa4e999628a4815@393m radars=true
+11-04 17:00:19.487  3648  3854 D EGL_emulation: app_time_stats: avg=605.43ms min=413.71ms max=797.15ms count=2
+11-04 17:00:19.549  3648  3736 D EGL_emulation: app_time_stats: avg=2027.55ms min=2027.55ms max=2027.55ms count=1
+11-04 17:00:19.813  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:20.728  3648  3854 D EGL_emulation: app_time_stats: avg=620.78ms min=591.12ms max=650.45ms count=2
+11-04 17:00:21.106  3648  3817 D AudioTrack: stop(15): called with 2880 frames delivered
+11-04 17:00:22.370  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:22.379  3648  3854 D EGL_emulation: app_time_stats: avg=549.86ms min=407.92ms max=716.03ms count=3
+11-04 17:00:23.500  3648  3648 I RoadguardSession: pos=46.71735,5.58708 v=70 cap=205 prec=5 nuit=true alerte=rg-119a4aa4e999628a4815@296m radars=true
+11-04 17:00:23.577  3648  3736 D EGL_emulation: app_time_stats: avg=4027.92ms min=4027.92ms max=4027.92ms count=1
+11-04 17:00:23.599  3648  3817 D AudioTrack: stop(15): called with 3520 frames delivered
+11-04 17:00:24.001  3648  3854 D EGL_emulation: app_time_stats: avg=540.75ms min=430.34ms max=755.37ms count=3
+11-04 17:00:24.694  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:25.058  3648  3854 D EGL_emulation: app_time_stats: avg=528.40ms min=503.08ms max=553.71ms count=2
+11-04 17:00:25.728  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:25.795  3648  3736 D EGL_emulation: app_time_stats: avg=2217.92ms min=2217.92ms max=2217.92ms count=1
+11-04 17:00:26.717  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:26.784  3648  3854 D EGL_emulation: app_time_stats: avg=862.94ms min=408.76ms max=1317.11ms count=2
+11-04 17:00:27.653  3648  3736 D EGL_emulation: app_time_stats: avg=1858.24ms min=1858.24ms max=1858.24ms count=1
+11-04 17:00:27.702  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:27.828  3648  3854 D EGL_emulation: app_time_stats: avg=1043.80ms min=1043.80ms max=1043.80ms count=1
+11-04 17:00:28.526  3648  3648 I RoadguardSession: pos=46.71656,5.58654 v=70 cap=205 prec=5 nuit=true alerte=rg-119a4aa4e999628a4815@199m radars=true
+11-04 17:00:28.584  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:29.095  3648  3854 D EGL_emulation: app_time_stats: avg=628.10ms min=532.47ms max=723.73ms count=2
+11-04 17:00:29.375  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:30.164  3648  3854 D EGL_emulation: app_time_stats: avg=534.42ms min=357.48ms max=711.36ms count=2
+11-04 17:00:30.192  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:31.026  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:31.297  3648  3854 D EGL_emulation: app_time_stats: avg=377.67ms min=316.78ms max=426.63ms count=3
+11-04 17:00:31.748  3648  3817 D AudioTrack: stop(15): called with 2880 frames delivered
+11-04 17:00:32.368  3648  3854 D EGL_emulation: app_time_stats: avg=535.32ms min=394.08ms max=676.56ms count=2
+11-04 17:00:32.493  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:33.211  3648  3817 D AudioTrack: stop(15): called with 3520 frames delivered
+11-04 17:00:33.513  3648  3854 D EGL_emulation: app_time_stats: avg=1144.87ms min=1144.87ms max=1144.87ms count=1
+11-04 17:00:33.955  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:34.082  3648  3648 I RoadguardSession: pos=46.71624,5.58633 v=70 cap=205 prec=5 nuit=true alerte=rg-119a4aa4e999628a4815@160m radars=true
+11-04 17:00:34.194  3648  3736 D EGL_emulation: app_time_stats: avg=6540.70ms min=6540.70ms max=6540.70ms count=1
+11-04 17:00:34.684  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:34.873  3648  3854 D EGL_emulation: app_time_stats: avg=453.30ms min=264.79ms max=788.82ms count=3
+11-04 17:00:35.349  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:35.933  3648  3854 D EGL_emulation: app_time_stats: avg=529.94ms min=520.92ms max=538.96ms count=2
+11-04 17:00:36.001  3648  3736 D EGL_emulation: app_time_stats: avg=1806.92ms min=1806.92ms max=1806.92ms count=1
+11-04 17:00:36.055  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:36.591  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:36.980  3648  3854 D EGL_emulation: app_time_stats: avg=523.52ms min=517.77ms max=529.26ms count=2
+11-04 17:00:37.124  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:37.580  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:38.036  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:38.340  3648  3854 D EGL_emulation: app_time_stats: avg=453.34ms min=276.23ms max=589.01ms count=3
+11-04 17:00:38.407  3648  3817 D AudioTrack: stop(15): called with 2880 frames delivered
+11-04 17:00:38.800  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:38.991  3648  3736 D EGL_emulation: app_time_stats: avg=2989.14ms min=2989.14ms max=2989.14ms count=1
+11-04 17:00:39.175  3648  3817 D AudioTrack: stop(15): called with 3520 frames delivered
+11-04 17:00:39.349  3648  3854 D EGL_emulation: app_time_stats: avg=504.49ms min=322.62ms max=686.37ms count=2
+11-04 17:00:39.483  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:39.782  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:39.971  3648  3648 I RoadguardSession: pos=46.71529,5.58568 v=70 cap=205 prec=5 nuit=true alerte=rg-119a4aa4e999628a4815@45m radars=true
+11-04 17:00:40.104  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:40.316  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:40.515  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:40.544  3648  3854 D EGL_emulation: app_time_stats: avg=298.63ms min=261.61ms max=400.26ms count=4
+11-04 17:00:40.714  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:40.915  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:41.113  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:41.264  3648  3817 D AudioTrack: stop(15): called with 2880 frames delivered
+11-04 17:00:41.441  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:41.593  3648  3817 D AudioTrack: stop(15): called with 3520 frames delivered
+11-04 17:00:41.763  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:41.874  3648  3854 D EGL_emulation: app_time_stats: avg=332.52ms min=214.25ms max=445.31ms count=4
+11-04 17:00:41.924  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:42.033  3648  3736 D EGL_emulation: app_time_stats: avg=1520.91ms min=63.91ms max=2977.90ms count=2
+11-04 17:00:42.089  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:42.250  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:42.411  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:42.572  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:42.735  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:42.894  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:43.046  3648  3817 D AudioTrack: stop(15): called with 2880 frames delivered
+11-04 17:00:43.217  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:43.368  3648  3817 D AudioTrack: stop(15): called with 3520 frames delivered
+11-04 17:00:43.378  3648  3854 D EGL_emulation: app_time_stats: avg=501.20ms min=350.94ms max=581.11ms count=3
+11-04 17:00:43.541  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:43.701  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:43.862  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:44.059  3648  3736 D EGL_emulation: app_time_stats: avg=1011.01ms min=38.51ms max=1983.52ms count=2
+11-04 17:00:44.065  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:44.224  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:44.385  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:44.548  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:44.571  3648  3854 D EGL_emulation: app_time_stats: avg=397.14ms min=227.67ms max=553.28ms count=3
+11-04 17:00:44.709  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:44.860  3648  3817 D AudioTrack: stop(15): called with 2880 frames delivered
+11-04 17:00:45.022  3648  3648 I RoadguardSession: pos=46.71450,5.58514 v=70 cap=205 prec=5 nuit=true alerte=rg-23221914238eedc5fb8a@61m radars=true
+11-04 17:00:45.115  3648  3817 D AudioTrack: stop(15): called with 8712 frames delivered
+11-04 17:00:45.364  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:45.587  3648  3854 D EGL_emulation: app_time_stats: avg=507.80ms min=471.93ms max=543.67ms count=2
+11-04 17:00:45.639  3648  3817 D AudioTrack: stop(15): called with 3000 frames delivered
+11-04 17:00:45.935  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:46.219  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:46.393  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:46.564  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:46.734  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:46.755  3648  3854 D EGL_emulation: app_time_stats: avg=389.19ms min=311.06ms max=450.27ms count=3
+11-04 17:00:46.905  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:47.077  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:47.158  3648  3736 D EGL_emulation: app_time_stats: avg=1549.21ms min=56.45ms max=3041.98ms count=2
+11-04 17:00:47.268  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:47.400  3648  3817 D AudioTrack: stop(15): called with 2880 frames delivered
+11-04 17:00:47.588  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:47.740  3648  3817 D AudioTrack: stop(15): called with 3520 frames delivered
+11-04 17:00:47.913  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:47.940  3648  3854 D EGL_emulation: app_time_stats: avg=296.31ms min=248.21ms max=365.50ms count=4
+11-04 17:00:48.084  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:48.245  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:48.406  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:48.566  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:48.727  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:48.890  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:49.065  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:49.099  3648  3854 D EGL_emulation: app_time_stats: avg=386.16ms min=279.74ms max=462.65ms count=3
+11-04 17:00:49.231  3648  3817 D AudioTrack: stop(15): called with 2880 frames delivered
+11-04 17:00:49.420  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:49.574  3648  3817 D AudioTrack: stop(15): called with 3520 frames delivered
+11-04 17:00:49.764  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:49.926  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:50.100  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:50.265  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:50.434  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:50.620  3648  3854 D EGL_emulation: app_time_stats: avg=380.32ms min=319.18ms max=533.93ms count=4
+11-04 17:00:50.635  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:50.784  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:50.944  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:51.060  3648  3648 I RoadguardSession: pos=46.71355,5.58449 v=70 cap=205 prec=5 nuit=true alerte=rg-c93dbc586205a1440bcf@15m radars=true
+11-04 17:00:51.153  3648  3817 D AudioTrack: stop(15): called with 8712 frames delivered
+11-04 17:00:51.297  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:51.323  3648  3736 D EGL_emulation: app_time_stats: avg=2081.84ms min=74.12ms max=4089.56ms count=2
+11-04 17:00:51.457  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:51.608  3648  3817 D AudioTrack: stop(15): called with 2880 frames delivered
+11-04 17:00:51.779  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:51.863  3648  3854 D EGL_emulation: app_time_stats: avg=613.81ms min=489.77ms max=737.85ms count=2
+11-04 17:00:51.931  3648  3817 D AudioTrack: stop(15): called with 3512 frames delivered
+11-04 17:00:52.105  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:52.267  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:52.439  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:52.602  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:52.764  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:52.940  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:53.092  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:53.145  3648  3736 D EGL_emulation: app_time_stats: avg=1821.57ms min=1821.57ms max=1821.57ms count=1
+11-04 17:00:53.540  3648  3854 D EGL_emulation: app_time_stats: avg=555.35ms min=475.47ms max=680.56ms count=3
+11-04 17:00:54.878  3648  3854 D EGL_emulation: app_time_stats: avg=668.71ms min=453.75ms max=883.68ms count=2
+11-04 17:00:55.900  3648  3854 D EGL_emulation: app_time_stats: avg=511.15ms min=443.29ms max=579.01ms count=2
+11-04 17:00:56.088  3648  3648 I RoadguardSession: pos=46.71291,5.58406 v=70 cap=0 prec=5 nuit=true alerte=rg-c93dbc586205a1440bcf@78m radars=true
+11-04 17:00:56.102  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:56.130  3648  3736 D EGL_emulation: app_time_stats: avg=2984.63ms min=2984.63ms max=2984.63ms count=1
+11-04 17:00:56.969  3648  3854 D EGL_emulation: app_time_stats: avg=534.01ms min=431.01ms max=637.01ms count=2
+11-04 17:00:57.186  3648  3817 D AudioTrack: stop(15): called with 2880 frames delivered
+11-04 17:00:58.036  3648  3854 D EGL_emulation: app_time_stats: avg=533.54ms min=519.46ms max=547.61ms count=2
+11-04 17:00:58.290  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:00:59.150  3648  3854 D EGL_emulation: app_time_stats: avg=371.19ms min=278.19ms max=422.76ms count=3
+11-04 17:00:59.376  3648  3817 D AudioTrack: stop(15): called with 3520 frames delivered
+11-04 17:01:00.298  3648  3854 D EGL_emulation: app_time_stats: avg=382.80ms min=262.35ms max=499.49ms count=3
+11-04 17:01:00.496  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:01:01.136  3648  3648 I RoadguardSession: pos=46.71291,5.58406 v=70 cap=0 prec=5 nuit=true alerte=rg-c93dbc586205a1440bcf@78m radars=true
+11-04 17:01:01.324  3648  3854 D EGL_emulation: app_time_stats: avg=341.86ms min=207.14ms max=505.99ms count=3
+11-04 17:01:01.577  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:01:02.444  3648  3854 D EGL_emulation: app_time_stats: avg=560.41ms min=427.02ms max=693.79ms count=2
+11-04 17:01:02.666  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
+11-04 17:01:03.482  3648  3854 D EGL_emulation: app_time_stats: avg=1037.84ms min=1037.84ms max=1037.84ms count=1
+11-04 17:01:03.769  3648  3817 D AudioTrack: stop(15): called with 3840 frames delivered
