@@ -39,4 +39,11 @@ class PersonalRadarsTest {
         assertEquals(RadarKind.MOBILE, back[0].kind); assertEquals(RadarKind.FIXED, back[1].kind)
         assertEquals(50, back[1].speedKmh)
     }
+
+    @Test fun ascFormat() {
+        val (r, skipped) = PersonalRadars.parseAsc("5.5848,46.714,\"Radar fixe 70\"\n; commentaire\n5.50103,46.64106,\"Feu rouge\"\nbad line\n")
+        assertEquals(2, r.size); assertEquals(1, skipped)
+        assertEquals(46.714, r[0].lat, 1e-9); assertEquals(70, r[0].speedKmh)
+        assertEquals(RadarKind.REDLIGHT, r[1].kind)
+    }
 }

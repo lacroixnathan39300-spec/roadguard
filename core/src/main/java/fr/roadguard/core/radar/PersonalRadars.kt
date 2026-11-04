@@ -27,8 +27,59 @@ object PersonalRadars {
     fun clear(context: Context) { file(context).delete(); RadarRepository.invalidate() }
 
     /** Ajoute les radars lus dans [text] ; renvoie (ajoutés, lignes ignorées). Les doublons (< 15 m) sont écartés. */
-    fun import(context: Context, text: String): Pair<Int, Int> {
-        val (parsed, skipped) = parseCsv(text)
+    fun import(context: Context, text: String): Pair<Int, Int> = importParsed(context, parseCsv(text))
+
+    /**
+     * Fichier d'import quelconque : CSV, ASC (format Lufop/iGO : longitude, latitude, "nom"),
+     * ou archive ZIP contenant plusieurs de ces fichiers.
+     */
+    fun importFile(context: Context, name: String, bytes: ByteArray): Pair<Int, Int> {
+        val all = ArrayList<Radar>()
+        var skipped = 0
+        fun one(n: String, data: ByteArray) {
+            val text = String(data, Charsets.UTF_8).let { if ('\uFFFD' in it) String(data, Charsets.ISO_8859_1) else it }
+            val (r, s) = if (n.lowercase().endsWith(".asc")) parseAsc(text) else parseCsv(text)
+            all += r; skipped += s
+        }
+        if (name.lowercase().endsWith(".zip") || (bytes.size > 4 && bytes[0] == 'P'.code.toByte() && bytes[1] == 'K'.code.toByte())) {
+            java.util.zip.ZipInputStream(bytes.inputStream()).use { zip ->
+                var e = zip.nextEntry
+                var total = 0L
+                while (e != null) {
+                    val n = e.name.lowercase()
+                    if (!e.isDirectory && (n.endsWith(".csv") || n.endsWith(".asc") || n.endsWith(".txt"))) {
+                        val data = zip.readBytes()
+                        total += data.size
+                        if (total > 60_000_000) throw java.io.IOException("archive trop grosse")
+                        one(e.name, data)
+                    }
+                    e = zip.nextEntry
+                }
+            }
+        } else one(name, bytes)
+        return importParsed(context, all to skipped)
+    }
+
+    /** Format ASC : « longitude, latitude, "Nom avec éventuellement la vitesse" ». */
+    fun parseAsc(text: String): Pair<List<Radar>, Int> {
+        val out = ArrayList<Radar>()
+        var skipped = 0
+        val stamp = System.currentTimeMillis()
+        text.lines().map { it.trim() }.filter { it.isNotEmpty() && !it.startsWith(";") && !it.startsWith("#") }.forEachIndexed { n, line ->
+            val m = Regex("""^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*(?:,\s*"?(.*?)"?\s*)?$""").find(line)
+            val lon = m?.groupValues?.get(1)?.toDoubleOrNull()
+            val lat = m?.groupValues?.get(2)?.toDoubleOrNull()
+            if (lat == null || lon == null || lat !in -90.0..90.0 || lon !in -180.0..180.0) { skipped++; return@forEachIndexed }
+            val label = m.groupValues.getOrNull(3).orEmpty()
+            val speed = Regex("""(?<!\d)(\d{2,3})(?!\d)""").find(label)?.value?.toIntOrNull()?.takeIf { it in 20..150 }
+            val kind = kindFrom(label)
+            out += Radar("perso-$stamp-asc-$n", lat, lon, kind, label(kind), speed, null, category(kind))
+        }
+        return out to skipped
+    }
+
+    private fun importParsed(context: Context, result: Pair<List<Radar>, Int>): Pair<Int, Int> {
+        val (parsed, skipped) = result
         val existing = list(context)
         val fresh = parsed.filter { p -> existing.none { Geo.distanceMeters(it.lat, it.lon, p.lat, p.lon) < 15 } }
             .distinctBy { "%.4f,%.4f".format(Locale.US, it.lat, it.lon) }

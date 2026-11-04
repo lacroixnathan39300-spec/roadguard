@@ -189,10 +189,13 @@ private fun PersonalRadarsTab(here: Pair<Double, Double>?) {
             message = "Import en cours…"
             message = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
                 runCatching {
-                    val text = context.contentResolver.openInputStream(uri)!!.use { it.readBytes() }
-                        .also { if (it.size > 20_000_000) throw java.io.IOException("fichier trop gros") }
-                        .toString(Charsets.UTF_8)
-                    val (added, skipped) = PersonalRadars.import(context, text)
+                    val bytes = context.contentResolver.openInputStream(uri)!!.use { it.readBytes() }
+                        .also { if (it.size > 40_000_000) throw java.io.IOException("fichier trop gros") }
+                    val name = runCatching {
+                        context.contentResolver.query(uri, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null)
+                            ?.use { c -> if (c.moveToFirst()) c.getString(0) else null }
+                    }.getOrNull() ?: uri.lastPathSegment.orEmpty()
+                    val (added, skipped) = PersonalRadars.importFile(context, name, bytes)
                     "$added radar(s) importé(s)" + if (skipped > 0) ", $skipped ligne(s) ignorée(s) (doublons ou illisibles)" else ""
                 }.getOrElse { "Import impossible : ${it.message}" }
             }
@@ -224,14 +227,14 @@ private fun PersonalRadarsTab(here: Pair<Double, Double>?) {
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 BigButton("📄 Importer un fichier CSV", DriveColors.Accent) {
-                    runCatching { picker.launch(arrayOf("text/*", "application/csv", "application/vnd.ms-excel", "application/octet-stream")) }
+                    runCatching { picker.launch(arrayOf("text/*", "application/csv", "application/vnd.ms-excel", "application/zip", "application/octet-stream")) }
                         .onFailure { message = "Aucun gestionnaire de fichiers sur cet appareil" }
                 }
                 if (radars.isNotEmpty()) BigButton("Tout effacer", Color(0xFF7F1D1D)) { PersonalRadars.clear(context); refresh++ }
             }
         }
         item {
-            Text(message ?: "Fichiers acceptés : latitude, longitude, vitesse (séparés par , ; ou tabulation), " +
+            Text(message ?: "Fichiers acceptés : CSV (latitude, longitude, vitesse), ASC Lufop, archives ZIP, " +
                 "en-têtes lat/lon/vitesse/type, ou format iGO (X,Y,TYPE,SPEED…). ${radars.size} radar(s) perso.",
                 color = DriveColors.TextSecondary, fontSize = 15.sp)
         }
