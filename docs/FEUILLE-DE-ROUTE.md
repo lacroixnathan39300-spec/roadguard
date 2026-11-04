@@ -33,7 +33,9 @@ et essai sur l'appareil réel.
 - [x] Cœur commun `core/` (Kotlin) : carte native, radars, alertes, vitesse moyenne, limites, navigation vocale, musique, réglages, et `DrivingSession` qui pilote tout. Utilisé par DRIVE et par le nouvel accueil du GPS (build 43).
 - [x] Nouvel accueil de l'appli GPS sur ce cœur ; anciennes fonctions accessibles par « Plus ».
 - [x] Alertes, vitesse moyenne et guidage vocal écran éteint (service en arrière-plan, build 47).
-- [ ] Reprendre dans le nouvel accueil : écran de téléchargement des packs, radars par pays, import CSV, signalements, compte.
+- [x] Écran « Hors ligne » natif (GPS et DRIVE) : 93 packs de cartes, téléchargement avec pause/reprise, vérification SHA-256, contrôle de l'espace, suppression ; le poste peut télécharger à travers le téléphone (build 50).
+- [x] Radars de 20 pays supplémentaires (MapAtlas, CC BY 4.0), rechargés à chaud dans la carte et les alertes.
+- [ ] Reprendre : import CSV de radars perso, signalements communautaires, compte du site.
 - [ ] Découper `MainActivity.java` (460 Ko) en écrans et services lisibles, avec tests.
 
 ## Phase 3 — ROADGUARD Link : « notre Android Auto »
