@@ -81,6 +81,7 @@ class DrivingSession(
 
     private var radarVersion = -1
     private var lastLogAt = 0L
+    private var alertAt = 0L
     private var previous: Fix? = null
     private var computedKmh = 0.0
     private var lastMovedBearing = Double.NaN
@@ -132,7 +133,14 @@ class DrivingSession(
 
         val newAlert = alerts?.update(f)?.takeIf { it.radar.kind in settings.alertKinds }
         if (newAlert?.isNew == true) voice.announce(newAlert)
-        alert = newAlert
+        // Une position isolée sans cap fiable ne doit pas faire clignoter le bandeau : on garde
+        // l'alerte précédente 4 s au plus, tant que le radar est encore devant (distance qui baisse).
+        val held = alert?.takeIf { newAlert == null && f.timeMs - alertAt < 4_000 }?.let { a ->
+            val d = fr.roadguard.core.radar.Geo.distanceMeters(f.lat, f.lon, a.radar.lat, a.radar.lon).toInt()
+            if (d < a.distanceM + 15) a.copy(distanceM = d, isNew = false) else null
+        }
+        if (newAlert != null) alertAt = f.timeMs
+        alert = newAlert ?: held
         val newAverage = averages?.update(f)
         if (newAverage?.finished == true && average?.finished != true) voice.announceAverageResult(newAverage)
         average = newAverage

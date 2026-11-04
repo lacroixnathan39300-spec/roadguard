@@ -72,6 +72,11 @@ fun DriveMap(
     /** Vitesse actuelle, pour le zoom adaptatif (plus large quand on roule vite). */
     speedKmh: Int = 0,
     adaptiveZoom: Boolean = true,
+    /**
+     * Position à afficher, fournie par ROADGUARD (GPS du poste ou du téléphone par Link, cap complété).
+     * La carte n'interroge plus le GPS elle-même : point et carte suivent exactement la même position que les alertes.
+     */
+    position: fr.roadguard.core.radar.Fix? = null,
 ) {
     val zoom = when {
         !adaptiveZoom -> if (route != null) 16.0 else 15.0
@@ -202,6 +207,18 @@ fun DriveMap(
         }
     }
 
+    LaunchedEffect(position, styleVersion) {
+        val p = position ?: return@LaunchedEffect
+        val comp = holder.map?.locationComponent?.takeIf { it.isLocationComponentActivated } ?: return@LaunchedEffect
+        val loc = android.location.Location("roadguard").apply {
+            latitude = p.lat; longitude = p.lon; time = p.timeMs
+            accuracy = p.accuracyM.toFloat()
+            if (p.speedKmh > 0) speed = (p.speedKmh / 3.6).toFloat()
+            if (!p.bearing.isNaN()) bearing = p.bearing.toFloat()
+        }
+        runCatching { comp.forceLocationUpdate(loc) }
+    }
+
     // Bouton « recentrer » : reprendre le suivi après un déplacement de la carte au doigt.
     LaunchedEffect(recenterRequest) {
         if (recenterRequest == 0) return@LaunchedEffect
@@ -225,7 +242,7 @@ private fun enableLocation(context: Context, map: MapLibreMap, style: Style) {
     val component = map.locationComponent
     if (component.isLocationComponentActivated) return
     component.activateLocationComponent(
-        LocationComponentActivationOptions.builder(context, style).useDefaultLocationEngine(true).build()
+        LocationComponentActivationOptions.builder(context, style).useDefaultLocationEngine(false).build()
     )
     component.isLocationComponentEnabled = true
     component.cameraMode = CameraMode.TRACKING_GPS_NORTH
