@@ -13,6 +13,9 @@ import java.util.Locale
 class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     private val tts = TextToSpeech(context.applicationContext, this)
     private var ttsReady = false
+    /** Réglages : voix et bip (modifiables à tout moment). */
+    var voiceEnabled = true
+    var beepEnabled = true
     private val tone = runCatching { ToneGenerator(AudioManager.STREAM_MUSIC, 90) }.getOrNull()
 
     override fun onInit(status: Int) {
@@ -22,18 +25,18 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     }
 
     fun announce(alert: RadarAlert) {
-        tone?.startTone(ToneGenerator.TONE_PROP_BEEP2, 300)
-        if (ttsReady) tts.speak(AlertText.spoken(alert), TextToSpeech.QUEUE_ADD, null, "rg-${alert.radar.id}")
+        if (beepEnabled) tone?.startTone(ToneGenerator.TONE_PROP_BEEP2, 300)
+        if (ttsReady && voiceEnabled) tts.speak(AlertText.spoken(alert), TextToSpeech.QUEUE_ADD, null, "rg-${alert.radar.id}")
     }
 
     fun announceAverageResult(status: AverageStatus) {
-        if (status.over) tone?.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 400)
-        if (ttsReady) tts.speak(AlertText.averageSpoken(status), TextToSpeech.QUEUE_ADD, null, "rg-average")
+        if (status.over && beepEnabled) tone?.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 400)
+        if (ttsReady && voiceEnabled) tts.speak(AlertText.averageSpoken(status), TextToSpeech.QUEUE_ADD, null, "rg-average")
     }
 
     /** Consigne de guidage ou message libre, à la suite des annonces en cours. */
     fun speak(text: String) {
-        if (ttsReady && text.isNotBlank()) tts.speak(text, TextToSpeech.QUEUE_ADD, null, "rg-nav-${text.hashCode()}")
+        if (ttsReady && voiceEnabled && text.isNotBlank()) tts.speak(text, TextToSpeech.QUEUE_ADD, null, "rg-nav-${text.hashCode()}")
     }
 
     fun release() {

@@ -60,6 +60,7 @@ fun DriveMap(
     route: Route?,
     recenterRequest: Int,
     night: Boolean,
+    visibleKinds: Set<RadarKind>,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -140,6 +141,13 @@ fun DriveMap(
             it.cameraMode = if (route != null) CameraMode.TRACKING_GPS else CameraMode.TRACKING_GPS_NORTH
             it.zoomWhileTracking(if (route != null) 16.0 else 15.0)
         }
+    }
+
+    // Types de radars affichés (réglages).
+    LaunchedEffect(visibleKinds, styleVersion) {
+        val layer = holder.style?.getLayerAs<CircleLayer>(RADAR_LAYER) ?: return@LaunchedEffect
+        val stops = RadarKind.entries.map { Expression.stop(it.name, Expression.literal(it in visibleKinds)) }.toTypedArray()
+        layer.setFilter(Expression.match(Expression.get("kind"), Expression.literal(false), *stops))
     }
 
     // Bouton « recentrer » : reprendre le suivi après un déplacement de la carte au doigt.

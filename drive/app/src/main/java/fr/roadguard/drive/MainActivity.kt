@@ -60,6 +60,7 @@ import fr.roadguard.drive.nav.RecentPlaces
 import fr.roadguard.drive.nav.SpeedLimitTracker
 import fr.roadguard.drive.nav.SpeedLimits
 import fr.roadguard.drive.ui.DayNight
+import fr.roadguard.drive.ui.SettingsScreen
 import fr.roadguard.drive.nav.Route
 import fr.roadguard.drive.radar.Fix
 import fr.roadguard.drive.ui.GuidanceBanner
@@ -147,6 +148,10 @@ private fun DriveHome() {
     DisposableEffect(Unit) { onDispose { equalizer.release() } }
     val voice = remember { AlertVoice(context) }
     DisposableEffect(Unit) { onDispose { voice.release() } }
+    val settings = remember { DriveSettings(context) }
+    voice.voiceEnabled = settings.voice
+    voice.beepEnabled = settings.beep
+    var showSettings by remember { mutableStateOf(false) }
 
     // Navigation
     val scope = rememberCoroutineScope()
@@ -213,7 +218,7 @@ private fun DriveHome() {
         SpeedSource(context).locations().collect { location ->
             fix = location.toSpeedFix()
             val f = location.toAlertFix()
-            val newAlert = alerts.update(f)
+            val newAlert = alerts.update(f)?.takeIf { it.radar.kind in settings.alertKinds }
             if (newAlert?.isNew == true) voice.announce(newAlert)
             alert = newAlert
             val newAverage = averages.update(f)
@@ -226,7 +231,7 @@ private fun DriveHome() {
                 scope.launch { SpeedLimits.current(trail)?.let { speedLimit = it } }
             }
             val kmh = fix?.kmh ?: 0
-            if (SpeedLimitTracker.isOver(kmh, speedLimit) && f.timeMs - lastOverWarning > 30_000) {
+            if (settings.speedLimitWarning && SpeedLimitTracker.isOver(kmh, speedLimit) && f.timeMs - lastOverWarning > 30_000) {
                 lastOverWarning = f.timeMs
                 voice.speak("Attention, limité à $speedLimit")
             }
@@ -249,7 +254,7 @@ private fun DriveHome() {
     Box(Modifier.fillMaxSize().background(DriveColors.Background)) {
         Row(Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Panel(Modifier.weight(0.62f).fillMaxHeight()) {
-                DriveMap(hasLocation = hasLocation, route = route, recenterRequest = recenter, night = night, modifier = Modifier.fillMaxSize())
+                DriveMap(hasLocation = hasLocation, route = route, recenterRequest = recenter, night = settings.isNight(night), visibleKinds = settings.alertKinds, modifier = Modifier.fillMaxSize())
                 if (navigating) {
                     GuidanceBanner(guidanceState, navStatus, onStop = { stopNavigation() }, modifier = Modifier.align(Alignment.TopStart))
                     AlertBanners(alert, average, Modifier.align(Alignment.BottomCenter).padding(bottom = 8.dp))
@@ -257,6 +262,7 @@ private fun DriveHome() {
                     AlertBanners(alert, average, Modifier.align(Alignment.TopCenter))
                 }
                 Column(Modifier.align(Alignment.BottomEnd).padding(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    MapButton("⚙", onClick = { showSettings = true })
                     MapButton("◎", onClick = { recenter++ })
                     if (!navigating) MapButton("🔍", onClick = { showSearch = true })
                 }
@@ -290,6 +296,12 @@ private fun DriveHome() {
             }
         }
         if (showApps) AppDrawer(onClose = { showApps = false })
+        if (showSettings) {
+            BackHandler { showSettings = false }
+            var radarCount by remember { mutableStateOf(0) }
+            LaunchedEffect(Unit) { radarCount = RadarRepository.radars(context).size }
+            SettingsScreen(settings, radarCount, onClose = { showSettings = false })
+        }
         if (showSearch) {
             BackHandler { showSearch = false }
             SearchScreen(
