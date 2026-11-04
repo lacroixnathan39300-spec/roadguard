@@ -143,8 +143,17 @@ class DrivingSession(
         if (from == null) { navStatus = "En attente du GPS…"; return }
         rerouting = true
         scope.launch {
+            val start = LatLon(from.lat, from.lon)
+            val heading = from.bearing.takeUnless { it.isNaN() }
             runCatching {
-                NavApi.route(LatLon(from.lat, from.lon), from.bearing.takeUnless { it.isNaN() }, destination)
+                // En ligne d'abord (Valhalla) ; sans réseau ou en cas d'échec, graphe routier installé.
+                runCatching { NavApi.route(start, heading, destination) }.getOrElse { online ->
+                    fr.roadguard.core.nav.OfflineRouter.route(context, start, heading, destination)
+                        ?: throw java.io.IOException(
+                            if (fr.roadguard.core.nav.OfflineRouter.installed(context).isEmpty()) online.message ?: "pas de réseau"
+                            else "pas de réseau et région non couverte par les itinéraires hors ligne"
+                        )
+                }
             }.onSuccess { r ->
                 if (!navigating) return@onSuccess
                 route = r; guidance = Guidance(r); guidanceState = null; navStatus = null

@@ -48,7 +48,17 @@ android {
     }
     kotlinOptions { jvmTarget = "17" }
     buildFeatures { compose = true; buildConfig = true }
-    lint { abortOnError = true; checkReleaseBuilds = false }
+    lint {
+        abortOnError = true; checkReleaseBuilds = false
+        // GraphHopper référence des classes Java de bureau jamais utilisées par l'itinéraire voiture.
+        disable += setOf("InvalidPackage")
+    }
+    packaging {
+        resources {
+            // Bibliothèques Java (GraphHopper, Jackson…) : fichiers de licence en double.
+            excludes += setOf("META-INF/DEPENDENCIES", "META-INF/LICENSE*", "META-INF/NOTICE*", "META-INF/INDEX.LIST", "META-INF/versions/**")
+        }
+    }
 }
 
 dependencies {
@@ -58,6 +68,12 @@ dependencies {
     implementation("org.maplibre.gl:android-sdk:11.11.0")
     // Même client HTTP que MapLibre, pour faire passer la carte par le téléphone si besoin.
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    // Itinéraires hors ligne (graphe OpenStreetMap précalculé).
+    implementation("com.graphhopper:graphhopper-core:5.3") {
+        exclude(group = "org.codehaus.janino")
+        exclude(group = "org.openstreetmap.osmosis")
+        exclude(group = "org.apache.xmlgraphics")
+    }
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     implementation("androidx.activity:activity-compose:1.10.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
