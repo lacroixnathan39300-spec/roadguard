@@ -67,7 +67,19 @@ fun DriveMap(
     offlinePack: OfflinePack? = null,
     /** Variantes du trajet proposées au départ, dessinées en gris. */
     alternatives: List<Route> = emptyList(),
+    /** Carte toujours orientée nord (sinon : dans le sens de la marche pendant le guidage). */
+    northUp: Boolean = false,
+    /** Vitesse actuelle, pour le zoom adaptatif (plus large quand on roule vite). */
+    speedKmh: Int = 0,
+    adaptiveZoom: Boolean = true,
 ) {
+    val zoom = when {
+        !adaptiveZoom -> if (route != null) 16.0 else 15.0
+        speedKmh >= 100 -> 14.0
+        speedKmh >= 70 -> 15.0
+        speedKmh >= 40 -> 15.8
+        else -> 16.5
+    }
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val mapView = remember {
@@ -159,8 +171,8 @@ fun DriveMap(
             }
         }
         holder.map?.locationComponent?.takeIf { it.isLocationComponentActivated }?.let {
-            it.cameraMode = if (route != null) CameraMode.TRACKING_GPS else CameraMode.TRACKING_GPS_NORTH
-            it.zoomWhileTracking(if (route != null) 16.0 else 15.0)
+            it.cameraMode = if (route != null && !northUp) CameraMode.TRACKING_GPS else CameraMode.TRACKING_GPS_NORTH
+            it.zoomWhileTracking(zoom)
         }
     }
 
@@ -182,12 +194,20 @@ fun DriveMap(
         runCatching { layer.setFilter(Expression.match(Expression.get("kind"), Expression.literal(false), *stops)) }
     }
 
+    // Zoom adaptatif et orientation : appliqués seulement si la carte suit encore la position.
+    LaunchedEffect(zoom, northUp) {
+        holder.map?.locationComponent?.takeIf { it.isLocationComponentActivated && it.cameraMode != CameraMode.NONE }?.let {
+            it.cameraMode = if (route != null && !northUp) CameraMode.TRACKING_GPS else CameraMode.TRACKING_GPS_NORTH
+            it.zoomWhileTracking(zoom, 1200)
+        }
+    }
+
     // Bouton « recentrer » : reprendre le suivi après un déplacement de la carte au doigt.
     LaunchedEffect(recenterRequest) {
         if (recenterRequest == 0) return@LaunchedEffect
         holder.map?.locationComponent?.takeIf { it.isLocationComponentActivated }?.let {
-            it.cameraMode = if (route != null) CameraMode.TRACKING_GPS else CameraMode.TRACKING_GPS_NORTH
-            it.zoomWhileTracking(if (route != null) 16.0 else 15.0)
+            it.cameraMode = if (route != null && !northUp) CameraMode.TRACKING_GPS else CameraMode.TRACKING_GPS_NORTH
+            it.zoomWhileTracking(zoom)
         }
     }
 

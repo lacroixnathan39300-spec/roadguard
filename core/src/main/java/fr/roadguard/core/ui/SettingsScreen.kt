@@ -58,6 +58,10 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                 ToggleRow(AlertText.kindLabel(kind), kind in settings.alertKinds) { settings.toggleKind(kind) }
             }
 
+            Section("Carte")
+            ToggleRow("Nord toujours en haut", settings.northUp, settings::changeNorthUp)
+            ToggleRow("Zoom selon la vitesse", settings.adaptiveZoom, settings::changeAdaptiveZoom)
+
             Section("Thème de la carte")
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 ThemeMode.entries.forEach { mode ->

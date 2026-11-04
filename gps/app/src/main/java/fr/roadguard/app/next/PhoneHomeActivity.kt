@@ -144,6 +144,7 @@ private fun PhoneHome() {
 
     Box(Modifier.fillMaxSize().background(DriveColors.Background)) {
         DriveMap(
+            northUp = settings.northUp, adaptiveZoom = settings.adaptiveZoom, speedKmh = s.fix?.kmh ?: 0,
             alternatives = s.alternatives,
             offlinePack = offlinePack,
             hasLocation = hasLocation, route = s.route, recenterRequest = s.recenter,

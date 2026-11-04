@@ -34,6 +34,11 @@ class DriveSettings(context: Context) {
     fun changeAvoidTolls(v: Boolean) { avoidTolls = v; prefs.edit().putBoolean("avoid_tolls", v).apply() }
     fun changeAvoidHighways(v: Boolean) { avoidHighways = v; prefs.edit().putBoolean("avoid_highways", v).apply() }
 
+    var northUp by mutableStateOf(prefs.getBoolean("north_up", false)); private set
+    var adaptiveZoom by mutableStateOf(prefs.getBoolean("adaptive_zoom", true)); private set
+    fun changeNorthUp(v: Boolean) { northUp = v; prefs.edit().putBoolean("north_up", v).apply() }
+    fun changeAdaptiveZoom(v: Boolean) { adaptiveZoom = v; prefs.edit().putBoolean("adaptive_zoom", v).apply() }
+
     fun changeAutostart(v: Boolean) { autostart = v; prefs.edit().putBoolean("autostart", v).apply() }
     fun changeAccent(v: Long) {
         accent = v; prefs.edit().putLong("accent", v).apply()
