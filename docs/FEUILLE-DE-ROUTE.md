@@ -22,7 +22,7 @@ et essai sur l'appareil réel.
 - [ ] Carte hors ligne (packs du GPS).
 - [x] Musique : lecteur en cours (MediaSession), pochette, commandes, égaliseur mémorisé (build 15).
 - [ ] Waze ou autre appli dans une fenêtre à côté de la carte (écran partagé / superposition).
-- [x] Navigation dans DRIVE : recherche d'adresse (Photon), itinéraire (Valhalla FOSSGIS, consignes en français), tracé, flèche + distance, voix à l'approche et au moment de tourner, recalcul automatique, destinations récentes (build 21).
+- [x] Navigation dans DRIVE : recherche d'adresse (Photon), itinéraire (Valhalla FOSSGIS, consignes en français), tracé, flèche + distance, voix à l'approche et au moment de tourner, recalcul automatique, destinations récentes (build 20).
 - [x] Plein écran façon tableau de bord, bouton recentrer.
 - [ ] Maison / Travail / favoris, choix entre plusieurs itinéraires, limites de vitesse affichées.
 - [ ] Réglages, thèmes jour/nuit automatiques, couleurs, taille des boutons.
