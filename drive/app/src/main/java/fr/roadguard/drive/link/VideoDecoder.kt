@@ -47,7 +47,7 @@ class VideoDecoder(private val surface: Surface, private val width: Int, private
             Thread({
                 val i = MediaCodec.BufferInfo()
                 while (codec === c) {
-                    val out = runCatching { c.dequeueOutputBuffer(i, 10_000) }.getOrElse { break }
+                    val out = try { c.dequeueOutputBuffer(i, 10_000) } catch (e: Exception) { break }
                     if (out >= 0) runCatching { c.releaseOutputBuffer(out, true) }
                 }
             }, "roadguard-video-out").apply { isDaemon = true; start() }
