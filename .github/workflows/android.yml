@@ -104,8 +104,12 @@ jobs:
           git config user.name "ROADGUARD CI"; git config user.email "ci@roadguard.local"
           git add -A && git commit -qm "APK build $RUN ($SHA)"
           git push -f "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" apk
+          # Une version GitHub par build ; on n'en garde que 2 (la plus récente et la précédente).
           gh release delete latest -R "$REPO" -y --cleanup-tag || true
-          gh release create latest -R "$REPO" --title "ROADGUARD build $RUN" --notes "Compilation automatique de $SHA" *.apk SHA256SUMS.txt
+          gh release create "build-$RUN" -R "$REPO" --title "ROADGUARD build $RUN" --notes "Compilation automatique de $SHA" *.apk SHA256SUMS.txt
+          for tag in $(gh release list -R "$REPO" --limit 100 --json tagName -q '.[].tagName' | grep '^build-' | sort -t- -k2 -n -r | tail -n +3); do
+            gh release delete "$tag" -R "$REPO" -y --cleanup-tag || true
+          done
       - uses: actions/checkout@v4
         with: { path: src, sparse-checkout: "keys\ntools/ci" }
       - name: Mise à jour depuis les applis (serveur ROADGUARD)

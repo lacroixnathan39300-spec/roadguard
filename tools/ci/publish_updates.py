@@ -34,14 +34,21 @@ for app, version in (("gps", 600 + run), ("drive", run)):
     manifest[app] = {"version": version, "build": run, "size": len(data), "sha256": hashlib.sha256(data).hexdigest(), "chunks": len(parts)}
     print(f"{app} build {run} : {len(parts)} morceaux, {len(data)} octets")
 
+# On garde au plus 2 versions par appli (l'actuelle et la précédente) ; les plus anciennes sont supprimées.
+for app in ("gps", "drive"):
+    cur, prev = manifest.get(app), old.get(app)
+    if not cur:
+        continue
+    if prev and prev.get("build") != cur.get("build"):
+        cur["previous"] = {k: v for k, v in prev.items() if k != "previous"}
+    keep = {cur["build"]} | ({cur["previous"]["build"]} if cur.get("previous") else set())
+    for info in [prev, (prev or {}).get("previous")]:
+        if info and info.get("build") not in keep:
+            for i in range(info.get("chunks", 0)):
+                try:
+                    call("DELETE", values + f"{app}:{info['build']}:{i}")
+                except Exception:
+                    pass
+            print(f"{app} build {info['build']} supprimé")
 call("PUT", values + "manifest", json.dumps(manifest).encode(), "application/json")
-
-# Anciennes versions supprimées (le stockage gratuit est limité).
-for app, info in old.items():
-    if manifest.get(app, {}).get("build") != info.get("build"):
-        for i in range(info.get("chunks", 0)):
-            try:
-                call("DELETE", values + f"{app}:{info['build']}:{i}")
-            except Exception:
-                pass
 print("Manifeste :", json.dumps(manifest))
