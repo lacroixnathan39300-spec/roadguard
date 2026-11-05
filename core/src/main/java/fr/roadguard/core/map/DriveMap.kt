@@ -192,7 +192,7 @@ fun DriveMap(
                 PropertyFactory.iconImage(ME_ICON), PropertyFactory.iconRotate(Expression.get("bearing")),
                 PropertyFactory.iconRotationAlignment(Property.ICON_ROTATION_ALIGNMENT_MAP),
                 PropertyFactory.iconAllowOverlap(true), PropertyFactory.iconIgnorePlacement(true),
-                PropertyFactory.iconSize(Expression.interpolate(Expression.linear(), Expression.zoom(), Expression.stop(8, 0.55f), Expression.stop(16, 1f))),
+                PropertyFactory.iconSize(Expression.interpolate(Expression.linear(), Expression.zoom(), Expression.stop(8, 0.5f), Expression.stop(16, 0.9f))),
             ))
             if (hasLocation) enableLocation(context, map, style, holder)
             styleVersion = if (styleVersion < 0) 1 else styleVersion + 1
@@ -420,19 +420,35 @@ private const val ROUTE_SOURCE = "roadguard-route"
 private const val ME_SOURCE = "rg-me"
 private const val ME_ICON = "rg-me-arrow"
 
-/** Flèche de position : rond blanc, flèche de la couleur d'accent pointée vers le haut (cap 0 = nord). */
+/**
+ * Flèche de position façon navigation : pointe nette vers le haut (cap 0 = nord), encoche profonde,
+ * contour blanc épais et ombre. Pas de rond autour : le sens se lit sans hésiter, même en petit.
+ */
 private fun meArrow(color: Int): android.graphics.Bitmap {
-    val s = 96
-    val b = android.graphics.Bitmap.createBitmap(s, s, android.graphics.Bitmap.Config.ARGB_8888)
+    val s = 120f
+    val b = android.graphics.Bitmap.createBitmap(s.toInt(), s.toInt(), android.graphics.Bitmap.Config.ARGB_8888)
     val c = android.graphics.Canvas(b)
-    val p = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
-    p.color = android.graphics.Color.argb(70, 0, 0, 0); c.drawCircle(s / 2f, s / 2f + 3, s * 0.42f, p)
-    p.color = android.graphics.Color.WHITE; c.drawCircle(s / 2f, s / 2f, s * 0.40f, p)
-    p.color = color
     val path = android.graphics.Path().apply {
-        moveTo(s * 0.5f, s * 0.18f); lineTo(s * 0.74f, s * 0.76f); lineTo(s * 0.5f, s * 0.62f); lineTo(s * 0.26f, s * 0.76f); close()
+        moveTo(s * 0.50f, s * 0.08f)   // pointe
+        lineTo(s * 0.84f, s * 0.88f)   // coin arrière droit
+        lineTo(s * 0.50f, s * 0.66f)   // encoche
+        lineTo(s * 0.16f, s * 0.88f)   // coin arrière gauche
+        close()
     }
+    val p = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply { strokeJoin = android.graphics.Paint.Join.ROUND }
+    // Ombre douce
+    c.save(); c.translate(0f, s * 0.03f)
+    p.style = android.graphics.Paint.Style.FILL_AND_STROKE; p.strokeWidth = s * 0.12f; p.color = android.graphics.Color.argb(90, 0, 0, 0)
+    c.drawPath(path, p); c.restore()
+    // Contour blanc
+    p.strokeWidth = s * 0.09f; p.color = android.graphics.Color.WHITE
     c.drawPath(path, p)
+    // Flèche
+    p.style = android.graphics.Paint.Style.FILL; p.color = color
+    c.drawPath(path, p)
+    // Reflet sur la moitié gauche : effet de relief, le sens saute aux yeux
+    p.color = android.graphics.Color.argb(70, 255, 255, 255)
+    c.drawPath(android.graphics.Path().apply { moveTo(s * 0.50f, s * 0.08f); lineTo(s * 0.50f, s * 0.66f); lineTo(s * 0.16f, s * 0.88f); close() }, p)
     return b
 }
 private const val COMMUNITY_SOURCE = "roadguard-community"
