@@ -15,6 +15,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -186,7 +188,7 @@ private fun PhoneHome() {
                     kmh = s.fix?.kmh, unit = "km/h",
                     waiting = if (hasLocation) "GPS…" else "Position ?",
                     limit = s.speedLimit, over = s.overSpeed,
-                    modifier = Modifier.size(132.dp),
+                    modifier = Modifier.size(140.dp),
                 )
                 MusicCard(
                     nowPlaying = nowPlaying, hasAccess = hasMediaAccess,
@@ -196,10 +198,10 @@ private fun PhoneHome() {
                 )
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Action("🔍 Où aller", Modifier.weight(1.4f), primary = true) { showSearch = true }
-                Action("🚗 Link", Modifier.weight(1f)) { context.startActivity(Intent(context, LinkActivity::class.java)) }
-                Action("⚙", Modifier.weight(0.6f)) { showSettings = true }
-                Action("☰ Menu", Modifier.weight(0.9f)) { showMenu = true }
+                Action("Où aller", Modifier.weight(1.4f), primary = true, icon = androidx.compose.material.icons.Icons.Filled.Search) { showSearch = true }
+                Action("Link", Modifier.weight(1f), icon = androidx.compose.material.icons.Icons.Filled.Share) { context.startActivity(Intent(context, LinkActivity::class.java)) }
+                Action("", Modifier.weight(0.6f), icon = androidx.compose.material.icons.Icons.Filled.Settings) { showSettings = true }
+                Action("Menu", Modifier.weight(0.9f), icon = androidx.compose.material.icons.Icons.Filled.Menu) { showMenu = true }
             }
         }
         Column(Modifier.align(Alignment.CenterEnd).padding(end = 12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -274,12 +276,22 @@ private fun PhoneHome() {
 }
 
 @Composable
-private fun Action(label: String, modifier: Modifier, primary: Boolean = false, onClick: () -> Unit) {
-    Box(
-        modifier.height(52.dp).clip(RoundedCornerShape(16.dp))
-            .background(if (primary) DriveColors.Accent else DriveColors.Track).clickable(onClick = onClick),
-        contentAlignment = Alignment.Center,
-    ) { Text(label, color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold, maxLines = 1) }
+private fun Action(label: String, modifier: Modifier, primary: Boolean = false, icon: androidx.compose.ui.graphics.vector.ImageVector? = null,
+    onClick: () -> Unit) {
+    Row(
+        modifier.height(54.dp).clip(RoundedCornerShape(16.dp))
+            .background(if (primary) DriveColors.Accent else DriveColors.Track)
+            .background(androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color(0x1FFFFFFF), Color.Transparent)))
+            .clickable(onClick = onClick),
+        horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically,
+    ) {
+        icon?.let { androidx.compose.material3.Icon(it, null, Modifier.size(22.dp), tint = if (primary) Color(0xFF00131C) else Color.White) }
+        if (label.isNotEmpty()) {
+            if (icon != null) Spacer(Modifier.width(6.dp))
+            Text(label, color = if (primary) Color(0xFF00131C) else Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold, maxLines = 1,
+                fontFamily = fr.roadguard.core.ui.DriveStyle.Titles)
+        }
+    }
 }
 
 /** Ligne du menu : icône, titre, explication courte. */
