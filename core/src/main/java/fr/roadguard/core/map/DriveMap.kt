@@ -130,6 +130,7 @@ fun DriveMap(
         lifecycle.addObserver(observer)
         onDispose {
             lifecycle.removeObserver(observer)
+            holder.stop()
             mapView.onDestroy()
         }
     }
@@ -349,35 +350,46 @@ private class MapHolder {
         val now = android.os.SystemClock.uptimeMillis()
         if (!force && now - lastDraw < 33) return
         lastDraw = now
+        val src = runCatching { style?.getSourceAs<GeoJsonSource>(ME_SOURCE) }.getOrNull()
+        if (src == null) { if (drawErrors++ < 3) android.util.Log.w("RoadguardMap", "flèche : source absente (style=${style != null})"); return }
         runCatching {
-            style?.getSourceAs<GeoJsonSource>(ME_SOURCE)?.setGeoJson(
-                Feature.fromGeometry(Point.fromLngLat(meLon, meLat)).apply { addNumberProperty("bearing", lastBearing) })
-        }
+            src.setGeoJson(Feature.fromGeometry(Point.fromLngLat(meLon, meLat)).apply { addNumberProperty("bearing", lastBearing) })
+        }.onFailure { if (drawErrors++ < 3) android.util.Log.w("RoadguardMap", "flèche : $it") }
     }
 
-    private var animator: android.animation.ValueAnimator? = null
     private var lastFixAt = 0L
+    private var fromLat = 0.0; private var fromLon = 0.0; private var fromB = 0.0
+    private var toLat = 0.0; private var toLon = 0.0; private var deltaB = 0.0
+    private var animStart = 0L; private var animDuration = 1L; private var animating = false
+    private var drawErrors = 0
 
-    /** Animation linéaire de la flèche vers la nouvelle position et le nouveau cap (chemin le plus court). */
+    /**
+     * Glissement linéaire de la flèche vers la nouvelle position et le nouveau cap (chemin le plus court).
+     * Image par image avec le Choreographer : indépendant du réglage « échelle d'animation » d'Android
+     * (désactivé sur certains téléphones, ce qui figeait la flèche).
+     */
     fun animateMe(lat: Double, lon: Double, bearing: Double) {
         val now = android.os.SystemClock.uptimeMillis()
         val duration = (now - lastFixAt).coerceIn(300L, 1200L)
         lastFixAt = now
-        animator?.cancel()
-        if (meLat.isNaN()) { drawMe(lat, lon, bearing); return }
-        val fromLat = meLat; val fromLon = meLon; val fromB = lastBearing
+        if (meLat.isNaN()) { drawMe(lat, lon, bearing, force = true); return }
+        fromLat = meLat; fromLon = meLon; fromB = lastBearing
+        toLat = lat; toLon = lon
         val toB = if (bearing.isNaN()) fromB else bearing
-        val delta = ((toB - fromB + 540.0) % 360.0) - 180.0
-        animator = android.animation.ValueAnimator.ofFloat(0f, 1f).apply {
-            this.duration = duration
-            interpolator = android.view.animation.LinearInterpolator()
-            addUpdateListener { a ->
-                val t = (a.animatedValue as Float).toDouble()
-                drawMe(fromLat + (lat - fromLat) * t, fromLon + (lon - fromLon) * t, (fromB + delta * t + 360.0) % 360.0, force = t >= 1.0)
-            }
-            start()
+        deltaB = ((toB - fromB + 540.0) % 360.0) - 180.0
+        animStart = now; animDuration = duration
+        if (!animating) { animating = true; android.view.Choreographer.getInstance().postFrameCallback(frame) }
+    }
+
+    private val frame = object : android.view.Choreographer.FrameCallback {
+        override fun doFrame(frameTimeNanos: Long) {
+            val t = ((android.os.SystemClock.uptimeMillis() - animStart).toDouble() / animDuration).coerceIn(0.0, 1.0)
+            drawMe(fromLat + (toLat - fromLat) * t, fromLon + (toLon - fromLon) * t, (fromB + deltaB * t + 360.0) % 360.0, force = t >= 1.0)
+            if (t < 1.0) android.view.Choreographer.getInstance().postFrameCallback(this) else animating = false
         }
     }
+
+    fun stop() { android.view.Choreographer.getInstance().removeFrameCallback(frame); animating = false }
 }
 
 @SuppressLint("MissingPermission")
