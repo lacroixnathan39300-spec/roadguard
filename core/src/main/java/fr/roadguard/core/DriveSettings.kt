@@ -70,6 +70,10 @@ class DriveSettings(context: Context) {
     fun changeVoiceName(v: String?) { voiceName = v; prefs.edit().putString("voice_name", v).apply() }
     fun changeSpeechRate(v: Float) { speechRate = v; prefs.edit().putFloat("speech_rate", v).apply() }
 
+    /** Rappel de pause après 2 h de conduite. */
+    var pauseReminder by mutableStateOf(prefs.getBoolean("pause_reminder", true)); private set
+    fun changePauseReminder(v: Boolean) { pauseReminder = v; prefs.edit().putBoolean("pause_reminder", v).apply() }
+
     /** DRIVE : ancienne disposition fixe (carte + colonne) au lieu de l'accueil en pages et modules. */
     var classicHome by mutableStateOf(prefs.getBoolean("classic_home", false)); private set
     fun changeClassicHome(v: Boolean) { classicHome = v; prefs.edit().putBoolean("classic_home", v).apply() }

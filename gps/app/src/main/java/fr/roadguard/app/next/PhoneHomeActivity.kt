@@ -90,6 +90,7 @@ class PhoneHomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Net.init(this)
+        fr.roadguard.core.account.CrashReporter.install(this)
         fr.roadguard.core.map.OfflineRegions.enlargeAmbientCache(this)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setContent { fr.roadguard.core.ui.CarFontScale { fr.roadguard.core.ui.AccountGate { PhoneHome() } } }
@@ -158,6 +159,7 @@ private fun PhoneHome() {
     LaunchedEffect(Unit) { runCatching { fr.roadguard.core.map.OfflineRegions.clearCacheOnce(context, 2) } }
     var showEqualizer by remember { mutableStateOf(false) }
     var showAdmin by remember { mutableStateOf(false) }
+    var showCamera by remember { mutableStateOf(false) }
 
     // Carte hors ligne : packs téléchargés dans « Plus → Cartes hors ligne », utilisés sans Internet.
     val packStates by fr.roadguard.core.map.MapPackManager.get(context).states.collectAsState()
@@ -250,6 +252,7 @@ private fun PhoneHome() {
                     fr.roadguard.core.ui.BigButton("Fermer", DriveColors.Panel) { showMenu = false }
                 }
                 fun open(tab: Int) { offlineTab = tab; showOffline = true; showMenu = false }
+                MenuEntry("📷", "Assistant caméra", "Distance avec la voiture de devant, alerte collision, départ au feu") { showMenu = false; showCamera = true }
                 MenuEntry("📊", "Ordinateur de bord", "Distances, temps, vitesses, chronos") { showMenu = false; showTrip = true }
                 MenuEntry("👥", "Communauté", "Pseudo, points, classement, conducteurs autour") { showMenu = false; showCommunity = true }
                 MenuEntry("📍", "Mes radars", "Ajouter un radar ici, importer un fichier CSV") { open(2) }
@@ -263,6 +266,10 @@ private fun PhoneHome() {
                     showMenu = false; context.startActivity(Intent(context, fr.roadguard.app.MainActivity::class.java))
                 }
             }
+        }
+        if (showCamera) {
+            BackHandler { showCamera = false }
+            CameraAssistScreen(s, onClose = { showCamera = false })
         }
         if (showAdmin) {
             BackHandler { showAdmin = false }

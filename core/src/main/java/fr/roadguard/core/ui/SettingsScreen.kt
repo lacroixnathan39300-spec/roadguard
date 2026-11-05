@@ -63,6 +63,7 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                 }
             }
             ToggleRow("Annoncer les changements de limitation", settings.announceLimit, settings::changeAnnounceLimit)
+            ToggleRow("Rappel de pause après 2 h de conduite", settings.pauseReminder, settings::changePauseReminder)
 
             Section("Itinéraire")
             ToggleRow("Éviter les péages", settings.avoidTolls, settings::changeAvoidTolls)

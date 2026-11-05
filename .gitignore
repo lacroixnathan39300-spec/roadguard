@@ -21,3 +21,6 @@ captures/
 site/node_modules/
 site/.next/
 site/.open-next/
+
+# Modèle de l'assistant caméra : téléchargé par la compilation automatique
+gps/app/src/main/assets/models/

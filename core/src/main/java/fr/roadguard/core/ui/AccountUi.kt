@@ -55,9 +55,31 @@ fun AccountGate(extra: @Composable () -> Unit = {}, content: @Composable () -> U
         while (account.loggedIn) { account.refresh(); delay(6 * 3_600_000L) }
     }
     when {
+        account.testBuild -> content()
         !account.loggedIn -> LoginScreen(account, extra)
         !account.allowed -> AccessEndedScreen(account, account.status!!, extra)
-        else -> content()
+        else -> Box(Modifier.fillMaxSize()) {
+            content()
+            // Fin d'essai proche : rappel discret (une fois par jour), avec le contact de l'administrateur.
+            val days = account.status?.trialDaysLeft()
+            val prefs = remember { context.getSharedPreferences("account", android.content.Context.MODE_PRIVATE) }
+            val today = (System.currentTimeMillis() / 86_400_000L).toInt()
+            var dismissed by remember { mutableStateOf(prefs.getInt("trial_warned_day", -1) == today) }
+            if (days != null && days <= 3 && !dismissed) {
+                Row(
+                    Modifier.align(Alignment.TopCenter).padding(top = 40.dp, start = 16.dp, end = 16.dp).clip(RoundedCornerShape(16.dp))
+                        .background(Color(0xF0B26A00)).padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        (if (days == 0) "Dernier jour d'essai gratuit." else "Plus que $days jour(s) d'essai gratuit.") +
+                            " Pour continuer : " + (account.status?.contact?.ifBlank { null } ?: "contacte Nathan Lacroix") + ".",
+                        color = Color.White, fontSize = 15.sp, modifier = Modifier.weight(1f, fill = false),
+                    )
+                    BigButton("OK", Color(0x55000000)) { dismissed = true; prefs.edit().putInt("trial_warned_day", today).apply() }
+                }
+            }
+        }
     }
 }
 
@@ -135,7 +157,8 @@ private fun AccessEndedScreen(account: AccountManager, s: AccountStatus, extra: 
         Text(if (s.blocked) "⛔" else "⏳", fontSize = 48.sp)
         Text(s.label, color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Bold)
         Text(
-            "Compte « ${s.username} ». Pour continuer à utiliser ROADGUARD, demande à Nathan Lacroix d'activer ton compte, puis touche « Vérifier ».",
+            "Compte « ${s.username} ». Pour continuer à utiliser ROADGUARD, demande à Nathan Lacroix d'activer ton compte" +
+                (if (s.contact.isNotBlank()) " (${s.contact})" else "") + ", puis touche « Vérifier ».",
             color = DriveColors.TextSecondary, fontSize = 16.sp,
         )
         message?.let { Text(it, color = DriveColors.TextSecondary, fontSize = 15.sp) }
@@ -183,7 +206,7 @@ fun AccountCard(onAdmin: () -> Unit) {
     }
 }
 
-/** Gestion des comptes (administrateur) : illimité, +1 mois, +1 an, bloquer, déconnecter, supprimer. */
+/** Gestion des comptes (administrateur) : chiffres, contact, plantages, et par compte : accès, mot de passe, blocage. */
 @Composable
 fun AdminScreen(onClose: () -> Unit) {
     val context = LocalContext.current
@@ -191,13 +214,40 @@ fun AdminScreen(onClose: () -> Unit) {
     val scope = rememberCoroutineScope()
     var users by remember { mutableStateOf<List<ManagedUser>?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
+    var info by remember { mutableStateOf<String?>(null) }
     var filter by remember { mutableStateOf("") }
     var confirmDelete by remember { mutableStateOf<String?>(null) }
+    var passwordFor by remember { mutableStateOf<String?>(null) }
+    var newPassword by remember { mutableStateOf("") }
+    var contact by remember { mutableStateOf(account.status?.contact ?: "") }
+    var crashes by remember { mutableStateOf<List<org.json.JSONObject>?>(null) }
     fun reload() = scope.launch { runCatching { account.users() }.fold({ users = it; error = null }, { error = it.message }) }
     LaunchedEffect(Unit) { reload() }
     fun act(u: String, action: String) = scope.launch {
         runCatching { account.manage(u, action) }.onFailure { error = it.message }
         reload()
+    }
+    val crashList = crashes
+    if (crashList != null) {
+        Column(Modifier.fillMaxSize().background(DriveColors.Background).padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Plantages (${crashList.size})", color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                BigButton("Tout effacer", Color(0xFF7F1D1D)) { scope.launch { runCatching { account.clearCrashes() }; crashes = emptyList() } }
+                BigButton("Retour", DriveColors.Panel) { crashes = null }
+            }
+            if (crashList.isEmpty()) Text("Aucun plantage remonté. 👍", color = DriveColors.TextSecondary, fontSize = 17.sp, modifier = Modifier.padding(top = 12.dp))
+            LazyColumn(Modifier.padding(top = 10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                items(crashList) { c ->
+                    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(DriveColors.Panel).padding(12.dp)) {
+                        Text("${c.optString("app").uppercase()} ${c.optString("version")} · ${c.optString("device")} · ${c.optString("username").ifBlank { "non connecté" }} · " +
+                            java.text.SimpleDateFormat("d MMM HH:mm", java.util.Locale.FRANCE).format(java.util.Date(c.optLong("at"))),
+                            color = DriveColors.Accent, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                        Text(c.optString("text").take(1500), color = Color.White, fontSize = 12.sp, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
+                    }
+                }
+            }
+        }
+        return
     }
     Column(Modifier.fillMaxSize().background(DriveColors.Background).padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -206,10 +256,23 @@ fun AdminScreen(onClose: () -> Unit) {
             BigButton("Fermer", DriveColors.Panel, onClose)
         }
         val list = users
+        val now = System.currentTimeMillis()
         Text(
-            if (list == null) "Chargement…" else "${list.size} comptes · ${list.count { it.status.stillActive() }} actifs",
+            if (list == null) "Chargement…" else "${list.size} comptes · ${list.count { it.status.stillActive() }} actifs · " +
+                "${list.count { it.status.plan == "trial" && it.status.stillActive() }} en essai · " +
+                "${list.count { now - it.lastSeen < 86_400_000L }} vus aujourd'hui · ${list.count { now - it.createdAt < 7 * 86_400_000L }} nouveaux en 7 jours",
             color = DriveColors.TextSecondary, fontSize = 15.sp, modifier = Modifier.padding(vertical = 6.dp),
         )
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            BigButton("🐞 Plantages", DriveColors.Track) { scope.launch { runCatching { account.crashes() }.fold({ crashes = it }, { error = it.message }) } }
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.weight(1f)) { Field(contact, { contact = it.take(120) }, "Ton contact affiché aux utilisateurs (tél. ou e-mail)") }
+            BigButton("Enregistrer", DriveColors.Accent) {
+                scope.launch { info = runCatching { account.setContact(contact); account.refresh() }.fold({ "Contact enregistré" }, { it.message }) }
+            }
+        }
+        info?.let { Text(it, color = DriveColors.TextSecondary, fontSize = 14.sp) }
         Field(filter, { filter = it }, "Rechercher un identifiant")
         error?.let { Text(it, color = Color(0xFFFF6B6B), fontSize = 15.sp) }
         LazyColumn(Modifier.padding(top = 10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -223,16 +286,30 @@ fun AdminScreen(onClose: () -> Unit) {
                             (if (u.lastSeen > 0) " · vu le ${AccountStatus.date(u.lastSeen)}" else ""),
                         color = if (s.stillActive()) Color(0xFF81C784) else Color(0xFFFF8A80), fontSize = 14.sp,
                     )
-                    if (!s.admin) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        BigButton("∞ Illimité", DriveColors.Accent) { act(s.username, "unlimited") }
-                        BigButton("+1 mois", DriveColors.Track) { act(s.username, "month") }
-                        BigButton("+1 an", DriveColors.Track) { act(s.username, "year") }
-                        BigButton("Arrêter l'accès", DriveColors.Track) { act(s.username, "expire") }
-                        if (s.blocked) BigButton("Débloquer", Color(0xFF2E7D32)) { act(s.username, "unblock") }
-                        else BigButton("Bloquer", Color(0xFF7F1D1D)) { act(s.username, "block") }
+                    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        if (!s.admin) {
+                            BigButton("∞ Illimité", DriveColors.Accent) { act(s.username, "unlimited") }
+                            BigButton("+1 mois", DriveColors.Track) { act(s.username, "month") }
+                            BigButton("+1 an", DriveColors.Track) { act(s.username, "year") }
+                            BigButton("Arrêter l'accès", DriveColors.Track) { act(s.username, "expire") }
+                            if (s.blocked) BigButton("Débloquer", Color(0xFF2E7D32)) { act(s.username, "unblock") }
+                            else BigButton("Bloquer", Color(0xFF7F1D1D)) { act(s.username, "block") }
+                        }
+                        BigButton("🔑 Mot de passe", DriveColors.Track) { passwordFor = if (passwordFor == s.username) null else s.username; newPassword = "" }
                         BigButton("Déconnecter ses appareils", DriveColors.Track) { act(s.username, "devices") }
-                        if (confirmDelete == s.username) BigButton("Confirmer la suppression", Color(0xFFB71C1C)) { confirmDelete = null; act(s.username, "delete") }
-                        else BigButton("Supprimer", Color(0xFF7F1D1D)) { confirmDelete = s.username }
+                        if (!s.admin) {
+                            if (confirmDelete == s.username) BigButton("Confirmer la suppression", Color(0xFFB71C1C)) { confirmDelete = null; act(s.username, "delete") }
+                            else BigButton("Supprimer", Color(0xFF7F1D1D)) { confirmDelete = s.username }
+                        }
+                    }
+                    if (passwordFor == s.username) Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(Modifier.weight(1f)) { Field(newPassword, { newPassword = it.take(100) }, "Nouveau mot de passe (6 caractères min.)") }
+                        BigButton("Valider", DriveColors.Accent) {
+                            scope.launch {
+                                info = runCatching { account.resetPassword(s.username, newPassword) }
+                                    .fold({ passwordFor = null; "Mot de passe de ${s.username} changé : donne-le-lui. Ses appareils sont déconnectés." }, { it.message })
+                            }
+                        }
                     }
                 }
             }

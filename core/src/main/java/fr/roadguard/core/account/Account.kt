@@ -25,7 +25,13 @@ data class AccountStatus(
     val accessUntil: Long,
     val active: Boolean,
     val blocked: Boolean,
+    /** Contact de l'administrateur affiché sur l'écran « accès terminé ». */
+    val contact: String = "",
 ) {
+    /** Jours d'essai restants (null si ce n'est pas un essai en cours). */
+    fun trialDaysLeft(now: Long = System.currentTimeMillis()): Int? =
+        if (plan == "trial" && accessUntil > now) ((accessUntil - now) / 86_400_000L).toInt() else null
+
     fun stillActive(now: Long = System.currentTimeMillis()) = admin || (!blocked && active && (accessUntil == 0L || accessUntil > now))
 
     val label: String get() = when {
@@ -38,13 +44,13 @@ data class AccountStatus(
     }
 
     fun toJson(): JSONObject = JSONObject().put("username", username).put("admin", admin).put("plan", plan)
-        .put("accessUntil", accessUntil).put("active", active).put("blocked", blocked)
+        .put("accessUntil", accessUntil).put("active", active).put("blocked", blocked).put("contact", contact)
 
     companion object {
         fun date(ms: Long): String = java.text.SimpleDateFormat("d MMMM yyyy", java.util.Locale.FRANCE).format(java.util.Date(ms))
         fun from(o: JSONObject) = AccountStatus(
             o.optString("username"), o.optBoolean("admin"), o.optString("plan"), o.optLong("accessUntil"),
-            o.optBoolean("active"), o.optBoolean("blocked"),
+            o.optBoolean("active"), o.optBoolean("blocked"), o.optString("contact"),
         )
     }
 }
@@ -75,7 +81,10 @@ class AccountManager private constructor(context: Context) {
         }
 
     /** Accès autorisé : connecté et accès en cours (vérifié par le serveur, ou dernier état connu). */
-    val allowed: Boolean get() = loggedIn && status?.stillActive() == true
+    val allowed: Boolean get() = testBuild || (loggedIn && status?.stillActive() == true)
+
+    /** Appli des essais automatiques (émulateur) : pas de compte demandé. Jamais vrai dans les applis publiées. */
+    val testBuild: Boolean = app.resources.getIdentifier("rg_emulator_test", "bool", app.packageName).let { it != 0 && app.resources.getBoolean(it) }
 
     suspend fun register(username: String, password: String) = auth("/v1/auth/register", username, password)
     suspend fun login(username: String, password: String) = auth("/v1/auth/login", username, password)
@@ -120,6 +129,23 @@ class AccountManager private constructor(context: Context) {
     suspend fun manage(username: String, action: String) = withContext(Dispatchers.IO) {
         request("POST", "/v1/admin/users/" + URLEncoder.encode(username, "UTF-8"), JSONObject().put("action", action))
     }
+
+    /** Administrateur : nouveau mot de passe pour un compte (oubli). */
+    suspend fun resetPassword(username: String, password: String) = withContext(Dispatchers.IO) {
+        request("POST", "/v1/admin/users/" + URLEncoder.encode(username, "UTF-8"), JSONObject().put("action", "password").put("password", password))
+    }
+
+    suspend fun setContact(contact: String) = withContext(Dispatchers.IO) {
+        request("POST", "/v1/admin/config", JSONObject().put("contact", contact))
+    }
+
+    /** Derniers plantages remontés (administrateur). */
+    suspend fun crashes(): List<JSONObject> = withContext(Dispatchers.IO) {
+        val a = request("GET", "/v1/admin/crashes", null).optJSONArray("crashes") ?: JSONArray()
+        (0 until a.length()).map { a.getJSONObject(it) }
+    }
+
+    suspend fun clearCrashes() = withContext(Dispatchers.IO) { request("POST", "/v1/admin/crashes/clear", JSONObject()) }
 
     private fun save(s: AccountStatus) {
         status = s

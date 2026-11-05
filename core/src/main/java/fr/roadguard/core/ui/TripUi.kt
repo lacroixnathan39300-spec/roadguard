@@ -62,6 +62,11 @@ fun TripScreen(trip: TripComputer, onClose: () -> Unit, tracks: fr.roadguard.cor
             "Trajets enregistrés (GPX)"
         }.getOrElse { "Export impossible : ${it.message}" }
     }
+    var showMaintenance by remember { mutableStateOf(false) }
+    if (showMaintenance) {
+        androidx.activity.compose.BackHandler { showMaintenance = false }
+        MaintenanceScreen(trip, onClose = { showMaintenance = false }); return
+    }
     val t: TripTotals = when (period) { "day" -> trip.day; "week" -> trip.week; "month" -> trip.month; "total" -> trip.total; else -> trip.trip }
     Column(Modifier.fillMaxSize().background(DriveColors.Background).padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -90,6 +95,7 @@ fun TripScreen(trip: TripComputer, onClose: () -> Unit, tracks: fr.roadguard.cor
                 Tile("Altitude", trip.altitudeM?.let { "$it m" } ?: "—", Modifier.weight(1f))
             }
             trip.lastRun?.let { Text("Dernier chrono : $it", color = Color.White, fontSize = 16.sp) }
+            BigButton("🔧 Carnet d'entretien (vidange, contrôle technique, pneus…)", DriveColors.Accent) { showMaintenance = true }
             Text("Les chronos se lancent seuls au départ d'un arrêt. À faire uniquement dans un lieu sûr et autorisé.",
                 color = DriveColors.TextSecondary, fontSize = 13.sp)
             if (tracks != null) {

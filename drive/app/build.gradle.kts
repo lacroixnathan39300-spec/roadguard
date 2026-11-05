@@ -11,6 +11,8 @@ android {
     defaultConfig {
         // Nouvelle application, écrite sans code Dashwheel : nouvel identifiant.
         applicationId = "fr.roadguard.drive"
+        // Essais automatiques sur émulateur (-Pemulator=true) : pas d'écran de connexion. Faux dans les applis publiées.
+        resValue("bool", "rg_emulator_test", if (project.hasProperty("emulator")) "true" else "false")
         minSdk = 27 // autoradio de référence : alps 8227L, SDK_INT 27
         targetSdk = 36
         versionCode = (System.getenv("VERSION_CODE") ?: "1").toInt()

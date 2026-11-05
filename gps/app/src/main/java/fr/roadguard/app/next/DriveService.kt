@@ -44,6 +44,7 @@ class DriveService : Service() {
 
     private fun start() {
         Net.init(this)
+        fr.roadguard.core.account.CrashReporter.install(this)
         val v = AlertVoice(this).also { voice = it }
         val s = DrivingSession(applicationContext, scope, v, DriveSettings(applicationContext))
         session = s

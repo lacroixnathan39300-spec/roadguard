@@ -82,6 +82,22 @@ class DrivingSession(
     val night: Boolean get() = settings.isNight(autoNight)
     val overSpeed: Boolean get() = SpeedLimitTracker.isOver(fix?.kmh ?: 0, speedLimit, settings.overTolerance)
     private var lastPassedId: String? = null
+
+    // Rappel de pause : 2 h de conduite sans arrêt d'au moins 15 min, puis toutes les 30 min.
+    private var drivingSince = 0L
+    private var stoppedAt = 0L
+    private var nextPauseAt = 0L
+    private fun pauseReminder(kmh: Double, now: Long) {
+        if (!settings.pauseReminder) return
+        if (kmh < 5) { if (stoppedAt == 0L) stoppedAt = now; if (stoppedAt != 0L && now - stoppedAt > 15 * 60_000) { drivingSince = 0; nextPauseAt = 0 }; return }
+        stoppedAt = 0
+        if (drivingSince == 0L) { drivingSince = now; nextPauseAt = now + 2 * 3_600_000L }
+        if (now >= nextPauseAt) {
+            val h = (now - drivingSince) / 3_600_000.0
+            voice.speak(if (h < 2.2) "Deux heures de route. Pense à faire une pause." else "Cela fait %.0f heures de route. Une pause s'impose.".format(java.util.Locale.FRANCE, h))
+            nextPauseAt = now + 30 * 60_000L
+        }
+    }
     private var limitCandidate: Int? = null
 
     /** Nouvelle limite lue : annoncée seulement si elle se confirme deux fois de suite (évite les erreurs aux carrefours). */
@@ -206,6 +222,7 @@ class DrivingSession(
             lastOverWarning = f.timeMs
             voice.speak("Attention, limité à $speedLimit")
         }
+        pauseReminder(f.speedKmh, f.timeMs)
 
         if (navigating && route == null && !rerouting && navStatus?.startsWith("En attente du GPS") == true) {
             pendingDestination?.let { computeRoute(it, announce = true) }

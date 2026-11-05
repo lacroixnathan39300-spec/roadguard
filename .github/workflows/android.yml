@@ -49,6 +49,14 @@ jobs:
         run: |
           mkdir -p gps/app/src/main/assets/graphs
           gh release download graphs -R "${{ github.repository }}" -p 'graph-franche-comte.zip' -D gps/app/src/main/assets/graphs --clobber || echo "Pas encore de graphe publié"
+      - name: Modèle de détection de l'assistant caméra (GPS)
+        if: ${{ matrix.app == 'gps' }}
+        working-directory: .
+        run: |
+          mkdir -p gps/app/src/main/assets/models
+          curl -fsSL --retry 3 -o gps/app/src/main/assets/models/efficientdet_lite0.tflite \
+            https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/int8/latest/efficientdet_lite0.tflite \
+            && ls -la gps/app/src/main/assets/models || echo "::warning::Modèle caméra non téléchargé"
       - name: Compiler et tester
         env:
           VERSION_CODE: ${{ github.run_number }}

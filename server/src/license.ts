@@ -81,6 +81,10 @@ export function status(u: User, now: number) {
   };
 }
 
+async function contact(env: LicEnv): Promise<string> {
+  return (await env.DB.prepare("SELECT value FROM config WHERE key = 'contact'").first<{ value: string }>())?.value ?? "";
+}
+
 async function openSession(env: LicEnv, u: User, device: string, app: string, now: number): Promise<Response> {
   const token = random(32);
   // Même appareil + même appli : l'ancienne connexion est remplacée.
@@ -90,7 +94,7 @@ async function openSession(env: LicEnv, u: User, device: string, app: string, no
   if (!u.admin && others.length >= MAX_DEVICES) return fail(403, `Compte déjà utilisé sur ${MAX_DEVICES} appareils. Demande à l'administrateur de les déconnecter.`);
   await env.DB.prepare("INSERT INTO sessions (token_hash, username, device, app, created_at, last_seen) VALUES (?, ?, ?, ?, ?, ?)")
     .bind(await sha256(token), u.username, device, app, now, now).run();
-  return json({ token, ...status(u, now) });
+  return json({ token, ...status(u, now), contact: await contact(env) });
 }
 
 async function sessionUser(req: Request, env: LicEnv): Promise<User | null> {
@@ -152,8 +156,20 @@ export async function licenseRoutes(req: Request, env: LicEnv, path: string): Pr
   }
 
   const me = await sessionUser(req, env);
+  if (req.method === "POST" && path === "/v1/auth/crash") {
+    // Rapport de plantage (connecté ou non) : gardé pour l'administrateur, 300 au plus.
+    const b = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+    const text = String(b.text ?? "").slice(0, 6000);
+    if (!text) return fail(400, "Rapport vide");
+    await env.DB.batch([
+      env.DB.prepare("INSERT INTO crashes (at, app, version, device, username, text) VALUES (?, ?, ?, ?, ?, ?)")
+        .bind(now, String(b.app ?? "?").slice(0, 10), String(b.version ?? "?").slice(0, 20), String(b.device ?? "?").slice(0, 64), me?.username ?? null, text),
+      env.DB.prepare("DELETE FROM crashes WHERE id NOT IN (SELECT id FROM crashes ORDER BY id DESC LIMIT 300)"),
+    ]);
+    return json({ ok: true });
+  }
   if (!me) return fail(401, "Connexion requise");
-  if (req.method === "GET" && path === "/v1/auth/status") return json(status(me, now));
+  if (req.method === "GET" && path === "/v1/auth/status") return json({ ...status(me, now), contact: await contact(env) });
   if (req.method === "POST" && path === "/v1/auth/logout") {
     const t = req.headers.get("x-rg-session") ?? new URL(req.url).searchParams.get("session") ?? "";
     await env.DB.prepare("DELETE FROM sessions WHERE token_hash = ?").bind(await sha256(t)).run();
@@ -170,6 +186,20 @@ export async function licenseRoutes(req: Request, env: LicEnv, path: string): Pr
   }
 
   if (!me.admin) return fail(403, "Réservé à l'administrateur");
+  if (req.method === "GET" && path === "/v1/admin/crashes") {
+    const rows = await env.DB.prepare("SELECT * FROM crashes ORDER BY id DESC LIMIT 100").all();
+    return json({ crashes: rows.results });
+  }
+  if (req.method === "POST" && path === "/v1/admin/crashes/clear") {
+    await env.DB.prepare("DELETE FROM crashes").run();
+    return json({ ok: true });
+  }
+  if (req.method === "POST" && path === "/v1/admin/config") {
+    const b = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+    const c = String(b.contact ?? "").replace(/[\u0000-\u001f<>]/g, "").trim().slice(0, 120);
+    await env.DB.prepare("INSERT INTO config (key, value) VALUES ('contact', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").bind(c).run();
+    return json({ contact: c });
+  }
   if (req.method === "GET" && path === "/v1/admin/users") {
     const rows = await env.DB.prepare(
       "SELECT u.*, (SELECT COUNT(DISTINCT device) FROM sessions s WHERE s.username = u.username) AS devices FROM users u ORDER BY u.created_at DESC LIMIT 500"
@@ -180,8 +210,18 @@ export async function licenseRoutes(req: Request, env: LicEnv, path: string): Pr
   if (req.method === "POST" && m) {
     const u = await env.DB.prepare("SELECT * FROM users WHERE username = ?").bind(m[1]).first<User>();
     if (!u) return fail(404, "Compte introuvable");
-    const action = String(((await req.json().catch(() => ({}))) as Record<string, unknown>).action ?? "");
-    if (action === "block" || action === "unblock") {
+    const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+    const action = String(body.action ?? "");
+    if (action === "password") {
+      // Nouveau mot de passe choisi par l'administrateur (utilisateur qui a oublié le sien).
+      const pw = body.password;
+      if (!validPassword(pw)) return fail(400, "Mot de passe : au moins 6 caractères");
+      const salt = random(16);
+      await env.DB.batch([
+        env.DB.prepare("UPDATE users SET pass_hash = ?, salt = ? WHERE username = ?").bind(await hashPassword(pw, salt), salt, u.username),
+        env.DB.prepare("DELETE FROM sessions WHERE username = ?").bind(u.username),
+      ]);
+    } else if (action === "block" || action === "unblock") {
       if (u.admin) return fail(400, "Impossible de bloquer l'administrateur");
       await env.DB.prepare("UPDATE users SET blocked = ? WHERE username = ?").bind(action === "block" ? 1 : 0, u.username).run();
       if (action === "block") await env.DB.prepare("DELETE FROM sessions WHERE username = ?").bind(u.username).run();
