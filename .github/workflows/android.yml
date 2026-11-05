@@ -123,7 +123,7 @@ jobs:
           git init -q -b apk
           git config user.name "ROADGUARD CI"; git config user.email "ci@roadguard.local"
           git add -A && git commit -qm "APK build $RUN ($SHA)"
-          git push -f "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" apk
+          git push -f "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" apk || echo "::warning::Branche apk non mise à jour (fichier trop gros) : les APK restent dans la version GitHub"
           # Une version GitHub par build ; on n'en garde que 2 (la plus récente et la précédente).
           gh release delete latest -R "$REPO" -y --cleanup-tag || true
           gh release create "build-$RUN" -R "$REPO" --title "ROADGUARD build $RUN" --notes "Compilation automatique de $SHA" *.apk SHA256SUMS.txt
