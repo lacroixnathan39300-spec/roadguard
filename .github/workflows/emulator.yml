@@ -51,7 +51,7 @@ jobs:
           target: ${{ matrix.target }}
           arch: x86_64
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -skin ${{ matrix.skin }}
-          disable-animations: true
+          disable-animations: false
           script: |
             adb install -r -g $(ls ${{ matrix.app }}/app/build/outputs/apk/debug/*.apk | head -1)
             python3 tools/emulator/drive_sim.py ${{ matrix.pkg }} ${{ matrix.activity }} essai-${{ matrix.app }}
