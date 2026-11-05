@@ -50,5 +50,18 @@ for app in ("gps", "drive"):
                 except Exception:
                     pass
             print(f"{app} build {info['build']} supprimé")
+# Ménage complet : tout morceau d'une version qui n'est ni l'actuelle ni la précédente est supprimé.
+try:
+    keys = [k["name"] for k in json.loads(call("GET", f"{api}/{ns}/keys?limit=1000"))["result"]]
+    for app in ("gps", "drive"):
+        cur = manifest.get(app) or {}
+        keep = {str(cur.get("build"))} | ({str(cur["previous"]["build"])} if cur.get("previous") else set())
+        for k in keys:
+            parts = k.split(":")
+            if len(parts) == 3 and parts[0] == app and parts[1] not in keep:
+                call("DELETE", values + k)
+                print("morceau ancien supprimé :", k)
+except Exception as e:
+    print("Ménage incomplet :", e)
 call("PUT", values + "manifest", json.dumps(manifest).encode(), "application/json")
 print("Manifeste :", json.dumps(manifest))
