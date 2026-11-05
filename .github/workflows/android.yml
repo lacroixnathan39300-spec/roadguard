@@ -6,6 +6,8 @@ permissions:
 on:
   push:
     branches: [main]
+    # Pas de compilation des applis pour un changement du serveur seul (économise les minutes GitHub).
+    paths-ignore: ["server/**", ".github/workflows/server.yml", ".github/workflows/diag.yml", "docs/**", "README.md"]
   pull_request:
   workflow_dispatch:
 
