@@ -186,6 +186,9 @@ fun DriveMap(
             style.addLayer(communityLayer())
             style.addSource(GeoJsonSource(DRIVERS_SOURCE))
             runCatching { style.addImage(ARROW_IMAGE, navArrowBitmap(context)) }
+            // Pas de fondu des symboles : sinon la flèche, déplacée à chaque image, reste à moitié transparente
+            // (voire invisible) quand l'appareil affiche peu d'images par seconde.
+            runCatching { style.transition = org.maplibre.android.style.layers.TransitionOptions(0, 0, false) }
             style.addLayer(driversLayer())
             if (hasLocation) enableLocation(context, map, style, holder)
             styleVersion = if (styleVersion < 0) 1 else styleVersion + 1
