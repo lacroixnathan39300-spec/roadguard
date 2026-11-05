@@ -5,6 +5,7 @@ import android.provider.Settings
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -114,22 +115,31 @@ private fun ControlButton(label: String, onClick: () -> Unit) {
     ) { Text(label, color = Color.White, fontSize = 24.sp) }
 }
 
-/** Égaliseur plein écran : une glissière verticale par bande, activation, remise à zéro. */
+/** Égaliseur pro plein écran : préréglages, 10 bandes, boost de volume, basses, spatialisation, réglages perso. */
 @Composable
 fun EqualizerPanel(equalizer: DriveEqualizer, onClose: () -> Unit) {
-    var bands by remember { mutableStateOf(equalizer.bands()) }
+    var gains by remember { mutableStateOf(equalizer.gains) }
     var enabled by remember { mutableStateOf(equalizer.enabled) }
+    var preset by remember { mutableStateOf(equalizer.presetName) }
+    var boost by remember { mutableStateOf(equalizer.boostDb) }
+    var bass by remember { mutableStateOf(equalizer.bassStrength) }
+    var spatial by remember { mutableStateOf(equalizer.spatial) }
+    var info by remember { mutableStateOf<String?>(null) }
+    fun refresh() { gains = equalizer.gains; preset = equalizer.presetName; enabled = equalizer.enabled; boost = equalizer.boostDb; bass = equalizer.bassStrength; spatial = equalizer.spatial }
     Column(
-        Modifier.fillMaxSize().background(DriveColors.Background.copy(alpha = 0.97f)).padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        Modifier.fillMaxSize().background(DriveColors.Background.copy(alpha = 0.98f)).padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Égaliseur", color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            Column(Modifier.weight(1f)) {
+                Text("Égaliseur", color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Bold)
+                Text("$preset · ${equalizer.engine}", color = DriveColors.TextSecondary, fontSize = 13.sp)
+            }
             if (equalizer.available) {
                 Switch(checked = enabled, onCheckedChange = { enabled = it; equalizer.enabled = it })
-                Spacer(Modifier.width(16.dp))
-                PanelButton("Remise à zéro") { equalizer.reset(); bands = equalizer.bands() }
                 Spacer(Modifier.width(12.dp))
+                PanelButton("Zéro") { equalizer.reset(); refresh() }
+                Spacer(Modifier.width(8.dp))
             }
             PanelButton("Fermer", onClose)
         }
@@ -137,23 +147,47 @@ fun EqualizerPanel(equalizer: DriveEqualizer, onClose: () -> Unit) {
             Text("Ce poste ne permet pas de régler l'égaliseur depuis une appli.", color = DriveColors.TextSecondary, fontSize = 18.sp)
             return@Column
         }
+        // Préréglages et réglages perso.
+        Row(Modifier.horizontalScroll(androidx.compose.foundation.rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            (equalizer.presets + (1..3).mapNotNull { equalizer.custom(it) }).forEach { p ->
+                Text(p.name, color = Color.White, fontSize = 15.sp,
+                    modifier = Modifier.clip(RoundedCornerShape(12.dp)).background(if (p.name == preset) DriveColors.Accent else DriveColors.Panel)
+                        .clickable { equalizer.applyPreset(p); refresh() }.padding(horizontal = 14.dp, vertical = 8.dp))
+            }
+        }
+        // 10 bandes.
         Row(Modifier.fillMaxWidth().weight(1f), horizontalArrangement = Arrangement.SpaceEvenly) {
-            bands.forEachIndexed { i, band ->
-                Column(Modifier.fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("${if (band.levelMb > 0) "+" else ""}${band.levelMb / 100} dB", color = Color.White, fontSize = 16.sp)
+            gains.forEachIndexed { i, g ->
+                Column(Modifier.fillMaxHeight().weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("%+.0f".format(java.util.Locale.FRANCE, g), color = if (g == 0f) DriveColors.TextSecondary else Color.White, fontSize = 13.sp)
                     VerticalSlider(
-                        value = band.levelMb.toFloat(),
-                        range = equalizer.minMb.toFloat()..equalizer.maxMb.toFloat(),
-                        onChange = { v ->
-                            equalizer.setBand(i, v.toInt())
-                            bands = bands.toMutableList().also { it[i] = band.copy(levelMb = v.toInt()) }
-                        },
+                        value = g, range = equalizer.minDb..equalizer.maxDb,
+                        onChange = { v -> val r = Math.round(v * 2) / 2f; equalizer.setGain(i, r); gains = equalizer.gains; preset = equalizer.presetName },
                         modifier = Modifier.weight(1f),
                     )
-                    Text(frequencyLabel(band.centerHz), color = DriveColors.TextSecondary, fontSize = 14.sp)
+                    Text(frequencyLabel(equalizer.frequencies[i]), color = DriveColors.TextSecondary, fontSize = 11.sp)
                 }
             }
         }
+        // Boost, basses, spatialisation.
+        @Composable fun Knob(label: String, valueText: String, value: Float, range: ClosedFloatingPointRange<Float>, available: Boolean, onChange: (Float) -> Unit) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(label, color = Color.White, fontSize = 15.sp, modifier = Modifier.width(150.dp))
+                if (available) {
+                    Slider(value = value, onValueChange = onChange, valueRange = range, modifier = Modifier.weight(1f),
+                        colors = SliderDefaults.colors(thumbColor = DriveColors.Accent, activeTrackColor = DriveColors.Accent))
+                    Text(valueText, color = Color.White, fontSize = 15.sp, modifier = Modifier.width(70.dp))
+                } else Text("non pris en charge par cet appareil", color = DriveColors.TextSecondary, fontSize = 13.sp)
+            }
+        }
+        Knob("🔊 Boost volume", "+%.0f dB".format(java.util.Locale.FRANCE, boost), boost, 0f..12f, equalizer.boostAvailable) { boost = it; equalizer.setBoost(it) }
+        Knob("🥁 Basses", "${bass / 10} %", bass.toFloat(), 0f..1000f, equalizer.bassAvailable) { bass = it.toInt(); equalizer.setBass(it.toInt()) }
+        Knob("🎧 Spatialisation", "${spatial / 10} %", spatial.toFloat(), 0f..1000f, equalizer.spatialAvailable) { spatial = it.toInt(); equalizer.setSpatial(it.toInt()) }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            (1..3).forEach { slot -> PanelButton("💾 Perso $slot") { equalizer.saveCustom(slot); preset = equalizer.presetName; info = "Réglage enregistré dans Perso $slot" } }
+            info?.let { Text(it, color = DriveColors.TextSecondary, fontSize = 13.sp) }
+        }
+        if (boost > 6f) Text("⚠️ Boost fort : le son peut saturer à volume maximum.", color = Color(0xFFFFB74D), fontSize = 13.sp)
     }
 }
 

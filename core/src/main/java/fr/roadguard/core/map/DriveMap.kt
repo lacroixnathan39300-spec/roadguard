@@ -74,6 +74,8 @@ fun DriveMap(
     alternatives: List<Route> = emptyList(),
     /** Style de carte ROADGUARD (jour façon Waze, nuit sombre) ; faux = styles classiques Liberty / Dark Matter. */
     roadguardStyle: Boolean = true,
+    /** Part du bas de la carte cachée par un panneau (téléphone : compteur et boutons) : la flèche reste au-dessus. */
+    bottomInset: Float = 0f,
     /** Carte toujours orientée nord (sinon : dans le sens de la marche pendant le guidage). */
     northUp: Boolean = false,
     /** Vitesse actuelle, pour le zoom adaptatif (plus large quand on roule vite). */
@@ -271,12 +273,17 @@ fun DriveMap(
 
     // Comme Waze : carte tournée dans le sens de la marche (sauf « nord en haut ») et flèche placée en bas
     // de la carte, pour voir plus loin devant soi.
-    LaunchedEffect(northUp, styleVersion, hasLocation) {
+    LaunchedEffect(northUp, styleVersion, hasLocation, bottomInset) {
         kotlinx.coroutines.delay(300)
+        repeat(20) { if (mapView.height == 0 || holder.map?.locationComponent?.isLocationComponentActivated != true) kotlinx.coroutines.delay(250) }
         holder.map?.locationComponent?.takeIf { it.isLocationComponentActivated }?.let {
             if (it.cameraMode != CameraMode.NONE) it.cameraMode = if (!northUp) CameraMode.TRACKING_GPS else CameraMode.TRACKING_GPS_NORTH
             val h = mapView.height.toDouble()
-            if (h > 0) runCatching { it.paddingWhileTracking(if (northUp) doubleArrayOf(0.0, 0.0, 0.0, 0.0) else doubleArrayOf(0.0, h * 0.38, 0.0, 0.0), 600) }
+            // Flèche aux 70 % de la partie visible de la carte (au-dessus du panneau du bas s'il y en a un).
+            val b = h * bottomInset
+            val focal = (h - b) * (if (northUp) 0.5 else 0.70)
+            val top = (2 * focal - h + b).coerceAtLeast(0.0)
+            if (h > 0) runCatching { it.paddingWhileTracking(doubleArrayOf(0.0, top, 0.0, b), 600) }
         }
     }
 

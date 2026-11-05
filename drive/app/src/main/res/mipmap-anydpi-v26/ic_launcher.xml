@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Logo Pilote de Nathan (images d'origine), sur fond noir. -->
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@drawable/pilote_background" />
-    <foreground android:drawable="@drawable/pilote_foreground" />
+    <background android:drawable="@color/pilote_icon_background" />
+    <foreground android:drawable="@mipmap/ic_launcher_foreground" />
 </adaptive-icon>
