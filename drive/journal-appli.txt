@@ -1,293 +1,275 @@
 --------- beginning of main
-11-05 07:33:48.169  2801  2801 I zygote64: Late-enabling -Xcheck:jni
-11-05 07:33:48.179  2801  2801 W zygote64: Unexpected CPU variant for X86 using defaults: x86_64
-11-05 07:33:48.331  2801  2801 D NetworkSecurityConfig: No Network Security Config specified, using platform default
-11-05 07:33:48.435  2801  2828 D OpenGLRenderer: HWUI GL Pipeline
-11-05 07:33:48.633  2801  2801 W Equalizer: WARNING: attaching an Equalizer to global output mix is deprecated!
-11-05 07:33:48.866  2801  2801 I TextToSpeech: Sucessfully bound to com.svox.pico
-11-05 07:33:48.868  2801  2801 W AudioTrack: AUDIO_OUTPUT_FLAG_FAST denied by server; frameCount 2308 -> 2308
-11-05 07:33:48.868  2801  2801 D AudioTrack: Client defaulted notificationFrames to 1154 for frameCount 2308
-11-05 07:33:49.010  2801  2806 I zygote64: Do partial code cache collection, code=30KB, data=20KB
-11-05 07:33:49.016  2801  2806 I zygote64: After code cache collection, code=30KB, data=20KB
-11-05 07:33:49.016  2801  2806 I zygote64: Increasing code cache capacity to 128KB
-11-05 07:33:49.044  2801  2812 I zygote64: Background concurrent copying GC freed 19058(2MB) AllocSpace objects, 2(104KB) LOS objects, 49% free, 2MB/5MB, paused 24us total 136.997ms
-11-05 07:33:55.038  2801  2806 I zygote64: Do partial code cache collection, code=61KB, data=49KB
-11-05 07:33:55.047  2801  2806 I zygote64: After code cache collection, code=60KB, data=49KB
-11-05 07:33:55.047  2801  2806 I zygote64: Increasing code cache capacity to 256KB
-11-05 07:33:55.182  2801  2828 D         : HostConnection::get() New Host Connection established 0x7c7976090ee0, tid 2828
-11-05 07:33:55.186  2801  2828 I zygote64: android::hardware::configstore::V1_0::ISurfaceFlingerConfigs::hasWideColorDisplay retrieved: 0
-11-05 07:33:55.186  2801  2828 I OpenGLRenderer: Initialized EGL, version 1.4
-11-05 07:33:55.186  2801  2828 D OpenGLRenderer: Swap behavior 1
-11-05 07:33:55.188  2801  2828 D EGL_emulation: eglCreateContext: 0x7c796b0eb8c0: maj 3 min 0 rcv 3
-11-05 07:33:55.194  2801  2828 D EGL_emulation: eglMakeCurrent: 0x7c796b0eb8c0: ver 3 0 (tinfo 0x7c796b1aba60)
-11-05 07:33:55.276  2801  2806 I zygote64: Do full code cache collection, code=124KB, data=105KB
-11-05 07:33:55.276  2801  2806 I zygote64: After code cache collection, code=103KB, data=70KB
-11-05 07:33:55.382  2801  2801 I Choreographer: Skipped 62 frames!  The application may be doing too much work on its main thread.
-11-05 07:33:55.431  2801  2870 I Mbgl-EGLConfigChooser: In emulator: true
-11-05 07:33:55.438  2801  2880 W Mbgl    : {DatabaseFileSou}[Database]: Removing existing incompatible offline database
-11-05 07:33:55.451  2801  2870 D         : HostConnection::get() New Host Connection established 0x7c795ed96240, tid 2870
-11-05 07:33:55.459  2801  2828 D EGL_emulation: eglMakeCurrent: 0x7c796b0eb8c0: ver 3 0 (tinfo 0x7c796b1aba60)
-11-05 07:33:55.476  2801  2870 D EGL_emulation: eglCreateContext: 0x7c796b11cb80: maj 3 min 0 rcv 3
-11-05 07:33:55.500  2801  2870 D EGL_emulation: eglMakeCurrent: 0x7c796b11cb80: ver 3 0 (tinfo 0x7c796b0c12a0)
-11-05 07:33:55.558  2801  2806 I zygote64: Do partial code cache collection, code=123KB, data=101KB
-11-05 07:33:55.640  2801  2806 I zygote64: After code cache collection, code=123KB, data=102KB
-11-05 07:33:55.640  2801  2806 I zygote64: Increasing code cache capacity to 512KB
-11-05 07:33:55.802  2801  2801 I TextToSpeech: Connected to ComponentInfo{com.svox.pico/com.svox.pico.PicoService}
-11-05 07:33:55.807  2801  2880 I Mbgl    : {TextureViewRend}[General]: GPU Identifier: Android Emulator OpenGL ES Translator (Google SwiftShader)
-11-05 07:33:55.816  2801  2801 V Mbgl-ConnectivityReceiver: connected - true
-11-05 07:33:55.899  2801  2889 I TextToSpeech: Set up connection to ComponentInfo{com.svox.pico/com.svox.pico.PicoService}
-11-05 07:33:55.920  2801  2870 E eglCodecCommon: glUtilsParamSize: unknow param 0x000090df
-11-05 07:33:55.941  2801  2870 E eglCodecCommon: glUtilsParamSize: unknow param 0x000090df
-11-05 07:33:56.179  2801  2812 I zygote64: Background concurrent copying GC freed 29820(1985KB) AllocSpace objects, 8(456KB) LOS objects, 50% free, 3MB/6MB, paused 20us total 153.282ms
-11-05 07:33:57.264  2801  2801 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-05 07:33:57.550  2801  2806 I zygote64: Do full code cache collection, code=215KB, data=182KB
-11-05 07:33:57.552  2801  2806 I zygote64: After code cache collection, code=172KB, data=120KB
-11-05 07:33:57.552  2801  2806 I zygote64: JIT allocated 94KB for stack maps of void fr.roadguard.drive.MainActivityKt.DriveHome(androidx.compose.runtime.Composer, int)
-11-05 07:33:57.564  2801  2812 I zygote64: Background concurrent copying GC freed 139132(4MB) AllocSpace objects, 2(40KB) LOS objects, 31% free, 13MB/19MB, paused 17us total 179.604ms
-11-05 07:33:57.716  2801  2896 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:33:57.718  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:33:57.737  2801  2801 I RoadguardMap: flèche id=2131099687
-11-05 07:33:57.745  2801  2880 W Mbgl    : {roadguard.drive}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
-11-05 07:33:57.777  2801  2880 I chatty  : uid=10059(fr.roadguard.drive) Worker 1 identical 1 line
-11-05 07:33:57.777  2801  2880 W Mbgl    : {roadguard.drive}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
-11-05 07:33:57.822  2801  2880 W Mbgl    : {roadguard.drive}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
-11-05 07:33:57.827  2801  2801 I RoadguardMap: puck enabled=true render=8 cam=36 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:33:58.208  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/8/40/97.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:33:58.208  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/12/646/1561.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:33:58.208  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/12/646/1562.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:33:58.208  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/12/647/1561.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:33:58.208  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/12/647/1562.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:33:58.514  2801  2915 W zygote64: Long monitor contention with owner OkHttp https://tiles.basemaps.cartocdn.com/... (2896) at int java.util.Calendar.getFirstDayOfWeek()(Calendar.java:2959) waiters=0 in boolean okhttp3.internal.connection.RealConnectionPool.callAcquirePooledConnection(okhttp3.Address, okhttp3.internal.connection.RealCall, java.util.List, boolean) for 466ms
-11-05 07:33:58.581  2801  2913 W zygote64: Long monitor contention with owner OkHttp https://tiles.basemaps.cartocdn.com/... (2896) at int java.util.Calendar.getFirstDayOfWeek()(Calendar.java:2959) waiters=1 in boolean okhttp3.internal.connection.RealConnectionPool.callAcquirePooledConnection(okhttp3.Address, okhttp3.internal.connection.RealCall, java.util.List, boolean) for 542ms
-11-05 07:33:58.586  2801  2915 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
-11-05 07:33:58.603  2801  2916 W zygote64: Long monitor contention with owner OkHttp https://tiles.basemaps.cartocdn.com/... (2896) at int java.util.Calendar.getFirstDayOfWeek()(Calendar.java:2959) waiters=2 in boolean okhttp3.internal.connection.RealConnectionPool.callAcquirePooledConnection(okhttp3.Address, okhttp3.internal.connection.RealCall, java.util.List, boolean) for 549ms
-11-05 07:33:58.611  2801  2896 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:33:58.634  2801  2917 W zygote64: Long monitor contention with owner OkHttp https://tiles.basemaps.cartocdn.com/... (2896) at int java.util.Calendar.getFirstDayOfWeek()(Calendar.java:2959) waiters=3 in boolean okhttp3.internal.connection.RealConnectionPool.callAcquirePooledConnection(okhttp3.Address, okhttp3.internal.connection.RealCall, java.util.List, boolean) for 539ms
-11-05 07:33:58.637  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/gl/dark-matter-gl-style/sprite.json). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:33:58.651  2801  2916 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
-11-05 07:33:58.657  2801  2917 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
-11-05 07:33:58.723  2801  2913 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:33:58.724  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/gl/dark-matter-gl-style/sprite.png). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:33:58.739  2801  2922 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
-11-05 07:33:58.758  2801  2915 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:33:58.791  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/9/80/195.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:33:58.823  2801  2917 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:33:58.838  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/13/1293/3124.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:33:58.842  2801  2916 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:33:58.850  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/13/1294/3123.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:33:58.914  2801  2923 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
-11-05 07:33:58.964  2801  2924 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:33:58.976  2801  2922 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:33:58.980  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/13/1294/3124.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:33:59.020  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/13/1293/3123.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:33:59.101  2801  2801 I Choreographer: Skipped 55 frames!  The application may be doing too much work on its main thread.
-11-05 07:33:59.162  2801  2924 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:33:59.173  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/fonts/Montserrat%20Regular%20Italic%2cOpen%20Sans%20Italic%2cNoto%20Sans%20Regular%2cNoto%20Sans%20CJK%20JP%20Regular/0-255.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:33:59.181  2801  2922 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:33:59.183  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/fonts/Montserrat%20SemiBold%2cOpen%20Sans%20Bold%2cNoto%20Sans%20Regular%2cNoto%20Sans%20CJK%20JP%20Regular/0-255.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:33:59.322  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/10/161/390.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:33:59.322  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/14/2587/6247.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:33:59.323  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/14/2586/6247.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:33:59.323  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/14/2586/6248.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:33:59.323  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/14/2587/6248.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:33:59.347  2801  2916 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
-11-05 07:33:59.352  2801  2923 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
-11-05 07:33:59.353  2801  2917 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
-11-05 07:33:59.354  2801  2924 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
-11-05 07:33:59.360  2801  2922 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
-11-05 07:33:59.396  2801  2915 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:33:59.408  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/12/646/1561.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:33:59.488  2801  2806 I zygote64: Do partial code cache collection, code=246KB, data=225KB
-11-05 07:33:59.556  2801  2806 I zygote64: After code cache collection, code=245KB, data=224KB
-11-05 07:33:59.556  2801  2806 I zygote64: Increasing code cache capacity to 1024KB
-11-05 07:33:59.650  2801  2925 D ProfileInstaller: Installing profile for fr.roadguard.drive
-11-05 07:34:00.067  2801  2915 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:34:00.077  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/5174/12495.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:34:00.320  2801  2915 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:34:00.323  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/fonts/Montserrat%20Medium%2cOpen%20Sans%20Regular%2cNoto%20Sans%20Regular%2cNoto%20Sans%20CJK%20JP%20Regular/0-255.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:34:00.609  2801  2812 I zygote64: Background concurrent copying GC freed 123230(4MB) AllocSpace objects, 7(396KB) LOS objects, 22% free, 20MB/26MB, paused 69us total 315.924ms
-11-05 07:34:00.633  2801  2806 I zygote64: Compiler allocated 7MB to compile void fr.roadguard.core.map.DriveMapKt.DriveMap(boolean, fr.roadguard.core.nav.Route, int, boolean, java.util.Set, androidx.compose.ui.Modifier, fr.roadguard.core.map.OfflinePack, java.util.List, boolean, int, boolean, fr.roadguard.core.radar.Fix, java.util.List, java.util.List, androidx.compose.runtime.Composer, int, int, int)
-11-05 07:34:02.439  2801  2801 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-05 07:34:02.656  2801  2806 I zygote64: Do full code cache collection, code=502KB, data=431KB
-11-05 07:34:02.658  2801  2806 I zygote64: After code cache collection, code=409KB, data=303KB
-11-05 07:34:05.514  2801  2801 I RoadguardMap: puck enabled=true render=8 cam=36 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:34:06.420  2801  2806 I zygote64: Do partial code cache collection, code=441KB, data=362KB
-11-05 07:34:06.424  2801  2806 I zygote64: After code cache collection, code=441KB, data=362KB
-11-05 07:34:06.424  2801  2806 I zygote64: Increasing code cache capacity to 2MB
-11-05 07:34:06.424  2801  2806 I zygote64: Compiler allocated 5MB to compile void android.view.ViewRootImpl.performTraversals()
-11-05 07:34:08.439  2801  2801 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-05 07:34:13.461  2801  2801 I RoadguardMap: puck enabled=true render=8 cam=36 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:34:14.442  2801  2801 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-05 07:34:20.441  2801  2801 I RoadguardSession: pos=46.72623,5.59312 v=0 cap=NaN prec=20 nuit=false alerte=- radars=true
-11-05 07:34:20.498  2801  2806 I zygote64: Compiler allocated 9MB to compile void fr.roadguard.core.ui.MusicCardKt.MusicCard(fr.roadguard.core.media.NowPlaying, boolean, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, androidx.compose.ui.Modifier, kotlin.jvm.functions.Function0, java.lang.String, androidx.compose.runtime.Composer, int, int)
-11-05 07:34:20.764  2801  2915 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:34:20.765  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/styles/liberty). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:34:20.777  2801  2880 W Mbgl    : {roadguard.drive}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
-11-05 07:34:20.801  2801  2801 I RoadguardMap: puck enabled=true render=8 cam=36 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:34:20.835  2801  2915 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:34:20.839  2801  2922 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:34:20.842  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/sprites/ofm_f384/ofm.json). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:34:20.843  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:34:21.054  2801  2924 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:34:21.063  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/sprites/ofm_f384/ofm.png). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:34:21.120  2801  2922 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:34:21.270  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/12/2111/1445.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:34:21.284  2801  2924 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:34:21.285  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8446/5780.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:34:21.341  2801  2915 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:34:21.351  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8446/5781.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:34:21.713  2801  2915 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:34:21.803  2801  2924 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:34:21.831  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/fonts/Noto%20Sans%20Regular/0-255.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:34:21.831  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/fonts/Noto%20Sans%20Italic/0-255.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:34:22.031  2801  2812 I zygote64: Background concurrent copying GC freed 139380(4MB) AllocSpace objects, 13(628KB) LOS objects, 21% free, 21MB/27MB, paused 47us total 239.870ms
-11-05 07:34:22.526  2801  2915 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:34:22.548  2801  2924 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:34:22.557  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/11/1055/722.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:34:22.565  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8446/5780.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:34:26.449  2801  2801 I RoadguardSession: pos=46.72527,5.59247 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
-11-05 07:34:28.469  2801  2801 I RoadguardMap: puck enabled=true render=8 cam=36 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:34:32.165  2801  2924 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:34:32.180  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/10/527/361.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:34:32.447  2801  2801 I RoadguardSession: pos=46.72432,5.59182 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
-11-05 07:34:36.487  2801  2801 I RoadguardMap: puck enabled=true render=8 cam=36 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:34:38.451  2801  2801 I RoadguardSession: pos=46.72337,5.59118 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
-11-05 07:34:39.475  2801  2806 I zygote64: Do full code cache collection, code=1003KB, data=791KB
-11-05 07:34:39.478  2801  2806 I zygote64: After code cache collection, code=993KB, data=735KB
-11-05 07:34:43.624  2801  2806 I zygote64: Do partial code cache collection, code=1000KB, data=763KB
-11-05 07:34:43.625  2801  2806 I zygote64: After code cache collection, code=1000KB, data=763KB
-11-05 07:34:43.625  2801  2806 I zygote64: Increasing code cache capacity to 3MB
-11-05 07:34:43.749  2801  2846 D AudioTrack: stop() called with 6916 frames delivered
-11-05 07:34:44.269  2801  2812 I zygote64: Background concurrent copying GC freed 159969(5MB) AllocSpace objects, 9(644KB) LOS objects, 21% free, 21MB/27MB, paused 14.223ms total 328.653ms
-11-05 07:34:44.506  2801  2801 I RoadguardSession: pos=46.72242,5.59053 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
-11-05 07:34:44.552  2801  2801 I RoadguardMap: puck enabled=true render=8 cam=36 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:34:44.786  2801  2801 I TextToSpeech: Asked to disconnect from ComponentInfo{com.svox.pico/com.svox.pico.PicoService}
-11-05 07:34:45.370  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:34:45.946  2801  2801 I TextToSpeech: Connected to ComponentInfo{com.svox.pico/com.svox.pico.PicoService}
-11-05 07:34:46.027  2801  2984 I TextToSpeech: Set up connection to ComponentInfo{com.svox.pico/com.svox.pico.PicoService}
-11-05 07:34:46.838  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:34:50.456  2801  2801 I RoadguardSession: pos=46.72147,5.58988 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
-11-05 07:34:52.493  2801  2801 I RoadguardMap: puck enabled=true render=8 cam=36 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:34:56.464  2801  2801 I RoadguardSession: pos=46.72052,5.58924 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
-11-05 07:35:00.492  2801  2801 I RoadguardMap: puck enabled=true render=8 cam=36 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:35:02.465  2801  2801 I RoadguardSession: pos=46.71957,5.58859 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
-11-05 07:35:04.492  2801  2846 D AudioTrack: stop() called with 2544 frames delivered
-11-05 07:35:06.053  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:06.066  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8445/5780.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:35:06.066  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8445/5781.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:35:06.069  2801  2924 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
-11-05 07:35:06.071  2801  2915 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
-11-05 07:35:07.581  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:08.537  2801  2801 I RoadguardSession: pos=46.71878,5.58805 v=70 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@471m radars=true
-11-05 07:35:08.562  2801  2801 I RoadguardMap: puck enabled=true render=8 cam=36 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:35:09.050  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:09.989  2801  2812 I zygote64: Background concurrent copying GC freed 173820(6MB) AllocSpace objects, 4(208KB) LOS objects, 22% free, 20MB/26MB, paused 28us total 207.168ms
-11-05 07:35:10.499  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:11.915  2801  2846 D AudioTrack: stop() called with 2536 frames delivered
-11-05 07:35:13.278  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:14.458  2801  2915 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:35:14.460  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8445/5781.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:35:14.468  2801  2801 I RoadguardSession: pos=46.71814,5.58762 v=51 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@393m radars=true
-11-05 07:35:14.577  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:15.221  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8445/5780.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:35:15.227  2801  2915 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
-11-05 07:35:15.783  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:16.536  2801  2801 I RoadguardMap: puck enabled=true render=8 cam=36 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:35:16.981  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:18.077  2801  2846 D AudioTrack: stop() called with 2536 frames delivered
-11-05 07:35:19.150  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:19.994  2801  2924 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:35:19.995  2801  2915 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:35:19.998  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8446/5782.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:35:20.053  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8445/5780.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:35:20.149  2801  2922 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
-11-05 07:35:20.161  2801  2821 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8445/5782.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
-11-05 07:35:20.200  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:20.559  2801  2801 I RoadguardSession: pos=46.71719,5.58697 v=136 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@277m radars=true
-11-05 07:35:21.193  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:22.120  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:23.038  2801  2846 D AudioTrack: stop() called with 2536 frames delivered
-11-05 07:35:23.891  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:24.536  2801  2801 I RoadguardMap: puck enabled=true render=8 cam=36 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:35:24.661  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:25.379  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:26.150  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:26.531  2801  2801 I RoadguardSession: pos=46.71640,5.58643 v=69 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@180m radars=true
-11-05 07:35:26.714  2801  2812 I zygote64: Background concurrent copying GC freed 172032(5MB) AllocSpace objects, 8(332KB) LOS objects, 22% free, 20MB/26MB, paused 22us total 128.880ms
-11-05 07:35:26.849  2801  2846 D AudioTrack: stop() called with 2536 frames delivered
-11-05 07:35:27.569  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:28.224  2801  2846 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 1 line
-11-05 07:35:28.898  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:29.612  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:30.268  2801  2846 D AudioTrack: stop() called with 2536 frames delivered
-11-05 07:35:30.873  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:31.456  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:32.032  2801  2846 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 1 line
-11-05 07:35:32.510  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:32.519  2801  2801 I RoadguardSession: pos=46.71576,5.58600 v=136 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@102m radars=true
-11-05 07:35:32.567  2801  2801 I RoadguardMap: puck enabled=true render=8 cam=36 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:35:33.011  2801  2846 D AudioTrack: stop() called with 2536 frames delivered
-11-05 07:35:33.486  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:34.314  2801  2846 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 07:35:34.698  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:34.992  2801  2846 D AudioTrack: stop() called with 2536 frames delivered
-11-05 07:35:35.321  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:35.828  2801  2846 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 07:35:36.023  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:36.218  2801  2846 D AudioTrack: stop() called with 2536 frames delivered
-11-05 07:35:36.462  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:36.690  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:36.906  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:37.097  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:37.310  2801  2846 D AudioTrack: stop() called with 2536 frames delivered
-11-05 07:35:37.499  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:37.886  2801  2846 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 07:35:38.055  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:38.273  2801  2846 D AudioTrack: stop() called with 2536 frames delivered
-11-05 07:35:38.468  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:38.507  2801  2801 I RoadguardSession: pos=46.71481,5.58536 v=69 cap=205 prec=20 nuit=false alerte=rg-23221914238eedc5fb8a@99m radars=true
-11-05 07:35:38.687  2801  2846 D AudioTrack: stop() called with 9232 frames delivered
-11-05 07:35:39.105  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:39.394  2801  2801 I TextToSpeech: Asked to disconnect from ComponentInfo{com.svox.pico/com.svox.pico.PicoService}
-11-05 07:35:39.553  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:39.984  2801  2846 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 1 line
-11-05 07:35:40.351  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:40.560  2801  2801 I RoadguardMap: puck enabled=true render=8 cam=36 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:35:40.731  2801  2846 D AudioTrack: stop() called with 2308 frames delivered
-11-05 07:35:41.010  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:41.356  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:41.690  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:41.907  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:42.095  2801  2846 D AudioTrack: stop() called with 2358 frames delivered
-11-05 07:35:42.285  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:42.699  2801  2846 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 07:35:42.863  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:43.047  2801  2846 D AudioTrack: stop() called with 2536 frames delivered
-11-05 07:35:43.206  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:43.403  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:43.631  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:43.782  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:43.972  2801  2846 D AudioTrack: stop() called with 2536 frames delivered
-11-05 07:35:44.173  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:44.383  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:44.526  2801  2801 I RoadguardSession: pos=46.71386,5.58471 v=70 cap=205 prec=20 nuit=false alerte=rg-23221914238eedc5fb8a@0m radars=true
-11-05 07:35:44.633  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:45.538  2801  2801 W TextToSpeech: speak failed: not bound to TTS engine
-11-05 07:35:45.636  2801  2846 D AudioTrack: stop() called with 5998 frames delivered
-11-05 07:35:45.780  2801  2812 I zygote64: Background concurrent copying GC freed 182515(6MB) AllocSpace objects, 2(104KB) LOS objects, 22% free, 20MB/26MB, paused 20us total 193.081ms
-11-05 07:35:45.853  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:46.027  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:46.229  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:46.408  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:46.639  2801  2846 D AudioTrack: stop() called with 2536 frames delivered
-11-05 07:35:46.785  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:47.145  2801  2846 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 07:35:47.337  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:47.534  2801  2846 D AudioTrack: stop() called with 2536 frames delivered
-11-05 07:35:47.788  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:47.939  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:48.138  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:48.327  2801  2846 D AudioTrack: stop() called with 3462 frames delivered
-11-05 07:35:48.535  2801  2846 D AudioTrack: stop() called with 2536 frames delivered
-11-05 07:35:48.570  2801  2801 I RoadguardMap: puck enabled=true render=8 cam=36 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:35:50.490  2801  2801 I RoadguardSession: pos=46.71291,5.58406 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:43:29.282  2833  2833 I zygote64: Late-enabling -Xcheck:jni
+11-05 07:43:29.290  2833  2833 W zygote64: Unexpected CPU variant for X86 using defaults: x86_64
+11-05 07:43:29.558  2833  2833 D NetworkSecurityConfig: No Network Security Config specified, using platform default
+11-05 07:43:29.675  2833  2862 D OpenGLRenderer: HWUI GL Pipeline
+11-05 07:43:29.957  2833  2833 W Equalizer: WARNING: attaching an Equalizer to global output mix is deprecated!
+11-05 07:43:30.111  2833  2833 I TextToSpeech: Sucessfully bound to com.svox.pico
+11-05 07:43:30.114  2833  2833 W AudioTrack: AUDIO_OUTPUT_FLAG_FAST denied by server; frameCount 2308 -> 2308
+11-05 07:43:30.114  2833  2833 D AudioTrack: Client defaulted notificationFrames to 1154 for frameCount 2308
+11-05 07:43:30.161  2833  2838 I zygote64: Do partial code cache collection, code=30KB, data=21KB
+11-05 07:43:30.163  2833  2838 I zygote64: After code cache collection, code=30KB, data=21KB
+11-05 07:43:30.163  2833  2838 I zygote64: Increasing code cache capacity to 128KB
+11-05 07:43:30.294  2833  2838 I zygote64: Do partial code cache collection, code=61KB, data=45KB
+11-05 07:43:30.295  2833  2838 I zygote64: After code cache collection, code=61KB, data=46KB
+11-05 07:43:30.295  2833  2838 I zygote64: Increasing code cache capacity to 256KB
+11-05 07:43:30.437  2833  2838 I zygote64: Do full code cache collection, code=124KB, data=97KB
+11-05 07:43:30.437  2833  2838 I zygote64: After code cache collection, code=100KB, data=68KB
+11-05 07:43:30.462  2833  2862 D         : HostConnection::get() New Host Connection established 0x7eaf5581c600, tid 2862
+11-05 07:43:30.472  2833  2862 I zygote64: android::hardware::configstore::V1_0::ISurfaceFlingerConfigs::hasWideColorDisplay retrieved: 0
+11-05 07:43:30.472  2833  2862 I OpenGLRenderer: Initialized EGL, version 1.4
+11-05 07:43:30.472  2833  2862 D OpenGLRenderer: Swap behavior 1
+11-05 07:43:30.479  2833  2862 D EGL_emulation: eglCreateContext: 0x7eaf5583e940: maj 3 min 0 rcv 3
+11-05 07:43:30.480  2833  2862 D EGL_emulation: eglMakeCurrent: 0x7eaf5583e940: ver 3 0 (tinfo 0x7eaf5580db80)
+11-05 07:43:30.590  2833  2838 I zygote64: Do partial code cache collection, code=119KB, data=98KB
+11-05 07:43:30.590  2833  2838 I zygote64: After code cache collection, code=119KB, data=98KB
+11-05 07:43:30.590  2833  2838 I zygote64: Increasing code cache capacity to 512KB
+11-05 07:43:30.687  2833  2833 I Choreographer: Skipped 56 frames!  The application may be doing too much work on its main thread.
+11-05 07:43:30.731  2833  2890 I Mbgl-EGLConfigChooser: In emulator: true
+11-05 07:43:30.732  2833  2890 D         : HostConnection::get() New Host Connection established 0x7eaf467471c0, tid 2890
+11-05 07:43:30.760  2833  2890 D EGL_emulation: eglCreateContext: 0x7eaf44679980: maj 3 min 0 rcv 3
+11-05 07:43:30.766  2833  2862 D EGL_emulation: eglMakeCurrent: 0x7eaf5583e940: ver 3 0 (tinfo 0x7eaf5580db80)
+11-05 07:43:30.772  2833  2890 D EGL_emulation: eglMakeCurrent: 0x7eaf44679980: ver 3 0 (tinfo 0x7eaf5da95d60)
+11-05 07:43:30.777  2833  2899 W Mbgl    : {DatabaseFileSou}[Database]: Removing existing incompatible offline database
+11-05 07:43:30.800  2833  2899 I Mbgl    : {TextureViewRend}[General]: GPU Identifier: Android Emulator OpenGL ES Translator (Google SwiftShader)
+11-05 07:43:30.899  2833  2890 E eglCodecCommon: glUtilsParamSize: unknow param 0x000090df
+11-05 07:43:30.924  2833  2890 E eglCodecCommon: glUtilsParamSize: unknow param 0x000090df
+11-05 07:43:31.251  2833  2833 I TextToSpeech: Connected to ComponentInfo{com.svox.pico/com.svox.pico.PicoService}
+11-05 07:43:31.253  2833  2833 V Mbgl-ConnectivityReceiver: connected - true
+11-05 07:43:31.268  2833  2833 I Choreographer: Skipped 33 frames!  The application may be doing too much work on its main thread.
+11-05 07:43:31.306  2833  2906 I TextToSpeech: Set up connection to ComponentInfo{com.svox.pico/com.svox.pico.PicoService}
+11-05 07:43:31.497  2833  2844 I zygote64: Background concurrent copying GC freed 28186(1840KB) AllocSpace objects, 8(456KB) LOS objects, 49% free, 3MB/7MB, paused 1.766ms total 367.958ms
+11-05 07:43:32.736  2833  2833 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
+11-05 07:43:32.941  2833  2844 I zygote64: Background concurrent copying GC freed 175674(6MB) AllocSpace objects, 2(40KB) LOS objects, 33% free, 12MB/18MB, paused 474us total 245.779ms
+11-05 07:43:33.045  2833  2838 I zygote64: Do full code cache collection, code=247KB, data=207KB
+11-05 07:43:33.046  2833  2838 I zygote64: After code cache collection, code=206KB, data=145KB
+11-05 07:43:33.046  2833  2838 I zygote64: JIT allocated 94KB for stack maps of void fr.roadguard.drive.MainActivityKt.DriveHome(androidx.compose.runtime.Composer, int)
+11-05 07:43:33.439  2833  2838 I zygote64: Do partial code cache collection, code=234KB, data=198KB
+11-05 07:43:33.445  2833  2838 I zygote64: After code cache collection, code=233KB, data=198KB
+11-05 07:43:33.445  2833  2838 I zygote64: Increasing code cache capacity to 1024KB
+11-05 07:43:33.540  2833  2914 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:43:33.573  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:34.105  2833  2899 W Mbgl    : {roadguard.drive}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
+11-05 07:43:34.126  2833  2833 I Choreographer: Skipped 52 frames!  The application may be doing too much work on its main thread.
+11-05 07:43:34.145  2833  2899 W Mbgl    : {roadguard.drive}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
+11-05 07:43:34.148  2833  2899 I chatty  : uid=10059(fr.roadguard.drive) Worker 1 identical 1 line
+11-05 07:43:34.153  2833  2899 W Mbgl    : {roadguard.drive}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
+11-05 07:43:34.208  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:43:34.415  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/8/131/90.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:34.416  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/12/2110/1445.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:34.416  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/12/2110/1446.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:34.416  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/12/2111/1445.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:34.416  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/12/2111/1446.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:34.431  2833  2936 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-05 07:43:34.471  2833  2937 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-05 07:43:34.537  2833  2914 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:43:34.539  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/gl/dark-matter-gl-style/sprite.json). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:34.558  2833  2935 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-05 07:43:34.576  2833  2932 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:43:34.579  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/gl/dark-matter-gl-style/sprite.png). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:34.621  2833  2938 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-05 07:43:34.629  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/8/40/97.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:34.629  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/12/646/1561.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:34.639  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/12/646/1562.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:34.639  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/12/647/1561.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:34.639  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/12/647/1562.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:34.640  2833  2914 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-05 07:43:34.648  2833  2938 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-05 07:43:34.649  2833  2937 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-05 07:43:34.652  2833  2939 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-05 07:43:34.678  2833  2932 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-05 07:43:34.765  2833  2940 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-05 07:43:34.921  2833  2940 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:43:34.934  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/11/323/780.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:35.050  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/5174/12495.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:35.065  2833  2932 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-05 07:43:35.353  2833  2932 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:43:35.363  2833  2838 I zygote64: Compiler allocated 7MB to compile void fr.roadguard.core.map.DriveMapKt.DriveMap(boolean, fr.roadguard.core.nav.Route, int, boolean, java.util.Set, androidx.compose.ui.Modifier, fr.roadguard.core.map.OfflinePack, java.util.List, boolean, int, boolean, fr.roadguard.core.radar.Fix, java.util.List, java.util.List, androidx.compose.runtime.Composer, int, int, int)
+11-05 07:43:35.388  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/12/646/1561.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:35.403  2833  2941 D ProfileInstaller: Installing profile for fr.roadguard.drive
+11-05 07:43:35.467  2833  2940 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:43:35.479  2833  2932 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:43:35.486  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/fonts/Montserrat%20Regular%20Italic%2cOpen%20Sans%20Italic%2cNoto%20Sans%20Regular%2cNoto%20Sans%20CJK%20JP%20Regular/0-255.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:35.514  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/vectortiles/carto.streets/v2/15/5174/12495.mvt). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:35.527  2833  2939 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:43:35.640  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/fonts/Montserrat%20SemiBold%2cOpen%20Sans%20Bold%2cNoto%20Sans%20Regular%2cNoto%20Sans%20CJK%20JP%20Regular/0-255.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:35.920  2833  2939 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:43:35.928  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.basemaps.cartocdn.com/v/20261026-01/fonts/Montserrat%20Medium%2cOpen%20Sans%20Regular%2cNoto%20Sans%20Regular%2cNoto%20Sans%20CJK%20JP%20Regular/0-255.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:36.590  2833  2844 I zygote64: Background concurrent copying GC freed 128350(4MB) AllocSpace objects, 8(416KB) LOS objects, 22% free, 20MB/26MB, paused 691us total 805.163ms
+11-05 07:43:37.140  2833  2838 I zygote64: Do full code cache collection, code=502KB, data=434KB
+11-05 07:43:37.140  2833  2838 I zygote64: After code cache collection, code=450KB, data=330KB
+11-05 07:43:37.967  2833  2833 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
+11-05 07:43:40.538  2833  2838 I zygote64: Do partial code cache collection, code=499KB, data=393KB
+11-05 07:43:40.538  2833  2838 I zygote64: After code cache collection, code=499KB, data=393KB
+11-05 07:43:40.538  2833  2838 I zygote64: Increasing code cache capacity to 2MB
+11-05 07:43:40.970  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:43:42.417  2833  2838 I zygote64: Compiler allocated 5MB to compile void android.view.ViewRootImpl.performTraversals()
+11-05 07:43:43.956  2833  2833 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
+11-05 07:43:43.998  2833  2838 I zygote64: Compiler allocated 9MB to compile void fr.roadguard.core.ui.MusicCardKt.MusicCard(fr.roadguard.core.media.NowPlaying, boolean, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, androidx.compose.ui.Modifier, kotlin.jvm.functions.Function0, java.lang.String, androidx.compose.runtime.Composer, int, int)
+11-05 07:43:49.009  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:43:49.970  2833  2833 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
+11-05 07:43:55.967  2833  2833 I RoadguardSession: pos=46.72623,5.59312 v=136 cap=0 prec=20 nuit=false alerte=- radars=true
+11-05 07:43:56.207  2833  2939 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:43:56.213  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/styles/liberty). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:56.235  2833  2899 W Mbgl    : {roadguard.drive}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
+11-05 07:43:56.291  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:43:56.307  2833  2940 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:43:56.308  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/sprites/ofm_f384/ofm.json). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:56.310  2833  2932 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:43:56.310  2833  2939 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:43:56.311  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:56.405  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/sprites/ofm_f384/ofm.png). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:56.822  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/11/1055/722.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:56.822  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8446/5780.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:56.823  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8446/5781.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:56.826  2833  2932 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-05 07:43:56.829  2833  2939 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-05 07:43:56.830  2833  2940 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-05 07:43:57.022  2833  2914 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:43:57.048  2833  2938 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:43:57.054  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8446/5781.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:57.056  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8446/5780.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:57.147  2833  2937 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:43:57.171  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/10/527/361.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:57.298  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8447/5780.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:57.298  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8447/5781.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:57.303  2833  2914 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-05 07:43:57.347  2833  2938 W Mbgl-HttpRequest: Request failed due to a permanent error: Canceled 
+11-05 07:43:57.445  2833  2937 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:43:57.448  2833  2914 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:43:57.471  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/fonts/Noto%20Sans%20Regular/0-255.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:57.561  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/fonts/Noto%20Sans%20Italic/0-255.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:57.822  2833  2844 I zygote64: Background concurrent copying GC freed 144260(5MB) AllocSpace objects, 15(764KB) LOS objects, 21% free, 21MB/27MB, paused 455us total 667.158ms
+11-05 07:43:59.094  2833  2914 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:43:59.096  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8447/5781.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:43:59.098  2833  2937 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:43:59.112  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8447/5780.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:44:00.493  2833  2937 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:44:00.496  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/11/1055/722.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:44:01.975  2833  2833 I RoadguardSession: pos=46.72527,5.59247 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:44:03.978  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:44:07.985  2833  2833 I RoadguardSession: pos=46.72432,5.59182 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:44:09.025  2833  2838 I zygote64: Do full code cache collection, code=1004KB, data=791KB
+11-05 07:44:09.027  2833  2838 I zygote64: After code cache collection, code=986KB, data=728KB
+11-05 07:44:11.154  2833  2937 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:44:11.160  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8445/5781.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:44:11.165  2833  2914 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:44:11.168  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8445/5780.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:44:11.983  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:44:13.973  2833  2833 I RoadguardSession: pos=46.72337,5.59118 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:44:19.975  2833  2833 I RoadguardSession: pos=46.72242,5.59053 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:44:20.003  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:44:25.979  2833  2833 I RoadguardSession: pos=46.72147,5.58988 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:44:25.982  2833  2838 I zygote64: Do partial code cache collection, code=996KB, data=768KB
+11-05 07:44:25.982  2833  2838 I zygote64: After code cache collection, code=993KB, data=767KB
+11-05 07:44:25.982  2833  2838 I zygote64: Increasing code cache capacity to 3MB
+11-05 07:44:28.001  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:44:31.982  2833  2833 I RoadguardSession: pos=46.72052,5.58924 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:44:34.258  2833  2877 D AudioTrack: stop() called with 6916 frames delivered
+11-05 07:44:35.059  2833  2833 I TextToSpeech: Asked to disconnect from ComponentInfo{com.svox.pico/com.svox.pico.PicoService}
+11-05 07:44:35.781  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:44:36.056  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:44:36.255  2833  2833 I TextToSpeech: Connected to ComponentInfo{com.svox.pico/com.svox.pico.PicoService}
+11-05 07:44:36.296  2833  3003 I TextToSpeech: Set up connection to ComponentInfo{com.svox.pico/com.svox.pico.PicoService}
+11-05 07:44:37.290  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:44:38.085  2833  2833 I RoadguardSession: pos=46.71957,5.58859 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:44:38.707  2833  2877 D AudioTrack: stop() called with 2544 frames delivered
+11-05 07:44:40.105  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:44:43.027  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:44:43.999  2833  2833 I RoadguardSession: pos=46.71878,5.58805 v=136 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@471m radars=true
+11-05 07:44:44.055  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:44:44.635  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:44:46.127  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:44:47.641  2833  2914 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:44:47.645  2833  2877 D AudioTrack: stop() called with 2536 frames delivered
+11-05 07:44:47.663  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/12/2111/1445.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:44:50.005  2833  2833 I RoadguardSession: pos=46.71814,5.58762 v=64 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@393m radars=true
+11-05 07:44:50.043  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:44:50.241  2833  2844 I zygote64: Background concurrent copying GC freed 170768(6MB) AllocSpace objects, 3(164KB) LOS objects, 22% free, 20MB/26MB, paused 632us total 203.828ms
+11-05 07:44:51.586  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:44:52.091  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:44:53.073  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:44:54.468  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:44:55.796  2833  2877 D AudioTrack: stop() called with 2536 frames delivered
+11-05 07:44:56.041  2833  2833 I RoadguardSession: pos=46.71719,5.58697 v=70 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@277m radars=true
+11-05 07:44:57.041  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:44:58.174  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 1 line
+11-05 07:44:59.203  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:00.034  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:45:00.137  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:01.050  2833  2877 D AudioTrack: stop() called with 2536 frames delivered
+11-05 07:45:01.915  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:02.033  2833  2833 I RoadguardSession: pos=46.71640,5.58643 v=70 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@180m radars=true
+11-05 07:45:02.755  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:03.574  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 1 line
+11-05 07:45:04.419  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:05.253  2833  2877 D AudioTrack: stop() called with 2536 frames delivered
+11-05 07:45:06.022  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:06.790  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:07.452  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:08.044  2833  2833 I RoadguardSession: pos=46.71576,5.58600 v=65 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@102m radars=true
+11-05 07:45:08.071  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:08.079  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:45:08.672  2833  2877 D AudioTrack: stop() called with 2536 frames delivered
+11-05 07:45:09.178  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:10.092  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:45:10.547  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:10.856  2833  2877 D AudioTrack: stop() called with 2536 frames delivered
+11-05 07:45:10.905  2833  2844 I zygote64: Background concurrent copying GC freed 180781(6MB) AllocSpace objects, 4(208KB) LOS objects, 22% free, 20MB/26MB, paused 1.708ms total 124.289ms
+11-05 07:45:11.244  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:11.699  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:45:11.966  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:12.224  2833  2877 D AudioTrack: stop() called with 2536 frames delivered
+11-05 07:45:12.424  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:12.759  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:45:12.954  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:13.150  2833  2877 D AudioTrack: stop() called with 2536 frames delivered
+11-05 07:45:13.347  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:13.723  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:45:13.896  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:14.112  2833  2833 I RoadguardSession: pos=46.71481,5.58536 v=70 cap=205 prec=20 nuit=false alerte=rg-23221914238eedc5fb8a@99m radars=true
+11-05 07:45:14.302  2833  2877 D AudioTrack: stop() called with 11540 frames delivered
+11-05 07:45:14.855  2833  2877 D AudioTrack: stop() called with 3284 frames delivered
+11-05 07:45:14.991  2833  2833 I TextToSpeech: Asked to disconnect from ComponentInfo{com.svox.pico/com.svox.pico.PicoService}
+11-05 07:45:15.337  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:15.794  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:16.102  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:45:16.221  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:16.533  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:16.869  2833  2877 D AudioTrack: stop() called with 2536 frames delivered
+11-05 07:45:17.207  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:17.642  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:45:17.837  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:17.997  2833  2877 D AudioTrack: stop() called with 2536 frames delivered
+11-05 07:45:18.216  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:18.605  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:45:18.795  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:18.988  2833  2877 D AudioTrack: stop() called with 2536 frames delivered
+11-05 07:45:19.178  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:19.587  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:45:19.757  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:19.925  2833  2877 D AudioTrack: stop() called with 2536 frames delivered
+11-05 07:45:20.032  2833  2833 I RoadguardSession: pos=46.71386,5.58471 v=136 cap=205 prec=20 nuit=false alerte=rg-23221914238eedc5fb8a@0m radars=true
+11-05 07:45:20.146  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:21.018  2833  2833 W TextToSpeech: speak failed: not bound to TTS engine
+11-05 07:45:21.148  2833  2877 D AudioTrack: stop() called with 6916 frames delivered
+11-05 07:45:21.292  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:21.482  2833  2877 D AudioTrack: stop() called with 2544 frames delivered
+11-05 07:45:21.653  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:21.778  2833  3035 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:45:21.790  2833  2914 V Mbgl-HttpRequest: [HTTP] Request was successful (code = 200).
+11-05 07:45:21.793  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8445/5782.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:45:21.795  2833  2855 D Mbgl-HttpRequest: [HTTP] This request was cancelled (https://tiles.openfreemap.org/planet/20261101_080013_pt/14/8446/5782.pbf). This is expected for tiles that were being prefetched but are no longer needed for the map to render.
+11-05 07:45:21.866  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:22.053  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 1 line
+11-05 07:45:22.230  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:22.417  2833  2877 D AudioTrack: stop() called with 2536 frames delivered
+11-05 07:45:22.633  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:23.041  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:45:23.209  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:23.381  2833  2877 D AudioTrack: stop() called with 2536 frames delivered
+11-05 07:45:23.525  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:23.736  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 1 line
+11-05 07:45:23.928  2833  2877 D AudioTrack: stop() called with 3462 frames delivered
+11-05 07:45:24.056  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:45:26.016  2833  2833 I RoadguardSession: pos=46.71291,5.58406 v=136 cap=205 prec=20 nuit=false alerte=- radars=true
