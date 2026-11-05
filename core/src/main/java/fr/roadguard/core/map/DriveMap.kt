@@ -194,7 +194,7 @@ fun DriveMap(
                 PropertyFactory.iconAllowOverlap(true), PropertyFactory.iconIgnorePlacement(true),
                 PropertyFactory.iconSize(Expression.interpolate(Expression.linear(), Expression.zoom(), Expression.stop(8, 0.55f), Expression.stop(16, 1f))),
             ))
-            if (hasLocation) enableLocation(context, map, style)
+            if (hasLocation) enableLocation(context, map, style, holder)
             styleVersion = if (styleVersion < 0) 1 else styleVersion + 1
         }
     }
@@ -202,7 +202,7 @@ fun DriveMap(
     LaunchedEffect(hasLocation) {
         val map = holder.map
         val style = holder.style
-        if (hasLocation && map != null && style != null) runCatching { enableLocation(context, map, style) }
+        if (hasLocation && map != null && style != null) runCatching { enableLocation(context, map, style, holder) }
     }
 
     // Trajet : tracé sur la carte et carte orientée dans le sens de la marche pendant le guidage.
@@ -277,11 +277,25 @@ fun DriveMap(
             if (!p.bearing.isNaN()) bearing = p.bearing.toFloat()
         }
         runCatching { comp.forceLocationUpdate(loc) }
-        // Flèche ROADGUARD : position et cap exacts (le dernier cap connu est gardé à l'arrêt).
-        if (!p.bearing.isNaN()) holder.lastBearing = p.bearing
-        runCatching {
-            holder.style?.getSourceAs<GeoJsonSource>(ME_SOURCE)?.setGeoJson(
-                Feature.fromGeometry(Point.fromLngLat(p.lon, p.lat)).apply { addNumberProperty("bearing", holder.lastBearing) })
+        // La flèche suit ensuite la position animée de la carte (voir enableLocation) : mouvement fluide.
+        if (!holder.indicatorSeen) holder.drawMe(p.lat, p.lon, if (p.bearing.isNaN()) holder.lastBearing else p.bearing)
+        // Trajet effacé derrière la voiture : on ne dessine que ce qui reste à parcourir.
+        val r = route
+        if (r != null && r.points.size >= 2) {
+            val pts = r.points
+            if (holder.trimRoute !== r) { holder.trimRoute = r; holder.trimIndex = 0 }
+            var best = holder.trimIndex; var bestD = Double.MAX_VALUE
+            val from = (holder.trimIndex - 3).coerceAtLeast(0); val to = (holder.trimIndex + 300).coerceAtMost(pts.size - 1)
+            for (i in from..to) {
+                val d = fr.roadguard.core.radar.Geo.distanceMeters(p.lat, p.lon, pts[i].lat, pts[i].lon)
+                if (d < bestD) { bestD = d; best = i }
+            }
+            if (bestD < 80) holder.trimIndex = best
+            val remaining = listOf(Point.fromLngLat(p.lon, p.lat)) +
+                pts.subList((holder.trimIndex + 1).coerceAtMost(pts.size - 1), pts.size).map { Point.fromLngLat(it.lon, it.lat) }
+            if (remaining.size >= 2) runCatching {
+                holder.style?.getSourceAs<GeoJsonSource>(ROUTE_SOURCE)?.setGeoJson(Feature.fromGeometry(LineString.fromLngLats(remaining)))
+            }
         }
     }
 
@@ -323,10 +337,28 @@ private class MapHolder {
     var style: Style? = null
     var styleUri: String? = null
     var lastBearing = 0.0
+    var indicatorSeen = false
+    var trimRoute: Route? = null
+    var trimIndex = 0
+    private var meLat = Double.NaN; private var meLon = 0.0; private var lastDraw = 0L
+
+    /** Dessine la flèche ROADGUARD (au plus 30 fois par seconde, pour ménager le poste). */
+    fun drawMe(lat: Double, lon: Double, bearing: Double) {
+        meLat = lat; meLon = lon; if (!bearing.isNaN()) lastBearing = bearing
+        val now = android.os.SystemClock.uptimeMillis()
+        if (now - lastDraw < 33) return
+        lastDraw = now
+        runCatching {
+            style?.getSourceAs<GeoJsonSource>(ME_SOURCE)?.setGeoJson(
+                Feature.fromGeometry(Point.fromLngLat(meLon, meLat)).apply { addNumberProperty("bearing", lastBearing) })
+        }
+    }
+
+    fun drawMeBearing(bearing: Double) { lastBearing = bearing; if (!meLat.isNaN()) drawMe(meLat, meLon, bearing) }
 }
 
 @SuppressLint("MissingPermission")
-private fun enableLocation(context: Context, map: MapLibreMap, style: Style) {
+private fun enableLocation(context: Context, map: MapLibreMap, style: Style, holder: MapHolder? = null) {
     val component = map.locationComponent
     if (component.isLocationComponentActivated) return
     component.activateLocationComponent(
@@ -340,6 +372,12 @@ private fun enableLocation(context: Context, map: MapLibreMap, style: Style) {
             ).build()
     )
     component.isLocationComponentEnabled = true
+    if (holder != null) {
+        // Position et cap animés par la carte entre deux mesures GPS : la flèche glisse au lieu de sauter,
+        // et reste alignée avec la carte qui tourne.
+        component.addOnIndicatorPositionChangedListener { pt -> holder.indicatorSeen = true; holder.drawMe(pt.latitude(), pt.longitude(), Double.NaN) }
+        component.addOnIndicatorBearingChangedListener { b -> holder.drawMeBearing(b) }
+    }
     component.cameraMode = CameraMode.TRACKING_GPS_NORTH
     component.renderMode = RenderMode.GPS
     component.zoomWhileTracking(15.0)
