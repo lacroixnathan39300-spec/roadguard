@@ -9,6 +9,11 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Une nouvelle compilation annule la précédente (sinon l'ancienne pourrait être publiée après la nouvelle).
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest

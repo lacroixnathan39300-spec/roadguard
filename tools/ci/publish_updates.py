@@ -22,6 +22,9 @@ try:
 except Exception:
     old = {}
 
+# Une compilation plus ancienne qui finit après une plus récente ne doit pas la remplacer.
+if max((old.get(a) or {}).get("build", 0) for a in ("gps", "drive")) > run:
+    print(f"Build {run} plus ancienne que celle publiée : rien à faire."); sys.exit(0)
 manifest = dict(old)
 for app, version in (("gps", 600 + run), ("drive", run)):
     path = os.path.join(dist, f"ROADGUARD-{app.upper()}-build{run}.apk")
