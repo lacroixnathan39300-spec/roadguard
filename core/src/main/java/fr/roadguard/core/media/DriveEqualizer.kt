@@ -29,6 +29,7 @@ class DriveEqualizer(context: Context) {
     val minDb = -15f
     val maxDb = 15f
 
+    // DynamicsProcessing n'existe qu'à partir d'Android 9 (API 28) : jamais utilisé sur l'autoradio en 8.1.
     private val dp: DynamicsProcessing? = if (Build.VERSION.SDK_INT >= 28) runCatching {
         val cfg = DynamicsProcessing.Config.Builder(DynamicsProcessing.VARIANT_FAVOR_FREQUENCY_RESOLUTION, 2,
             true, frequencies.size, false, 0, false, 0, true).build()
@@ -103,7 +104,7 @@ class DriveEqualizer(context: Context) {
 
     private fun applyBands() {
         val on = enabled
-        runCatching {
+        if (Build.VERSION.SDK_INT >= 28) runCatching {
             dp?.let { d ->
                 d.enabled = on
                 frequencies.forEachIndexed { i, f ->
@@ -153,7 +154,7 @@ class DriveEqualizer(context: Context) {
             .putInt("bass", bassStrength).putInt("spatial", spatial).putString("preset", presetName).apply()
     }
 
-    fun release() { runCatching { dp?.release() }; runCatching { eq?.release() }; runCatching { loud?.release() }; runCatching { bass?.release() }; runCatching { virt?.release() } }
+    fun release() { if (Build.VERSION.SDK_INT >= 28) runCatching { dp?.release() }; runCatching { eq?.release() }; runCatching { loud?.release() }; runCatching { bass?.release() }; runCatching { virt?.release() } }
 }
 
 /** « 31 Hz », « 1 kHz », « 16 kHz ». */
