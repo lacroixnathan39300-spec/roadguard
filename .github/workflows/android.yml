@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
     strategy:
       fail-fast: false
       matrix:
@@ -36,6 +36,9 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
+      # Sur l'ordinateur de Nathan (runner gratuit) : SDK Android installé au besoin.
+      - uses: android-actions/setup-android@v3
+        if: ${{ runner.environment == 'self-hosted' }}
       - uses: gradle/actions/setup-gradle@v4
       - name: Graphe routier embarqué (Franche-Comté)
         env:
@@ -76,11 +79,13 @@ jobs:
             ${{ matrix.app }}/app/build/outputs/apk/**/*.apk
             ${{ matrix.app }}/app/build/reports/**
           if-no-files-found: warn
+          # Stockage GitHub limité (gratuit) : les APK restent dans les versions, l'artefact ne sert qu'à la publication.
+          retention-days: 1
 
   publish:
     needs: build
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
     steps:
       - uses: actions/download-artifact@v4
         with:
