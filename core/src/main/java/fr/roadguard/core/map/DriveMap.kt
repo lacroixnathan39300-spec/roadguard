@@ -221,7 +221,7 @@ fun DriveMap(
             }
         }
         holder.map?.locationComponent?.takeIf { it.isLocationComponentActivated }?.let {
-            it.cameraMode = if (route != null && !northUp) CameraMode.TRACKING_GPS else CameraMode.TRACKING_GPS_NORTH
+            it.cameraMode = if (!northUp) CameraMode.TRACKING_GPS else CameraMode.TRACKING_GPS_NORTH
             it.zoomWhileTracking(zoom)
         }
     }
@@ -267,10 +267,21 @@ fun DriveMap(
         runCatching { layer.setFilter(Expression.match(Expression.get("kind"), Expression.literal(false), *stops)) }
     }
 
+    // Comme Waze : carte tournée dans le sens de la marche (sauf « nord en haut ») et flèche placée en bas
+    // de la carte, pour voir plus loin devant soi.
+    LaunchedEffect(northUp, styleVersion, hasLocation) {
+        kotlinx.coroutines.delay(300)
+        holder.map?.locationComponent?.takeIf { it.isLocationComponentActivated }?.let {
+            if (it.cameraMode != CameraMode.NONE) it.cameraMode = if (!northUp) CameraMode.TRACKING_GPS else CameraMode.TRACKING_GPS_NORTH
+            val h = mapView.height.toDouble()
+            if (h > 0) runCatching { it.paddingWhileTracking(if (northUp) doubleArrayOf(0.0, 0.0, 0.0, 0.0) else doubleArrayOf(0.0, h * 0.38, 0.0, 0.0), 600) }
+        }
+    }
+
     // Zoom adaptatif et orientation : appliqués seulement si la carte suit encore la position.
     LaunchedEffect(zoom, northUp) {
         holder.map?.locationComponent?.takeIf { it.isLocationComponentActivated && it.cameraMode != CameraMode.NONE }?.let {
-            it.cameraMode = if (route != null && !northUp) CameraMode.TRACKING_GPS else CameraMode.TRACKING_GPS_NORTH
+            it.cameraMode = if (!northUp) CameraMode.TRACKING_GPS else CameraMode.TRACKING_GPS_NORTH
             it.zoomWhileTracking(zoom, 1200)
         }
     }
@@ -311,7 +322,7 @@ fun DriveMap(
     LaunchedEffect(recenterRequest) {
         if (recenterRequest == 0) return@LaunchedEffect
         holder.map?.locationComponent?.takeIf { it.isLocationComponentActivated }?.let {
-            it.cameraMode = if (route != null && !northUp) CameraMode.TRACKING_GPS else CameraMode.TRACKING_GPS_NORTH
+            it.cameraMode = if (!northUp) CameraMode.TRACKING_GPS else CameraMode.TRACKING_GPS_NORTH
             it.zoomWhileTracking(zoom)
         }
     }
