@@ -86,24 +86,6 @@ jobs:
           export VERSION_CODE=${{ github.run_number }}
           ./gradlew --stacktrace ${{ matrix.release }}
           rm -rf "$K"
-      - name: Pilote Drive Système (clé « platform » de test publique d'Android)
-        if: ${{ github.event_name != 'pull_request' && matrix.app == 'drive' }}
-        run: |
-          set -e
-          K="$RUNNER_TEMP/platform"; mkdir -p "$K"
-          base=https://android.googlesource.com/platform/build/+/refs/heads/main/target/product/security
-          curl -fsSL "$base/platform.pk8?format=TEXT" | base64 -d > "$K/platform.pk8" || { echo "::warning::Clé platform AOSP introuvable"; exit 0; }
-          curl -fsSL "$base/platform.x509.pem?format=TEXT" | base64 -d > "$K/platform.x509.pem"
-          openssl pkcs8 -inform DER -nocrypt -in "$K/platform.pk8" -out "$K/platform.key"
-          openssl pkcs12 -export -in "$K/platform.x509.pem" -inkey "$K/platform.key" -name platform -out "$K/platform.p12" -password pass:android
-          cp -r app/build/outputs/apk/release "$RUNNER_TEMP/release-normale" 2>/dev/null || true
-          RG_KEYSTORE_FILE="$K/platform.p12" RG_KEYSTORE_PASSWORD=android RG_KEY_PASSWORD=android RG_KEY_ALIAS=platform \
-            VERSION_CODE=${{ github.run_number }} ./gradlew --stacktrace :app:assembleRelease -Psystem
-          mkdir -p app/build/outputs/apk/platform
-          cp "$(ls app/build/outputs/apk/release/*.apk | head -1)" app/build/outputs/apk/platform/pilote-drive-systeme.apk
-          rm -rf app/build/outputs/apk/release
-          [ -d "$RUNNER_TEMP/release-normale" ] && cp -r "$RUNNER_TEMP/release-normale" app/build/outputs/apk/release
-          rm -rf "$K"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -131,8 +113,6 @@ jobs:
           SHA: ${{ github.sha }}
         run: |
           mkdir -p dist
-          s=$(find art/drive-apk-$RUN -name 'pilote-drive-systeme.apk' | head -1)
-          [ -n "$s" ] && cp "$s" "dist/ROADGUARD-DRIVESYS-build$RUN.apk"
           for app in drive gps suite; do
             U=$(echo $app | tr a-z A-Z)
             f=$(find art/$app-apk-$RUN -path '*release*' -name '*universal*.apk' | head -1)

@@ -115,7 +115,6 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                 BigButton("Style ROADGUARD", if (settings.mapStyle == "roadguard") DriveColors.Accent else DriveColors.Panel) { settings.changeMapStyle("roadguard") }
                 BigButton("Style classique", if (settings.mapStyle != "roadguard") DriveColors.Accent else DriveColors.Panel) { settings.changeMapStyle("classic") }
             }
-            ToggleRow("Bouton « Trafic Waze en direct » sur la carte", settings.wazeButton, settings::changeWazeButton)
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 ThemeMode.entries.forEach { mode ->
                     BigButton(mode.label, if (settings.theme == mode) DriveColors.Accent else DriveColors.Panel) { settings.changeTheme(mode) }
@@ -158,21 +157,6 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     listOf("auto" to "Automatique", "unit" to "GPS du poste", "phone" to "GPS du téléphone").forEach { (v, label) ->
                         BigButton(label, if (settings.gpsSource == v) DriveColors.Accent else DriveColors.Panel) { settings.changeGpsSource(v) }
-                    }
-                }
-                Section("Diagnostic du poste")
-                run {
-                    val keys = androidx.compose.runtime.remember { fr.roadguard.core.account.DeviceKeys.check(context) }
-                    val sent = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
-                    val ok = keys.testKeys || keys.aospCert
-                    Text(
-                        if (ok) "✅ Poste signé avec les clés de test d'Android : « Pilote Drive Système » (Waze dans un module) est possible."
-                        else "❌ Poste signé avec les clés du fabricant : la version système n'est pas possible sans root.",
-                        color = if (ok) Color(0xFF81C784) else Color(0xFFFF8A80), fontSize = 17.sp,
-                    )
-                    Text(keys.text, color = DriveColors.TextSecondary, fontSize = 12.sp)
-                    BigButton(if (sent.value) "Envoyé ✔" else "Envoyer le diagnostic à Nathan", DriveColors.Panel) {
-                        fr.roadguard.core.account.DeviceKeys.send(context, keys); sent.value = true
                     }
                 }
                 Section("Démarrage")

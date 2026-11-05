@@ -74,9 +74,6 @@ class DriveSettings(context: Context) {
     var mapStyle by mutableStateOf(prefs.getString("map_style", "roadguard") ?: "roadguard"); private set
     fun changeMapStyle(v: String) { mapStyle = v; prefs.edit().putString("map_style", v).apply() }
 
-    /** DRIVE : bouton « carte Waze en direct » sur la carte. */
-    var wazeButton by mutableStateOf(prefs.getBoolean("waze_button", true)); private set
-    fun changeWazeButton(v: Boolean) { wazeButton = v; prefs.edit().putBoolean("waze_button", v).apply() }
 
     /** Alarme forte quand on dépasse la limite en approchant d'un radar. */
     var radarAlarm by mutableStateOf(prefs.getBoolean("radar_alarm", true)); private set

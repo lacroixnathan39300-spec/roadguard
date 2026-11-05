@@ -65,7 +65,6 @@ private fun pages(drive: Boolean): List<Page> = listOf(
     if (drive) Page("✎", "Ton accueil, à ta façon", listOf(
         "Plusieurs pages : passe de l'une à l'autre avec ‹ › en bas.",
         "✎ : déplace, agrandis ou retire les modules, ajoute des widgets Android ou une page.",
-        "Bouton « W » sur la carte : ouvre ou ferme la carte Waze en direct (bouchons, police…).",
         "Glisse depuis le bord gauche pour revenir, ou depuis le bord droit pour les applis ; le long du bord droit pour le volume.",
     )) else Page("🚗", "Avec l'autoradio", listOf(
         "Menu → « Pilote Link » : relie le téléphone à l'autoradio (Wi-Fi ou câble).",

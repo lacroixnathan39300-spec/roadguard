@@ -249,7 +249,6 @@ private fun DriveHome() {
     var showSearch by remember { mutableStateOf(false) }
     var showAdmin by remember { mutableStateOf(false) }
     var launcherMapVisible by remember { mutableStateOf(true) }
-    var showWaze by remember { mutableStateOf(false) }
     fun startNavigation(place: Place) { showSearch = false; session.startNavigation(place) }
 
     // Messages et appels du téléphone : annonce vocale à l'arrivée.
@@ -303,11 +302,7 @@ private fun DriveHome() {
         // Contenu des modules, partagé entre l'accueil en pages (façon Car Launcher) et la disposition classique.
         val mapContent: @Composable BoxScope.() -> Unit = {
                 DriveMap(reports = session.community.reports, drivers = session.community.drivers, jams = session.community.jams, position = session.here, northUp = settings.northUp, adaptiveZoom = settings.adaptiveZoom, speedKmh = session.fix?.kmh ?: 0, alternatives = session.alternatives, offlinePack = offlinePack, hasLocation = hasLocation, route = session.route, recenterRequest = session.recenter, night = session.night, visibleKinds = settings.alertKinds, roadguardStyle = settings.mapStyle == "roadguard",
-                    // Avec Waze ouvert : carte Pilote à gauche, carte Waze à droite (les deux en même temps).
-                    modifier = if (showWaze) Modifier.fillMaxHeight().fillMaxWidth(0.5f).align(Alignment.CenterStart) else Modifier.fillMaxSize())
-                // Carte Waze en direct par-dessus la carte ROADGUARD : bouton « W » pour l'ouvrir ou la fermer.
-                if (showWaze) fr.roadguard.core.ui.WazeLiveMap(session.here?.lat, session.here?.lon,
-                    Modifier.fillMaxHeight().fillMaxWidth(0.5f).align(Alignment.CenterEnd).padding(start = 4.dp), onClose = { showWaze = false })
+                    modifier = Modifier.fillMaxSize())
                 if (session.navigating) {
                     GuidanceBanner(session.guidanceState, session.navStatus, onStop = { session.stopNavigation() }, modifier = Modifier.align(Alignment.TopStart),
                         choices = session.alternatives, current = session.route, onChoose = session::chooseRoute, onDismissChoices = session::dismissAlternatives)
@@ -325,7 +320,6 @@ private fun DriveHome() {
                     MapButton("▦", onClick = { page = 1 })
                     MapButton("⚠", onClick = { showReport = true })
                     MapButton("⚙", onClick = { showSettings = true })
-                    if (settings.wazeButton) MapButton(if (showWaze) "🗺" else "W", onClick = { showWaze = !showWaze })
                     MapButton("◎", onClick = { session.recenter++ })
                     if (!session.navigating) MapButton("🔍", onClick = { showSearch = true })
                     if (settings.showVolume) {
@@ -409,16 +403,6 @@ private fun DriveHome() {
                         }
                     }
                     ModuleType.WIDGET -> AndroidWidget(tile.widgetId, m)
-                    ModuleType.WAZE -> fr.roadguard.core.ui.WazeLiveMap(session.here?.lat, session.here?.lon, m)
-                    ModuleType.APP_EMBED -> EmbeddedAppModule(tile.pkg.ifBlank { "com.waze" }, m)
-                    ModuleType.WAZE_APP -> Panel(m.clickable {
-                        if (!fr.roadguard.core.ui.Waze.openApp(context, adjacent = true)) showApps = true
-                    }) {
-                        Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("🧭", fontSize = 34.sp)
-                            Text(if (fr.roadguard.core.ui.Waze.installed(context)) "Waze à côté" else "Waze non installé", color = Color.White, fontSize = 16.sp)
-                        }
-                    }
                 }
             }
             // Alertes radars toujours visibles, même sur une page sans la carte.

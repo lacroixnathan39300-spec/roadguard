@@ -68,9 +68,6 @@ enum class ModuleType(val label: String, val emoji: String, val minW: Int, val m
     DOCK("Applis favorites", "▦", 2, 1),
     TRIP("Ordinateur de bord", "📊", 1, 1),
     SHORTCUTS("Raccourcis (signaler, recherche, réglages)", "⚡", 1, 1),
-    WAZE("Trafic Waze en direct (carte)", "🚦", 2, 2),
-    WAZE_APP("Appli Waze en écran partagé", "🧭", 1, 1),
-    APP_EMBED("Appli intégrée (Waze, Maps… · Pilote Drive Système)", "📲", 2, 2),
     WIDGET("Widget Android", "🧩", 1, 1),
 }
 
@@ -192,7 +189,6 @@ fun LauncherPages(layout: LauncherLayout, modifier: Modifier = Modifier, onPage:
     var selected by remember { mutableStateOf<Long?>(null) }
     var picker by remember { mutableStateOf(false) }
     var widgetPicker by remember { mutableStateOf(false) }
-    var appPicker by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf<String?>(null) }
     val pager = rememberPagerState(pageCount = { layout.pages.size })
     androidx.compose.runtime.LaunchedEffect(pager.currentPage) { onPage(pager.currentPage) }
@@ -307,13 +303,8 @@ fun LauncherPages(layout: LauncherLayout, modifier: Modifier = Modifier, onPage:
                     .clip(RoundedCornerShape(12.dp)).background(Color(0xDD7F1D1D)).padding(horizontal = 12.dp, vertical = 6.dp))
             }
         }
-        if (appPicker) AppEmbedPicker(onPick = { pkg ->
-            appPicker = false
-            if (!layout.add(pager.currentPage, ModuleType.APP_EMBED, pkg = pkg)) message = "Plus de place sur cette page : ajoute une page"
-        }, onClose = { appPicker = false })
         if (picker) ModulePicker(hasMap = layout.hasMap, onPick = { type ->
             picker = false
-            if (type == ModuleType.APP_EMBED) { appPicker = true; return@ModulePicker }
             if (!layout.add(pager.currentPage, type)) message = "Plus de place sur cette page : ajoute une page"
         }, onClose = { picker = false })
         if (widgetPicker) WidgetPicker(onPick = { widgetPicker = false; addWidget(it) }, onClose = { widgetPicker = false })
@@ -418,17 +409,3 @@ fun TripModule(trip: fr.roadguard.core.TripComputer, modifier: Modifier) {
     }
 }
 
-@Composable
-private fun AppEmbedPicker(onPick: (String) -> Unit, onClose: () -> Unit) = PickerFrame("Appli à intégrer", onClose) {
-    val context = LocalContext.current
-    val apps = remember { runCatching { embeddableApps(context) }.getOrDefault(emptyList()) }
-    if (!Embedding.isSystemBuild(context)) Text("Fonctionne seulement avec Pilote Drive Système (postes en test-keys).", color = DriveColors.TextSecondary, fontSize = 14.sp)
-    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        items(apps, key = { it.first }) { (pkg, label) ->
-            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(DriveColors.Panel).clickable { onPick(pkg) }.padding(14.dp),
-                verticalAlignment = Alignment.CenterVertically) {
-                Text((if (pkg == "com.waze") "⭐ " else "") + label, color = Color.White, fontSize = 18.sp)
-            }
-        }
-    }
-}
