@@ -1,72 +1,109 @@
 Appli : fr.roadguard.gps
 Plantage : non
 
-11-04 20:21:36.960   526  1770 I ActivityTaskManager: START u0 {flg=0x10000000 cmp=fr.roadguard.gps/fr.roadguard.app.next.PhoneHomeActivity} with LAUNCH_SINGLE_TASK from uid 2000 (BAL_ALLOW_PERMISSION) result code=0
-11-04 20:21:36.965   861   899 V WindowManagerShell: Transition requested: android.os.BinderProxy@591e30f TransitionRequestInfo { type = OPEN, triggerTask = TaskInfo{userId=0 taskId=8 displayId=0 isRunning=true baseIntent=Intent { flg=0x10000000 cmp=fr.roadguard.gps/fr.roadguard.app.next.PhoneHomeActivity } baseActivity=ComponentInfo{fr.roadguard.gps/fr.roadguard.app.next.PhoneHomeActivity} topActivity=ComponentInfo{fr.roadguard.gps/fr.roadguard.app.next.PhoneHomeActivity} origActivity=null realActivity=ComponentInfo{fr.roadguard.gps/fr.roadguard.app.next.PhoneHomeActivity} numActivities=1 lastActiveTime=66099 supportsMultiWindow=true resizeMode=1 isResizeable=true minWidth=-1 minHeight=-1 defaultMinSize=220 token=WCT{android.window.IWindowContainerToken$Stub$Proxy@ee66f9c} topActivityType=1 pictureInPictureParams=null shouldDockBigOverlays=false launchIntoPipHostTaskId=-1 lastParentTaskIdBeforePip=-1 displayCutoutSafeInsets=null topActivityInfo=ActivityInfo{cc73da5 fr.roadguard.app.next.PhoneHomeActivity} launchCookies=[] positionInParent=Point(0, 0) parentTaskId=-1 isFocused=false isVisible=false isVisibleRequested=false isSleeping=false topActivityInSizeCompat=false topActivityEligibleForLetterboxEducation= false topActivityLetterboxed= false isFromDoubleTap= false topActivityLetterboxVerticalPosition= -1 topActivityLetterboxHorizontalPosition= -1 topActivityLetterboxWidth=-1 topActivityLetterboxHeight=-1 locusId=null displayAreaFeatureId=1 cameraCompatControlState=hidden}, remoteTransition = null, displayChange = null }
-11-04 20:21:37.893   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{628d801 com.google.android.googlequicksearchbox/10128} BLOCKED
-11-04 20:21:37.893   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{2fa76a6 com.google.android.as/10124} BLOCKED
-11-04 20:21:37.893   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{f2f48e7 com.google.android.gm/10142} BLOCKED
-11-04 20:21:37.895   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{9029c94 com.google.android.dialer/10129} BLOCKED
-11-04 20:21:37.896   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{49f33d com.google.android.contacts/10156} BLOCKED
-11-04 20:21:37.897   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{5c75732 com.google.android.partnersetup/10125} BLOCKED
-11-04 20:21:37.906   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{b226ddf com.google.android.inputmethod.latin/10146} BLOCKED
-11-04 20:21:38.498   526   570 I ActivityManager: Start proc 2652:fr.roadguard.gps/u0a192 for next-top-activity {fr.roadguard.gps/fr.roadguard.app.next.PhoneHomeActivity}
-11-04 20:21:38.550   526   559 V WindowManager: Sent Transition #5 createdAt=11-04 20:21:36.945 via request=TransitionRequestInfo { type = OPEN, triggerTask = TaskInfo{userId=0 taskId=8 displayId=0 isRunning=true baseIntent=Intent { flg=0x10000000 cmp=fr.roadguard.gps/fr.roadguard.app.next.PhoneHomeActivity } baseActivity=ComponentInfo{fr.roadguard.gps/fr.roadguard.app.next.PhoneHomeActivity} topActivity=ComponentInfo{fr.roadguard.gps/fr.roadguard.app.next.PhoneHomeActivity} origActivity=null realActivity=ComponentInfo{fr.roadguard.gps/fr.roadguard.app.next.PhoneHomeActivity} numActivities=1 lastActiveTime=66099 supportsMultiWindow=true resizeMode=1 isResizeable=true minWidth=-1 minHeight=-1 defaultMinSize=220 token=WCT{RemoteToken{f9161b9 Task{e4b293b #8 type=standard A=10192:fr.roadguard.gps}}} topActivityType=1 pictureInPictureParams=null shouldDockBigOverlays=false launchIntoPipHostTaskId=-1 lastParentTaskIdBeforePip=-1 displayCutoutSafeInsets=null topActivityInfo=ActivityInfo{ac329fe fr.roadguard.app.next.PhoneHomeActivity} launchCookies=[] positionInParent=Point(0, 0) parentTaskId=-1 isFocused=false isVisible=false isVisibleRequested=false isSleeping=false topActivityInSizeCompat=false topActivityEligibleForLetterboxEducation= false topActivityLetterboxed= false isFromDoubleTap= false topActivityLetterboxVerticalPosition= -1 topActivityLetterboxHorizontalPosition= -1 topActivityLetterboxWidth=-1 topActivityLetterboxHeight=-1 locusId=null displayAreaFeatureId=1 cameraCompatControlState=hidden}, remoteTransition = null, displayChange = null }
-11-04 20:21:38.550   526   559 V WindowManager:     info={id=5 t=OPEN f=0x0 trk=0 r=[0@Point(0, 0)] c=[{WCT{RemoteToken{f9161b9 Task{e4b293b #8 type=standard A=10192:fr.roadguard.gps}}} m=OPEN f=NONE leash=Surface(name=Task=8)/@0x447bb07 sb=Rect(0, 0 - 1080, 2400) eb=Rect(0, 0 - 1080, 2400) d=0},{WCT{RemoteToken{458755f Task{734ecb9 #1 type=home}}} m=TO_BACK f=SHOW_WALLPAPER leash=Surface(name=Task=1)/@0x74e35cc sb=Rect(0, 0 - 1080, 2400) eb=Rect(0, 0 - 1080, 2400) d=0}]}
-11-04 20:21:42.222   526  1744 D CoreBackPreview: Window{c1d0c59 u0 fr.roadguard.gps/fr.roadguard.app.next.PhoneHomeActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@67784f6, mPriority=-1, mIsAnimationCallback=false}
-11-04 20:21:44.149   526  2315 I ActivityManager: Background started FGS: Allowed [callingPackage: fr.roadguard.gps; callingUid: 10192; uidState: TOP ; uidBFSL: [BFSL]; intent: Intent { cmp=fr.roadguard.gps/fr.roadguard.app.next.DriveService }; code:PROC_STATE_TOP; tempAllowListReason:<null>; targetSdkVersion:36; callerTargetSdkVersion:36; startForegroundCount:0; bindFromPackage:null: isBindService:false]
-11-04 20:21:50.485   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{46f1b54 com.google.android.youtube/10139} BLOCKED
-11-04 20:21:50.485   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{49a6afd com.google.android.as/10124} BLOCKED
-11-04 20:21:50.485   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{f06d3f2 com.google.android.gm/10142} BLOCKED
-11-04 20:21:50.485   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{9a82a43 com.google.android.contacts/10156} BLOCKED
-11-04 20:21:55.349   526   569 E ActivityManager: Timeout waiting for provider com.google.android.gms/10131 for provider com.google.android.gms.fonts caller=ProcessRecord{9318842 2652:fr.roadguard.gps/u0a192}
-11-04 20:22:00.992   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{3e381e7 com.google.android.googlequicksearchbox/10128} BLOCKED
-11-04 20:22:01.000   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{80fa432 com.google.android.gm/10142} BLOCKED
-11-04 20:22:01.001   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{35c5583 com.google.android.devicelockcontroller/10188} BLOCKED
-11-04 20:22:04.000   526  2308 W ProcessStats: Tracking association SourceState{d176ee2 fr.roadguard.gps/10192 BTop #1855} whose proc state 2 is better than process ProcessState{4981221 com.google.android.gms.persistent/10131 pkg=com.google.android.gms} proc state 4 (3571 skipped)
-11-04 20:22:04.939   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{3248b50 com.android.camera2/10144} BLOCKED
-11-04 20:22:06.927   526  3586 E ActivityManager:   33% 2652/fr.roadguard.gps: 29% user + 3.5% kernel / faults: 48925 minor 17 major
-11-04 20:22:07.399   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{977882 com.google.android.gm/10142} BLOCKED
-11-04 20:22:07.399   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{6beb7d0 com.google.android.devicelockcontroller/10188} BLOCKED
-11-04 20:22:07.724   526  2313 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{6471353 com.google.android.gm/10142} BLOCKED
-11-04 20:22:08.705   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{54d3d84 com.google.android.gm/10142} BLOCKED
-11-04 20:22:11.905   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{6fc10d0 com.google.android.rkpdapp/10183} BLOCKED
-11-04 20:22:11.906   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{92f92b4 com.google.android.projection.gearhead/10123} BLOCKED
-11-04 20:22:13.117   526  2314 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{aeb9966 com.google.android.settings.intelligence/10118} BLOCKED
-11-04 20:22:13.118   526  2314 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{9f194a7 com.google.android.settings.intelligence/10118} BLOCKED
-11-04 20:22:15.836   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{43790ff com.google.android.gm/10142} BLOCKED
-11-04 20:22:18.736   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{796488e com.google.android.googlequicksearchbox/10128} BLOCKED
-11-04 20:22:19.965   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{67ea3b6 com.google.android.googlequicksearchbox/10128} BLOCKED
-11-04 20:22:21.049   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{3d717a0 com.google.android.googlequicksearchbox/10128} BLOCKED
-11-04 20:22:28.687   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{eb4143f com.google.android.apps.messaging/10132} BLOCKED
-11-04 20:22:39.153   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{1522289 com.google.android.apps.messaging/10132} BLOCKED
-11-04 20:22:39.153   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{574a28e com.google.android.gm/10142} BLOCKED
-11-04 20:22:40.088   526  4648 E ActivityManager:   34% 2652/fr.roadguard.gps: 14% user + 20% kernel / faults: 147652 minor 417 major
-11-04 20:22:42.495  2652  2652 I RoadguardSession: pos=46.72052,5.58924 v=70 cap=205 prec=5 nuit=true alerte=- radars=true
-11-04 20:22:44.050   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{bf91b33 com.google.android.apps.messaging/10132} BLOCKED
-11-04 20:22:47.961  2652  2652 I RoadguardSession: pos=46.71973,5.58870 v=70 cap=205 prec=5 nuit=true alerte=- radars=true
-11-04 20:22:50.115   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{70f0b58 com.google.android.youtube/10139} BLOCKED
-11-04 20:22:50.116   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{6f762ec com.google.android.apps.maps/10153} BLOCKED
-11-04 20:22:51.879  1636  1636 I AiAiEcho: AppFetcherImpl onPackageChanged fr.roadguard.gps.
-11-04 20:22:51.883  1636  3008 I AiAiEcho: AppIndexer Package:[fr.roadguard.gps] UserProfile:[0] Enabled:[true].
-11-04 20:22:51.883  1636  3008 I AiAiEcho: AppFetcherImplV2 updateApps package:[fr.roadguard.gps], userId:[0], reason:[package is updated.].
-11-04 20:22:53.036  2652  2652 I RoadguardSession: pos=46.71894,5.58816 v=70 cap=205 prec=5 nuit=true alerte=- radars=true
-11-04 20:22:54.989   526  1770 I MediaFocusControl: requestAudioFocus() from uid/pid 10192/2652 AA=USAGE_ASSISTANCE_NAVIGATION_GUIDANCE/CONTENT_TYPE_SPEECH clientId=android.media.AudioManager@c1e2eeafr.roadguard.core.radar.AlertVoice$$ExternalSyntheticLambda0@e2175db callingPack=fr.roadguard.gps req=3 flags=0x0 sdk=36
-11-04 20:22:58.010  2652  2661 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 148336(6064KB) AllocSpace objects, 21(972KB) LOS objects, 49% free, 22MB/44MB, paused 85us,34us total 2.777s
-11-04 20:22:58.137  2652  2652 I RoadguardSession: pos=46.71878,5.58805 v=70 cap=0 prec=5 nuit=true alerte=- radars=true
-11-04 20:23:04.700  2652  2652 I RoadguardSession: pos=46.71767,5.58730 v=70 cap=205 prec=5 nuit=true alerte=rg-119a4aa4e999628a4815@335m radars=true
-11-04 20:23:07.730   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{1af9cb5 com.google.android.contacts/10156} BLOCKED
-11-04 20:23:09.986  2652  2652 I RoadguardSession: pos=46.71688,5.58676 v=70 cap=205 prec=5 nuit=true alerte=rg-119a4aa4e999628a4815@238m radars=true
-11-04 20:23:14.991  2652  2652 I RoadguardSession: pos=46.71640,5.58643 v=70 cap=0 prec=5 nuit=true alerte=- radars=true
-11-04 20:23:17.468   526   610 I MediaFocusControl: abandonAudioFocus() from uid/pid 10192/2652 clientId=android.media.AudioManager@c1e2eeafr.roadguard.core.radar.AlertVoice$$ExternalSyntheticLambda0@e2175db
-11-04 20:23:17.861   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{c1022ec com.google.android.googlequicksearchbox/10128} BLOCKED
-11-04 20:23:17.861   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{c0af6b5 com.google.android.contacts/10156} BLOCKED
-11-04 20:23:18.171   526  2310 I MediaFocusControl: requestAudioFocus() from uid/pid 10192/2652 AA=USAGE_ASSISTANCE_NAVIGATION_GUIDANCE/CONTENT_TYPE_SPEECH clientId=android.media.AudioManager@c1e2eeafr.roadguard.core.radar.AlertVoice$$ExternalSyntheticLambda0@e2175db callingPack=fr.roadguard.gps req=3 flags=0x0 sdk=36
-11-04 20:23:20.985  2652  2652 I RoadguardSession: pos=46.71576,5.58600 v=70 cap=205 prec=5 nuit=true alerte=rg-119a4aa4e999628a4815@102m radars=true
-11-04 20:23:26.008  2652  2652 I RoadguardSession: pos=46.71497,5.58546 v=70 cap=205 prec=5 nuit=true alerte=rg-119a4aa4e999628a4815@14m radars=true
-11-04 20:23:32.002  2652  2652 I RoadguardSession: pos=46.71402,5.58482 v=70 cap=205 prec=5 nuit=true alerte=rg-23221914238eedc5fb8a@2m radars=true
-11-04 20:23:37.782   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{76bdf35 com.google.android.contacts/10156} BLOCKED
-11-04 20:23:38.031  2652  2652 I RoadguardSession: pos=46.71307,5.58417 v=70 cap=205 prec=5 nuit=true alerte=- radars=true
-11-04 20:23:38.065   526  1744 I MediaFocusControl: abandonAudioFocus() from uid/pid 10192/2652 clientId=android.media.AudioManager@c1e2eeafr.roadguard.core.radar.AlertVoice$$ExternalSyntheticLambda0@e2175db
-11-04 20:23:40.846   526   592 I AppsFilter: interaction: PackageSetting{f96c9e8 fr.roadguard.gps/10192} -> PackageSetting{d4c4313 com.google.android.as/10124} BLOCKED
-11-04 20:23:41.006   526   610 I MediaFocusControl: requestAudioFocus() from uid/pid 10192/2652 AA=USAGE_ASSISTANCE_NAVIGATION_GUIDANCE/CONTENT_TYPE_SPEECH clientId=android.media.AudioManager@c1e2eeafr.roadguard.core.radar.AlertVoice$$ExternalSyntheticLambda0@e2175db callingPack=fr.roadguard.gps req=3 flags=0x0 sdk=36
+fcaZ2QYAg==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~DKDv4lJ0CCMjgu0mLHp0Ug==/fr.roadguard.gps-jRVifUHnvG0R-fcaZ2QYAg==/lib/x86_64:/data/app/~~DKDv4lJ0CCMjgu0mLHp0Ug==/fr.roadguard.gps-jRVifUHnvG0R-fcaZ2QYAg==/base.apk!/lib/x86_64, permitted_path=/data:/mnt/expand:/data/user/0/fr.roadguard.gps
+11-05 05:00:54.226  3431  3431 V GraphicsEnvironment: ANGLE GameManagerService for fr.roadguard.gps: false
+11-05 05:00:54.226  3431  3431 V GraphicsEnvironment: fr.roadguard.gps is not listed in per-application setting
+11-05 05:00:56.492   528   838 D CoreBackPreview: Window{8ead4c0 u0 fr.roadguard.gps/fr.roadguard.app.next.PhoneHomeActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@fec8b08, mPriority=-1, mIsAnimationCallback=false}
+11-05 05:00:58.004   528   556 W ziparchive: Unable to open '/data/app/~~DKDv4lJ0CCMjgu0mLHp0Ug==/fr.roadguard.gps-jRVifUHnvG0R-fcaZ2QYAg==/base.dm': No such file or directory
+11-05 05:00:58.079   528   556 I ActivityTaskManager: Displayed fr.roadguard.gps/fr.roadguard.app.next.PhoneHomeActivity for user 0: +7s118ms
+11-05 05:00:58.250   528   547 W InputManager-JNI: Input channel object '4b66789 Splash Screen fr.roadguard.gps (client)' was disposed without first being removed with the input manager!
+11-05 05:00:58.787   528  2132 I ActivityManager: Background started FGS: Allowed [callingPackage: fr.roadguard.gps; callingUid: 10192; uidState: TOP ; uidBFSL: [BFSL]; intent: Intent { cmp=fr.roadguard.gps/fr.roadguard.app.next.DriveService }; code:PROC_STATE_TOP; tempAllowListReason:<null>; targetSdkVersion:36; callerTargetSdkVersion:36; startForegroundCount:0; bindFromPackage:null: isBindService:false]
+11-05 05:01:00.460   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{96bb62b com.android.camera2/10146} BLOCKED
+11-05 05:01:00.460   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{49fda88 com.google.android.gm/10142} BLOCKED
+11-05 05:01:00.567   528   970 I ImeTracker: fr.roadguard.gps:3dd12a82: onRequestHide at ORIGIN_SERVER_HIDE_INPUT reason HIDE_UNSPECIFIED_WINDOW
+11-05 05:01:00.567   528   970 I ImeTracker: fr.roadguard.gps:3dd12a82: onCancelled at PHASE_SERVER_SHOULD_HIDE
+11-05 05:01:00.592  1544  1544 I GoogleInputMethodService: GoogleInputMethodService.onStartInput():1877 onStartInput(EditorInfo{inputType=0x0(NULL) imeOptions=0x0 privateImeOptions=null actionName=UNSPECIFIED actionLabel=null actionId=0 initialSelStart=-1 initialSelEnd=-1 initialCapsMode=0x0 hintText=null label=null packageName=fr.roadguard.gps fieldId=0 fieldName=null extras=null}, false)
+11-05 05:01:01.347  3431  3431 W r.roadguard.gps: Accessing hidden field Landroid/graphics/Typeface;->sSystemFontMap:Ljava/util/Map; (unsupported, reflection, allowed)
+11-05 05:01:04.005  3431  3452 W r.roadguard.gps: Suspending all threads took: 11.794ms
+11-05 05:01:04.256  3431  3452 I r.roadguard.gps: Background concurrent copying GC freed 86722(5030KB) AllocSpace objects, 8(348KB) LOS objects, 49% free, 8966KB/17MB, paused 34.794ms,11.855ms total 2.140s
+11-05 05:01:04.675  3431  3917 D ProfileInstaller: Installing profile for fr.roadguard.gps
+11-05 05:01:04.943  3431  3917 W r.roadguard.gps: Verification of void androidx.profileinstaller.ProfileVerifier.<clinit>() took 128.217ms (132.59 bytecodes/s) (1656B approximate peak alloc)
+11-05 05:01:06.758   528  1833 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{a3485f0 com.google.android.settings.intelligence/10117} BLOCKED
+11-05 05:01:08.060  3431  3452 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 176520(8307KB) AllocSpace objects, 3(124KB) LOS objects, 49% free, 5992KB/11MB, paused 23us,13us total 242.113ms
+11-05 05:01:08.957  3431  3452 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 95928(4036KB) AllocSpace objects, 1(20KB) LOS objects, 49% free, 6559KB/12MB, paused 26us,21us total 185.107ms
+11-05 05:01:09.681  3431  3452 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 108383(4655KB) AllocSpace objects, 1(20KB) LOS objects, 49% free, 7380KB/14MB, paused 46us,16us total 193.914ms
+11-05 05:01:10.216  3431  3452 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 133457(6382KB) AllocSpace objects, 1(20KB) LOS objects, 49% free, 6865KB/13MB, paused 10.381ms,13us total 133.509ms
+11-05 05:01:10.645   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{3fe3e68 com.google.android.googlequicksearchbox/10132} BLOCKED
+11-05 05:01:10.645   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{6b47281 com.google.android.gm/10142} BLOCKED
+11-05 05:01:10.645   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{67e3f26 com.google.android.devicelockcontroller/10179} BLOCKED
+11-05 05:01:10.645   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{862a767 com.google.android.rkpdapp/10183} BLOCKED
+11-05 05:01:10.645   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{1acd914 com.google.android.settings.intelligence/10117} BLOCKED
+11-05 05:01:10.645   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{a0b9261 com.google.android.projection.gearhead/10123} BLOCKED
+11-05 05:01:10.859  3431  3452 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 121662(5840KB) AllocSpace objects, 0(0B) LOS objects, 49% free, 7296KB/14MB, paused 47us,15us total 184.750ms
+11-05 05:01:10.884   528  2300 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{4cc9328 com.google.android.gm/10142} BLOCKED
+11-05 05:01:11.401  3431  3452 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 122990(5968KB) AllocSpace objects, 0(0B) LOS objects, 49% free, 7632KB/14MB, paused 67us,18us total 204.167ms
+11-05 05:01:11.996  3431  3452 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 148467(7197KB) AllocSpace objects, 0(0B) LOS objects, 49% free, 7555KB/14MB, paused 56us,13us total 132.778ms
+11-05 05:01:12.681  3431  3452 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 152397(7345KB) AllocSpace objects, 0(0B) LOS objects, 49% free, 7569KB/14MB, paused 27us,28us total 243.367ms
+11-05 05:01:13.668  3431  3452 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 139726(6668KB) AllocSpace objects, 0(0B) LOS objects, 49% free, 8997KB/17MB, paused 42us,13us total 224.197ms
+11-05 05:01:14.227  1626  1626 I AiAiEcho: AppFetcherImplV2 updateApps package:[fr.roadguard.gps], userId:[0], reason:[package is added.].
+11-05 05:01:15.251  3431  3452 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 140329(5854KB) AllocSpace objects, 0(0B) LOS objects, 49% free, 9792KB/19MB, paused 21us,48us total 252.546ms
+11-05 05:01:16.110  3431  3452 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 159963(6776KB) AllocSpace objects, 0(0B) LOS objects, 49% free, 10MB/21MB, paused 23us,30us total 357.355ms
+11-05 05:01:19.216  3431  3582 W r.roadguard.gps: Verification of void org.maplibre.android.module.http.HttpRequestImpl.executeRequest(org.maplibre.android.http.HttpResponder, long, java.lang.String, java.lang.String, java.lang.String, java.lang.String, boolean) took 105.326ms (1243.76 bytecodes/s) (4048B approximate peak alloc)
+11-05 05:01:19.356  3431  3452 I r.roadguard.gps: Background young concurrent copying GC freed 84589(1893KB) AllocSpace objects, 1(20KB) LOS objects, 0% free, 21MB/21MB, paused 36us,18us total 655.633ms
+11-05 05:01:19.786  3431  3452 I r.roadguard.gps: Background concurrent copying GC freed 21336(978KB) AllocSpace objects, 1(20KB) LOS objects, 49% free, 21MB/42MB, paused 36us,22us total 356.307ms
+11-05 05:01:20.688   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{80350ec com.google.android.apps.messaging/10131} BLOCKED
+11-05 05:01:20.688   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{e998cb5 com.google.android.gm/10142} BLOCKED
+11-05 05:01:20.805  3431  3842 W Mbgl    : {r.roadguard.gps}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
+11-05 05:01:20.886  3431  3842 W Mbgl    : {r.roadguard.gps}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
+11-05 05:01:20.899  3431  3842 W Mbgl    : {r.roadguard.gps}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
+11-05 05:01:20.924  3431  3842 W Mbgl    : {r.roadguard.gps}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
+11-05 05:01:21.703  3431  3431 I RoadguardSession: pos=46.72591,5.59290 v=70 cap=0 prec=5 nuit=true alerte=- radars=true
+11-05 05:01:22.087  3431  4529 W r.roadguard.gps: Long monitor contention with owner OkHttp TaskRunner (4501) at void okhttp3.internal.http2.Http2Writer.rstStream(int, okhttp3.internal.http2.ErrorCode)(Http2Writer.kt:136) waiters=0 in okhttp3.internal.http2.Http2Stream okhttp3.internal.http2.Http2Connection.newStream(int, java.util.List, boolean) for 200ms
+11-05 05:01:22.339  1498  3994 I BlockstoreStorage: Clearing Blockstore Data for package fr.roadguard.gps [CONTEXT service_id=258 ]
+11-05 05:01:25.690  3431  4500 W r.roadguard.gps: Long monitor contention with owner OkHttp tiles.openfreemap.org[19] writeSynReset (4501) at javax.net.ssl.SSLEngineResult com.android.org.conscrypt.ConscryptEngine.wrap(java.nio.ByteBuffer[], int, int, java.nio.ByteBuffer)(ConscryptEngine.java:1547) waiters=0 in javax.net.ssl.SSLEngineResult$HandshakeStatus com.android.org.conscrypt.ConscryptEngine.getHandshakeStatus() for 544ms
+11-05 05:01:26.389  1626  1626 I AiAiEcho: AppFetcherImpl onPackageChanged fr.roadguard.gps.
+11-05 05:01:26.389  1626  2399 I AiAiEcho: AppIndexer Package:[fr.roadguard.gps] UserProfile:[0] Enabled:[true].
+11-05 05:01:26.389  1626  2399 I AiAiEcho: AppFetcherImplV2 updateApps package:[fr.roadguard.gps], userId:[0], reason:[package is updated.].
+11-05 05:01:26.717  3431  3451 I r.roadguard.gps: JIT allocated 88KB for compiled code of void fr.roadguard.app.next.PhoneHomeActivityKt.PhoneHome(androidx.compose.runtime.Composer, int)
+11-05 05:01:26.717  3431  3451 I r.roadguard.gps: JIT allocated 57KB for stack maps of void fr.roadguard.app.next.PhoneHomeActivityKt.PhoneHome(androidx.compose.runtime.Composer, int)
+11-05 05:01:26.717  3431  3451 I r.roadguard.gps: Compiler allocated 13MB to compile void fr.roadguard.app.next.PhoneHomeActivityKt.PhoneHome(androidx.compose.runtime.Composer, int)
+11-05 05:01:26.882  3431  3842 W Mbgl    : {r.roadguard.gps}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
+11-05 05:01:27.542  3431  3452 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 139482(6736KB) AllocSpace objects, 23(1792KB) LOS objects, 49% free, 23MB/46MB, paused 9.731ms,26us total 657.932ms
+11-05 05:01:27.755  3431  3431 I RoadguardSession: pos=46.72496,5.59225 v=70 cap=205 prec=5 nuit=true alerte=- radars=true
+11-05 05:01:30.837   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{85a3034 com.google.android.apps.messaging/10131} BLOCKED
+11-05 05:01:31.076  3431  4507 W r.roadguard.gps: Long monitor contention with owner OkHttp https://tiles.basemaps.cartocdn.com/... (4508) at boolean okhttp3.internal.connection.RealConnectionPool.callAcquirePooledConnection(okhttp3.Address, okhttp3.internal.connection.RealCall, java.util.List, boolean)(RealConnectionPool.kt:88) waiters=2 in boolean okhttp3.internal.connection.RealConnectionPool.callAcquirePooledConnection(okhttp3.Address, okhttp3.internal.connection.RealCall, java.util.List, boolean) for 501ms
+11-05 05:01:31.095  3431  4482 W r.roadguard.gps: Long monitor contention with owner OkHttp https://tiles.basemaps.cartocdn.com/... (4508) at boolean okhttp3.internal.connection.RealConnectionPool.callAcquirePooledConnection(okhttp3.Address, okhttp3.internal.connection.RealCall, java.util.List, boolean)(RealConnectionPool.kt:88) waiters=3 in boolean okhttp3.internal.connection.RealConnectionPool.callAcquirePooledConnection(okhttp3.Address, okhttp3.internal.connection.RealCall, java.util.List, boolean) for 497ms
+11-05 05:01:31.454  3431  4507 W r.roadguard.gps: Long monitor contention with owner OkHttp https://tiles.basemaps.cartocdn.com/... (4530) at void okhttp3.internal.http2.Http2Writer.flush()(Http2Writer.kt:121) waiters=0 in okhttp3.internal.http2.Http2Stream okhttp3.internal.http2.Http2Connection.newStream(int, java.util.List, boolean) for 109ms
+11-05 05:01:31.512  3431  4728 W r.roadguard.gps: Long monitor contention with owner OkHttp https://tiles.basemaps.cartocdn.com/... (4735) at boolean okhttp3.internal.connection.RealConnectionPool.callAcquirePooledConnection(okhttp3.Address, okhttp3.internal.connection.RealCall, java.util.List, boolean)(RealConnectionPool.kt:88) waiters=4 in boolean okhttp3.internal.connection.RealConnectionPool.callAcquirePooledConnection(okhttp3.Address, okhttp3.internal.connection.RealCall, java.util.List, boolean) for 159ms
+11-05 05:01:33.280  3431  4735 W r.roadguard.gps: Long monitor contention with owner OkHttp https://tiles.basemaps.cartocdn.com/... (4727) at void okhttp3.internal.http2.Http2Writer.flush()(Http2Writer.kt:121) waiters=6 in okhttp3.internal.http2.Http2Stream okhttp3.internal.http2.Http2Connection.newStream(int, java.util.List, boolean) for 258ms
+11-05 05:01:33.294  3431  3431 I RoadguardSession: pos=46.72401,5.59161 v=70 cap=205 prec=5 nuit=true alerte=- radars=true
+11-05 05:01:33.352  3431  3452 W r.roadguard.gps: Suspending all threads took: 5.342ms
+11-05 05:01:33.481  3431  3431 W r.roadguard.gps: Weak pointer dereference blocked for 101 milliseconds.
+11-05 05:01:33.481  3431  3587 W r.roadguard.gps: Weak pointer dereference blocked for 65 milliseconds.
+11-05 05:01:33.628  3431  4508 W r.roadguard.gps: Weak pointer dereference blocked for 145 milliseconds.
+11-05 05:01:33.629  3431  3786 W r.roadguard.gps: Weak pointer dereference blocked for 253 milliseconds.
+11-05 05:01:33.629  3431  4511 W r.roadguard.gps: Weak pointer dereference blocked for 253 milliseconds.
+11-05 05:01:33.635  3431  4513 W r.roadguard.gps: Weak pointer dereference blocked for 257 milliseconds.
+11-05 05:01:33.641  3431  4530 W r.roadguard.gps: Long monitor contention with owner OkHttp https://tiles.basemaps.cartocdn.com/... (4508) at java.io.IOException okhttp3.internal.connection.RealCall.callDone(java.io.IOException)(RealCall.kt:349) waiters=2 in void okhttp3.internal.connection.RealConnection.incrementSuccessCount$okhttp() for 160ms
+11-05 05:01:33.912  3431  3452 I r.roadguard.gps: NativeAlloc concurrent copying GC freed 86133(3288KB) AllocSpace objects, 2(128KB) LOS objects, 49% free, 23MB/46MB, paused 62.626ms,5.396ms total 3.348s
+11-05 05:01:34.704   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{dca17f8 com.google.android.youtube/10139} BLOCKED
+11-05 05:01:34.705   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{2a3835a com.google.android.apps.maps/10152} BLOCKED
+11-05 05:01:38.327  3431  3431 I RoadguardSession: pos=46.72321,5.59107 v=70 cap=205 prec=5 nuit=true alerte=- radars=true
+11-05 05:01:39.565   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{f8b081d com.google.android.contacts/10154} BLOCKED
+11-05 05:01:41.183   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{cb179bb com.google.android.gm/10142} BLOCKED
+11-05 05:01:43.358  3431  3431 I RoadguardSession: pos=46.72242,5.59053 v=70 cap=205 prec=5 nuit=true alerte=- radars=true
+11-05 05:01:46.126   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{460ceb4 com.google.android.as/10128} BLOCKED
+11-05 05:01:48.383  3431  3431 I RoadguardSession: pos=46.72163,5.58999 v=70 cap=205 prec=5 nuit=true alerte=- radars=true
+11-05 05:01:50.038   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{553a806 com.google.android.googlequicksearchbox/10132} BLOCKED
+11-05 05:01:53.407  3431  3431 I RoadguardSession: pos=46.72084,5.58945 v=70 cap=205 prec=5 nuit=true alerte=- radars=true
+11-05 05:01:55.737   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{5d841b6 com.google.android.apps.messaging/10131} BLOCKED
+11-05 05:01:58.764  3431  3431 I RoadguardSession: pos=46.72004,5.58891 v=70 cap=205 prec=5 nuit=true alerte=- radars=true
+11-05 05:02:01.024   528   970 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{3c33aa8 com.google.android.settings.intelligence/10117} BLOCKED
+11-05 05:02:01.883   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{da808af com.google.android.as/10128} BLOCKED
+11-05 05:02:03.806  3431  3431 I RoadguardSession: pos=46.71925,5.58837 v=70 cap=205 prec=5 nuit=true alerte=- radars=true
+11-05 05:02:06.768   528  1961 I MediaFocusControl: requestAudioFocus() from uid/pid 10192/3431 AA=USAGE_ASSISTANCE_NAVIGATION_GUIDANCE/CONTENT_TYPE_SPEECH clientId=android.media.AudioManager@6fcc3e7fr.roadguard.core.radar.AlertVoice$$ExternalSyntheticLambda0@8f9fb94 callingPack=fr.roadguard.gps req=3 flags=0x0 sdk=36
+11-05 05:02:09.958  3431  3431 I RoadguardSession: pos=46.71878,5.58805 v=70 cap=0 prec=5 nuit=true alerte=- radars=true
+11-05 05:02:10.489   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{ce635b4 com.google.android.googlequicksearchbox/10132} BLOCKED
+11-05 05:02:15.167  3431  3431 I RoadguardSession: pos=46.71798,5.58751 v=70 cap=205 prec=5 nuit=true alerte=rg-119a4aa4e999628a4815@374m radars=true
+11-05 05:02:21.179   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{1540abf com.google.android.contacts/10154} BLOCKED
+11-05 05:02:21.215  3431  3431 I RoadguardSession: pos=46.71703,5.58686 v=70 cap=205 prec=5 nuit=true alerte=rg-119a4aa4e999628a4815@257m radars=true
+11-05 05:02:27.805  3431  3431 I RoadguardSession: pos=46.71640,5.58643 v=70 cap=0 prec=5 nuit=true alerte=- radars=true
+11-05 05:02:29.442   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{cbd975a com.google.android.contacts/10154} BLOCKED
+11-05 05:02:33.990  3431  3431 I RoadguardSession: pos=46.71545,5.58579 v=70 cap=205 prec=5 nuit=true alerte=rg-119a4aa4e999628a4815@64m radars=true
+11-05 05:02:39.455   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{54ed593 com.google.android.contacts/10154} BLOCKED
+11-05 05:02:40.006  3431  3431 I RoadguardSession: pos=46.71450,5.58514 v=70 cap=205 prec=5 nuit=true alerte=rg-23221914238eedc5fb8a@61m radars=true
+11-05 05:02:45.802  3431  3431 I RoadguardSession: pos=46.71370,5.58460 v=70 cap=205 prec=5 nuit=true alerte=rg-c93dbc586205a1440bcf@25m radars=true
+11-05 05:02:47.776   528   593 I AppsFilter: interaction: PackageSetting{342fe7a fr.roadguard.gps/10192} -> PackageSetting{115fb83 com.google.android.contacts/10154} BLOCKED
+11-05 05:02:49.524   528  1235 I MediaFocusControl: abandonAudioFocus() from uid/pid 10192/3431 clientId=android.media.AudioManager@6fcc3e7fr.roadguard.core.radar.AlertVoice$$ExternalSyntheticLambda0@8f9fb94
+11-05 05:02:51.819  3431  3431 I RoadguardSession: pos=46.71291,5.58406 v=70 cap=205 prec=5 nuit=true alerte=- radars=true
