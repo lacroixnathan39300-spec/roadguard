@@ -278,7 +278,8 @@ fun DriveMap(
         }
         runCatching { comp.forceLocationUpdate(loc) }
         // La flèche suit ensuite la position animée de la carte (voir enableLocation) : mouvement fluide.
-        if (!holder.indicatorSeen) holder.drawMe(p.lat, p.lon, if (p.bearing.isNaN()) holder.lastBearing else p.bearing)
+        // Flèche glissée jusqu'à la nouvelle position (même durée que l'animation de la caméra) : pas de sauts.
+        holder.animateMe(p.lat, p.lon, if (p.bearing.isNaN()) Double.NaN else p.bearing)
         // Trajet effacé derrière la voiture : on ne dessine que ce qui reste à parcourir.
         val r = route
         if (r != null && r.points.size >= 2) {
@@ -337,7 +338,6 @@ private class MapHolder {
     var style: Style? = null
     var styleUri: String? = null
     var lastBearing = 0.0
-    var indicatorSeen = false
     var trimRoute: Route? = null
     var trimIndex = 0
     private var meLat = Double.NaN; private var meLon = 0.0; private var lastDraw = 0L
@@ -354,7 +354,29 @@ private class MapHolder {
         }
     }
 
-    fun drawMeBearing(bearing: Double) { lastBearing = bearing; if (!meLat.isNaN()) drawMe(meLat, meLon, bearing) }
+    private var animator: android.animation.ValueAnimator? = null
+    private var lastFixAt = 0L
+
+    /** Animation linéaire de la flèche vers la nouvelle position et le nouveau cap (chemin le plus court). */
+    fun animateMe(lat: Double, lon: Double, bearing: Double) {
+        val now = android.os.SystemClock.uptimeMillis()
+        val duration = (now - lastFixAt).coerceIn(300L, 1200L)
+        lastFixAt = now
+        animator?.cancel()
+        if (meLat.isNaN()) { drawMe(lat, lon, bearing); return }
+        val fromLat = meLat; val fromLon = meLon; val fromB = lastBearing
+        val toB = if (bearing.isNaN()) fromB else bearing
+        val delta = ((toB - fromB + 540.0) % 360.0) - 180.0
+        animator = android.animation.ValueAnimator.ofFloat(0f, 1f).apply {
+            this.duration = duration
+            interpolator = android.view.animation.LinearInterpolator()
+            addUpdateListener { a ->
+                val t = (a.animatedValue as Float).toDouble()
+                drawMe(fromLat + (lat - fromLat) * t, fromLon + (lon - fromLon) * t, (fromB + delta * t + 360.0) % 360.0)
+            }
+            start()
+        }
+    }
 }
 
 @SuppressLint("MissingPermission")
@@ -372,12 +394,6 @@ private fun enableLocation(context: Context, map: MapLibreMap, style: Style, hol
             ).build()
     )
     component.isLocationComponentEnabled = true
-    if (holder != null) {
-        // Position et cap animés par la carte entre deux mesures GPS : la flèche glisse au lieu de sauter,
-        // et reste alignée avec la carte qui tourne.
-        component.addOnIndicatorPositionChangedListener { pt -> holder.indicatorSeen = true; holder.drawMe(pt.latitude(), pt.longitude(), Double.NaN) }
-        component.addOnIndicatorBearingChangedListener { b -> holder.drawMeBearing(b) }
-    }
     component.cameraMode = CameraMode.TRACKING_GPS_NORTH
     component.renderMode = RenderMode.GPS
     component.zoomWhileTracking(15.0)
