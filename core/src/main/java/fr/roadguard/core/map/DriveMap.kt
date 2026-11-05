@@ -273,12 +273,6 @@ fun DriveMap(
             if (!p.bearing.isNaN()) bearing = p.bearing.toFloat()
         }
         runCatching { comp.forceLocationUpdate(loc) }
-        if (holder.debugCount++ % 8 == 0) runCatching {
-            val st = holder.style
-            val layers = st?.layers?.filter { it.id.startsWith("mapbox-location") }?.joinToString { it.id + "=" + it.visibility.value }
-            android.util.Log.i("RoadguardMap", "puck enabled=${comp.isLocationComponentEnabled} render=${comp.renderMode} cam=${comp.cameraMode} " +
-                "fleche=${st?.getImage(ARROW_IMAGE)?.width} icone=${st?.getImage("mapbox-location-icon") != null}/${st?.getImage("mapbox-location-stroke-icon") != null} layers=$layers")
-        }.onFailure { android.util.Log.w("RoadguardMap", "diag", it) }
         // Trajet effacé derrière la voiture : on ne dessine que ce qui reste à parcourir.
         val r = route
         if (r != null && r.points.size >= 2) {
@@ -339,7 +333,6 @@ private class MapHolder {
     var lastBearing = 0.0
     var trimRoute: Route? = null
     var trimIndex = 0
-    var debugCount = 0
 }
 
 @SuppressLint("MissingPermission")
