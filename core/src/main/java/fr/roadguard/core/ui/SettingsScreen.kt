@@ -163,7 +163,7 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                 Section("Diagnostic du poste")
                 run {
                     val keys = androidx.compose.runtime.remember { fr.roadguard.core.account.DeviceKeys.check(context) }
-                    var sent by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+                    val sent = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
                     val ok = keys.testKeys || keys.aospCert
                     Text(
                         if (ok) "✅ Poste signé avec les clés de test d'Android : « Pilote Drive Système » (Waze dans un module) est possible."
@@ -171,8 +171,8 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                         color = if (ok) Color(0xFF81C784) else Color(0xFFFF8A80), fontSize = 17.sp,
                     )
                     Text(keys.text, color = DriveColors.TextSecondary, fontSize = 12.sp)
-                    BigButton(if (sent) "Envoyé ✔" else "Envoyer le diagnostic à Nathan", DriveColors.Panel) {
-                        fr.roadguard.core.account.DeviceKeys.send(context, keys); sent = true
+                    BigButton(if (sent.value) "Envoyé ✔" else "Envoyer le diagnostic à Nathan", DriveColors.Panel) {
+                        fr.roadguard.core.account.DeviceKeys.send(context, keys); sent.value = true
                     }
                 }
                 Section("Démarrage")
