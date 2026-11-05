@@ -157,14 +157,16 @@ class DrivingSession(
         if (newAlert?.isNew == true) voice.announce(newAlert)
         // Une position isolée sans cap fiable ne doit pas faire clignoter le bandeau : on garde
         // l'alerte précédente 4 s au plus, tant que le radar est encore devant (distance qui baisse).
-        val held = alert?.takeIf { newAlert == null && f.timeMs - alertAt < 4_000 }?.let { a ->
+        val held = alert?.takeIf { newAlert == null && !it.passed && f.timeMs - alertAt < 4_000 }?.let { a ->
             val d = fr.roadguard.core.radar.Geo.distanceMeters(f.lat, f.lon, a.radar.lat, a.radar.lon).toInt()
             if (d < a.distanceM + 15) a.copy(distanceM = d, isNew = false) else null
         }
         if (newAlert != null) alertAt = f.timeMs
         alert = newAlert ?: held
         voice.proximityBeeps = settings.proximityBeeps
-        voice.proximity(alert?.distanceM)
+        val a = alert
+        // Radar dépassé : bips encore le temps de parcourir les derniers mètres (20 m après le radar).
+        voice.proximity(a?.distanceM, if (a?.passed == true) (a.remainingM / (f.speedKmh / 3.6).coerceAtLeast(2.0) * 1000).toLong().coerceAtLeast(1) else 0)
         community.onFix(f)
         trip.onFix(f.lat, f.lon, f.speedKmh, f.accuracyM, f.timeMs, if (location.hasAltitude()) location.altitude else null)
         localInfo.onFix(f.lat, f.lon, System.currentTimeMillis())

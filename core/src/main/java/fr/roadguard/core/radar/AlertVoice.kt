@@ -89,7 +89,11 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
      * Distance au radar annoncé (null quand il n'y en a plus) : les bips s'accélèrent en approchant,
      * jusqu'à devenir continus dans les derniers mètres.
      */
-    fun proximity(distanceM: Int?) {
+    @Volatile private var stopAt = 0L
+
+    /** [stopAfterMs] > 0 : radar dépassé, bips rapides encore ce temps-là puis arrêt (sans attendre la position suivante). */
+    fun proximity(distanceM: Int?, stopAfterMs: Long = 0) {
+        stopAt = if (stopAfterMs > 0 && distanceM != null) android.os.SystemClock.uptimeMillis() + stopAfterMs else 0L
         proximityM = if (beepEnabled && proximityBeeps) distanceM else null
         // Distance de départ de l'alerte : l'accélération s'étale de ce point jusqu'au radar.
         if (distanceM == null) startM = 0 else if (distanceM > startM || startM == 0) startM = distanceM
@@ -98,6 +102,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
 
     private val beepTick = object : Runnable {
         override fun run() {
+            if (stopAt > 0 && android.os.SystemClock.uptimeMillis() >= stopAt) { proximityM = null; stopAt = 0 }
             val d = proximityM
             if (d == null) { beeping = false; scheduleRelease(); return }
             val interval = BeepCadence.intervalMs(d, startM)

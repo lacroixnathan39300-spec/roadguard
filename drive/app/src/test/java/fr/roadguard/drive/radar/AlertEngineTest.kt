@@ -25,6 +25,14 @@ class AlertEngineTest {
         assertFalse(second!!.isNew)
     }
 
+    @Test fun keepsAlertingTwentyMetresAfterTheRadar() {
+        val engine = AlertEngine(RadarIndex(listOf(radar("r", 46.001))))
+        assertNotNull(engine.update(fix(46.0, 0)))
+        val past10 = engine.update(fix(46.00109, 1000)) // ~10 m après
+        assertTrue(past10!!.passed); assertEquals(10.0, past10.remainingM.toDouble(), 2.0)
+        assertNull(engine.update(fix(46.00127, 2000))) // ~30 m après : fini
+    }
+
     @Test fun ignoresRadarBehindOrOffAxis() {
         val engine = AlertEngine(RadarIndex(listOf(radar("behind", 45.996), radar("side", 46.0, lon = 5.006))))
         assertNull(engine.update(fix(46.0, 0)))
