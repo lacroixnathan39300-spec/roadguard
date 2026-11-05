@@ -92,7 +92,7 @@ class PhoneHomeActivity : ComponentActivity() {
         Net.init(this)
         fr.roadguard.core.map.OfflineRegions.enlargeAmbientCache(this)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        setContent { fr.roadguard.core.ui.CarFontScale { PhoneHome() } }
+        setContent { fr.roadguard.core.ui.CarFontScale { fr.roadguard.core.ui.AccountGate { PhoneHome() } } }
     }
 
     override fun onStart() { super.onStart(); visible = true }
@@ -157,6 +157,7 @@ private fun PhoneHome() {
     var showTrip by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { runCatching { fr.roadguard.core.map.OfflineRegions.clearCacheOnce(context, 2) } }
     var showEqualizer by remember { mutableStateOf(false) }
+    var showAdmin by remember { mutableStateOf(false) }
 
     // Carte hors ligne : packs téléchargés dans « Plus → Cartes hors ligne », utilisés sans Internet.
     val packStates by fr.roadguard.core.map.MapPackManager.get(context).states.collectAsState()
@@ -263,7 +264,10 @@ private fun PhoneHome() {
                 }
             }
         }
-        if (showOffline) {
+        if (showAdmin) {
+            BackHandler { showAdmin = false }
+            fr.roadguard.core.ui.AdminScreen(onClose = { showAdmin = false })
+        } else if (showOffline) {
             BackHandler { showOffline = false }
             fr.roadguard.core.ui.OfflineDataScreen(setOf("FR", "CH"), onClose = { showOffline = false },
                 here = s.here?.let { it.lat to it.lon }, startTab = offlineTab)
@@ -271,7 +275,7 @@ private fun PhoneHome() {
             BackHandler { showSettings = false }
             var radarCount by remember { mutableStateOf(0) }
             LaunchedEffect(Unit) { radarCount = RadarRepository.radars(context).size }
-            SettingsScreen(settings, radarCount, onClose = { showSettings = false }, onOfflineData = { showOffline = true }, voice = s.voice, updateApp = "gps")
+            SettingsScreen(settings, radarCount, onClose = { showSettings = false }, onOfflineData = { showOffline = true }, voice = s.voice, updateApp = "gps", onAdmin = { showAdmin = true })
         }
         if (showEqualizer) {
             BackHandler { showEqualizer = false }

@@ -70,6 +70,10 @@ class DriveSettings(context: Context) {
     fun changeVoiceName(v: String?) { voiceName = v; prefs.edit().putString("voice_name", v).apply() }
     fun changeSpeechRate(v: Float) { speechRate = v; prefs.edit().putFloat("speech_rate", v).apply() }
 
+    /** DRIVE : ancienne disposition fixe (carte + colonne) au lieu de l'accueil en pages et modules. */
+    var classicHome by mutableStateOf(prefs.getBoolean("classic_home", false)); private set
+    fun changeClassicHome(v: Boolean) { classicHome = v; prefs.edit().putBoolean("classic_home", v).apply() }
+
     /** DRIVE : horloge de l'accueil (0 = heure, 1 = avec secondes, 2 = avec la date). */
     var clockStyle by mutableStateOf(prefs.getInt("clock_style", 0)); private set
     fun changeClockStyle(v: Int) { clockStyle = v; prefs.edit().putInt("clock_style", v).apply() }

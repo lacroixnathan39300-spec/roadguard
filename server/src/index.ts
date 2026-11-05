@@ -7,6 +7,8 @@
  * - Conducteurs à proximité (seulement s'ils partagent leur position) et « coucou ».
  */
 
+import { licenseRoutes } from "./license.ts";
+
 export interface Env {
   DB: D1Database;
   /** Applis à jour (APK découpés en morceaux de 20 Mo), déposées par la compilation automatique. */
@@ -357,6 +359,8 @@ export default {
     const path = url.pathname.replace(/\/+$/, "");
     try {
       if (path === "" || path === "/v1") return json({ service: "ROADGUARD communauté", version: 1, types: TYPES });
+      const lic = await licenseRoutes(req, env, path);
+      if (lic) return lic;
       if (req.method === "POST" && path === "/v1/account") return createAccount(req, env);
       const me = await auth(req, env);
       if (req.method === "GET" && path === "/v1/reports") return reportsNear(url, env, me);

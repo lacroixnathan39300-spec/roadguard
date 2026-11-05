@@ -19,6 +19,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -141,7 +142,18 @@ class MainActivity : ComponentActivity() {
         setContent {
             fr.roadguard.core.ui.CarFontScale {
                 androidx.compose.foundation.layout.Box {
-                    DriveHome()
+                    // DRIVE est l'accueil du poste : même sans accès, on peut ouvrir les autres applis.
+                    // La liaison démarre avant la connexion au compte : le poste passe souvent par le téléphone pour Internet.
+                    val link = remember { LinkClient.current ?: LinkClient(applicationContext) }
+                    LaunchedEffect(Unit) { link.start() }
+                    var apps by remember { mutableStateOf(false) }
+                    var linkScreen by remember { mutableStateOf(false) }
+                    fr.roadguard.core.ui.AccountGate(extra = {
+                        fr.roadguard.core.ui.BigButton("📱 ROADGUARD Link (Internet par le téléphone)", DriveColors.Track) { linkScreen = true }
+                        fr.roadguard.core.ui.BigButton("▦ Autres applications", DriveColors.Track) { apps = true }
+                    }) { DriveHome() }
+                    if (linkScreen) { BackHandler { linkScreen = false }; fr.roadguard.drive.ui.LinkScreen(link, onClose = { linkScreen = false }) }
+                    if (apps) AppDrawer(onClose = { apps = false })
                     // Logo au démarrage de l'appli (pas à chaque retour sur l'accueil).
                     if (savedInstanceState == null) BootSplash()
                 }
@@ -222,7 +234,7 @@ private fun DriveHome() {
     var showOffline by remember { mutableStateOf(false) }
 
     // ROADGUARD Link : liaison avec le téléphone.
-    val link = remember { LinkClient(context.applicationContext) }
+    val link = remember { LinkClient.current ?: LinkClient(context.applicationContext) }
     LaunchedEffect(Unit) { link.start() }
     val linkState by link.state.collectAsState()
     val phoneMedia by link.media.collectAsState()
@@ -233,6 +245,8 @@ private fun DriveHome() {
     LaunchedEffect(mirror) { if (mirror != null) mirrorHidden = false }
 
     var showSearch by remember { mutableStateOf(false) }
+    var showAdmin by remember { mutableStateOf(false) }
+    var launcherMapVisible by remember { mutableStateOf(true) }
     fun startNavigation(place: Place) { showSearch = false; session.startNavigation(place) }
 
     // Messages et appels du téléphone : annonce vocale à l'arrivée.
@@ -283,10 +297,8 @@ private fun DriveHome() {
         awaitPointerEventScope { while (true) { awaitPointerEvent(androidx.compose.ui.input.pointer.PointerEventPass.Initial); lastTouch = System.currentTimeMillis() } }
     }) {
         WallpaperBackground(wallpaperVersion)
-        Row(Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            // Disposition réglable : carte à gauche ou à droite, largeur de la carte.
-            val mapPart: @Composable () -> Unit = {
-            Panel(Modifier.weight(settings.mapWeight).fillMaxHeight()) {
+        // Contenu des modules, partagé entre l'accueil en pages (façon Car Launcher) et la disposition classique.
+        val mapContent: @Composable BoxScope.() -> Unit = {
                 DriveMap(reports = session.community.reports, drivers = session.community.drivers, position = session.here, northUp = settings.northUp, adaptiveZoom = settings.adaptiveZoom, speedKmh = session.fix?.kmh ?: 0, alternatives = session.alternatives, offlinePack = offlinePack, hasLocation = hasLocation, route = session.route, recenterRequest = session.recenter, night = session.night, visibleKinds = settings.alertKinds, modifier = Modifier.fillMaxSize())
                 if (session.navigating) {
                     GuidanceBanner(session.guidanceState, session.navStatus, onStop = { session.stopNavigation() }, modifier = Modifier.align(Alignment.TopStart),
@@ -311,10 +323,8 @@ private fun DriveHome() {
                         MapButton("🔉", onClick = { audio?.adjustStreamVolume(android.media.AudioManager.STREAM_MUSIC, android.media.AudioManager.ADJUST_LOWER, android.media.AudioManager.FLAG_SHOW_UI) })
                     }
                 }
-            }
-            }
-            val sidePart: @Composable () -> Unit = {
-            Column(Modifier.weight(1f - settings.mapWeight).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        }
+        val clockContent: @Composable () -> Unit = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Clock(settings.clockStyle)
                     Spacer(Modifier.weight(1f))
@@ -326,7 +336,8 @@ private fun DriveHome() {
                     )
                 }
                 if (settings.showWeather) fr.roadguard.core.ui.WeatherAddressLine(session.localInfo, Modifier.padding(start = 4.dp))
-                Panel(Modifier.fillMaxWidth().weight(1f).heightIn(min = 150.dp).clickable { showTrip = true }) {
+        }
+        val speedContent: @Composable () -> Unit = {
                     Speedometer(
                         limit = session.speedLimit,
                         over = session.overSpeed,
@@ -335,8 +346,8 @@ private fun DriveHome() {
                         waiting = if (hasLocation) stringResource(R.string.gps_waiting) else stringResource(R.string.location_needed),
                         modifier = Modifier.padding(16.dp),
                     )
-                }
-                if (settings.showMusic) Panel(Modifier.fillMaxWidth().height(132.dp)) {
+                        }
+        val musicContent: @Composable () -> Unit = {
                     // Musique du téléphone si la liaison en fournit, sinon celle du poste.
                     val fromPhone = phoneMedia != null
                     MusicCard(
@@ -352,11 +363,45 @@ private fun DriveHome() {
                         playerLabel = MusicPlayer.chosen(context)?.second,
                         modifier = Modifier.fillMaxSize(),
                     )
-                }
+                        }
+        if (settings.classicHome) Row(Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            // Disposition réglable : carte à gauche ou à droite, largeur de la carte.
+            val mapPart: @Composable () -> Unit = { Panel(Modifier.weight(settings.mapWeight).fillMaxHeight(), mapContent) }
+            val sidePart: @Composable () -> Unit = {
+            Column(Modifier.weight(1f - settings.mapWeight).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column { clockContent() }
+                Panel(Modifier.fillMaxWidth().weight(1f).heightIn(min = 150.dp).clickable { showTrip = true }) { speedContent() }
+                if (settings.showMusic) Panel(Modifier.fillMaxWidth().height(132.dp)) { musicContent() }
                 FavoritesDock(refresh = showApps, onAll = { showApps = true })
             }
             }
             if (settings.mapRight) { sidePart(); mapPart() } else { mapPart(); sidePart() }
+        } else {
+            val launcher = remember { LauncherLayout(context) }
+            LauncherPages(launcher, Modifier.fillMaxSize().padding(12.dp), onPage = { p ->
+                launcherMapVisible = launcher.pages.getOrNull(p)?.any { it.type == ModuleType.MAP } == true
+            }) { tile, m ->
+                when (tile.type) {
+                    ModuleType.MAP -> Panel(m, mapContent)
+                    ModuleType.CLOCK -> Panel(m) { Column(Modifier.align(Alignment.CenterStart).padding(8.dp)) { clockContent() } }
+                    ModuleType.SPEED -> Panel(m.clickable { showTrip = true }) { speedContent() }
+                    ModuleType.MUSIC -> Panel(m) { musicContent() }
+                    ModuleType.DOCK -> Box(m, contentAlignment = Alignment.Center) { FavoritesDock(refresh = showApps, onAll = { showApps = true }) }
+                    ModuleType.TRIP -> Panel(m.clickable { showTrip = true }) { TripModule(session.trip, Modifier.align(Alignment.Center)) }
+                    ModuleType.SHORTCUTS -> Panel(m) {
+                        Row(Modifier.align(Alignment.Center).horizontalScroll(androidx.compose.foundation.rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            MapButton("⚠", onClick = { showReport = true })
+                            MapButton("🔍", onClick = { showSearch = true })
+                            MapButton("▦", onClick = { page = 1 })
+                            MapButton("⚙", onClick = { showSettings = true })
+                            MapButton("📱", onClick = { showLink = true })
+                        }
+                    }
+                    ModuleType.WIDGET -> AndroidWidget(tile.widgetId, m)
+                }
+            }
+            // Alertes radars toujours visibles, même sur une page sans la carte.
+            if (!launcherMapVisible) AlertBanners(session.alert, session.average, Modifier.align(Alignment.TopCenter).padding(top = 16.dp))
         }
         if (page == 1) {
             BackHandler { page = 0 }
@@ -396,7 +441,10 @@ private fun DriveHome() {
             BackHandler { showReport = false }
             fr.roadguard.core.ui.ReportSheet(onPick = { showReport = false; session.community.report(it) }, onClose = { showReport = false })
         }
-        if (showOffline) {
+        if (showAdmin) {
+            BackHandler { showAdmin = false }
+            fr.roadguard.core.ui.AdminScreen(onClose = { showAdmin = false })
+        } else if (showOffline) {
             BackHandler { showOffline = false }
             fr.roadguard.core.ui.OfflineDataScreen(setOf("FR", "CH"), onClose = { showOffline = false }, here = session.here?.let { it.lat to it.lon })
         } else if (showPersonalize) {
@@ -414,7 +462,7 @@ private fun DriveHome() {
             LaunchedEffect(Unit) { radarCount = RadarRepository.radars(context).size }
             SettingsScreen(settings, radarCount, onClose = { showSettings = false }, onOfflineData = { showOffline = true }, showAutostart = true,
                 onCommunity = { showCommunity = true }, onMusicPlayer = { showPlayer = true },
-                onPersonalize = { showPersonalize = true }, voice = session.voice, updateApp = "drive")
+                onPersonalize = { showPersonalize = true }, voice = session.voice, updateApp = "drive", onAdmin = { showAdmin = true })
         }
         if (showSearch) {
             BackHandler { showSearch = false }

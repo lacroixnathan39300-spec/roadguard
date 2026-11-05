@@ -36,6 +36,8 @@ class DriveService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_STOP) { stopSelf(); return START_NOT_STICKY }
         startForegroundNow()
+        // Compte ROADGUARD sans accès (essai fini, bloqué ou déconnecté) : pas d'alertes en arrière-plan.
+        if (!fr.roadguard.core.account.AccountManager.get(this).allowed) { stopSelf(); return START_NOT_STICKY }
         if (session == null) start()
         return START_STICKY
     }

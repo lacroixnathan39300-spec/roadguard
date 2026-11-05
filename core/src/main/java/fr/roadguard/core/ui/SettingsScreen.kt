@@ -32,7 +32,7 @@ import fr.roadguard.core.radar.RadarKind
 @Composable
 fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit, onOfflineData: (() -> Unit)? = null, showAutostart: Boolean = false,
     onCommunity: (() -> Unit)? = null, onMusicPlayer: (() -> Unit)? = null, onPersonalize: (() -> Unit)? = null,
-    voice: fr.roadguard.core.radar.AlertVoice? = null, updateApp: String? = null) {
+    voice: fr.roadguard.core.radar.AlertVoice? = null, updateApp: String? = null, onAdmin: (() -> Unit)? = null) {
     val context = androidx.compose.ui.platform.LocalContext.current
     Column(Modifier.fillMaxSize().background(DriveColors.Background).padding(20.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -43,6 +43,7 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
             Modifier.fillMaxWidth().padding(top = 16.dp).verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
+            AccountCard(onAdmin = { onAdmin?.invoke() })
             if (onPersonalize != null) BigButton("🖼 Fond d'écran et logo de démarrage", DriveColors.Accent, onPersonalize)
             if (onMusicPlayer != null) BigButton("🎵 Lecteur de musique (Bluetooth du poste…)", DriveColors.Accent, onMusicPlayer)
             if (onCommunity != null) BigButton("👥 Communauté : pseudo, points, classement", DriveColors.Accent, onCommunity)
@@ -126,6 +127,7 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
             }
             if (showAutostart) {
                 Section("Disposition de l'accueil")
+                ToggleRow("Accueil en pages et modules (✎ en bas à droite de l'accueil pour modifier)", !settings.classicHome) { settings.changeClassicHome(!it) }
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     BigButton("Carte à gauche", if (!settings.mapRight) DriveColors.Accent else DriveColors.Panel) { settings.changeMapRight(false) }
                     BigButton("Carte à droite", if (settings.mapRight) DriveColors.Accent else DriveColors.Panel) { settings.changeMapRight(true) }

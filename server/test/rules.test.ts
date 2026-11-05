@@ -38,3 +38,19 @@ test("suppression", () => {
   assert.equal(shouldRemove(10, 3, true), false);
   assert.equal(shouldRemove(10, 4, true), true);
 });
+
+import { cleanUsername, grant, isActive, TRIAL_MS } from "../src/license.ts";
+
+test("comptes : identifiant, accès et actions de l'administrateur", () => {
+  assert.equal(cleanUsername("  Nathan.L "), "nathan.l");
+  assert.equal(cleanUsername("ab"), null);
+  const now = 1_000_000_000_000;
+  assert.ok(isActive({ access_until: now + TRIAL_MS, blocked: 0, admin: 0 }, now));
+  assert.ok(!isActive({ access_until: now - 1, blocked: 0, admin: 0 }, now));
+  assert.ok(isActive({ access_until: 0, blocked: 0, admin: 0 }, now));
+  assert.ok(!isActive({ access_until: 0, blocked: 1, admin: 0 }, now));
+  assert.ok(isActive({ access_until: now - 1, blocked: 1, admin: 1 }, now));
+  assert.equal(grant({ access_until: now - 5 }, "unlimited", now)?.access_until, 0);
+  assert.equal(grant({ access_until: now + 10 * D }, "month", now)?.access_until, now + 41 * D);
+  assert.equal(grant({ access_until: now }, "bidon", now), null);
+});
