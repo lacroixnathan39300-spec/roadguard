@@ -27,7 +27,8 @@ enum class ReportType(val code: String, val label: String, val emoji: String, va
     JAM("bouchon", "Bouchon", "🚗", 0xFF8E24AA),
     DANGER("danger", "Danger", "⚠️", 0xFFFB8C00),
     WORKS("travaux", "Travaux", "🚧", 0xFFF4511E),
-    FIXED("radar_fixe", "Radar fixe", "📷", 0xFFD32F2F);
+    FIXED("radar_fixe", "Radar fixe", "📷", 0xFFD32F2F),
+    MESSAGE("message", "Message (24 h)", "💬", 0xFF00897B);
 
     companion object { fun of(code: String) = entries.firstOrNull { it.code == code } }
 }
@@ -35,6 +36,8 @@ enum class ReportType(val code: String, val label: String, val emoji: String, va
 data class Report(
     val id: String, val type: ReportType, val lat: Double, val lon: Double, val author: String,
     val createdAt: Long, val yes: Int, val permanent: Boolean, val mine: Boolean, val voted: Boolean,
+    /** Texte d'un signalement « Message » (visible 24 h). */
+    val text: String? = null,
 )
 
 data class Driver(val id: String, val name: String, val lat: Double, val lon: Double, val speed: Int?)
@@ -140,15 +143,16 @@ class Community(context: Context, private val scope: CoroutineScope, private val
         }
     }
 
-    fun report(type: ReportType) {
+    fun report(type: ReportType, text: String? = null) {
         val f = here ?: return show("Position GPS indisponible")
         if (!hasAccount) return show("Choisis d'abord ton pseudo dans Menu → Communauté")
         scope.launch {
             runCatching {
                 post("/v1/reports", JSONObject().put("type", type.code).put("lat", f.lat).put("lon", f.lon)
-                    .apply { if (!f.bearing.isNaN()) put("heading", f.bearing.toInt()) })
+                    .apply { if (!f.bearing.isNaN()) put("heading", f.bearing.toInt()); if (text != null) put("text", text) })
             }.onSuccess { r ->
-                show(if (r.optBoolean("created")) "${type.label} signalé, merci ! +5 points" else "Déjà signalé : ta confirmation est comptée")
+                show(if (type == ReportType.MESSAGE) "Message publié pour 24 h, merci ! +5 points"
+                    else if (r.optBoolean("created")) "${type.label} signalé, merci ! +5 points" else "Déjà signalé : ta confirmation est comptée")
             }.onFailure { show("Signalement impossible : ${it.message}") }
             runCatching { refresh() }
         }
@@ -214,6 +218,7 @@ class Community(context: Context, private val scope: CoroutineScope, private val
             id = o.getString("id"), type = type, lat = o.getDouble("lat"), lon = o.getDouble("lon"),
             author = o.optString("author"), createdAt = o.optLong("created_at"), yes = o.optInt("yes"),
             permanent = o.optInt("permanent") == 1, mine = o.optInt("mine") == 1, voted = !o.isNull("my_vote") && o.has("my_vote"),
+            text = o.optString("text").takeIf { !o.isNull("text") && it.isNotBlank() },
         )
     }
 

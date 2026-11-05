@@ -43,7 +43,9 @@ import kotlinx.coroutines.launch
 
 /** Choix du type de signalement : 7 grosses tuiles, un seul appui. */
 @Composable
-fun ReportSheet(onPick: (ReportType) -> Unit, onClose: () -> Unit) {
+fun ReportSheet(onPick: (ReportType, String?) -> Unit, onClose: () -> Unit) {
+    var writing by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    var msg by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("") }
     Box(Modifier.fillMaxSize().background(Color(0xCC000000)).clickable(onClick = onClose), contentAlignment = Alignment.Center) {
         Column(
             Modifier.padding(16.dp).clip(RoundedCornerShape(22.dp)).background(DriveColors.Panel).padding(16.dp).clickable(enabled = false) {},
@@ -56,7 +58,7 @@ fun ReportSheet(onPick: (ReportType) -> Unit, onClose: () -> Unit) {
             ) { r ->
                 val said = r.data?.getStringArrayListExtra(android.speech.RecognizerIntent.EXTRA_RESULTS).orEmpty()
                 val type = said.firstNotNullOfOrNull { reportFromSpeech(it) }
-                if (type != null) onPick(type) else heard = if (said.isEmpty()) "Rien entendu" else "Pas compris : « ${said.first()} »"
+                if (type != null) onPick(type, null) else heard = if (said.isEmpty()) "Rien entendu" else "Pas compris : « ${said.first()} »"
             }
             val speechIntent = androidx.compose.runtime.remember {
                 android.content.Intent(android.speech.RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
@@ -75,7 +77,7 @@ fun ReportSheet(onPick: (ReportType) -> Unit, onClose: () -> Unit) {
                     row.forEach { t ->
                         Column(
                             Modifier.width(104.dp * DriveColors.Scale).clip(RoundedCornerShape(16.dp)).background(Color(t.color))
-                                .clickable { onPick(t) }.padding(vertical = 14.dp),
+                                .clickable { if (t == ReportType.MESSAGE) writing = true else onPick(t, null) }.padding(vertical = 14.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(t.emoji, fontSize = 30.sp)
@@ -83,6 +85,18 @@ fun ReportSheet(onPick: (ReportType) -> Unit, onClose: () -> Unit) {
                         }
                     }
                 }
+            }
+            if (writing) {
+                OutlinedTextField(
+                    value = msg, onValueChange = { msg = it.take(100) }, singleLine = false, maxLines = 3,
+                    label = { Text("Ton message (visible 24 h autour d'ici)") },
+                    textStyle = androidx.compose.ui.text.TextStyle(color = Color.White, fontSize = 18.sp),
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = DriveColors.Accent, unfocusedBorderColor = DriveColors.Track,
+                        focusedLabelColor = DriveColors.Accent, unfocusedLabelColor = DriveColors.TextSecondary),
+                    modifier = Modifier.width(332.dp * DriveColors.Scale),
+                )
+                Text("${msg.length}/100 · ex. « Route glissante après le virage »", color = DriveColors.TextSecondary, fontSize = 13.sp)
+                BigButton("💬 Publier pour 24 h", DriveColors.Accent) { if (msg.trim().length >= 3) onPick(ReportType.MESSAGE, msg.trim()) }
             }
             BigButton("Annuler", DriveColors.Track, onClose)
         }

@@ -84,7 +84,7 @@ fun BootSplash() {
         Box(Modifier.fillMaxSize().background(Color.Black), contentAlignment = Alignment.Center) {
             if (logo != null) Image(logo.asImageBitmap(), null, Modifier.fillMaxSize(0.6f), contentScale = ContentScale.Fit)
             else Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("ROADGUARD", color = Color.White, fontSize = 56.sp, fontWeight = FontWeight.Black)
+                Text("Pilote Drive", color = Color.White, fontSize = 56.sp, fontWeight = FontWeight.Black)
                 Text("DRIVE", color = DriveColors.Accent, fontSize = 28.sp, fontWeight = FontWeight.Bold)
             }
         }

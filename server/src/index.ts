@@ -28,6 +28,7 @@ export const TYPES: Record<string, { label: string; life: number; canBePermanent
   danger: { label: "Danger", life: 6 * HOUR, canBePermanent: true },
   travaux: { label: "Travaux", life: 5 * DAY, canBePermanent: false },
   radar_fixe: { label: "Radar fixe", life: 14 * DAY, canBePermanent: true },
+  message: { label: "Message", life: 24 * HOUR, canBePermanent: false },
 };
 
 export const RULES = {
@@ -105,6 +106,18 @@ function randomId(bytes = 12): string {
   return [...a].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+/** Mots refusés dans les messages (filtre simple ; l'administrateur peut supprimer un message). */
+const BANNED = ["connard", "connasse", "salope", "pute", "enculé", "encule", "nique", "fdp", "batard", "bâtard", "pd", "negro", "bougnoul"];
+
+export function cleanMessage(raw: unknown): string | null {
+  if (typeof raw !== "string") return null;
+  const t = raw.normalize("NFC").replace(/[\u0000-\u001f<>]/g, "").replace(/\s+/g, " ").trim();
+  if (t.length < 3 || t.length > 100) return null;
+  const words = t.toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").split(/[^a-z0-9]+/);
+  const banned = BANNED.map((b) => b.normalize("NFD").replace(/\p{M}/gu, ""));
+  return words.some((w) => banned.includes(w)) ? null : t;
+}
+
 export function cleanName(raw: unknown): string | null {
   if (typeof raw !== "string") return null;
   const n = raw.normalize("NFC").replace(/[\u0000-\u001f<>]/g, "").replace(/\s+/g, " ").trim();
@@ -163,7 +176,7 @@ async function reportsNear(url: URL, env: Env, me: Account | null): Promise<Resp
   const now = Date.now();
   const b = box(lat, lon, radius);
   const rows = await env.DB.prepare(
-    `SELECT r.id, r.type, r.lat, r.lon, r.heading, r.created_at, r.expires_at, r.yes, r.no, r.permanent,
+    `SELECT r.id, r.type, r.lat, r.lon, r.heading, r.created_at, r.expires_at, r.yes, r.no, r.permanent, r.text,
             a.name AS author, (r.author_id = ?) AS mine,
             (SELECT still FROM votes v WHERE v.report_id = r.id AND v.account_id = ?) AS my_vote
        FROM reports r JOIN accounts a ON a.id = r.author_id
@@ -180,6 +193,8 @@ async function createReport(req: Request, env: Env, me: Account): Promise<Respon
   const lon = num(body.lon, -180, 180);
   const heading = num(body.heading, 0, 360);
   if (!type || lat == null || lon == null) return fail(400, "Type ou position invalide");
+  const text = type === "message" ? cleanMessage(body.text) : null;
+  if (type === "message" && !text) return fail(400, "Message de 3 à 100 caractères, sans insulte");
   const now = Date.now();
   if (now - me.last_report_at < RULES.reportCooldown) return fail(429, "Patiente quelques secondes entre deux signalements");
 
@@ -190,12 +205,13 @@ async function createReport(req: Request, env: Env, me: Account): Promise<Respon
   ).bind(type, b.minLat, b.maxLat, b.minLon, b.maxLon, now).all<{ id: string; lat: number; lon: number }>();
   const existing = near.results.find((r) => distanceM(lat, lon, r.lat, r.lon) <= RULES.mergeRadiusM);
   await env.DB.prepare("UPDATE accounts SET last_report_at = ? WHERE id = ?").bind(now, me.id).run();
-  if (existing) return vote(env, me, existing.id, true, now, true);
+  // Les messages ne se fusionnent pas : chacun garde son texte.
+  if (existing && type !== "message") return vote(env, me, existing.id, true, now, true);
 
   const id = randomId(10);
   await env.DB.prepare(
-    "INSERT INTO reports (id, type, lat, lon, heading, author_id, created_at, expires_at, last_yes_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-  ).bind(id, type, lat, lon, heading == null ? null : Math.round(heading), me.id, now, now + TYPES[type].life, now).run();
+    "INSERT INTO reports (id, type, lat, lon, heading, author_id, created_at, expires_at, last_yes_at, text) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+  ).bind(id, type, lat, lon, heading == null ? null : Math.round(heading), me.id, now, now + TYPES[type].life, now, text).run();
   await addPoints(env, me.id, RULES.pointsReport, now);
   return json({ id, created: true, points: me.points + RULES.pointsReport });
 }
@@ -396,7 +412,22 @@ export default {
         const m = env.APPS ? await env.APPS.get("manifest") : null;
         return new Response(m ?? "{}", { headers: { "content-type": "application/json", "cache-control": "max-age=300", ...CORS } });
       }
-      const chunk = /^\/v1\/apps\/(gps|drive)\/(\d+)\/(\d{1,2})$/.exec(path);
+      // Lien direct pour installer Pilote Suite la première fois (à partager, ou en QR code).
+      if (req.method === "GET" && (path === "/suite" || path === "/v1/apps/suite.apk") && env.APPS) {
+        const m = JSON.parse((await env.APPS.get("manifest")) ?? "{}") as Record<string, { build: number; chunks: number }>;
+        const info = m.suite;
+        if (!info) return fail(404, "Pilote Suite pas encore publiée");
+        const parts: ArrayBuffer[] = [];
+        for (let i = 0; i < info.chunks; i++) {
+          const part = await env.APPS.get(`suite:${info.build}:${i}`, "arrayBuffer");
+          if (!part) return fail(404, "Morceau introuvable");
+          parts.push(part);
+        }
+        return new Response(new Blob(parts), { headers: {
+          "content-type": "application/vnd.android.package-archive",
+          "content-disposition": `attachment; filename="Pilote-Suite-${info.build}.apk"`, ...CORS } });
+      }
+      const chunk = /^\/v1\/apps\/(gps|drive|suite)\/(\d+)\/(\d{1,2})$/.exec(path);
       if (req.method === "GET" && chunk && env.APPS) {
         const data = await env.APPS.get(`${chunk[1]}:${chunk[2]}:${chunk[3]}`, "arrayBuffer");
         if (!data) return fail(404, "Morceau introuvable");

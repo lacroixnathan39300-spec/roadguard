@@ -189,6 +189,7 @@ fun DriveMap(
             style.addLayer(radarLayer())
             style.addSource(GeoJsonSource(COMMUNITY_SOURCE))
             style.addLayer(communityLayer())
+            style.addLayer(messagesLayer())
             style.addSource(GeoJsonSource(JAMS_SOURCE))
             style.addLayerBelow(jamsLayer(), firstSymbolLayer(style))
             style.addSource(GeoJsonSource(DRIVERS_SOURCE))
@@ -252,6 +253,7 @@ fun DriveMap(
                 Feature.fromGeometry(Point.fromLngLat(r.lon, r.lat)).apply {
                     addStringProperty("color", String.format("#%06X", r.type.color and 0xFFFFFF))
                     addBooleanProperty("permanent", r.permanent)
+                    r.text?.let { addStringProperty("text", it) }
                 }
             }))
             style.getSourceAs<GeoJsonSource>(DRIVERS_SOURCE)?.setGeoJson(FeatureCollection.fromFeatures(drivers.map { d ->
@@ -422,6 +424,19 @@ private fun jamsLayer() = CircleLayer(JAMS_SOURCE, JAMS_SOURCE).withProperties(
     PropertyFactory.circleOpacity(0.45f),
     PropertyFactory.circleBlur(0.6f),
 )
+
+/** Messages de 24 h : le texte en bulle au-dessus de la pastille (police des tuiles, sans émoji). */
+private fun messagesLayer() = org.maplibre.android.style.layers.SymbolLayer("roadguard-messages", COMMUNITY_SOURCE).withProperties(
+    PropertyFactory.textField(Expression.get("text")),
+    PropertyFactory.textFont(arrayOf("Noto Sans Regular")),
+    PropertyFactory.textSize(14f),
+    PropertyFactory.textMaxWidth(12f),
+    PropertyFactory.textColor(android.graphics.Color.WHITE),
+    PropertyFactory.textHaloColor(android.graphics.Color.parseColor("#00897B")),
+    PropertyFactory.textHaloWidth(3f),
+    PropertyFactory.textOffset(arrayOf(0f, -1.6f)),
+    PropertyFactory.textAnchor(org.maplibre.android.style.layers.Property.TEXT_ANCHOR_BOTTOM),
+).withFilter(Expression.has("text")).also { it.minZoom = 11f }
 
 /** Signalements : pastille de la couleur du type, contour blanc épais. */
 private fun communityLayer() = CircleLayer(COMMUNITY_SOURCE, COMMUNITY_SOURCE).withProperties(

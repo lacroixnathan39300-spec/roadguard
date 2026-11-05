@@ -44,6 +44,7 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             AccountCard(onAdmin = { onAdmin?.invoke() })
+            BigButton("📖 Revoir le tutoriel", DriveColors.Panel) { Tutorial.forceShow = true; onClose() }
             if (onPersonalize != null) BigButton("🖼 Fond d'écran et logo de démarrage", DriveColors.Accent, onPersonalize)
             if (onMusicPlayer != null) BigButton("🎵 Lecteur de musique (Bluetooth du poste…)", DriveColors.Accent, onMusicPlayer)
             if (onCommunity != null) BigButton("👥 Communauté : pseudo, points, classement", DriveColors.Accent, onCommunity)
@@ -167,7 +168,7 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
 
             Section("À propos")
             Text(
-                "ROADGUARD DRIVE 2 — © Nathan Lacroix. $radarCount points d'alerte embarqués.\n" +
+                "Pilote — © Nathan Lacroix. $radarCount points d'alerte embarqués.\n" +
                     "Cartes © OpenStreetMap (OpenFreeMap, CARTO). Recherche Photon, itinéraires Valhalla (FOSSGIS).\n" +
                     "Les alertes complètent la signalisation : elles ne la remplacent pas.",
                 color = DriveColors.TextSecondary, fontSize = 15.sp,

@@ -60,6 +60,9 @@ fun AccountGate(extra: @Composable () -> Unit = {}, content: @Composable () -> U
         !account.allowed -> AccessEndedScreen(account, account.status!!, extra)
         else -> Box(Modifier.fillMaxSize()) {
             content()
+            // Tutoriel au premier lancement (et à la demande depuis les réglages).
+            var tutorialDone by remember { mutableStateOf(Tutorial.seen(context)) }
+            if (!tutorialDone || Tutorial.forceShow) TutorialScreen(onDone = { tutorialDone = true; Tutorial.forceShow = false })
             // Fin d'essai proche : rappel discret (une fois par jour), avec le contact de l'administrateur.
             val days = account.status?.trialDaysLeft()
             val prefs = remember { context.getSharedPreferences("account", android.content.Context.MODE_PRIVATE) }
@@ -122,7 +125,7 @@ private fun LoginScreen(account: AccountManager, extra: @Composable () -> Unit) 
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     CenteredCard {
-        Text("ROADGUARD", color = DriveColors.Accent, fontSize = 30.sp, fontWeight = FontWeight.Black)
+        Text(if (LocalContext.current.packageName.contains("drive")) "Pilote Drive" else "Pilote", color = DriveColors.Accent, fontSize = 32.sp, fontWeight = FontWeight.Black)
         Text(if (creating) "Créer un compte" else "Connexion", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
         Text(
             if (creating) "Essai gratuit d'un mois. Un seul essai par appareil." else "Le même compte sert sur le téléphone et sur l'autoradio.",
@@ -157,7 +160,7 @@ private fun AccessEndedScreen(account: AccountManager, s: AccountStatus, extra: 
         Text(if (s.blocked) "⛔" else "⏳", fontSize = 48.sp)
         Text(s.label, color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Bold)
         Text(
-            "Compte « ${s.username} ». Pour continuer à utiliser ROADGUARD, demande à Nathan Lacroix d'activer ton compte" +
+            "Compte « ${s.username} ». Pour continuer à utiliser Pilote, demande à Nathan Lacroix d'activer ton compte" +
                 (if (s.contact.isNotBlank()) " (${s.contact})" else "") + ", puis touche « Vérifier ».",
             color = DriveColors.TextSecondary, fontSize = 16.sp,
         )

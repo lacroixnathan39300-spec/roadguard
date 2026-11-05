@@ -26,7 +26,7 @@ class LockedCarScreen(context: androidx.car.app.CarContext) : Screen(context) {
         val s = fr.roadguard.core.account.AccountManager.get(carContext).status
         val text = if (s == null) "Connecte-toi à ton compte ROADGUARD dans l'appli du téléphone."
             else "${s.label}. Demande à Nathan Lacroix d'activer ton compte" + (if (s.contact.isNotBlank()) " (${s.contact})." else ".")
-        return androidx.car.app.model.MessageTemplate.Builder(text).setTitle("ROADGUARD")
+        return androidx.car.app.model.MessageTemplate.Builder(text).setTitle("Pilote")
             .setHeaderAction(androidx.car.app.model.Action.APP_ICON).build()
     }
 }

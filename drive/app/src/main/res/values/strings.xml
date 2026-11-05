@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ROADGUARD DRIVE</string>
+    <string name="app_name">Pilote Drive</string>
     <string name="apps">Applications</string>
     <string name="speed_unit">km/h</string>
     <string name="gps_waiting">GPS…</string>

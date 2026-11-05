@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { box, cleanName, detectJams, distanceM, extendedExpiry, shouldBecomePermanent, shouldRemove, TYPES } from "../src/index.ts";
+import { box, cleanMessage, cleanName, detectJams, distanceM, extendedExpiry, shouldBecomePermanent, shouldRemove, TYPES } from "../src/index.ts";
 
 const H = 3_600_000, D = 24 * H;
 
@@ -66,4 +66,11 @@ test("bouchons détectés : 2 conducteurs au pas au même endroit", () => {
   assert.equal(j.length, 1);
   assert.equal(j[0].n, 2);
   assert.equal(j[0].speed, 12);
+});
+
+test("messages : longueur et filtre", () => {
+  assert.equal(cleanMessage("  Route glissante  après le virage "), "Route glissante après le virage");
+  assert.equal(cleanMessage("ok"), null);
+  assert.equal(cleanMessage("espèce de connard"), null);
+  assert.equal(cleanMessage("x".repeat(101)), null);
 });

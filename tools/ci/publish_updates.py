@@ -23,10 +23,10 @@ except Exception:
     old = {}
 
 # Une compilation plus ancienne qui finit après une plus récente ne doit pas la remplacer.
-if max((old.get(a) or {}).get("build", 0) for a in ("gps", "drive")) > run:
+if max((old.get(a) or {}).get("build", 0) for a in ("gps", "drive", "suite")) > run:
     print(f"Build {run} plus ancienne que celle publiée : rien à faire."); sys.exit(0)
 manifest = dict(old)
-for app, version in (("gps", 600 + run), ("drive", run)):
+for app, version in (("gps", 600 + run), ("drive", run), ("suite", run)):
     path = os.path.join(dist, f"ROADGUARD-{app.upper()}-build{run}.apk")
     if not os.path.isfile(path):
         continue
@@ -38,7 +38,7 @@ for app, version in (("gps", 600 + run), ("drive", run)):
     print(f"{app} build {run} : {len(parts)} morceaux, {len(data)} octets")
 
 # On garde au plus 2 versions par appli (l'actuelle et la précédente) ; les plus anciennes sont supprimées.
-for app in ("gps", "drive"):
+for app in ("gps", "drive", "suite"):
     cur, prev = manifest.get(app), old.get(app)
     if not cur:
         continue
@@ -56,7 +56,7 @@ for app in ("gps", "drive"):
 # Ménage complet : tout morceau d'une version qui n'est ni l'actuelle ni la précédente est supprimé.
 try:
     keys = [k["name"] for k in json.loads(call("GET", f"{api}/{ns}/keys?limit=1000"))["result"]]
-    for app in ("gps", "drive"):
+    for app in ("gps", "drive", "suite"):
         cur = manifest.get(app) or {}
         keep = {str(cur.get("build"))} | ({str(cur["previous"]["build"])} if cur.get("previous") else set())
         for k in keys:

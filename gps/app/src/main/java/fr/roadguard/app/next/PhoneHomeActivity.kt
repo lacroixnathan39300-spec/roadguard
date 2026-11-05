@@ -219,7 +219,7 @@ private fun PhoneHome() {
         }
         if (showReport) {
             BackHandler { showReport = false }
-            fr.roadguard.core.ui.ReportSheet(onPick = { showReport = false; s.community.report(it) }, onClose = { showReport = false })
+            fr.roadguard.core.ui.ReportSheet(onPick = { t, text -> showReport = false; s.community.report(t, text) }, onClose = { showReport = false })
         }
         if (showTrip) {
             BackHandler { showTrip = false }

@@ -2,9 +2,10 @@
 
 Dernière mise à jour : 5 novembre 2026, étape 2 (build 150+).
 
-## Les applis
-- **GPS** (`fr.roadguard.gps`, dossier `gps/`) : appli téléphone : carte, radars, guidage, Link, assistant caméra.
-- **DRIVE** (`fr.roadguard.drive`, dossier `drive/`) : appli autoradio (alps 8227L, Android 8.1, 1024×600), accueil façon Car Launcher Pro.
+## Les applis (nom public : Pilote)
+- **Pilote Suite** (`fr.roadguard.suite`, dossier `suite/`) : installateur sans Play Store, lien direct `https://roadguard.roadguard-app.workers.dev/suite`.
+- **Pilote / GPS** (`fr.roadguard.gps`, dossier `gps/`) : appli téléphone : carte, radars, guidage, Link, assistant caméra.
+- **Pilote Drive** (`fr.roadguard.drive`, dossier `drive/`) : appli autoradio (alps 8227L, Android 8.1, 1024×600), accueil façon Car Launcher Pro.
 - **core/** : code partagé (session de conduite, carte MapLibre, radars, comptes, écrans communs).
 - **server/** : serveur Cloudflare (Worker + base D1 `roadguard-eu` + KV `roadguard-apps`) : communauté, comptes, mises à jour des applis, plantages.
 - **link-protocol/** : ROADGUARD Link (téléphone ↔ autoradio).
@@ -30,7 +31,7 @@ Radars + bips (20 m après le radar), vitesse moyenne, guidage, communauté, Lin
 gestes sur les bords, tolérance de vitesse, annonce des limitations, signalement vocal, ordinateur de bord, carnet d'entretien,
 rappel de pause, assistant caméra (distance, collision, départ au feu), rapports de plantage, position réseau en attendant le GPS,
 style de carte ROADGUARD jour/nuit (tools/map/gen_style.py), carte Waze en direct (WebView, ouvrir/fermer), Waze en écran partagé,
-bouchons détectés automatiquement (conducteurs au pas), alertes radar 30 s avant, arrêt pile au radar (retard GPS compensé), alarme forte si excès devant un radar.
+bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier lancement, logos Pilote (tools/icon_gen.py) (conducteurs au pas), alertes radar 30 s avant, arrêt pile au radar (retard GPS compensé), alarme forte si excès devant un radar.
 
 ## À faire (prochaines étapes)
 - **Reste de l'étape 2** : zones écoles, vitesse à tenir sur les tronçons, styles de compteur, partage de trajet, itinéraire qui évite les bouchons, bulle améliorée.

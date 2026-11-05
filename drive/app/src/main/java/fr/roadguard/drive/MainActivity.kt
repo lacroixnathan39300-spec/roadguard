@@ -456,7 +456,7 @@ private fun DriveHome() {
         }
         if (showReport) {
             BackHandler { showReport = false }
-            fr.roadguard.core.ui.ReportSheet(onPick = { showReport = false; session.community.report(it) }, onClose = { showReport = false })
+            fr.roadguard.core.ui.ReportSheet(onPick = { t, text -> showReport = false; session.community.report(t, text) }, onClose = { showReport = false })
         }
         if (showAdmin) {
             BackHandler { showAdmin = false }

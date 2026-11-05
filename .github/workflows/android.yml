@@ -29,6 +29,9 @@ jobs:
           - app: gps
             tasks: ":app:testDebugUnitTest --tests fr.roadguard.app.AverageSpeedZoneMonitorTest :app:assembleDebug"
             release: ":app:assembleRelease"
+          - app: suite
+            tasks: ":app:assembleDebug"
+            release: ":app:assembleRelease"
     defaults:
       run:
         working-directory: ${{ matrix.app }}
@@ -73,8 +76,10 @@ jobs:
           K="$RUNNER_TEMP/keys"; mkdir -p "$K"
           openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in ../keys/keys.tgz.enc -pass env:RG_KEYS_PASSPHRASE | tar -xzf - -C "$K"
           set -a; . "$K/keys.env"; set +a
-          U=$(echo "$APP" | tr a-z A-Z)
-          export RG_KEYSTORE_FILE="$K/roadguard-$APP.jks"
+          # Pilote Suite est signée avec la clé de l'appli téléphone.
+          KEYAPP=$APP; [ "$APP" = suite ] && KEYAPP=gps
+          U=$(echo "$KEYAPP" | tr a-z A-Z)
+          export RG_KEYSTORE_FILE="$K/roadguard-$KEYAPP.jks"
           export RG_KEYSTORE_PASSWORD="$(eval echo \$${U}_KEYSTORE_PASSWORD)"
           export RG_KEY_PASSWORD="$(eval echo \$${U}_KEY_PASSWORD)"
           export RG_KEY_ALIAS="$(eval echo \$${U}_KEY_ALIAS)"
@@ -108,7 +113,7 @@ jobs:
           SHA: ${{ github.sha }}
         run: |
           mkdir -p dist
-          for app in drive gps; do
+          for app in drive gps suite; do
             U=$(echo $app | tr a-z A-Z)
             f=$(find art/$app-apk-$RUN -path '*release*' -name '*universal*.apk' | head -1)
             [ -z "$f" ] && f=$(find art/$app-apk-$RUN -path '*release*' -name '*.apk' | head -1)
