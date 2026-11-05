@@ -162,6 +162,7 @@ class LauncherLayout(context: Context) {
                 Tile(9, ModuleType.MUSIC, 2, 1, 4, 1),
                 Tile(10, ModuleType.DOCK, 0, 2, 3, 1),
                 Tile(11, ModuleType.SHORTCUTS, 3, 2, 3, 1),
+            ),
         )
     }
 }
