@@ -90,7 +90,7 @@ class LauncherLayout(context: Context) {
     var pages by mutableStateOf(load()); private set
 
     private fun load(): List<List<Tile>> {
-        val raw = prefs.getString("pages", null) ?: return defaults()
+        val raw = prefs.getString(KEY, null) ?: return defaults()
         return runCatching {
             val a = JSONArray(raw)
             (0 until a.length()).map { p -> val t = a.getJSONArray(p); (0 until t.length()).mapNotNull { Tile.from(t.getJSONObject(it)) } }
@@ -99,7 +99,7 @@ class LauncherLayout(context: Context) {
 
     private fun save(p: List<List<Tile>>) {
         pages = p
-        prefs.edit().putString("pages", JSONArray(p.map { page -> JSONArray(page.map { it.toJson() }) }).toString()).apply()
+        prefs.edit().putString(KEY, JSONArray(p.map { page -> JSONArray(page.map { it.toJson() }) }).toString()).apply()
     }
 
     fun reset() = save(defaults())
@@ -143,23 +143,25 @@ class LauncherLayout(context: Context) {
 
     companion object {
         const val COLS = 6
-        const val ROWS = 4
+        /** 3 rangées : chaque module reste assez haut sur un écran de 600 px (musique, compteur lisibles). */
+        const val ROWS = 3
+        /** Clé d'enregistrement (v2 : grille de 3 rangées ; l'ancienne disposition de 4 rangées est oubliée). */
+        private const val KEY = "pages_v2"
         /** Accueil de départ : carte à gauche, compteur, musique et favoris à droite (comme avant), puis une page infos. */
         fun defaults(): List<List<Tile>> = listOf(
             listOf(
-                Tile(1, ModuleType.MAP, 0, 0, 4, 4),
+                Tile(1, ModuleType.MAP, 0, 0, 4, 3),
                 Tile(2, ModuleType.CLOCK, 4, 0, 2, 1),
                 Tile(3, ModuleType.SPEED, 4, 1, 2, 1),
                 Tile(4, ModuleType.MUSIC, 4, 2, 2, 1),
-                Tile(5, ModuleType.DOCK, 4, 3, 2, 1),
             ),
             listOf(
-                Tile(6, ModuleType.CLOCK, 0, 0, 3, 1),
-                Tile(7, ModuleType.SPEED, 3, 0, 3, 2),
-                Tile(8, ModuleType.TRIP, 0, 1, 3, 2),
-                Tile(9, ModuleType.MUSIC, 3, 2, 3, 2),
-                Tile(10, ModuleType.SHORTCUTS, 0, 3, 3, 1),
-            ),
+                Tile(6, ModuleType.SPEED, 0, 0, 2, 2),
+                Tile(7, ModuleType.CLOCK, 2, 0, 2, 1),
+                Tile(8, ModuleType.TRIP, 4, 0, 2, 1),
+                Tile(9, ModuleType.MUSIC, 2, 1, 4, 1),
+                Tile(10, ModuleType.DOCK, 0, 2, 3, 1),
+                Tile(11, ModuleType.SHORTCUTS, 3, 2, 3, 1),
         )
     }
 }
@@ -265,7 +267,7 @@ fun LauncherPages(layout: LauncherLayout, modifier: Modifier = Modifier, onPage:
             }
         }
         // Points des pages.
-        if (layout.pages.size > 1) Row(Modifier.align(Alignment.BottomCenter).padding(bottom = 2.dp).clip(RoundedCornerShape(12.dp)).background(Color(0x66000000)),
+        if (!editing) Row(Modifier.align(Alignment.BottomCenter).padding(bottom = 2.dp).clip(RoundedCornerShape(12.dp)).background(Color(0x66000000)),
             horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
             Text("‹", color = Color.White, fontSize = 22.sp, modifier = Modifier.clickable {
                 scope.launch { pager.animateScrollToPage((pager.currentPage - 1).coerceAtLeast(0)) } }.padding(horizontal = 12.dp))
@@ -276,6 +278,8 @@ fun LauncherPages(layout: LauncherLayout, modifier: Modifier = Modifier, onPage:
             }
             Text("›", color = Color.White, fontSize = 22.sp, modifier = Modifier.clickable {
                 scope.launch { pager.animateScrollToPage((pager.currentPage + 1).coerceAtMost(layout.pages.size - 1)) } }.padding(horizontal = 12.dp))
+            // Modifier l'accueil (l'appui long sur un module en mode édition sert à choisir le module).
+            Text("✎", color = Color.White, fontSize = 18.sp, modifier = Modifier.clickable { editing = true }.padding(horizontal = 12.dp, vertical = 4.dp))
         }
         if (editing) {
             Row(
@@ -299,10 +303,6 @@ fun LauncherPages(layout: LauncherLayout, modifier: Modifier = Modifier, onPage:
                 Text(it, color = Color.White, fontSize = 15.sp, modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 18.dp)
                     .clip(RoundedCornerShape(12.dp)).background(Color(0xDD7F1D1D)).padding(horizontal = 12.dp, vertical = 6.dp))
             }
-        } else {
-            // Bouton discret pour passer en édition (l'appui long sur un module marche aussi).
-            Text("✎", color = Color(0xAAFFFFFF), fontSize = 18.sp, modifier = Modifier.align(Alignment.BottomEnd).padding(end = 22.dp)
-                .clip(CircleShape).background(Color(0x66000000)).clickable { editing = true }.padding(8.dp))
         }
         if (picker) ModulePicker(hasMap = layout.hasMap, onPick = { type ->
             picker = false
