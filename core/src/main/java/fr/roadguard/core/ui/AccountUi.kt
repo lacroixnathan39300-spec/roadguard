@@ -62,6 +62,9 @@ fun AccountGate(extra: @Composable () -> Unit = {}, content: @Composable () -> U
 }
 
 @Composable
+private fun appName(): String = if (LocalContext.current.packageName.contains("drive")) "drive" else "gps"
+
+@Composable
 private fun CenteredCard(content: @Composable () -> Unit) {
     Box(Modifier.fillMaxSize().background(DriveColors.Background).padding(16.dp), contentAlignment = Alignment.Center) {
         Column(
@@ -119,6 +122,8 @@ private fun LoginScreen(account: AccountManager, extra: @Composable () -> Unit) 
         }
         BigButton(if (creating) "J'ai déjà un compte" else "Créer un compte", DriveColors.Panel) { creating = !creating; error = null }
         extra()
+        // Mise à jour possible même sans être connecté (une correction peut être nécessaire pour se connecter).
+        UpdateCard(appName())
     }
 }
 
@@ -142,6 +147,7 @@ private fun AccessEndedScreen(account: AccountManager, s: AccountStatus, extra: 
         }
         BigButton("Changer de compte", DriveColors.Panel) { scope.launch { account.logout() } }
         extra()
+        UpdateCard(appName())
     }
 }
 
