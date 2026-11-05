@@ -124,7 +124,13 @@ export async function licenseRoutes(req: Request, env: LicEnv, path: string): Pr
     if (!validPassword(password)) return fail(400, "Mot de passe : au moins 6 caractères");
     if (!device) return fail(400, "Appareil inconnu");
     if (path === "/v1/auth/register") {
-      if (await env.DB.prepare("SELECT 1 FROM users WHERE username = ?").bind(username).first()) return fail(409, "Cet identifiant est déjà pris");
+      const existing = await env.DB.prepare("SELECT * FROM users WHERE username = ?").bind(username).first<User>();
+      if (existing) {
+        // Même identifiant et même mot de passe : c'est une nouvelle tentative (Android renvoie parfois la
+        // requête si la réponse s'est perdue) → on connecte au lieu de refuser.
+        if (existing.pass_hash === (await hashPassword(password, existing.salt))) return openSession(env, existing, device, app, now);
+        return fail(409, "Cet identifiant est déjà pris");
+      }
       const first = !(await env.DB.prepare("SELECT 1 FROM users LIMIT 1").first());
       // Un seul essai gratuit par appareil : un 2e compte créé sur le même appareil démarre sans essai.
       const usedTrial = await env.DB.prepare("SELECT username FROM trials WHERE device = ?").bind(device).first<{ username: string }>();
