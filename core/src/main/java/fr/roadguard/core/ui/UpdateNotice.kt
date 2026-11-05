@@ -39,8 +39,16 @@ import kotlinx.coroutines.launch
 object UpdateNotifier {
     private const val CHANNEL = "pilote_updates"
 
-    fun appKey(context: Context) = if (context.packageName.contains("drive")) "drive" else "gps"
-    fun appName(context: Context) = if (context.packageName.contains("drive")) "Pilote Drive" else "Pilote"
+    fun appKey(context: Context) = when {
+        context.packageName.endsWith(".system") -> "drivesys"
+        context.packageName.contains("drive") -> "drive"
+        else -> "gps"
+    }
+    fun appName(context: Context) = when {
+        context.packageName.endsWith(".system") -> "Pilote Drive Système"
+        context.packageName.contains("drive") -> "Pilote Drive"
+        else -> "Pilote"
+    }
 
     /** Vérifie le serveur ; notifie si une version plus récente existe et n'a pas encore été signalée. */
     suspend fun checkAndNotify(context: Context): AppRelease? {

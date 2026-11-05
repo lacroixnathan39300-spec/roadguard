@@ -70,16 +70,17 @@ enum class ModuleType(val label: String, val emoji: String, val minW: Int, val m
     SHORTCUTS("Raccourcis (signaler, recherche, réglages)", "⚡", 1, 1),
     WAZE("Trafic Waze en direct (carte)", "🚦", 2, 2),
     WAZE_APP("Appli Waze en écran partagé", "🧭", 1, 1),
+    APP_EMBED("Appli intégrée (Waze, Maps… · Pilote Drive Système)", "📲", 2, 2),
     WIDGET("Widget Android", "🧩", 1, 1),
 }
 
 /** Bloc posé sur la grille : colonne, ligne, largeur, hauteur (en cases). */
-data class Tile(val id: Long, val type: ModuleType, val x: Int, val y: Int, val w: Int, val h: Int, val widgetId: Int = -1) {
+data class Tile(val id: Long, val type: ModuleType, val x: Int, val y: Int, val w: Int, val h: Int, val widgetId: Int = -1, val pkg: String = "") {
     fun overlaps(o: Tile) = x < o.x + o.w && o.x < x + w && y < o.y + o.h && o.y < y + h
-    fun toJson(): JSONObject = JSONObject().put("id", id).put("t", type.name).put("x", x).put("y", y).put("w", w).put("h", h).put("wid", widgetId)
+    fun toJson(): JSONObject = JSONObject().put("id", id).put("t", type.name).put("x", x).put("y", y).put("w", w).put("h", h).put("wid", widgetId).put("pkg", pkg)
     companion object {
         fun from(o: JSONObject) = runCatching {
-            Tile(o.getLong("id"), ModuleType.valueOf(o.getString("t")), o.getInt("x"), o.getInt("y"), o.getInt("w"), o.getInt("h"), o.optInt("wid", -1))
+            Tile(o.getLong("id"), ModuleType.valueOf(o.getString("t")), o.getInt("x"), o.getInt("y"), o.getInt("w"), o.getInt("h"), o.optInt("wid", -1), o.optString("pkg"))
         }.getOrNull()
     }
 }
@@ -115,12 +116,12 @@ class LauncherLayout(context: Context) {
     }
 
     /** Ajoute un module à la page ; faux s'il n'y a plus de place. */
-    fun add(page: Int, type: ModuleType, widgetId: Int = -1): Boolean {
+    fun add(page: Int, type: ModuleType, widgetId: Int = -1, pkg: String = ""): Boolean {
         // Taille de départ confortable, sinon la taille minimale si la page est chargée.
         val sizes = listOf(maxOf(type.minW, 2) to maxOf(type.minH, if (type == ModuleType.MAP) 3 else 1), type.minW to type.minH)
         for ((w, h) in sizes) {
             val spot = freeSpot(page, w, h) ?: continue
-            save(pages.mapIndexed { i, p -> if (i == page) p + Tile(System.nanoTime(), type, spot.first, spot.second, w, h, widgetId) else p })
+            save(pages.mapIndexed { i, p -> if (i == page) p + Tile(System.nanoTime(), type, spot.first, spot.second, w, h, widgetId, pkg) else p })
             return true
         }
         return false
@@ -191,6 +192,7 @@ fun LauncherPages(layout: LauncherLayout, modifier: Modifier = Modifier, onPage:
     var selected by remember { mutableStateOf<Long?>(null) }
     var picker by remember { mutableStateOf(false) }
     var widgetPicker by remember { mutableStateOf(false) }
+    var appPicker by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf<String?>(null) }
     val pager = rememberPagerState(pageCount = { layout.pages.size })
     androidx.compose.runtime.LaunchedEffect(pager.currentPage) { onPage(pager.currentPage) }
@@ -305,8 +307,13 @@ fun LauncherPages(layout: LauncherLayout, modifier: Modifier = Modifier, onPage:
                     .clip(RoundedCornerShape(12.dp)).background(Color(0xDD7F1D1D)).padding(horizontal = 12.dp, vertical = 6.dp))
             }
         }
+        if (appPicker) AppEmbedPicker(onPick = { pkg ->
+            appPicker = false
+            if (!layout.add(pager.currentPage, ModuleType.APP_EMBED, pkg = pkg)) message = "Plus de place sur cette page : ajoute une page"
+        }, onClose = { appPicker = false })
         if (picker) ModulePicker(hasMap = layout.hasMap, onPick = { type ->
             picker = false
+            if (type == ModuleType.APP_EMBED) { appPicker = true; return@ModulePicker }
             if (!layout.add(pager.currentPage, type)) message = "Plus de place sur cette page : ajoute une page"
         }, onClose = { picker = false })
         if (widgetPicker) WidgetPicker(onPick = { widgetPicker = false; addWidget(it) }, onClose = { widgetPicker = false })
@@ -408,5 +415,20 @@ fun TripModule(trip: fr.roadguard.core.TripComputer, modifier: Modifier) {
         Text("${fr.roadguard.core.TripComputer.duration(t.movingS)} · moy. ${if (t.avgKmh > 0) "${t.avgKmh.toInt()} km/h" else "—"}",
             color = Color.White, fontSize = 16.sp)
         Text("Maxi ${t.maxKmh.toInt()} km/h · ${t.radars} radar(s)", color = DriveColors.TextSecondary, fontSize = 14.sp)
+    }
+}
+
+@Composable
+private fun AppEmbedPicker(onPick: (String) -> Unit, onClose: () -> Unit) = PickerFrame("Appli à intégrer", onClose) {
+    val context = LocalContext.current
+    val apps = remember { runCatching { embeddableApps(context) }.getOrDefault(emptyList()) }
+    if (!Embedding.isSystemBuild(context)) Text("Fonctionne seulement avec Pilote Drive Système (postes en test-keys).", color = DriveColors.TextSecondary, fontSize = 14.sp)
+    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        items(apps, key = { it.first }) { (pkg, label) ->
+            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(DriveColors.Panel).clickable { onPick(pkg) }.padding(14.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                Text((if (pkg == "com.waze") "⭐ " else "") + label, color = Color.White, fontSize = 18.sp)
+            }
+        }
     }
 }

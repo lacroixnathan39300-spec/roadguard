@@ -410,6 +410,7 @@ private fun DriveHome() {
                     }
                     ModuleType.WIDGET -> AndroidWidget(tile.widgetId, m)
                     ModuleType.WAZE -> fr.roadguard.core.ui.WazeLiveMap(session.here?.lat, session.here?.lon, m)
+                    ModuleType.APP_EMBED -> EmbeddedAppModule(tile.pkg.ifBlank { "com.waze" }, m)
                     ModuleType.WAZE_APP -> Panel(m.clickable {
                         if (!fr.roadguard.core.ui.Waze.openApp(context, adjacent = true)) showApps = true
                     }) {
@@ -482,7 +483,7 @@ private fun DriveHome() {
             LaunchedEffect(Unit) { radarCount = RadarRepository.radars(context).size }
             SettingsScreen(settings, radarCount, onClose = { showSettings = false }, onOfflineData = { showOffline = true }, showAutostart = true,
                 onCommunity = { showCommunity = true }, onMusicPlayer = { showPlayer = true },
-                onPersonalize = { showPersonalize = true }, voice = session.voice, updateApp = "drive", onAdmin = { showAdmin = true })
+                onPersonalize = { showPersonalize = true }, voice = session.voice, updateApp = fr.roadguard.core.ui.UpdateNotifier.appKey(context), onAdmin = { showAdmin = true })
         }
         if (showSearch) {
             BackHandler { showSearch = false }

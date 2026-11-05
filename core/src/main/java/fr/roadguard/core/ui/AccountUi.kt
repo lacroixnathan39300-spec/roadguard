@@ -88,7 +88,7 @@ fun AccountGate(extra: @Composable () -> Unit = {}, content: @Composable () -> U
 }
 
 @Composable
-private fun appName(): String = if (LocalContext.current.packageName.contains("drive")) "drive" else "gps"
+private fun appName(): String = UpdateNotifier.appKey(LocalContext.current)
 
 @Composable
 private fun CenteredCard(content: @Composable () -> Unit) {

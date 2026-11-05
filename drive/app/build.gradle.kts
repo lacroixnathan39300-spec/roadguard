@@ -13,6 +13,12 @@ android {
         applicationId = "fr.roadguard.drive"
         // Essais automatiques sur émulateur (-Pemulator=true) : pas d'écran de connexion. Faux dans les applis publiées.
         resValue("bool", "rg_emulator_test", if (project.hasProperty("emulator")) "true" else "false")
+        // « Pilote Drive Système » (-Psystem) : appli à part, signée avec la clé « platform » de test d'Android,
+        // reconnue comme appli système sur les postes en test-keys (applis intégrées dans un module).
+        val system = project.hasProperty("system")
+        if (system) applicationIdSuffix = ".system"
+        manifestPlaceholders["appLabel"] = if (system) "Pilote Drive Système" else "Pilote Drive"
+        resValue("bool", "rg_system_build", if (system) "true" else "false")
         minSdk = 27 // autoradio de référence : alps 8227L, SDK_INT 27
         targetSdk = 36
         versionCode = (System.getenv("VERSION_CODE") ?: "1").toInt()

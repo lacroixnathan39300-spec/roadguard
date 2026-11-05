@@ -427,7 +427,7 @@ export default {
           "content-type": "application/vnd.android.package-archive",
           "content-disposition": `attachment; filename="Pilote-Suite-${info.build}.apk"`, ...CORS } });
       }
-      const chunk = /^\/v1\/apps\/(gps|drive|suite)\/(\d+)\/(\d{1,2})$/.exec(path);
+      const chunk = /^\/v1\/apps\/(gps|drive|suite|drivesys)\/(\d+)\/(\d{1,2})$/.exec(path);
       if (req.method === "GET" && chunk && env.APPS) {
         const data = await env.APPS.get(`${chunk[1]}:${chunk[2]}:${chunk[3]}`, "arrayBuffer");
         if (!data) return fail(404, "Morceau introuvable");
