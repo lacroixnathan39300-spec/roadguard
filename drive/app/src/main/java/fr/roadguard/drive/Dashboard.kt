@@ -132,16 +132,17 @@ private fun Widget(w: DashWidget, s: DrivingSession, music: NowPlaying?, onPlayP
             if (maxWidth > maxHeight * 1.8f) {
                 // Bloc large et bas : grands chiffres lisibles d'un coup d'œil, avec la limite à côté.
                 val density = androidx.compose.ui.platform.LocalDensity.current
-                val big = with(density) { (maxHeight * 0.78f).toSp() }
+                val h = maxHeight
+                val big = with(density) { (h * 0.78f).toSp() }
                 val kmh = s.fix?.kmh
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                     Text(kmh?.toString() ?: "—", color = if (s.overSpeed) Color(0xFFFF5252) else Color.White, fontSize = big,
                         fontWeight = FontWeight.Bold, fontFamily = fr.roadguard.core.ui.DriveStyle.Numbers)
-                    Text("km/h", color = DriveColors.TextSecondary, fontSize = with(density) { (maxHeight * 0.22f).toSp() })
+                    Text("km/h", color = DriveColors.TextSecondary, fontSize = with(density) { (h * 0.22f).toSp() })
                     s.speedLimit?.let { lim ->
-                        Box(Modifier.size(maxHeight * 0.72f).clip(androidx.compose.foundation.shape.CircleShape).background(Color(0xFFD32F2F)).padding(maxHeight * 0.07f)
+                        Box(Modifier.size(h * 0.72f).clip(androidx.compose.foundation.shape.CircleShape).background(Color(0xFFD32F2F)).padding(h * 0.07f)
                             .clip(androidx.compose.foundation.shape.CircleShape).background(Color.White), contentAlignment = Alignment.Center) {
-                            Text("$lim", color = Color.Black, fontSize = with(density) { (maxHeight * 0.28f).toSp() }, fontWeight = FontWeight.Bold)
+                            Text("$lim", color = Color.Black, fontSize = with(density) { (h * 0.28f).toSp() }, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
