@@ -82,13 +82,14 @@ fun TripScreen(trip: TripComputer, onClose: () -> Unit, tracks: fr.roadguard.cor
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Tile("Vitesse moyenne", if (t.avgKmh > 0) "${t.avgKmh.toInt()} km/h" else "—", Modifier.weight(1f))
                 Tile("Vitesse maxi", if (t.maxKmh > 0) "${t.maxKmh.toInt()} km/h" else "—", Modifier.weight(1f))
-                Tile("Altitude", trip.altitudeM?.let { "$it m" } ?: "—", Modifier.weight(1f))
+                Tile("Radars franchis", "${t.radars}", Modifier.weight(1f))
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Tile("Meilleur 0-60", trip.best060?.let { "%.1f s".format(java.util.Locale.FRANCE, it) } ?: "—", Modifier.weight(1f))
                 Tile("Meilleur 0-100", trip.best0100?.let { "%.1f s".format(java.util.Locale.FRANCE, it) } ?: "—", Modifier.weight(1f))
-                Tile("Dernier chrono", trip.lastRun ?: "—", Modifier.weight(1f))
+                Tile("Altitude", trip.altitudeM?.let { "$it m" } ?: "—", Modifier.weight(1f))
             }
+            trip.lastRun?.let { Text("Dernier chrono : $it", color = Color.White, fontSize = 16.sp) }
             Text("Les chronos se lancent seuls au départ d'un arrêt. À faire uniquement dans un lieu sûr et autorisé.",
                 color = DriveColors.TextSecondary, fontSize = 13.sp)
             if (tracks != null) {

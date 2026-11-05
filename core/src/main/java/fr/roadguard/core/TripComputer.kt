@@ -16,6 +16,8 @@ data class TripTotals(
     val maxKmh: Double = 0.0,
     /** Clé de la période (jour, semaine…) : changement → remise à zéro. */
     val key: String = "",
+    /** Radars franchis. */
+    val radars: Int = 0,
 ) {
     val avgKmh: Double get() = if (movingS > 30) distanceM / movingS * 3.6 else 0.0
 
@@ -26,11 +28,11 @@ data class TripTotals(
         maxKmh = maxOf(maxKmh, kmh),
     )
 
-    fun toJson(): JSONObject = JSONObject().put("d", distanceM).put("m", movingS).put("s", stoppedS).put("x", maxKmh).put("k", key)
+    fun toJson(): JSONObject = JSONObject().put("d", distanceM).put("m", movingS).put("s", stoppedS).put("x", maxKmh).put("k", key).put("r", radars)
 
     companion object {
         fun fromJson(o: JSONObject?) = if (o == null) TripTotals() else
-            TripTotals(o.optDouble("d"), o.optDouble("m"), o.optDouble("s"), o.optDouble("x"), o.optString("k"))
+            TripTotals(o.optDouble("d"), o.optDouble("m"), o.optDouble("s"), o.optDouble("x"), o.optString("k"), o.optInt("r"))
     }
 }
 
@@ -86,6 +88,11 @@ class TripComputer(context: Context) {
         total = total.add(d, dt, moving, kmh)
         chrono(kmh, now)
         if (now - lastSave > 15_000) save(now)
+    }
+
+    fun onRadarPassed() {
+        trip = trip.copy(radars = trip.radars + 1); day = day.copy(radars = day.radars + 1)
+        week = week.copy(radars = week.radars + 1); month = month.copy(radars = month.radars + 1); total = total.copy(radars = total.radars + 1)
     }
 
     /** Chronos 0-60 et 0-100 : départ quand on quitte l'arrêt, arrivée à la vitesse visée. */

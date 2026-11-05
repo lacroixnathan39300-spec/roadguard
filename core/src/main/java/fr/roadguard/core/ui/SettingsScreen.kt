@@ -56,6 +56,12 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
             ToggleRow("Bips de plus en plus rapides en approchant (détecteur)", settings.proximityBeeps, settings::changeProximityBeeps)
             ToggleRow("Lire à voix haute les messages du téléphone", settings.readMessages, settings::changeReadMessages)
             ToggleRow("Avertir en cas de dépassement de la limite", settings.speedLimitWarning, settings::changeSpeedLimitWarning)
+            if (settings.speedLimitWarning) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                listOf(-1 to "Tolérance légale", 0 to "Dès 1 km/h", 3 to "+3 km/h", 10 to "+10 km/h").forEach { (v, l) ->
+                    BigButton(l, if (settings.overTolerance == v) DriveColors.Accent else DriveColors.Panel) { settings.changeOverTolerance(v) }
+                }
+            }
+            ToggleRow("Annoncer les changements de limitation", settings.announceLimit, settings::changeAnnounceLimit)
 
             Section("Itinéraire")
             ToggleRow("Éviter les péages", settings.avoidTolls, settings::changeAvoidTolls)
@@ -132,6 +138,7 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                 ToggleRow("Météo et adresse", settings.showWeather, settings::changeShowWeather)
                 ToggleRow("Carte musique", settings.showMusic, settings::changeShowMusic)
                 ToggleRow("Boutons de volume sur la carte", settings.showVolume, settings::changeShowVolume)
+                ToggleRow("Gestes sur les bords : ⟵ retour depuis la gauche, applis depuis la droite, volume en glissant le long du bord droit", settings.edgeGestures, settings::changeEdgeGestures)
                 Section("Position GPS")
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     listOf("auto" to "Automatique", "unit" to "GPS du poste", "phone" to "GPS du téléphone").forEach { (v, label) ->

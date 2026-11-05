@@ -80,7 +80,20 @@ class DrivingSession(
     private var averages: AverageSpeedTracker? = null
 
     val night: Boolean get() = settings.isNight(autoNight)
-    val overSpeed: Boolean get() = SpeedLimitTracker.isOver(fix?.kmh ?: 0, speedLimit)
+    val overSpeed: Boolean get() = SpeedLimitTracker.isOver(fix?.kmh ?: 0, speedLimit, settings.overTolerance)
+    private var lastPassedId: String? = null
+    private var limitCandidate: Int? = null
+
+    /** Nouvelle limite lue : annoncée seulement si elle se confirme deux fois de suite (évite les erreurs aux carrefours). */
+    private fun onLimit(v: Int) {
+        val old = speedLimit
+        if (old == null) { speedLimit = v; limitCandidate = null; return }
+        if (v == old) { limitCandidate = null; return }
+        if (limitCandidate != v) { limitCandidate = v; return }
+        limitCandidate = null
+        speedLimit = v
+        if (settings.announceLimit && alert == null) voice.speak("Limitation $v")
+    }
 
     /** À appeler une fois (bases radars chargées en arrière-plan). */
     suspend fun prepare() {
@@ -162,6 +175,8 @@ class DrivingSession(
             if (d < a.distanceM + 15) a.copy(distanceM = d, isNew = false) else null
         }
         if (newAlert != null) alertAt = f.timeMs
+        // Radar franchi : compté une fois dans l'ordinateur de bord.
+        if (newAlert?.passed == true && newAlert.radar.id != lastPassedId) { lastPassedId = newAlert.radar.id; trip.onRadarPassed() }
         alert = newAlert ?: held
         voice.proximityBeeps = settings.proximityBeeps
         val a = alert
@@ -184,10 +199,10 @@ class DrivingSession(
                 newAlert?.let { "${it.radar.id}@${it.distanceM.toInt()}m" } ?: "-", alerts != null))
         }
         limitTracker.add(f.lat, f.lon, f.timeMs, f.speedKmh)?.let { trail ->
-            scope.launch { SpeedLimits.current(trail)?.let { speedLimit = it } }
+            scope.launch { SpeedLimits.current(trail)?.let { onLimit(it) } }
         }
         val kmh = fix?.kmh ?: 0
-        if (settings.speedLimitWarning && SpeedLimitTracker.isOver(kmh, speedLimit) && f.timeMs - lastOverWarning > 30_000) {
+        if (settings.speedLimitWarning && SpeedLimitTracker.isOver(kmh, speedLimit, settings.overTolerance) && f.timeMs - lastOverWarning > 30_000) {
             lastOverWarning = f.timeMs
             voice.speak("Attention, limité à $speedLimit")
         }

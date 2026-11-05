@@ -70,6 +70,18 @@ class DriveSettings(context: Context) {
     fun changeVoiceName(v: String?) { voiceName = v; prefs.edit().putString("voice_name", v).apply() }
     fun changeSpeechRate(v: Float) { speechRate = v; prefs.edit().putFloat("speech_rate", v).apply() }
 
+    /** DRIVE : gestes sur les bords de l'écran (retour, applis, volume). */
+    var edgeGestures by mutableStateOf(prefs.getBoolean("edge_gestures", true)); private set
+    fun changeEdgeGestures(v: Boolean) { edgeGestures = v; prefs.edit().putBoolean("edge_gestures", v).apply() }
+
+    /** Marge avant l'alerte de dépassement : -1 = tolérance légale (5 km/h, 5 % au-delà de 100), sinon en km/h. */
+    var overTolerance by mutableStateOf(prefs.getInt("over_tolerance", -1)); private set
+    fun changeOverTolerance(v: Int) { overTolerance = v; prefs.edit().putInt("over_tolerance", v).apply() }
+
+    /** Annonce vocale quand la limitation change (« Limitation 50 »). */
+    var announceLimit by mutableStateOf(prefs.getBoolean("announce_limit", true)); private set
+    fun changeAnnounceLimit(v: Boolean) { announceLimit = v; prefs.edit().putBoolean("announce_limit", v).apply() }
+
     fun changeAutostart(v: Boolean) { autostart = v; prefs.edit().putBoolean("autostart", v).apply() }
     fun changeAccent(v: Long) {
         accent = v; prefs.edit().putLong("accent", v).apply()

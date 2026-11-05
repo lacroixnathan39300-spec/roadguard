@@ -67,9 +67,9 @@ class SpeedLimitTracker {
 
     companion object {
         /** Dépassement signalé au-delà de la tolérance habituelle (5 km/h sous 100, 5 % au-dessus). */
-        fun isOver(speedKmh: Int, limit: Int?): Boolean {
+        fun isOver(speedKmh: Int, limit: Int?, margin: Int = -1): Boolean {
             if (limit == null) return false
-            val tolerance = if (limit < 100) 5 else (limit * 0.05).toInt()
+            val tolerance = if (margin >= 0) margin else if (limit < 100) 5 else (limit * 0.05).toInt()
             return speedKmh > limit + tolerance
         }
     }

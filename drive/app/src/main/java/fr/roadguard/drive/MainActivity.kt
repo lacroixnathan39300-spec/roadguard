@@ -441,6 +441,19 @@ private fun DriveHome() {
             BackHandler { showEqualizer = false }
             EqualizerPanel(equalizer, onClose = { showEqualizer = false })
         }
+        if (settings.edgeGestures) {
+            val dispatcher = androidx.activity.compose.LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+            val audio = remember { context.getSystemService(android.media.AudioManager::class.java) }
+            EdgeGestures(
+                // Retour seulement si un écran est ouvert (DRIVE est l'accueil : il ne doit pas se fermer).
+                onBack = { if (dispatcher?.hasEnabledCallbacks() == true) dispatcher.onBackPressed() },
+                onApps = { showApps = true },
+                onVolume = { up ->
+                    audio?.adjustStreamVolume(android.media.AudioManager.STREAM_MUSIC,
+                        if (up) android.media.AudioManager.ADJUST_RAISE else android.media.AudioManager.ADJUST_LOWER, android.media.AudioManager.FLAG_SHOW_UI)
+                },
+            )
+        }
     }
 }
 

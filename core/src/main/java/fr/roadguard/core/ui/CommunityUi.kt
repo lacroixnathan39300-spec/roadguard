@@ -49,7 +49,27 @@ fun ReportSheet(onPick: (ReportType) -> Unit, onClose: () -> Unit) {
             Modifier.padding(16.dp).clip(RoundedCornerShape(22.dp)).background(DriveColors.Panel).padding(16.dp).clickable(enabled = false) {},
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Text("Signaler", color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Bold)
+            val context = androidx.compose.ui.platform.LocalContext.current
+            var heard by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<String?>(null) }
+            val speech = androidx.activity.compose.rememberLauncherForActivityResult(
+                androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
+            ) { r ->
+                val said = r.data?.getStringArrayListExtra(android.speech.RecognizerIntent.EXTRA_RESULTS).orEmpty()
+                val type = said.firstNotNullOfOrNull { reportFromSpeech(it) }
+                if (type != null) onPick(type) else heard = if (said.isEmpty()) "Rien entendu" else "Pas compris : « ${said.first()} »"
+            }
+            val speechIntent = androidx.compose.runtime.remember {
+                android.content.Intent(android.speech.RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                    .putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE_MODEL, android.speech.RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                    .putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE, "fr-FR")
+                    .putExtra(android.speech.RecognizerIntent.EXTRA_PROMPT, "Police, radar, accident, bouchon, travaux, danger…")
+            }
+            val canSpeak = androidx.compose.runtime.remember { speechIntent.resolveActivity(context.packageManager) != null }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Signaler", color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                if (canSpeak) BigButton("🎤 Dire", DriveColors.Accent) { heard = null; runCatching { speech.launch(speechIntent) } }
+            }
+            heard?.let { Text(it, color = DriveColors.TextSecondary, fontSize = 14.sp) }
             ReportType.entries.chunked(3).forEach { row ->
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     row.forEach { t ->
@@ -204,5 +224,20 @@ fun CommunityScreen(community: Community, hereLat: Double?, hereLon: Double?, on
                 )
             }
         }
+    }
+}
+
+/** Signalement reconnu dans une phrase dite à voix haute (« radar mobile », « y'a les flics », « bouchon »…). */
+fun reportFromSpeech(text: String): ReportType? {
+    val t = java.text.Normalizer.normalize(text.lowercase(), java.text.Normalizer.Form.NFD).replace(Regex("\\p{M}+"), "")
+    return when {
+        "radar fixe" in t -> ReportType.FIXED
+        "radar" in t || "flash" in t || "jumelle" in t || "camera" in t -> ReportType.MOBILE
+        listOf("police", "flic", "gendarme", "controle", "keuf").any { it in t } -> ReportType.POLICE
+        "accident" in t || "accroch" in t -> ReportType.ACCIDENT
+        listOf("bouchon", "embouteill", "trafic", "ralenti").any { it in t } -> ReportType.JAM
+        "travaux" in t || "chantier" in t -> ReportType.WORKS
+        listOf("danger", "obstacle", "objet", "animal", "verglas", "panne").any { it in t } -> ReportType.DANGER
+        else -> null
     }
 }
