@@ -316,7 +316,7 @@ private fun DriveHome() {
             val sidePart: @Composable () -> Unit = {
             Column(Modifier.weight(1f - settings.mapWeight).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Clock()
+                    Clock(settings.clockStyle)
                     Spacer(Modifier.weight(1f))
                     Text(
                         if (linkState is LinkState.Connected) "📱 Connecté" else "📱",
@@ -467,12 +467,15 @@ private fun Panel(modifier: Modifier, content: @Composable BoxScope.() -> Unit) 
 }
 
 @Composable
-private fun Clock() {
+private fun Clock(style: Int = 0) {
     var now by remember { mutableStateOf(Date()) }
     LaunchedEffect(Unit) { while (true) { now = Date(); delay(1_000) } }
-    val format = remember { SimpleDateFormat("HH:mm", Locale.FRANCE) }
-    Text(format.format(now), color = Color.White, fontSize = 46.sp, fontFamily = fr.roadguard.core.ui.DriveStyle.Numbers,
-        modifier = Modifier.padding(start = 8.dp))
+    val format = remember(style) { SimpleDateFormat(if (style == 1) "HH:mm:ss" else "HH:mm", Locale.FRANCE) }
+    val dateFormat = remember { SimpleDateFormat("EEE d MMM", Locale.FRANCE) }
+    Column(Modifier.padding(start = 8.dp)) {
+        Text(format.format(now), color = Color.White, fontSize = if (style == 1) 40.sp else 46.sp, fontFamily = fr.roadguard.core.ui.DriveStyle.Numbers)
+        if (style == 2) Text(dateFormat.format(now).replaceFirstChar { it.titlecase(Locale.FRANCE) }, color = DriveColors.TextSecondary, fontSize = 16.sp)
+    }
 }
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)

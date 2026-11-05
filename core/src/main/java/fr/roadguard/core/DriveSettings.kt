@@ -70,6 +70,10 @@ class DriveSettings(context: Context) {
     fun changeVoiceName(v: String?) { voiceName = v; prefs.edit().putString("voice_name", v).apply() }
     fun changeSpeechRate(v: Float) { speechRate = v; prefs.edit().putFloat("speech_rate", v).apply() }
 
+    /** DRIVE : horloge de l'accueil (0 = heure, 1 = avec secondes, 2 = avec la date). */
+    var clockStyle by mutableStateOf(prefs.getInt("clock_style", 0)); private set
+    fun changeClockStyle(v: Int) { clockStyle = v; prefs.edit().putInt("clock_style", v).apply() }
+
     /** DRIVE : gestes sur les bords de l'écran (retour, applis, volume). */
     var edgeGestures by mutableStateOf(prefs.getBoolean("edge_gestures", true)); private set
     fun changeEdgeGestures(v: Boolean) { edgeGestures = v; prefs.edit().putBoolean("edge_gestures", v).apply() }
