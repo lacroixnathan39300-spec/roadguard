@@ -15,6 +15,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Box
@@ -198,10 +203,10 @@ private fun PhoneHome() {
                 )
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Action("Où aller", Modifier.weight(1.4f), primary = true, icon = androidx.compose.material.icons.Icons.Filled.Search) { showSearch = true }
-                Action("Link", Modifier.weight(1f), icon = androidx.compose.material.icons.Icons.Filled.Share) { context.startActivity(Intent(context, LinkActivity::class.java)) }
-                Action("", Modifier.weight(0.6f), icon = androidx.compose.material.icons.Icons.Filled.Settings) { showSettings = true }
-                Action("Menu", Modifier.weight(0.9f), icon = androidx.compose.material.icons.Icons.Filled.Menu) { showMenu = true }
+                Action("Où aller", Modifier.weight(1.4f), primary = true, icon = Icons.Filled.Search) { showSearch = true }
+                Action("Link", Modifier.weight(1f), icon = Icons.Filled.Share) { context.startActivity(Intent(context, LinkActivity::class.java)) }
+                Action("", Modifier.weight(0.6f), icon = Icons.Filled.Settings) { showSettings = true }
+                Action("Menu", Modifier.weight(0.9f), icon = Icons.Filled.Menu) { showMenu = true }
             }
         }
         Column(Modifier.align(Alignment.CenterEnd).padding(end = 12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
