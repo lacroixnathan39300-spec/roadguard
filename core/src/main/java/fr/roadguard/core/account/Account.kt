@@ -63,8 +63,10 @@ class AccountManager private constructor(context: Context) {
     private val appName = if (app.packageName.contains("drive")) "drive" else "gps"
 
     var status by mutableStateOf(prefs.getString("status", null)?.let { runCatching { AccountStatus.from(JSONObject(it)) }.getOrNull() }); private set
-    val loggedIn: Boolean get() = token != null && status != null
-    private val token: String? get() = prefs.getString("token", null)
+    // Jeton observable lui aussi : sinon l'écran de connexion ne voyait pas qu'on venait de se connecter
+    // (« token != null && … » ne lisait jamais l'état du compte tant que le jeton était vide).
+    private var token by mutableStateOf(prefs.getString("token", null))
+    val loggedIn: Boolean get() { val s = status; val t = token; return t != null && s != null }
 
     @SuppressLint("HardwareIds")
     private val device: String = (Settings.Secure.getString(app.contentResolver, Settings.Secure.ANDROID_ID) ?: "")
@@ -80,8 +82,10 @@ class AccountManager private constructor(context: Context) {
 
     private suspend fun auth(path: String, username: String, password: String) = withContext(Dispatchers.IO) {
         val o = request("POST", path, JSONObject().put("username", username.trim()).put("password", password).put("device", device).put("app", appName), withToken = false)
-        prefs.edit().putString("token", o.getString("token")).apply()
+        val t = o.getString("token")
+        prefs.edit().putString("token", t).apply()
         save(AccountStatus.from(o))
+        token = t
     }
 
     /** Nouvelle vérification auprès du serveur. Faux si le serveur n'a pas pu être joint. */
@@ -124,6 +128,7 @@ class AccountManager private constructor(context: Context) {
 
     private fun clear() {
         status = null
+        token = null
         prefs.edit().remove("token").remove("status").apply()
     }
 
