@@ -109,7 +109,11 @@ class DrivingSession(
         if (d / dt * 3.6 > 300) { previous = f; computedKmh = 0.0; return f.copy(speedKmh = if (f.speedKmh in 0.0..300.0) f.speedKmh else 0.0) }
         if (d < 6) {
             // Trop près pour mesurer : on garde la référence ; vitesse calculée conservée un court instant.
-            if (f.speedKmh > 0 || dt >= 3) return f
+            if (f.speedKmh > 0 || dt >= 3) return f.copy(bearing = when {
+                lastMovedBearing.isNaN() -> f.bearing
+                f.bearing.isNaN() || fr.roadguard.core.radar.Geo.headingDelta(f.bearing, lastMovedBearing) > 25 -> lastMovedBearing
+                else -> f.bearing
+            })
             return f.copy(speedKmh = computedKmh, bearing = if (computedKmh > 7) lastMovedBearing else f.bearing)
         }
         previous = f
@@ -122,10 +126,13 @@ class DrivingSession(
         }
         val moved = if (speed > 7) fr.roadguard.core.radar.Geo.bearing(p.lat, p.lon, f.lat, f.lon) else Double.NaN
         if (!moved.isNaN()) lastMovedBearing = moved
-        // Certaines puces renvoient un cap figé à 0 : le sens réel du déplacement l'emporte alors.
+        // Le sens réel du déplacement (entre deux positions) fait foi : certains téléphones donnent un
+        // « cap » issu de la boussole (téléphone en biais sur son support) ou figé à 0. Le cap du GPS
+        // n'est gardé que s'il concorde avec le déplacement (il est alors plus lisse).
         val bearing = when {
+            moved.isNaN() -> f.bearing
             f.bearing.isNaN() -> moved
-            f.bearing == 0.0 && !moved.isNaN() && fr.roadguard.core.radar.Geo.headingDelta(0.0, moved) > 30 -> moved
+            fr.roadguard.core.radar.Geo.headingDelta(f.bearing, moved) > 25 -> moved
             else -> f.bearing
         }
         return f.copy(speedKmh = speed, bearing = bearing)

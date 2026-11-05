@@ -343,10 +343,10 @@ private class MapHolder {
     private var meLat = Double.NaN; private var meLon = 0.0; private var lastDraw = 0L
 
     /** Dessine la flèche ROADGUARD (au plus 30 fois par seconde, pour ménager le poste). */
-    fun drawMe(lat: Double, lon: Double, bearing: Double) {
+    fun drawMe(lat: Double, lon: Double, bearing: Double, force: Boolean = false) {
         meLat = lat; meLon = lon; if (!bearing.isNaN()) lastBearing = bearing
         val now = android.os.SystemClock.uptimeMillis()
-        if (now - lastDraw < 33) return
+        if (!force && now - lastDraw < 33) return
         lastDraw = now
         runCatching {
             style?.getSourceAs<GeoJsonSource>(ME_SOURCE)?.setGeoJson(
@@ -372,7 +372,7 @@ private class MapHolder {
             interpolator = android.view.animation.LinearInterpolator()
             addUpdateListener { a ->
                 val t = (a.animatedValue as Float).toDouble()
-                drawMe(fromLat + (lat - fromLat) * t, fromLon + (lon - fromLon) * t, (fromB + delta * t + 360.0) % 360.0)
+                drawMe(fromLat + (lat - fromLat) * t, fromLon + (lon - fromLon) * t, (fromB + delta * t + 360.0) % 360.0, force = t >= 1.0)
             }
             start()
         }
