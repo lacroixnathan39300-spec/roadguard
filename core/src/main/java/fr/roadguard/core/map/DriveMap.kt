@@ -277,6 +277,7 @@ fun DriveMap(
             if (!p.bearing.isNaN()) bearing = p.bearing.toFloat()
         }
         runCatching { comp.forceLocationUpdate(loc) }
+        hidePuck(holder.style)
         // La flèche suit ensuite la position animée de la carte (voir enableLocation) : mouvement fluide.
         // Flèche glissée jusqu'à la nouvelle position (même durée que l'animation de la caméra) : pas de sauts.
         holder.animateMe(p.lat, p.lon, if (p.bearing.isNaN()) Double.NaN else p.bearing)
@@ -395,8 +396,24 @@ private fun enableLocation(context: Context, map: MapLibreMap, style: Style, hol
     )
     component.isLocationComponentEnabled = true
     component.cameraMode = CameraMode.TRACKING_GPS_NORTH
-    component.renderMode = RenderMode.GPS
+    component.renderMode = RenderMode.NORMAL
     component.zoomWhileTracking(15.0)
+    hidePuck(style)
+}
+
+/**
+ * Le point MapLibre (sa propre flèche, mal orientée sur certains téléphones) est masqué : il passait
+ * au-dessus de la flèche ROADGUARD « rg-me ». MapLibre réaffiche parfois ses couches : appelé à chaque position.
+ */
+private fun hidePuck(style: Style?) {
+    val st = style ?: return
+    runCatching {
+        for (layer in st.layers) {
+            val id = layer.id
+            if (id != ME_SOURCE && (id.contains("location", ignoreCase = true) || id.contains("puck", ignoreCase = true)) &&
+                layer.visibility.value != Property.NONE) layer.setProperties(PropertyFactory.visibility(Property.NONE))
+        }
+    }
 }
 
 private const val ROUTE_SOURCE = "roadguard-route"
