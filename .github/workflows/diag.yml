@@ -3,6 +3,10 @@ name: Diagnostic comptes
 # Lancement manuel : essai de création / connexion d'un compte de test sur le serveur, puis ménage.
 on:
   workflow_dispatch:
+    inputs:
+      reset:
+        description: "Supprimer TOUS les comptes (oui/non)"
+        default: "non"
 
 jobs:
   diag:
@@ -24,6 +28,12 @@ jobs:
           npm install --no-audit --no-fund >/dev/null 2>&1
           sed -i "s/REMPLACE_PAR_LA_CI/$(npx wrangler d1 list --json | python3 -c "import json,sys; print(next(d['uuid'] for d in json.load(sys.stdin) if d['name']=='roadguard-eu'))")/" wrangler.toml
           url=https://roadguard.roadguard-app.workers.dev
+          if [ "${{ inputs.reset }}" = "oui" ]; then
+            echo "== suppression de tous les comptes"
+            npx wrangler d1 execute roadguard-eu --remote --command "DELETE FROM sessions; DELETE FROM trials; DELETE FROM users" 2>&1 | grep -E '"changes"' || true
+            npx wrangler d1 execute roadguard-eu --remote --json --command "SELECT COUNT(*) AS n FROM users" 2>/dev/null | python3 -c "import json,sys; print('comptes restants :', json.load(sys.stdin)[0]['results'][0]['n'])"
+            exit 0
+          fi
           echo "== comptes"; npx wrangler d1 execute roadguard-eu --remote --command "SELECT username, plan, admin, blocked, access_until, created_at FROM users" 2>&1 | tail -15
           echo "== sessions"; npx wrangler d1 execute roadguard-eu --remote --command "SELECT username, device, app, created_at FROM sessions" 2>&1 | tail -10
           d=ci$(date +%s)test
