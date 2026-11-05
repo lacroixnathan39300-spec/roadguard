@@ -58,9 +58,14 @@ function random(bytes: number): string {
 async function sha256(text: string): Promise<string> {
   return hex(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text)));
 }
+/**
+ * Itérations PBKDF2 : l'offre gratuite Cloudflare limite le calcul à ~10 ms par requête ;
+ * 100 000 itérations dépassaient la limite (connexion refusée). Le sel reste unique par compte.
+ */
+export const PBKDF2_ITERATIONS = 4_000;
 export async function hashPassword(password: string, salt: string): Promise<string> {
   const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
-  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt: new TextEncoder().encode(salt), iterations: 100_000 }, key, 256);
+  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt: new TextEncoder().encode(salt), iterations: PBKDF2_ITERATIONS }, key, 256);
   return hex(bits);
 }
 
