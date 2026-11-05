@@ -70,6 +70,14 @@ class DriveSettings(context: Context) {
     fun changeVoiceName(v: String?) { voiceName = v; prefs.edit().putString("voice_name", v).apply() }
     fun changeSpeechRate(v: Float) { speechRate = v; prefs.edit().putFloat("speech_rate", v).apply() }
 
+    /** Style de carte : « roadguard » (nouveau, façon Waze) ou « classic ». */
+    var mapStyle by mutableStateOf(prefs.getString("map_style", "roadguard") ?: "roadguard"); private set
+    fun changeMapStyle(v: String) { mapStyle = v; prefs.edit().putString("map_style", v).apply() }
+
+    /** DRIVE : bouton « carte Waze en direct » sur la carte. */
+    var wazeButton by mutableStateOf(prefs.getBoolean("waze_button", true)); private set
+    fun changeWazeButton(v: Boolean) { wazeButton = v; prefs.edit().putBoolean("waze_button", v).apply() }
+
     /** Rappel de pause après 2 h de conduite. */
     var pauseReminder by mutableStateOf(prefs.getBoolean("pause_reminder", true)); private set
     fun changePauseReminder(v: Boolean) { pauseReminder = v; prefs.edit().putBoolean("pause_reminder", v).apply() }

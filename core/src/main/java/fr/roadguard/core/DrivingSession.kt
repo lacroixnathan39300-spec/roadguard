@@ -196,7 +196,7 @@ class DrivingSession(
         alert = newAlert ?: held
         voice.proximityBeeps = settings.proximityBeeps
         val a = alert
-        // Radar dépassé : bips encore le temps de parcourir les derniers mètres (20 m après le radar).
+        // Radar dépassé : bips encore le temps de parcourir les derniers mètres (40 m après le radar).
         voice.proximity(a?.distanceM, if (a?.passed == true) (a.remainingM / (f.speedKmh / 3.6).coerceAtLeast(2.0) * 1000).toLong().coerceAtLeast(1) else 0)
         community.onFix(f)
         trip.onFix(f.lat, f.lon, f.speedKmh, f.accuracyM, f.timeMs, if (location.hasAltitude()) location.altitude else null)

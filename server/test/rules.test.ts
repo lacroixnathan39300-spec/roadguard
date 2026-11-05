@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { box, cleanName, distanceM, extendedExpiry, shouldBecomePermanent, shouldRemove, TYPES } from "../src/index.ts";
+import { box, cleanName, detectJams, distanceM, extendedExpiry, shouldBecomePermanent, shouldRemove, TYPES } from "../src/index.ts";
 
 const H = 3_600_000, D = 24 * H;
 
@@ -53,4 +53,17 @@ test("comptes : identifiant, accès et actions de l'administrateur", () => {
   assert.equal(grant({ access_until: now - 5 }, "unlimited", now)?.access_until, 0);
   assert.equal(grant({ access_until: now + 10 * D }, "month", now)?.access_until, now + 41 * D);
   assert.equal(grant({ access_until: now }, "bidon", now), null);
+});
+
+test("bouchons détectés : 2 conducteurs au pas au même endroit", () => {
+  const rows = [
+    { account_id: "a", lat: 46.70, lon: 5.55, speed: 10 },
+    { account_id: "b", lat: 46.7001, lon: 5.5501, speed: 14 },
+    { account_id: "c", lat: 46.80, lon: 5.60, speed: 12 },
+    { account_id: "d", lat: 46.70, lon: 5.55, speed: 80 },
+  ];
+  const j = detectJams(rows);
+  assert.equal(j.length, 1);
+  assert.equal(j[0].n, 2);
+  assert.equal(j[0].speed, 12);
 });

@@ -53,6 +53,8 @@ class Community(context: Context, private val scope: CoroutineScope, private val
 
     var reports by mutableStateOf<List<Report>>(emptyList()); private set
     var drivers by mutableStateOf<List<Driver>>(emptyList()); private set
+    /** Bouchons détectés automatiquement (plusieurs conducteurs ROADGUARD au pas au même endroit). */
+    var jams by mutableStateOf<List<Driver>>(emptyList()); private set
     var prompt by mutableStateOf<VotePrompt?>(null); private set
     /** Message bref à afficher (coucou reçu, signalement envoyé, erreur). */
     var toast by mutableStateOf<String?>(null); private set
@@ -98,6 +100,11 @@ class Community(context: Context, private val scope: CoroutineScope, private val
         drivers = (0 until ds.length()).map { i ->
             val d = ds.getJSONObject(i)
             Driver(d.getString("id"), d.optString("name"), d.getDouble("lat"), d.getDouble("lon"), d.optInt("speed").takeIf { it > 0 })
+        }
+        val js = o.optJSONArray("jams") ?: JSONArray()
+        jams = (0 until js.length()).map { i ->
+            val j = js.getJSONObject(i)
+            Driver("jam$i", "${j.optInt("n")} conducteurs", j.getDouble("lat"), j.getDouble("lon"), j.optInt("speed"))
         }
         val waves = o.optJSONArray("waves") ?: JSONArray()
         if (waves.length() > 0) {

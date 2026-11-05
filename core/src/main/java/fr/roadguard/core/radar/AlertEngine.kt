@@ -51,7 +51,7 @@ class AlertEngine(private val index: RadarIndex) {
             if (d > range || d >= bestDist) continue
             // Devant soi : le radar doit être dans l'axe de la route suivie.
             val off = Geo.headingDelta(fix.bearing, Geo.bearing(fix.lat, fix.lon, r.lat, r.lon))
-            if (off > 90 && d > 5) continue  // déjà derrière (le prolongement de 20 m est géré plus haut)
+            if (off > 90 && d > 5) continue  // déjà derrière (le prolongement de 40 m est géré plus haut)
             if (d > 40 && off > 35) continue
             // Sens du radar connu : ignorer ceux qui contrôlent l'autre sens.
             val dir = r.directionDeg
@@ -73,10 +73,10 @@ class AlertEngine(private val index: RadarIndex) {
     }
 
     companion object {
-        /** L'alerte (bips) continue encore 20 m après le radar. */
-        const val AFTER_M = 20.0
+        /** L'alerte (bips) continue encore 40 m après le radar. */
+        const val AFTER_M = 40.0
 
-        /** Environ 25 s de trajet : 400 m en ville, ~625 m à 90 km/h, ~900 m à 130 km/h (max 1 000 m). */
-        fun warningDistance(speedKmh: Double): Double = (speedKmh / 3.6 * 25.0).coerceIn(400.0, 1000.0)
+        /** Environ 30 s de trajet : 500 m en ville, 750 m à 90 km/h, ~1 080 m à 130 km/h (max 1 200 m). */
+        fun warningDistance(speedKmh: Double): Double = (speedKmh / 3.6 * 30.0).coerceIn(500.0, 1200.0)
     }
 }

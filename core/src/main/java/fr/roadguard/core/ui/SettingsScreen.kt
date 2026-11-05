@@ -109,6 +109,11 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
             ToggleRow("Zoom selon la vitesse", settings.adaptiveZoom, settings::changeAdaptiveZoom)
 
             Section("Thème de la carte")
+            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                BigButton("Style ROADGUARD", if (settings.mapStyle == "roadguard") DriveColors.Accent else DriveColors.Panel) { settings.changeMapStyle("roadguard") }
+                BigButton("Style classique", if (settings.mapStyle != "roadguard") DriveColors.Accent else DriveColors.Panel) { settings.changeMapStyle("classic") }
+            }
+            ToggleRow("Bouton « Trafic Waze en direct » sur la carte", settings.wazeButton, settings::changeWazeButton)
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 ThemeMode.entries.forEach { mode ->
                     BigButton(mode.label, if (settings.theme == mode) DriveColors.Accent else DriveColors.Panel) { settings.changeTheme(mode) }

@@ -72,6 +72,8 @@ fun DriveMap(
     offlinePack: OfflinePack? = null,
     /** Variantes du trajet proposées au départ, dessinées en gris. */
     alternatives: List<Route> = emptyList(),
+    /** Style de carte ROADGUARD (jour façon Waze, nuit sombre) ; faux = styles classiques Liberty / Dark Matter. */
+    roadguardStyle: Boolean = true,
     /** Carte toujours orientée nord (sinon : dans le sens de la marche pendant le guidage). */
     northUp: Boolean = false,
     /** Vitesse actuelle, pour le zoom adaptatif (plus large quand on roule vite). */
@@ -85,6 +87,8 @@ fun DriveMap(
     /** Signalements de la communauté et conducteurs visibles autour. */
     reports: List<fr.roadguard.core.community.Report> = emptyList(),
     drivers: List<fr.roadguard.core.community.Driver> = emptyList(),
+    /** Bouchons détectés par ROADGUARD (zones rouges ou orange). */
+    jams: List<fr.roadguard.core.community.Driver> = emptyList(),
 ) {
     val zoom = when {
         !adaptiveZoom -> if (route != null) 16.0 else 15.0
@@ -156,19 +160,20 @@ fun DriveMap(
     }
 
     // Style jour/nuit ; à chaque changement, les couches ROADGUARD sont remises.
-    LaunchedEffect(night, styleVersion < 0 || styleVersion > 0, radarCollection, offlinePack?.file?.path, retry) {
+    LaunchedEffect(night, styleVersion < 0 || styleVersion > 0, radarCollection, offlinePack?.file?.path, retry, roadguardStyle) {
         val map = holder.map ?: return@LaunchedEffect
         val collection = radarCollection ?: return@LaunchedEffect
         // Sans aucun Internet : style de jour, celui des zones enregistrées et du cache (la nuit n'est pas enregistrée).
         val online = fr.roadguard.core.net.Net.hasDirectInternet() || fr.roadguard.core.net.Net.relay?.isConnected() == true
         val useNight = night && online
-        val uri = offlinePack?.let { "offline:${it.file.path}:$night" } ?: if (useNight) NIGHT_STYLE_URL else STYLE_URL
+        val uri = offlinePack?.let { "offline:${it.file.path}:$night" } ?: if (roadguardStyle) "roadguard:$useNight" else if (useNight) NIGHT_STYLE_URL else STYLE_URL
         if (holder.styleUri == uri) return@LaunchedEffect
         holder.styleUri = uri
         val builder = offlinePack?.let { pack ->
             val json = withContext(Dispatchers.IO) { runCatching { OfflineMaps.style(context, pack, night) }.getOrNull() }
             json?.let { Style.Builder().fromJson(it) }
-        } ?: Style.Builder().fromUri(if (useNight) NIGHT_STYLE_URL else STYLE_URL)
+        } ?: if (roadguardStyle) Style.Builder().fromJson(RoadguardStyle.json(useNight))
+            else Style.Builder().fromUri(if (useNight) NIGHT_STYLE_URL else STYLE_URL)
         // L'ancien style devient inutilisable dès ce moment : plus aucun accès jusqu'au nouveau.
         holder.style = null
         map.setStyle(builder) { style ->
@@ -184,6 +189,8 @@ fun DriveMap(
             style.addLayer(radarLayer())
             style.addSource(GeoJsonSource(COMMUNITY_SOURCE))
             style.addLayer(communityLayer())
+            style.addSource(GeoJsonSource(JAMS_SOURCE))
+            style.addLayerBelow(jamsLayer(), firstSymbolLayer(style))
             style.addSource(GeoJsonSource(DRIVERS_SOURCE))
             runCatching { style.addImage(ARROW_IMAGE, navArrowBitmap(context)) }
             // Pas de fondu des symboles : sinon la flèche, déplacée à chaque image, reste à moitié transparente
@@ -231,6 +238,13 @@ fun DriveMap(
     }
 
     // Signalements et conducteurs (mis à jour toutes les minutes en roulant).
+    LaunchedEffect(jams, styleVersion) {
+        runCatching {
+            holder.style?.getSourceAs<GeoJsonSource>(JAMS_SOURCE)?.setGeoJson(FeatureCollection.fromFeatures(jams.map { j ->
+                Feature.fromGeometry(Point.fromLngLat(j.lon, j.lat)).apply { addNumberProperty("speed", j.speed ?: 10) }
+            }))
+        }
+    }
     LaunchedEffect(reports, drivers, styleVersion) {
         val style = holder.style ?: return@LaunchedEffect
         runCatching {
@@ -386,6 +400,17 @@ private fun navArrowBitmap(context: Context): android.graphics.Bitmap {
 
 private const val COMMUNITY_SOURCE = "roadguard-community"
 private const val DRIVERS_SOURCE = "roadguard-drivers"
+private const val JAMS_SOURCE = "roadguard-jams"
+
+/** Bouchon : grande tache rouge (au pas) ou orange (lent), floue, sous les noms de rues. */
+private fun jamsLayer() = CircleLayer(JAMS_SOURCE, JAMS_SOURCE).withProperties(
+    PropertyFactory.circleRadius(Expression.interpolate(Expression.linear(), Expression.zoom(),
+        Expression.stop(10, 6f), Expression.stop(14, 22f), Expression.stop(17, 60f))),
+    PropertyFactory.circleColor(Expression.step(Expression.get("speed"), Expression.color(android.graphics.Color.parseColor("#E53935")),
+        Expression.stop(12, Expression.color(android.graphics.Color.parseColor("#FB8C00"))))),
+    PropertyFactory.circleOpacity(0.45f),
+    PropertyFactory.circleBlur(0.6f),
+)
 
 /** Signalements : pastille de la couleur du type, contour blanc épais. */
 private fun communityLayer() = CircleLayer(COMMUNITY_SOURCE, COMMUNITY_SOURCE).withProperties(

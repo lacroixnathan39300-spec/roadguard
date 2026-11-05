@@ -68,6 +68,8 @@ enum class ModuleType(val label: String, val emoji: String, val minW: Int, val m
     DOCK("Applis favorites", "▦", 2, 1),
     TRIP("Ordinateur de bord", "📊", 1, 1),
     SHORTCUTS("Raccourcis (signaler, recherche, réglages)", "⚡", 1, 1),
+    WAZE("Trafic Waze en direct (carte)", "🚦", 2, 2),
+    WAZE_APP("Appli Waze en écran partagé", "🧭", 1, 1),
     WIDGET("Widget Android", "🧩", 1, 1),
 }
 

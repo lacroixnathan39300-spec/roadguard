@@ -160,6 +160,7 @@ private fun PhoneHome() {
     var showEqualizer by remember { mutableStateOf(false) }
     var showAdmin by remember { mutableStateOf(false) }
     var showCamera by remember { mutableStateOf(false) }
+    var showWaze by remember { mutableStateOf(false) }
 
     // Carte hors ligne : packs téléchargés dans « Plus → Cartes hors ligne », utilisés sans Internet.
     val packStates by fr.roadguard.core.map.MapPackManager.get(context).states.collectAsState()
@@ -168,12 +169,12 @@ private fun PhoneHome() {
 
     Box(Modifier.fillMaxSize().background(DriveColors.Background)) {
         DriveMap(
-            reports = s.community.reports, drivers = s.community.drivers,
+            reports = s.community.reports, drivers = s.community.drivers, jams = s.community.jams,
             position = s.here, northUp = settings.northUp, adaptiveZoom = settings.adaptiveZoom, speedKmh = s.fix?.kmh ?: 0,
             alternatives = s.alternatives,
             offlinePack = offlinePack,
             hasLocation = hasLocation, route = s.route, recenterRequest = s.recenter,
-            night = s.night, visibleKinds = settings.alertKinds, modifier = Modifier.fillMaxSize(),
+            night = s.night, visibleKinds = settings.alertKinds, roadguardStyle = settings.mapStyle == "roadguard", modifier = Modifier.fillMaxSize(),
         )
         Column(Modifier.align(Alignment.TopCenter).statusBarsPadding().fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             if (s.navigating) {
@@ -252,6 +253,10 @@ private fun PhoneHome() {
                     fr.roadguard.core.ui.BigButton("Fermer", DriveColors.Panel) { showMenu = false }
                 }
                 fun open(tab: Int) { offlineTab = tab; showOffline = true; showMenu = false }
+                MenuEntry("🚦", "Trafic Waze en direct", "Bouchons, accidents et police signalés par Waze, autour de toi") { showMenu = false; showWaze = true }
+                if (fr.roadguard.core.ui.Waze.installed(context)) MenuEntry("🧭", "Waze à côté de ROADGUARD", "Écran partagé : Waze + alertes ROADGUARD (ou bulle)") {
+                    showMenu = false; fr.roadguard.core.ui.Waze.openApp(context, adjacent = true)
+                }
                 MenuEntry("📷", "Assistant caméra", "Distance avec la voiture de devant, alerte collision, départ au feu") { showMenu = false; showCamera = true }
                 MenuEntry("📊", "Ordinateur de bord", "Distances, temps, vitesses, chronos") { showMenu = false; showTrip = true }
                 MenuEntry("👥", "Communauté", "Pseudo, points, classement, conducteurs autour") { showMenu = false; showCommunity = true }
@@ -266,6 +271,10 @@ private fun PhoneHome() {
                     showMenu = false; context.startActivity(Intent(context, fr.roadguard.app.MainActivity::class.java))
                 }
             }
+        }
+        if (showWaze) {
+            BackHandler { showWaze = false }
+            fr.roadguard.core.ui.WazeLiveMap(s.here?.lat, s.here?.lon, Modifier.fillMaxSize().statusBarsPadding(), onClose = { showWaze = false })
         }
         if (showCamera) {
             BackHandler { showCamera = false }

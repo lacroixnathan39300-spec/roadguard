@@ -318,7 +318,7 @@ async function sync(req: Request, env: Env, me: Account | null): Promise<Respons
   q.searchParams.set("lon", String(lon));
   q.searchParams.set("radius", String(num(body.radius, 1000, 100_000) ?? 30_000));
   const reports = (await (await reportsNear(q, env, me)).json()) as { reports: unknown[] };
-  if (!me) return json({ reports: reports.reports, drivers: [], waves: [], points: null });
+  if (!me) return json({ reports: reports.reports, drivers: [], waves: [], points: null, jams: await jamsNear(lat, lon, env) });
   let drivers: unknown[] = [];
   if (body.share === true) {
     await presence(new Request(req.url, { method: "POST", body: JSON.stringify({ lat, lon, heading: body.heading, speed: body.speed }) }), env, me);
@@ -327,7 +327,32 @@ async function sync(req: Request, env: Env, me: Account | null): Promise<Respons
     await env.DB.prepare("DELETE FROM presence WHERE account_id = ?").bind(me.id).run();
   }
   const waves = ((await (await inbox(env, me)).json()) as { waves: unknown[] }).waves;
-  return json({ reports: reports.reports, drivers, waves, points: me.points, name: me.name });
+  return json({ reports: reports.reports, drivers, waves, points: me.points, name: me.name, jams: await jamsNear(lat, lon, env) });
+}
+
+/**
+ * Bouchons détectés automatiquement : au moins 2 conducteurs ROADGUARD différents roulant au pas (3 à 25 km/h)
+ * dans la même case d'environ 250 m au cours des 10 dernières minutes.
+ */
+export function detectJams(rows: { account_id: string; lat: number; lon: number; speed: number | null }[]) {
+  const cells = new Map<string, { ids: Set<string>; lat: number; lon: number; speed: number; n: number }>();
+  for (const r of rows) {
+    if (r.speed == null || r.speed < 3 || r.speed > 25) continue;
+    const key = `${Math.round(r.lat * 450)}:${Math.round(r.lon * 320)}`;
+    const c = cells.get(key) ?? { ids: new Set<string>(), lat: 0, lon: 0, speed: 0, n: 0 };
+    c.ids.add(r.account_id); c.lat += r.lat; c.lon += r.lon; c.speed += r.speed; c.n++;
+    cells.set(key, c);
+  }
+  return [...cells.values()].filter((c) => c.ids.size >= 2)
+    .map((c) => ({ lat: c.lat / c.n, lon: c.lon / c.n, speed: Math.round(c.speed / c.n), n: c.ids.size }));
+}
+
+async function jamsNear(lat: number, lon: number, env: Env) {
+  const b = box(lat, lon, 30_000);
+  const rows = await env.DB.prepare(
+    "SELECT account_id, lat, lon, speed FROM presence WHERE at > ? AND lat BETWEEN ? AND ? AND lon BETWEEN ? AND ?"
+  ).bind(Date.now() - 10 * MIN, b.minLat, b.maxLat, b.minLon, b.maxLon).all<{ account_id: string; lat: number; lon: number; speed: number | null }>();
+  return detectJams(rows.results);
 }
 
 /** Chiffres d'utilisation (pour suivre l'approche des limites de l'offre gratuite). */

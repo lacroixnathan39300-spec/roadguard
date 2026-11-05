@@ -1,6 +1,6 @@
 # ROADGUARD : état du projet (pour reprendre dans une nouvelle conversation)
 
-Dernière mise à jour : 5 novembre 2026, build 149.
+Dernière mise à jour : 5 novembre 2026, étape 2 (build 150+).
 
 ## Les applis
 - **GPS** (`fr.roadguard.gps`, dossier `gps/`) : appli téléphone : carte, radars, guidage, Link, assistant caméra.
@@ -28,9 +28,11 @@ Dernière mise à jour : 5 novembre 2026, build 149.
 ## Fait
 Radars + bips (20 m après le radar), vitesse moyenne, guidage, communauté, Link, bulle, comptes, accueil DRIVE en pages/modules/widgets,
 gestes sur les bords, tolérance de vitesse, annonce des limitations, signalement vocal, ordinateur de bord, carnet d'entretien,
-rappel de pause, assistant caméra (distance, collision, départ au feu), rapports de plantage, position réseau en attendant le GPS.
+rappel de pause, assistant caméra (distance, collision, départ au feu), rapports de plantage, position réseau en attendant le GPS,
+style de carte ROADGUARD jour/nuit (tools/map/gen_style.py), carte Waze en direct (WebView, ouvrir/fermer), Waze en écran partagé,
+bouchons détectés automatiquement (conducteurs au pas), alertes radar 30 s avant et 40 m après.
 
 ## À faire (prochaines étapes)
-- **Étape 2** : zones écoles, vitesse à tenir sur les tronçons, styles de compteur, partage de trajet en direct.
+- **Reste de l'étape 2** : zones écoles, vitesse à tenir sur les tronçons, styles de compteur, partage de trajet, itinéraire qui évite les bouchons, bulle améliorée.
 - **Étape 3** : indication des voies, prix des carburants, OBD2, commandes vocales « OK ROADGUARD », affichage tête haute, groupes d'amis.
 - À valider en voiture : position (build 147+), accueil DRIVE et widgets, connexion sur l'autoradio, assistant caméra.
