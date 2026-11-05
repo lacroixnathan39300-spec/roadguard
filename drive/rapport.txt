@@ -1,78 +1,77 @@
 Appli : fr.roadguard.drive
 Plantage : non
 
-11-05 07:43:28.184  1644  1675 V BackupManagerService: restoreAtInstall pkg=fr.roadguard.drive token=1 restoreSet=0
-11-05 07:43:28.313  1644  1964 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:fr.roadguard.drive flg=0x4000010 (has extras) } to com.svox.pico/.VoiceDataInstallerReceiver
-11-05 07:43:28.487  1865  1865 D ImsResolver: maybeAddedImsService, packageName: fr.roadguard.drive
-11-05 07:43:28.658  2778  2778 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
-11-05 07:43:28.753  2778  2778 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
-11-05 07:43:28.758  2778  2778 I AndroidRuntime: VM exiting with result code 0.
-11-05 07:43:28.898  2796  2796 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
-11-05 07:43:28.942  2796  2796 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
-11-05 07:43:28.946  2796  2796 I AndroidRuntime: VM exiting with result code 0.
-11-05 07:43:29.045  2807  2807 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
-11-05 07:43:29.089  2807  2807 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
-11-05 07:43:29.095  2807  2807 I AndroidRuntime: VM exiting with result code 1.
-11-05 07:43:29.198  2818  2818 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
-11-05 07:43:29.242  2818  2818 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
-11-05 07:43:29.244  2818  2818 I AndroidRuntime: VM exiting with result code 1.
-11-05 07:43:29.263  1644  1965 I ActivityManager: START u0 {flg=0x10000000 cmp=fr.roadguard.drive/.MainActivity} from uid 2000
-11-05 07:43:29.287  1644  2333 I ActivityManager: Start proc 2833:fr.roadguard.drive/u0a59 for activity fr.roadguard.drive/.MainActivity
-11-05 07:43:31.240  1644  1666 I ActivityManager: Displayed fr.roadguard.drive/.MainActivity: +1s963ms
-11-05 07:43:32.736  2833  2833 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-05 07:43:33.046  2833  2838 I zygote64: JIT allocated 94KB for stack maps of void fr.roadguard.drive.MainActivityKt.DriveHome(androidx.compose.runtime.Composer, int)
-11-05 07:43:34.105  2833  2899 W Mbgl    : {roadguard.drive}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
-11-05 07:43:34.145  2833  2899 W Mbgl    : {roadguard.drive}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
-11-05 07:43:34.148  2833  2899 I chatty  : uid=10059(fr.roadguard.drive) Worker 1 identical 1 line
-11-05 07:43:34.153  2833  2899 W Mbgl    : {roadguard.drive}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
-11-05 07:43:34.208  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:43:35.363  2833  2838 I zygote64: Compiler allocated 7MB to compile void fr.roadguard.core.map.DriveMapKt.DriveMap(boolean, fr.roadguard.core.nav.Route, int, boolean, java.util.Set, androidx.compose.ui.Modifier, fr.roadguard.core.map.OfflinePack, java.util.List, boolean, int, boolean, fr.roadguard.core.radar.Fix, java.util.List, java.util.List, androidx.compose.runtime.Composer, int, int, int)
-11-05 07:43:35.403  2833  2941 D ProfileInstaller: Installing profile for fr.roadguard.drive
-11-05 07:43:37.967  2833  2833 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-05 07:43:40.970  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:43:43.956  2833  2833 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-05 07:43:43.998  2833  2838 I zygote64: Compiler allocated 9MB to compile void fr.roadguard.core.ui.MusicCardKt.MusicCard(fr.roadguard.core.media.NowPlaying, boolean, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, androidx.compose.ui.Modifier, kotlin.jvm.functions.Function0, java.lang.String, androidx.compose.runtime.Composer, int, int)
-11-05 07:43:49.009  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:43:49.970  2833  2833 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-05 07:43:55.967  2833  2833 I RoadguardSession: pos=46.72623,5.59312 v=136 cap=0 prec=20 nuit=false alerte=- radars=true
-11-05 07:43:56.235  2833  2899 W Mbgl    : {roadguard.drive}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
-11-05 07:43:56.291  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:44:01.975  2833  2833 I RoadguardSession: pos=46.72527,5.59247 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
-11-05 07:44:03.978  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:44:07.985  2833  2833 I RoadguardSession: pos=46.72432,5.59182 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
-11-05 07:44:11.983  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:44:13.973  2833  2833 I RoadguardSession: pos=46.72337,5.59118 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
-11-05 07:44:19.975  2833  2833 I RoadguardSession: pos=46.72242,5.59053 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
-11-05 07:44:20.003  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:44:25.979  2833  2833 I RoadguardSession: pos=46.72147,5.58988 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
-11-05 07:44:28.001  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:44:31.982  2833  2833 I RoadguardSession: pos=46.72052,5.58924 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
-11-05 07:44:33.984  1644  2255 I MediaFocusControl: requestAudioFocus() from uid/pid 10059/2833 clientId=android.media.AudioManager@e813676fr.roadguard.core.radar.AlertVoice$$ExternalSyntheticLambda0@e05477 callingPack=fr.roadguard.drive req=3 flags=0x0 sdk=36
-11-05 07:44:36.056  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:44:38.085  2833  2833 I RoadguardSession: pos=46.71957,5.58859 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
-11-05 07:44:43.999  2833  2833 I RoadguardSession: pos=46.71878,5.58805 v=136 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@471m radars=true
-11-05 07:44:44.055  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:44:50.005  2833  2833 I RoadguardSession: pos=46.71814,5.58762 v=64 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@393m radars=true
-11-05 07:44:52.091  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:44:56.041  2833  2833 I RoadguardSession: pos=46.71719,5.58697 v=70 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@277m radars=true
-11-05 07:44:58.174  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 1 line
-11-05 07:45:00.034  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:45:02.033  2833  2833 I RoadguardSession: pos=46.71640,5.58643 v=70 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@180m radars=true
-11-05 07:45:03.574  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 1 line
-11-05 07:45:08.044  2833  2833 I RoadguardSession: pos=46.71576,5.58600 v=65 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@102m radars=true
-11-05 07:45:08.079  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:45:10.092  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 07:45:11.699  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 07:45:12.759  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 07:45:13.723  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 07:45:14.112  2833  2833 I RoadguardSession: pos=46.71481,5.58536 v=70 cap=205 prec=20 nuit=false alerte=rg-23221914238eedc5fb8a@99m radars=true
-11-05 07:45:16.102  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:45:17.642  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 07:45:18.605  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 07:45:19.587  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 07:45:20.032  2833  2833 I RoadguardSession: pos=46.71386,5.58471 v=136 cap=205 prec=20 nuit=false alerte=rg-23221914238eedc5fb8a@0m radars=true
-11-05 07:45:22.053  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 1 line
-11-05 07:45:23.041  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 07:45:23.736  2833  2877 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 1 line
-11-05 07:45:24.056  2833  2833 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
-11-05 07:45:26.016  2833  2833 I RoadguardSession: pos=46.71291,5.58406 v=136 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:52:10.648  1647  1678 V BackupManagerService: restoreAtInstall pkg=fr.roadguard.drive token=1 restoreSet=0
+11-05 07:52:10.701  1647  2274 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:fr.roadguard.drive flg=0x4000010 (has extras) } to com.svox.pico/.VoiceDataInstallerReceiver
+11-05 07:52:10.815  1865  1865 D ImsResolver: maybeAddedImsService, packageName: fr.roadguard.drive
+11-05 07:52:10.950  2768  2768 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+11-05 07:52:11.032  2768  2768 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
+11-05 07:52:11.035  2768  2768 I AndroidRuntime: VM exiting with result code 0.
+11-05 07:52:11.143  2785  2785 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+11-05 07:52:11.173  2785  2785 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
+11-05 07:52:11.175  2785  2785 I AndroidRuntime: VM exiting with result code 0.
+11-05 07:52:11.234  2797  2797 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+11-05 07:52:11.267  2797  2797 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
+11-05 07:52:11.269  2797  2797 I AndroidRuntime: VM exiting with result code 1.
+11-05 07:52:11.328  2808  2808 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+11-05 07:52:11.353  2808  2808 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
+11-05 07:52:11.354  2808  2808 I AndroidRuntime: VM exiting with result code 1.
+11-05 07:52:11.367  1647  2274 I ActivityManager: START u0 {flg=0x10000000 cmp=fr.roadguard.drive/.MainActivity} from uid 2000
+11-05 07:52:11.388  1647  2726 I ActivityManager: Start proc 2823:fr.roadguard.drive/u0a59 for activity fr.roadguard.drive/.MainActivity
+11-05 07:52:12.561  1647  1669 I ActivityManager: Displayed fr.roadguard.drive/.MainActivity: +1s182ms
+11-05 07:52:17.336  2823  2823 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
+11-05 07:52:17.638  2823  2828 I zygote64: JIT allocated 94KB for stack maps of void fr.roadguard.drive.MainActivityKt.DriveHome(androidx.compose.runtime.Composer, int)
+11-05 07:52:17.876  2823  2886 W Mbgl    : {roadguard.drive}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
+11-05 07:52:17.893  2823  2886 I chatty  : uid=10059(fr.roadguard.drive) Worker 1 identical 2 lines
+11-05 07:52:17.893  2823  2886 W Mbgl    : {roadguard.drive}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
+11-05 07:52:17.911  2823  2823 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:52:19.000  2823  2828 I zygote64: Compiler allocated 7MB to compile void fr.roadguard.core.map.DriveMapKt.DriveMap(boolean, fr.roadguard.core.nav.Route, int, boolean, java.util.Set, androidx.compose.ui.Modifier, fr.roadguard.core.map.OfflinePack, java.util.List, boolean, int, boolean, fr.roadguard.core.radar.Fix, java.util.List, java.util.List, androidx.compose.runtime.Composer, int, int, int)
+11-05 07:52:20.769  2823  2942 D ProfileInstaller: Installing profile for fr.roadguard.drive
+11-05 07:52:22.611  2823  2823 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
+11-05 07:52:25.649  2823  2823 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:52:28.619  2823  2823 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
+11-05 07:52:28.649  2823  2828 I zygote64: Compiler allocated 9MB to compile void fr.roadguard.core.ui.MusicCardKt.MusicCard(fr.roadguard.core.media.NowPlaying, boolean, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, androidx.compose.ui.Modifier, kotlin.jvm.functions.Function0, java.lang.String, androidx.compose.runtime.Composer, int, int)
+11-05 07:52:33.640  2823  2823 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:52:34.624  2823  2823 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
+11-05 07:52:40.624  2823  2823 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
+11-05 07:52:41.665  2823  2823 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=null icone=false/false layers=null
+11-05 07:52:41.837  2823  2886 W Mbgl    : {roadguard.drive}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
+11-05 07:52:46.617  2823  2823 I RoadguardSession: pos=46.72543,5.59258 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:52:48.644  2823  2823 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:52:52.621  2823  2823 I RoadguardSession: pos=46.72448,5.59193 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:52:56.649  2823  2823 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:52:58.625  2823  2823 I RoadguardSession: pos=46.72353,5.59128 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:53:04.635  2823  2823 I RoadguardSession: pos=46.72258,5.59064 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:53:04.647  2823  2823 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:53:10.634  2823  2823 I RoadguardSession: pos=46.72163,5.58999 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:53:12.640  1647  1658 I MediaFocusControl: requestAudioFocus() from uid/pid 10059/2823 clientId=android.media.AudioManager@5998680fr.roadguard.core.radar.AlertVoice$$ExternalSyntheticLambda0@5974b9 callingPack=fr.roadguard.drive req=3 flags=0x0 sdk=36
+11-05 07:53:12.809  2823  2823 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:53:16.678  2823  2823 I RoadguardSession: pos=46.72068,5.58934 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:53:20.657  2823  2823 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:53:22.641  2823  2823 I RoadguardSession: pos=46.71973,5.58870 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:53:28.649  2823  2823 I RoadguardSession: pos=46.71878,5.58805 v=136 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@471m radars=true
+11-05 07:53:28.681  2823  2823 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:53:34.668  2823  2823 I RoadguardSession: pos=46.71830,5.58773 v=70 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@413m radars=true
+11-05 07:53:36.703  2823  2823 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:53:40.658  2823  2823 I RoadguardSession: pos=46.71735,5.58708 v=70 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@296m radars=true
+11-05 07:53:43.063  2823  2866 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 1 line
+11-05 07:53:44.723  2823  2823 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:53:46.699  2823  2823 I RoadguardSession: pos=46.71640,5.58643 v=70 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@180m radars=true
+11-05 07:53:51.443  2823  2866 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:53:52.656  2823  2823 I RoadguardSession: pos=46.71576,5.58600 v=66 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@102m radars=true
+11-05 07:53:52.678  2823  2823 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:53:54.038  2823  2866 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:53:55.715  2823  2866 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:53:56.799  2823  2866 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:53:57.689  2823  2866 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:53:58.387  2823  2866 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 1 line
+11-05 07:53:58.701  2823  2823 I RoadguardSession: pos=46.71481,5.58536 v=70 cap=205 prec=20 nuit=false alerte=rg-23221914238eedc5fb8a@99m radars=true
+11-05 07:54:00.706  2823  2823 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:54:01.978  2823  2866 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:54:03.806  2823  2866 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 1 line
+11-05 07:54:04.681  2823  2823 I RoadguardSession: pos=46.71386,5.58471 v=70 cap=205 prec=20 nuit=false alerte=rg-23221914238eedc5fb8a@0m radars=true
+11-05 07:54:06.426  2823  2866 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:54:07.264  2823  2866 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:54:08.123  2823  2866 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:54:08.722  2823  2823 I RoadguardMap: puck enabled=true render=8 cam=36 fleche=48 icone=true/true layers=mapbox-location-shadow-layer=none, mapbox-location-pulsing-circle-layer=none, mapbox-location-accuracy-layer=none, mapbox-location-background-layer=visible, mapbox-location-foreground-layer=visible, mapbox-location-bearing-layer=none
+11-05 07:54:10.662  2823  2823 I RoadguardSession: pos=46.71291,5.58406 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
