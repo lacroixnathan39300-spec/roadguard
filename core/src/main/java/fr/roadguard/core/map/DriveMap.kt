@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
@@ -185,6 +186,14 @@ fun DriveMap(
             style.addLayer(communityLayer())
             style.addSource(GeoJsonSource(DRIVERS_SOURCE))
             style.addLayer(driversLayer())
+            style.addImage(ME_ICON, meArrow(fr.roadguard.core.ui.DriveColors.Accent.toArgb()))
+            style.addSource(GeoJsonSource(ME_SOURCE))
+            style.addLayer(SymbolLayer(ME_SOURCE, ME_SOURCE).withProperties(
+                PropertyFactory.iconImage(ME_ICON), PropertyFactory.iconRotate(Expression.get("bearing")),
+                PropertyFactory.iconRotationAlignment(Property.ICON_ROTATION_ALIGNMENT_MAP),
+                PropertyFactory.iconAllowOverlap(true), PropertyFactory.iconIgnorePlacement(true),
+                PropertyFactory.iconSize(Expression.interpolate(Expression.linear(), Expression.zoom(), Expression.stop(8, 0.55f), Expression.stop(16, 1f))),
+            ))
             if (hasLocation) enableLocation(context, map, style)
             styleVersion = if (styleVersion < 0) 1 else styleVersion + 1
         }
@@ -268,6 +277,12 @@ fun DriveMap(
             if (!p.bearing.isNaN()) bearing = p.bearing.toFloat()
         }
         runCatching { comp.forceLocationUpdate(loc) }
+        // Flèche ROADGUARD : position et cap exacts (le dernier cap connu est gardé à l'arrêt).
+        if (!p.bearing.isNaN()) holder.lastBearing = p.bearing
+        runCatching {
+            holder.style?.getSourceAs<GeoJsonSource>(ME_SOURCE)?.setGeoJson(
+                Feature.fromGeometry(Point.fromLngLat(p.lon, p.lat)).apply { addNumberProperty("bearing", holder.lastBearing) })
+        }
     }
 
     // Bouton « recentrer » : reprendre le suivi après un déplacement de la carte au doigt.
@@ -307,6 +322,7 @@ private class MapHolder {
     var map: MapLibreMap? = null
     var style: Style? = null
     var styleUri: String? = null
+    var lastBearing = 0.0
 }
 
 @SuppressLint("MissingPermission")
@@ -314,7 +330,14 @@ private fun enableLocation(context: Context, map: MapLibreMap, style: Style) {
     val component = map.locationComponent
     if (component.isLocationComponentActivated) return
     component.activateLocationComponent(
-        LocationComponentActivationOptions.builder(context, style).useDefaultLocationEngine(false).build()
+        LocationComponentActivationOptions.builder(context, style).useDefaultLocationEngine(false)
+            // Point MapLibre rendu invisible : la flèche ROADGUARD (couche « rg-me ») montre le vrai sens de marche.
+            .locationComponentOptions(
+                org.maplibre.android.location.LocationComponentOptions.builder(context)
+                    .foregroundTintColor(android.graphics.Color.TRANSPARENT).backgroundTintColor(android.graphics.Color.TRANSPARENT)
+                    .foregroundStaleTintColor(android.graphics.Color.TRANSPARENT).backgroundStaleTintColor(android.graphics.Color.TRANSPARENT)
+                    .bearingTintColor(android.graphics.Color.TRANSPARENT).accuracyAlpha(0f).elevation(0f).build()
+            ).build()
     )
     component.isLocationComponentEnabled = true
     component.cameraMode = CameraMode.TRACKING_GPS_NORTH
@@ -323,6 +346,24 @@ private fun enableLocation(context: Context, map: MapLibreMap, style: Style) {
 }
 
 private const val ROUTE_SOURCE = "roadguard-route"
+private const val ME_SOURCE = "rg-me"
+private const val ME_ICON = "rg-me-arrow"
+
+/** Flèche de position : rond blanc, flèche de la couleur d'accent pointée vers le haut (cap 0 = nord). */
+private fun meArrow(color: Int): android.graphics.Bitmap {
+    val s = 96
+    val b = android.graphics.Bitmap.createBitmap(s, s, android.graphics.Bitmap.Config.ARGB_8888)
+    val c = android.graphics.Canvas(b)
+    val p = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
+    p.color = android.graphics.Color.argb(70, 0, 0, 0); c.drawCircle(s / 2f, s / 2f + 3, s * 0.42f, p)
+    p.color = android.graphics.Color.WHITE; c.drawCircle(s / 2f, s / 2f, s * 0.40f, p)
+    p.color = color
+    val path = android.graphics.Path().apply {
+        moveTo(s * 0.5f, s * 0.18f); lineTo(s * 0.74f, s * 0.76f); lineTo(s * 0.5f, s * 0.62f); lineTo(s * 0.26f, s * 0.76f); close()
+    }
+    c.drawPath(path, p)
+    return b
+}
 private const val COMMUNITY_SOURCE = "roadguard-community"
 private const val DRIVERS_SOURCE = "roadguard-drivers"
 
