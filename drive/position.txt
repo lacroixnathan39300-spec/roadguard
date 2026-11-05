@@ -1,8 +1,8 @@
 Current Location Manager state:
   Location Listeners:
-    Reciever[a0fbb61 listener UpdateRecord[gps fr.roadguard.drive(10059 foreground) Request[ACCURACY_FINE gps requested=+1s0ms fastest=+1s0ms]]]
-    Reciever[1d08686 listener UpdateRecord[passive android(1000 foreground) Request[POWER_NONE passive fastest=+30m0s0ms]]]
-    Reciever[6a4b47 listener UpdateRecord[passive android(1000 foreground) Request[POWER_NONE passive fastest=0]]]
+    Reciever[238b122 listener UpdateRecord[passive android(1000 foreground) Request[POWER_NONE passive fastest=+30m0s0ms]]]
+    Reciever[a67f7b3 listener UpdateRecord[passive android(1000 foreground) Request[POWER_NONE passive fastest=0]]]
+    Reciever[32f3170 listener UpdateRecord[gps fr.roadguard.drive(10059 foreground) Request[ACCURACY_FINE gps requested=+1s0ms fastest=+1s0ms]]]
   Active Records by Provider:
     gps:
       UpdateRecord[gps fr.roadguard.drive(10059 foreground) Request[ACCURACY_FINE gps requested=+1s0ms fastest=+1s0ms]]
@@ -15,11 +15,11 @@ Current Location Manager state:
     android: passive: Min interval 0 seconds: Max interval 1800 seconds: Duration requested 2 out of the last 2 minutes: Currently active
     fr.roadguard.drive: gps: Interval 1 seconds: Duration requested 1 out of the last 1 minutes: Currently active
   Last Known Locations:
-    gps: Location[gps 46.712912,5.584062 hAcc=20 et=+2m45s116ms vel=37.8 bear=0.0 vAcc=??? sAcc=??? bAcc=??? {Bundle[{satellites=0, maxCn0=0, meanCn0=0}]}]
-    passive: Location[gps 46.712912,5.584062 hAcc=20 et=+2m45s116ms alt=400.0 vAcc=??? sAcc=??? bAcc=??? {Bundle[{satellites=0, maxCn0=0, meanCn0=0}]}]
+    gps: Location[gps 46.712912,5.584062 hAcc=20 et=+2m45s24ms vel=37.8 bear=0.0 vAcc=??? sAcc=??? bAcc=??? {Bundle[{satellites=0, maxCn0=0, meanCn0=0}]}]
+    passive: Location[gps 46.712912,5.584062 hAcc=20 et=+2m45s23ms alt=400.0 vAcc=??? sAcc=??? bAcc=??? {Bundle[{satellites=0, maxCn0=0, meanCn0=0}]}]
   Last Known Locations Coarse Intervals:
-    gps: Location[gps 39.237255,-123.150032 hAcc=20 et=+51s523ms vel=0.0 bear=0.0 vAcc=??? sAcc=??? bAcc=??? {Bundle[{}]}]
-    passive: Location[gps 39.237255,-123.150032 hAcc=20 et=+51s523ms vel=0.0 bear=0.0 vAcc=??? sAcc=??? bAcc=??? {Bundle[{}]}]
+    gps: Location[gps 39.237255,-123.150032 hAcc=20 et=+51s388ms vel=0.0 bear=0.0 vAcc=??? sAcc=??? bAcc=??? {Bundle[{}]}]
+    passive: Location[gps 39.237255,-123.150032 hAcc=20 et=+51s388ms vel=0.0 bear=0.0 vAcc=??? sAcc=??? bAcc=??? {Bundle[{}]}]
   Geofences:
   Enabled Providers:
     fused
@@ -27,7 +27,7 @@ Current Location Manager state:
   mWhitelist=[] mBlacklist=[]
   Throttling Whitelisted Packages:
     
-  fudger: offset: 757, 1280 (meters)
+  fudger: offset: 213, -782 (meters)
 passive Internal State:
 mReportLocation=true
 gps Internal State:
@@ -36,8 +36,8 @@ gps Internal State:
   mDisableGps (battery saver mode)=false
   mEngineCapabilities=0x0 ( )
 GNSS_KPI_START
-  KPI logging start time: +29s721ms
-  KPI logging end time: +2m45s561ms
+  KPI logging start time: +29s703ms
+  KPI logging end time: +2m45s635ms
   Number of location reports: 399
   Percentage location failure: 0.0
   Number of TTFF reports: 1
