@@ -185,6 +185,7 @@ fun DriveMap(
             style.addSource(GeoJsonSource(COMMUNITY_SOURCE))
             style.addLayer(communityLayer())
             style.addSource(GeoJsonSource(DRIVERS_SOURCE))
+            runCatching { style.addImage(ARROW_IMAGE, navArrowBitmap(context)) }
             style.addLayer(driversLayer())
             if (hasLocation) enableLocation(context, map, style, holder)
             styleVersion = if (styleVersion < 0) 1 else styleVersion + 1
@@ -273,7 +274,7 @@ fun DriveMap(
             val st = holder.style
             val layers = st?.layers?.filter { it.id.startsWith("mapbox-location") }?.joinToString { it.id + "=" + it.visibility.value }
             android.util.Log.i("RoadguardMap", "puck enabled=${comp.isLocationComponentEnabled} render=${comp.renderMode} cam=${comp.cameraMode} " +
-                "icone=${st?.getImage("mapbox-location-icon") != null}/${st?.getImage("mapbox-location-stroke-icon") != null} layers=$layers")
+                "fleche=${st?.getImage(ARROW_IMAGE)?.width} icone=${st?.getImage("mapbox-location-icon") != null}/${st?.getImage("mapbox-location-stroke-icon") != null} layers=$layers")
         }.onFailure { android.util.Log.w("RoadguardMap", "diag", it) }
         // Trajet effacé derrière la voiture : on ne dessine que ce qui reste à parcourir.
         val r = route
@@ -347,12 +348,9 @@ private fun enableLocation(context: Context, map: MapLibreMap, style: Style, hol
             // Point de position MapLibre avec la flèche ROADGUARD : MapLibre l'anime en même temps que la
             // caméra (fluide, sans décalage). Le cap vient de DrivingSession (sens réel du déplacement).
             .locationComponentOptions(
-                org.maplibre.android.location.LocationComponentOptions.builder(context).apply {
-                    val arrow = context.resources.getIdentifier("rg_nav_arrow", "drawable", context.packageName)
-                        .takeIf { it != 0 } ?: context.resources.getIdentifier("fr.roadguard.app:drawable/rg_nav_arrow", null, null)
-                    android.util.Log.i("RoadguardMap", "flèche id=$arrow")
-                    if (arrow != 0) { gpsDrawable(arrow); foregroundDrawable(arrow) }
-                }
+                org.maplibre.android.location.LocationComponentOptions.builder(context)
+                    // Flèche dessinée en code et ajoutée au style sous ce nom (pas de ressource à retrouver).
+                    .gpsName(ARROW_IMAGE).foregroundName(ARROW_IMAGE).foregroundStaleName(ARROW_IMAGE)
                     .backgroundTintColor(android.graphics.Color.TRANSPARENT).bearingTintColor(android.graphics.Color.TRANSPARENT)
                     .accuracyAlpha(0f).elevation(0f).enableStaleState(false)
                     .trackingInitialMoveThreshold(0f).compassAnimationEnabled(false).accuracyAnimationEnabled(false)
@@ -366,6 +364,29 @@ private fun enableLocation(context: Context, map: MapLibreMap, style: Style, hol
 }
 
 private const val ROUTE_SOURCE = "roadguard-route"
+private const val ARROW_IMAGE = "rg-nav-arrow"
+
+/** Flèche de position ROADGUARD (pointe vers le haut = cap) : contour blanc, bleu, moitié droite plus foncée. */
+private fun navArrowBitmap(context: Context): android.graphics.Bitmap {
+    val px = (46 * context.resources.displayMetrics.density).toInt().coerceAtLeast(48)
+    val bmp = android.graphics.Bitmap.createBitmap(px, px, android.graphics.Bitmap.Config.ARGB_8888)
+    val c = android.graphics.Canvas(bmp)
+    val k = px / 120f
+    fun path(vararg p: Float) = android.graphics.Path().apply {
+        moveTo(p[0] * k, p[1] * k); var i = 2
+        while (i < p.size) { lineTo(p[i] * k, p[i + 1] * k); i += 2 }; close()
+    }
+    val arrow = path(60f, 12f, 99f, 104f, 60f, 79f, 21f, 104f)
+    val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply { strokeJoin = android.graphics.Paint.Join.ROUND }
+    paint.style = android.graphics.Paint.Style.FILL_AND_STROKE
+    paint.color = 0x55000000; paint.strokeWidth = 16 * k
+    c.save(); c.translate(0f, 4 * k); c.drawPath(arrow, paint); c.restore()
+    paint.color = android.graphics.Color.WHITE; paint.strokeWidth = 11 * k; c.drawPath(arrow, paint)
+    paint.style = android.graphics.Paint.Style.FILL
+    paint.color = 0xFF00B8FF.toInt(); c.drawPath(arrow, paint)
+    paint.color = 0x33000000; c.drawPath(path(60f, 12f, 99f, 104f, 60f, 79f), paint)
+    return bmp
+}
 
 private const val COMMUNITY_SOURCE = "roadguard-community"
 private const val DRIVERS_SOURCE = "roadguard-drivers"
