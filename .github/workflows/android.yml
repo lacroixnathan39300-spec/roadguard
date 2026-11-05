@@ -121,7 +121,7 @@ jobs:
             gh release delete "$tag" -R "$REPO" -y --cleanup-tag || true
           done
       - uses: actions/checkout@v4
-        with: { path: src, sparse-checkout: "keys\ntools/ci" }
+        with: { path: src }
       - name: Mise à jour depuis les applis (serveur ROADGUARD)
         env:
           RG_KEYS_PASSPHRASE: ${{ secrets.RG_KEYS_PASSPHRASE }}
@@ -132,3 +132,6 @@ jobs:
           while IFS='=' read -r k v; do [ -n "$k" ] && echo "::add-mask::$v" && export "$k=$v"; done < "$RUNNER_TEMP/cf.env"
           rm -f "$RUNNER_TEMP/cf.env"
           python3 src/tools/ci/publish_updates.py dist "$RUN" || echo "::warning::Mise à jour en ligne non publiée"
+          # Sauvegarde des sources sur le serveur ROADGUARD (en cas de perte du compte GitHub) : 2 gardées.
+          git -C src archive --format=zip -o "$RUNNER_TEMP/sources.zip" HEAD
+          python3 src/tools/ci/backup_sources.py "$RUNNER_TEMP/sources.zip" "$RUN" "${{ github.sha }}" || echo "::warning::Sauvegarde des sources non faite"
