@@ -14,14 +14,20 @@ HEADING = 205.0
 SPEED_KMH = 70.0
 
 def adb(*args, check=False):
-    return subprocess.run(["adb", *args], capture_output=True, text=True, check=check).stdout
+    try:
+        return subprocess.run(["adb", *args], capture_output=True, text=True, check=check, timeout=40).stdout
+    except subprocess.TimeoutExpired:
+        print("adb bloqué :", args); return ""
 
 def shot(name):
     # La synthèse vocale de l'émulateur (sans son) plante parfois : on ferme sa fenêtre avant la capture.
     adb("shell", "am", "broadcast", "-a", "android.intent.action.CLOSE_SYSTEM_DIALOGS")
     time.sleep(0.5)
     with open(os.path.join(OUT, name + ".png"), "wb") as f:
-        f.write(subprocess.run(["adb", "exec-out", "screencap", "-p"], capture_output=True).stdout)
+        try:
+            f.write(subprocess.run(["adb", "exec-out", "screencap", "-p"], capture_output=True, timeout=40).stdout)
+        except subprocess.TimeoutExpired:
+            print("capture bloquée :", name)
 
 def offset(lat, lon, bearing_deg, meters):
     r = 6371000.0
