@@ -24,19 +24,36 @@ class SpeedSource(private val context: Context) {
     @SuppressLint("MissingPermission")
     fun locations(): Flow<Location> = callbackFlow {
         val manager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        val listener = object : LocationListener {
+        var lastGpsAt = 0L
+        // GPS en priorité ; position réseau (Wi-Fi, antennes) seulement en attendant le GPS ou s'il ne capte
+        // plus (intérieur, parking) : la carte et le compteur ne restent pas bloqués sur « GPS… ».
+        val gps = object : LocationListener {
+            override fun onLocationChanged(location: Location) { lastGpsAt = android.os.SystemClock.elapsedRealtime(); trySend(location) }
+            @Deprecated("Requis pour API < 29")
+            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) = Unit
+            override fun onProviderEnabled(provider: String) = Unit
+            override fun onProviderDisabled(provider: String) = Unit
+        }
+        val network = object : LocationListener {
             override fun onLocationChanged(location: Location) {
-                trySend(location)
+                if (android.os.SystemClock.elapsedRealtime() - lastGpsAt > 5_000) trySend(location)
             }
             @Deprecated("Requis pour API < 29")
             override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) = Unit
             override fun onProviderEnabled(provider: String) = Unit
             override fun onProviderDisabled(provider: String) = Unit
         }
-        if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L, 0f, listener, Looper.getMainLooper())
+        // Dernière position connue (moins de 10 min) : affichée tout de suite au démarrage.
+        listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)
+            .mapNotNull { runCatching { manager.getLastKnownLocation(it) }.getOrNull() }
+            .filter { System.currentTimeMillis() - it.time < 10 * 60_000 }
+            .maxByOrNull { it.time }?.let { trySend(it) }
+        // Inscription même si le GPS est coupé : les positions arrivent dès qu'on le rallume.
+        runCatching { manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L, 0f, gps, Looper.getMainLooper()) }
+        if (manager.allProviders.contains(LocationManager.NETWORK_PROVIDER)) {
+            runCatching { manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000L, 0f, network, Looper.getMainLooper()) }
         }
-        awaitClose { manager.removeUpdates(listener) }
+        awaitClose { manager.removeUpdates(gps); manager.removeUpdates(network) }
     }
 }
 
