@@ -105,6 +105,8 @@ class DrivingSession(
         val dt = p?.let { (f.timeMs - it.timeMs) / 1000.0 } ?: 0.0
         val d = p?.let { fr.roadguard.core.radar.Geo.distanceMeters(it.lat, it.lon, f.lat, f.lon) } ?: 0.0
         if (p == null || dt > 10 || dt <= 0) { previous = f; computedKmh = 0.0; return f }
+        // Saut impossible (position de départ fausse, GPS qui se recale) : on repart de cette position.
+        if (d / dt * 3.6 > 300) { previous = f; computedKmh = 0.0; return f.copy(speedKmh = if (f.speedKmh in 0.0..300.0) f.speedKmh else 0.0) }
         if (d < 6) {
             // Trop près pour mesurer : on garde la référence ; vitesse calculée conservée un court instant.
             if (f.speedKmh > 0 || dt >= 3) return f

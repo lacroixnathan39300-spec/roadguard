@@ -75,7 +75,7 @@ fun Speedometer(kmh: Int?, unit: String, waiting: String, limit: Int?, over: Boo
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = kmh?.toString() ?: "--",
+                text = kmh?.coerceIn(0, 399)?.toString() ?: "--",
                 color = if (over) Color(0xFFFF5252) else Color.White, fontSize = numberSize * 1.12f, fontWeight = FontWeight.Bold,
                 fontFamily = DriveStyle.Numbers,
                 maxLines = 1, softWrap = false,
