@@ -130,7 +130,6 @@ fun DriveMap(
         lifecycle.addObserver(observer)
         onDispose {
             lifecycle.removeObserver(observer)
-            holder.stop()
             mapView.onDestroy()
         }
     }
@@ -187,14 +186,6 @@ fun DriveMap(
             style.addLayer(communityLayer())
             style.addSource(GeoJsonSource(DRIVERS_SOURCE))
             style.addLayer(driversLayer())
-            style.addImage(ME_ICON, meArrow(fr.roadguard.core.ui.DriveColors.Accent.toArgb()))
-            style.addSource(GeoJsonSource(ME_SOURCE))
-            style.addLayer(SymbolLayer(ME_SOURCE, ME_SOURCE).withProperties(
-                PropertyFactory.iconImage(ME_ICON), PropertyFactory.iconRotate(Expression.get("bearing")),
-                PropertyFactory.iconRotationAlignment(Property.ICON_ROTATION_ALIGNMENT_MAP),
-                PropertyFactory.iconAllowOverlap(true), PropertyFactory.iconIgnorePlacement(true),
-                PropertyFactory.iconSize(Expression.interpolate(Expression.linear(), Expression.zoom(), Expression.stop(8, 0.5f), Expression.stop(16, 0.9f))),
-            ))
             if (hasLocation) enableLocation(context, map, style, holder)
             styleVersion = if (styleVersion < 0) 1 else styleVersion + 1
         }
@@ -278,10 +269,6 @@ fun DriveMap(
             if (!p.bearing.isNaN()) bearing = p.bearing.toFloat()
         }
         runCatching { comp.forceLocationUpdate(loc) }
-        hidePuck(holder.style)
-        // La flèche suit ensuite la position animée de la carte (voir enableLocation) : mouvement fluide.
-        // Flèche glissée jusqu'à la nouvelle position (même durée que l'animation de la caméra) : pas de sauts.
-        holder.animateMe(p.lat, p.lon, if (p.bearing.isNaN()) Double.NaN else p.bearing)
         // Trajet effacé derrière la voiture : on ne dessine que ce qui reste à parcourir.
         val r = route
         if (r != null && r.points.size >= 2) {
@@ -342,54 +329,6 @@ private class MapHolder {
     var lastBearing = 0.0
     var trimRoute: Route? = null
     var trimIndex = 0
-    private var meLat = Double.NaN; private var meLon = 0.0; private var lastDraw = 0L
-
-    /** Dessine la flèche ROADGUARD (au plus 30 fois par seconde, pour ménager le poste). */
-    fun drawMe(lat: Double, lon: Double, bearing: Double, force: Boolean = false) {
-        meLat = lat; meLon = lon; if (!bearing.isNaN()) lastBearing = bearing
-        val now = android.os.SystemClock.uptimeMillis()
-        if (!force && now - lastDraw < 33) return
-        lastDraw = now
-        val src = runCatching { style?.getSourceAs<GeoJsonSource>(ME_SOURCE) }.getOrNull()
-        if (src == null) { if (drawErrors++ < 3) android.util.Log.w("RoadguardMap", "flèche : source absente (style=${style != null})"); return }
-        runCatching {
-            src.setGeoJson(Feature.fromGeometry(Point.fromLngLat(meLon, meLat)).apply { addNumberProperty("bearing", lastBearing) })
-        }.onFailure { if (drawErrors++ < 3) android.util.Log.w("RoadguardMap", "flèche : $it") }
-    }
-
-    private var lastFixAt = 0L
-    private var fromLat = 0.0; private var fromLon = 0.0; private var fromB = 0.0
-    private var toLat = 0.0; private var toLon = 0.0; private var deltaB = 0.0
-    private var animStart = 0L; private var animDuration = 1L; private var animating = false
-    private var drawErrors = 0
-
-    /**
-     * Glissement linéaire de la flèche vers la nouvelle position et le nouveau cap (chemin le plus court).
-     * Image par image avec le Choreographer : indépendant du réglage « échelle d'animation » d'Android
-     * (désactivé sur certains téléphones, ce qui figeait la flèche).
-     */
-    fun animateMe(lat: Double, lon: Double, bearing: Double) {
-        val now = android.os.SystemClock.uptimeMillis()
-        val duration = (now - lastFixAt).coerceIn(300L, 1200L)
-        lastFixAt = now
-        if (meLat.isNaN()) { drawMe(lat, lon, bearing, force = true); return }
-        fromLat = meLat; fromLon = meLon; fromB = lastBearing
-        toLat = lat; toLon = lon
-        val toB = if (bearing.isNaN()) fromB else bearing
-        deltaB = ((toB - fromB + 540.0) % 360.0) - 180.0
-        animStart = now; animDuration = duration
-        if (!animating) { animating = true; android.view.Choreographer.getInstance().postFrameCallback(frame) }
-    }
-
-    private val frame = object : android.view.Choreographer.FrameCallback {
-        override fun doFrame(frameTimeNanos: Long) {
-            val t = ((android.os.SystemClock.uptimeMillis() - animStart).toDouble() / animDuration).coerceIn(0.0, 1.0)
-            drawMe(fromLat + (toLat - fromLat) * t, fromLon + (toLon - fromLon) * t, (fromB + deltaB * t + 360.0) % 360.0, force = t >= 1.0)
-            if (t < 1.0) android.view.Choreographer.getInstance().postFrameCallback(this) else animating = false
-        }
-    }
-
-    fun stop() { android.view.Choreographer.getInstance().removeFrameCallback(frame); animating = false }
 }
 
 @SuppressLint("MissingPermission")
@@ -398,71 +337,27 @@ private fun enableLocation(context: Context, map: MapLibreMap, style: Style, hol
     if (component.isLocationComponentActivated) return
     component.activateLocationComponent(
         LocationComponentActivationOptions.builder(context, style).useDefaultLocationEngine(false)
-            // Point MapLibre rendu invisible : la flèche ROADGUARD (couche « rg-me ») montre le vrai sens de marche.
+            // Point de position MapLibre avec la flèche ROADGUARD : MapLibre l'anime en même temps que la
+            // caméra (fluide, sans décalage). Le cap vient de DrivingSession (sens réel du déplacement).
             .locationComponentOptions(
-                org.maplibre.android.location.LocationComponentOptions.builder(context)
-                    .foregroundTintColor(android.graphics.Color.TRANSPARENT).backgroundTintColor(android.graphics.Color.TRANSPARENT)
-                    .foregroundStaleTintColor(android.graphics.Color.TRANSPARENT).backgroundStaleTintColor(android.graphics.Color.TRANSPARENT)
-                    .bearingTintColor(android.graphics.Color.TRANSPARENT).accuracyAlpha(0f).elevation(0f).build()
+                org.maplibre.android.location.LocationComponentOptions.builder(context).apply {
+                    val arrow = context.resources.getIdentifier("rg_nav_arrow", "drawable", context.packageName)
+                    if (arrow != 0) { gpsDrawable(arrow); foregroundDrawable(arrow) }
+                }
+                    .backgroundTintColor(android.graphics.Color.TRANSPARENT).bearingTintColor(android.graphics.Color.TRANSPARENT)
+                    .accuracyAlpha(0f).elevation(0f).enableStaleState(false)
+                    .trackingInitialMoveThreshold(0f).compassAnimationEnabled(false).accuracyAnimationEnabled(false)
+                    .build()
             ).build()
     )
     component.isLocationComponentEnabled = true
     component.cameraMode = CameraMode.TRACKING_GPS_NORTH
-    component.renderMode = RenderMode.NORMAL
+    component.renderMode = RenderMode.GPS
     component.zoomWhileTracking(15.0)
-    hidePuck(style)
-}
-
-/**
- * Le point MapLibre (sa propre flèche, mal orientée sur certains téléphones) est masqué : il passait
- * au-dessus de la flèche ROADGUARD « rg-me ». MapLibre réaffiche parfois ses couches : appelé à chaque position.
- */
-private fun hidePuck(style: Style?) {
-    val st = style ?: return
-    runCatching {
-        for (layer in st.layers) {
-            val id = layer.id
-            if (id != ME_SOURCE && (id.contains("location", ignoreCase = true) || id.contains("puck", ignoreCase = true)) &&
-                layer.visibility.value != Property.NONE) layer.setProperties(PropertyFactory.visibility(Property.NONE))
-        }
-    }
 }
 
 private const val ROUTE_SOURCE = "roadguard-route"
-private const val ME_SOURCE = "rg-me"
-private const val ME_ICON = "rg-me-arrow"
 
-/**
- * Flèche de position façon navigation : pointe nette vers le haut (cap 0 = nord), encoche profonde,
- * contour blanc épais et ombre. Pas de rond autour : le sens se lit sans hésiter, même en petit.
- */
-private fun meArrow(color: Int): android.graphics.Bitmap {
-    val s = 120f
-    val b = android.graphics.Bitmap.createBitmap(s.toInt(), s.toInt(), android.graphics.Bitmap.Config.ARGB_8888)
-    val c = android.graphics.Canvas(b)
-    val path = android.graphics.Path().apply {
-        moveTo(s * 0.50f, s * 0.08f)   // pointe
-        lineTo(s * 0.84f, s * 0.88f)   // coin arrière droit
-        lineTo(s * 0.50f, s * 0.66f)   // encoche
-        lineTo(s * 0.16f, s * 0.88f)   // coin arrière gauche
-        close()
-    }
-    val p = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply { strokeJoin = android.graphics.Paint.Join.ROUND }
-    // Ombre douce
-    c.save(); c.translate(0f, s * 0.03f)
-    p.style = android.graphics.Paint.Style.FILL_AND_STROKE; p.strokeWidth = s * 0.12f; p.color = android.graphics.Color.argb(90, 0, 0, 0)
-    c.drawPath(path, p); c.restore()
-    // Contour blanc
-    p.strokeWidth = s * 0.09f; p.color = android.graphics.Color.WHITE
-    c.drawPath(path, p)
-    // Flèche
-    p.style = android.graphics.Paint.Style.FILL; p.color = color
-    c.drawPath(path, p)
-    // Reflet sur la moitié gauche : effet de relief, le sens saute aux yeux
-    p.color = android.graphics.Color.argb(70, 255, 255, 255)
-    c.drawPath(android.graphics.Path().apply { moveTo(s * 0.50f, s * 0.08f); lineTo(s * 0.50f, s * 0.66f); lineTo(s * 0.16f, s * 0.88f); close() }, p)
-    return b
-}
 private const val COMMUNITY_SOURCE = "roadguard-community"
 private const val DRIVERS_SOURCE = "roadguard-drivers"
 

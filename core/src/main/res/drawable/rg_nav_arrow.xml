@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Flèche de position ROADGUARD (pointe vers le haut = cap). Utilisée par le point de position de la carte. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="44dp" android:height="44dp"
+    android:viewportWidth="120" android:viewportHeight="120">
+    <!-- ombre -->
+    <path android:pathData="M60,14 L101,110 L60,83 L19,110 Z"
+        android:fillColor="#55000000" android:strokeColor="#55000000"
+        android:strokeWidth="14" android:strokeLineJoin="round" />
+    <!-- contour blanc -->
+    <path android:pathData="M60,10 L101,106 L60,79 L19,106 Z"
+        android:fillColor="#FFFFFFFF" android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="10" android:strokeLineJoin="round" />
+    <!-- flèche -->
+    <path android:pathData="M60,10 L101,106 L60,79 L19,106 Z" android:fillColor="#FF00B8FF" />
+    <!-- relief (moitié droite plus foncée) -->
+    <path android:pathData="M60,10 L101,106 L60,79 Z" android:fillColor="#33000000" />
+</vector>

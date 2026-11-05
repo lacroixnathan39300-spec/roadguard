@@ -112,4 +112,5 @@ android.sourceSets.getByName("main").assets.srcDir(radarAssets)
 android.sourceSets.getByName("main").java.srcDir(rootProject.file("../link-protocol/src/main/java"))
 // Cœur commun ROADGUARD (carte, radars, navigation, musique, réglages) : même code que l'appli GPS.
 android.sourceSets.getByName("main").java.srcDir(rootProject.file("../core/src/main/java"))
+android.sourceSets.getByName("main").res.srcDir(rootProject.file("../core/src/main/res"))
 tasks.named("preBuild") { dependsOn(copyRadarAssets) }
