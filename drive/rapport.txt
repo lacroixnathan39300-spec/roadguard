@@ -1,72 +1,70 @@
 Appli : fr.roadguard.drive
 Plantage : non
 
-11-05 05:45:58.730  1646  1677 V BackupManagerService: restoreAtInstall pkg=fr.roadguard.drive token=1 restoreSet=0
-11-05 05:45:58.808  1646  2159 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:fr.roadguard.drive flg=0x4000010 (has extras) } to com.svox.pico/.VoiceDataInstallerReceiver
-11-05 05:45:59.030  1877  1877 D ImsResolver: maybeAddedImsService, packageName: fr.roadguard.drive
-11-05 05:45:59.203  2778  2778 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
-11-05 05:45:59.330  2778  2778 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
-11-05 05:45:59.333  2778  2778 I AndroidRuntime: VM exiting with result code 0.
-11-05 05:45:59.488  2793  2793 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
-11-05 05:45:59.526  2793  2793 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
-11-05 05:45:59.528  2793  2793 I AndroidRuntime: VM exiting with result code 0.
-11-05 05:45:59.622  2804  2804 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
-11-05 05:45:59.668  2804  2804 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
-11-05 05:45:59.673  2804  2804 I AndroidRuntime: VM exiting with result code 1.
-11-05 05:45:59.765  2815  2815 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
-11-05 05:45:59.804  2815  2815 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
-11-05 05:45:59.806  2815  2815 I AndroidRuntime: VM exiting with result code 1.
-11-05 05:45:59.825  1646  1658 I ActivityManager: START u0 {flg=0x10000000 cmp=fr.roadguard.drive/.MainActivity} from uid 2000
-11-05 05:45:59.842  1646  1794 I ActivityManager: Start proc 2830:fr.roadguard.drive/u0a59 for activity fr.roadguard.drive/.MainActivity
-11-05 05:46:01.266  1646  1668 I ActivityManager: Displayed fr.roadguard.drive/.MainActivity: +1s430ms
-11-05 05:46:09.344  2830  2830 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-05 05:46:09.770  2830  2896 W Mbgl    : {roadguard.drive}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
-11-05 05:46:09.803  2830  2896 W Mbgl    : {roadguard.drive}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
-11-05 05:46:09.806  2830  2896 W Mbgl    : {roadguard.drive}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
-11-05 05:46:09.806  2830  2896 W Mbgl    : {roadguard.drive}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
-11-05 05:46:10.685  2830  2835 I zygote64: Compiler allocated 7MB to compile void fr.roadguard.core.map.DriveMapKt.DriveMap(boolean, fr.roadguard.core.nav.Route, int, boolean, java.util.Set, androidx.compose.ui.Modifier, fr.roadguard.core.map.OfflinePack, java.util.List, boolean, int, boolean, fr.roadguard.core.radar.Fix, java.util.List, java.util.List, androidx.compose.runtime.Composer, int, int, int)
-11-05 05:46:11.494  2830  2835 I zygote64: JIT allocated 94KB for stack maps of void fr.roadguard.drive.MainActivityKt.DriveHome(androidx.compose.runtime.Composer, int)
-11-05 05:46:11.532  2830  2835 I zygote64: JIT allocated 53KB for compiled code of void fr.roadguard.drive.MainActivityKt.DriveHome(androidx.compose.runtime.Composer, int)
-11-05 05:46:11.532  2830  2835 I zygote64: Compiler allocated 22MB to compile void fr.roadguard.drive.MainActivityKt.DriveHome(androidx.compose.runtime.Composer, int)
-11-05 05:46:12.173  2830  2937 D ProfileInstaller: Installing profile for fr.roadguard.drive
-11-05 05:46:15.192  2830  2830 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-05 05:46:21.193  2830  2830 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-05 05:46:21.227  2830  2835 I zygote64: Compiler allocated 9MB to compile void fr.roadguard.core.ui.MusicCardKt.MusicCard(fr.roadguard.core.media.NowPlaying, boolean, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, androidx.compose.ui.Modifier, kotlin.jvm.functions.Function0, java.lang.String, androidx.compose.runtime.Composer, int, int)
-11-05 05:46:27.193  2830  2830 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-05 05:46:33.194  2830  2830 I RoadguardSession: pos=46.72623,5.59312 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
-11-05 05:46:39.196  2830  2830 I RoadguardSession: pos=46.72527,5.59247 v=70 cap=205 prec=20 nuit=true alerte=- radars=true
-11-05 05:46:45.196  2830  2830 I RoadguardSession: pos=46.72432,5.59182 v=70 cap=205 prec=20 nuit=true alerte=- radars=true
-11-05 05:46:51.197  2830  2830 I RoadguardSession: pos=46.72337,5.59118 v=136 cap=205 prec=20 nuit=true alerte=- radars=true
-11-05 05:46:57.199  2830  2830 I RoadguardSession: pos=46.72242,5.59053 v=70 cap=205 prec=20 nuit=true alerte=- radars=true
-11-05 05:47:03.201  1646  2159 I MediaFocusControl: requestAudioFocus() from uid/pid 10059/2830 clientId=android.media.AudioManager@2b56dd9fr.roadguard.core.radar.AlertVoice$$ExternalSyntheticLambda0@d8e139e callingPack=fr.roadguard.drive req=3 flags=0x0 sdk=36
-11-05 05:47:03.332  2830  2830 I RoadguardSession: pos=46.72147,5.58988 v=136 cap=205 prec=20 nuit=true alerte=rg-119a4aa4e999628a4815@801m radars=true
-11-05 05:47:09.205  2830  2830 I RoadguardSession: pos=46.72052,5.58924 v=70 cap=205 prec=20 nuit=true alerte=- radars=true
-11-05 05:47:15.208  2830  2830 I RoadguardSession: pos=46.71957,5.58859 v=70 cap=205 prec=20 nuit=true alerte=- radars=true
-11-05 05:47:18.642  2830  2874 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 05:47:21.208  2830  2830 I RoadguardSession: pos=46.71878,5.58805 v=70 cap=205 prec=20 nuit=true alerte=rg-119a4aa4e999628a4815@471m radars=true
-11-05 05:47:25.092  2830  2874 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 05:47:27.215  2830  2830 I RoadguardSession: pos=46.71798,5.58751 v=70 cap=205 prec=20 nuit=true alerte=rg-119a4aa4e999628a4815@374m radars=true
-11-05 05:47:30.437  2830  2874 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 05:47:33.221  2830  2830 I RoadguardSession: pos=46.71703,5.58687 v=70 cap=205 prec=20 nuit=true alerte=rg-119a4aa4e999628a4815@257m radars=true
-11-05 05:47:34.783  2830  2874 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 1 line
-11-05 05:47:37.616  2830  2874 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 1 line
-11-05 05:47:39.217  2830  2830 I RoadguardSession: pos=46.71640,5.58643 v=70 cap=205 prec=20 nuit=true alerte=rg-119a4aa4e999628a4815@180m radars=true
-11-05 05:47:41.287  2830  2874 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 05:47:43.879  2830  2874 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 05:47:45.215  2830  2830 I RoadguardSession: pos=46.71561,5.58589 v=67 cap=205 prec=20 nuit=true alerte=rg-119a4aa4e999628a4815@83m radars=true
-11-05 05:47:45.872  2830  2874 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 1 line
-11-05 05:47:47.357  2830  2874 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 05:47:48.316  2830  2874 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 05:47:49.138  2830  2874 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 05:47:49.950  2830  2874 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 05:47:51.216  2830  2830 I RoadguardSession: pos=46.71465,5.58525 v=70 cap=205 prec=20 nuit=true alerte=rg-23221914238eedc5fb8a@80m radars=true
-11-05 05:47:53.023  2830  2874 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 05:47:53.962  2830  2874 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 05:47:54.780  2830  2874 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 05:47:55.590  2830  2874 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 05:47:56.238  2830  2874 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 1 line
-11-05 05:47:57.216  2830  2830 I RoadguardSession: pos=46.71370,5.58460 v=70 cap=205 prec=20 nuit=true alerte=rg-c93dbc586205a1440bcf@25m radars=true
-11-05 05:47:57.778  2830  2874 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 05:47:58.567  2830  2874 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 05:47:59.405  2830  2874 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
-11-05 05:48:03.221  2830  2830 I RoadguardSession: pos=46.71291,5.58406 v=70 cap=205 prec=20 nuit=true alerte=- radars=true
+11-05 07:16:24.519  1630  1663 I PackageManager.DexOptimizer: Running dexopt (dexoptNeeded=1) on: /data/app/fr.roadguard.drive-UiX9dF7rbx1i6DPYpZemNA==/base.apk pkg=fr.roadguard.drive isa=x86_64 dexoptFlags=boot_complete,debuggable,public target-filter=quicken oatDir=/data/app/fr.roadguard.drive-UiX9dF7rbx1i6DPYpZemNA==/oat sharedLibraries=PCL[]
+11-05 07:16:24.577  2704  2704 I dex2oat : /system/bin/dex2oat --input-vdex-fd=-1 --output-vdex-fd=10 --compiler-filter=quicken --debuggable --classpath-dir=/data/app/fr.roadguard.drive-UiX9dF7rbx1i6DPYpZemNA== --class-loader-context=PCL[]
+11-05 07:16:27.085  1630  1663 V BackupManagerService: restoreAtInstall pkg=fr.roadguard.drive token=1 restoreSet=0
+11-05 07:16:27.131  1630  1642 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:fr.roadguard.drive flg=0x4000010 (has extras) } to com.svox.pico/.VoiceDataInstallerReceiver
+11-05 07:16:27.134  1876  1876 D ImsResolver: maybeAddedImsService, packageName: fr.roadguard.drive
+11-05 07:16:27.294  2744  2744 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+11-05 07:16:27.330  2744  2744 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
+11-05 07:16:27.331  2744  2744 I AndroidRuntime: VM exiting with result code 0.
+11-05 07:16:27.410  2754  2754 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+11-05 07:16:27.444  2754  2754 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
+11-05 07:16:27.444  2754  2754 I AndroidRuntime: VM exiting with result code 0.
+11-05 07:16:27.570  2765  2765 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+11-05 07:16:27.615  2765  2765 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
+11-05 07:16:27.620  2765  2765 I AndroidRuntime: VM exiting with result code 1.
+11-05 07:16:27.831  2790  2790 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+11-05 07:16:27.896  2790  2790 D AndroidRuntime: Calling main entry com.android.commands.pm.Pm
+11-05 07:16:27.899  2790  2790 I AndroidRuntime: VM exiting with result code 1.
+11-05 07:16:27.921  1630  1774 I ActivityManager: START u0 {flg=0x10000000 cmp=fr.roadguard.drive/.MainActivity} from uid 2000
+11-05 07:16:27.959  1630  1774 I ActivityManager: Start proc 2805:fr.roadguard.drive/u0a59 for activity fr.roadguard.drive/.MainActivity
+11-05 07:16:28.808  1630  1652 I ActivityManager: Displayed fr.roadguard.drive/.MainActivity: +861ms
+11-05 07:16:29.944  2805  2805 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
+11-05 07:16:30.202  2805  2810 I zygote64: JIT allocated 94KB for stack maps of void fr.roadguard.drive.MainActivityKt.DriveHome(androidx.compose.runtime.Composer, int)
+11-05 07:16:30.409  2805  2869 W Mbgl    : {roadguard.drive}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
+11-05 07:16:30.409  2805  2869 I chatty  : uid=10059(fr.roadguard.drive) Worker 1 identical 2 lines
+11-05 07:16:30.409  2805  2869 W Mbgl    : {roadguard.drive}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
+11-05 07:16:31.977  2805  2810 I zygote64: Compiler allocated 7MB to compile void fr.roadguard.core.map.DriveMapKt.DriveMap(boolean, fr.roadguard.core.nav.Route, int, boolean, java.util.Set, androidx.compose.ui.Modifier, fr.roadguard.core.map.OfflinePack, java.util.List, boolean, int, boolean, fr.roadguard.core.radar.Fix, java.util.List, java.util.List, androidx.compose.runtime.Composer, int, int, int)
+11-05 07:16:34.096  2805  2907 D ProfileInstaller: Installing profile for fr.roadguard.drive
+11-05 07:16:34.972  2805  2805 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
+11-05 07:16:44.857  2805  2805 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
+11-05 07:16:50.859  2805  2805 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
+11-05 07:16:55.896  2805  2810 I zygote64: Compiler allocated 9MB to compile void fr.roadguard.core.ui.MusicCardKt.MusicCard(fr.roadguard.core.media.NowPlaying, boolean, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, androidx.compose.ui.Modifier, kotlin.jvm.functions.Function0, java.lang.String, androidx.compose.runtime.Composer, int, int)
+11-05 07:16:56.859  2805  2805 I RoadguardSession: pos=39.23726,-123.15003 v=0 cap=NaN prec=20 nuit=true alerte=- radars=true
+11-05 07:16:58.091  2805  2869 W Mbgl    : {roadguard.drive}[General]: Image 'mapbox-location-shadow-icon' is not present in style, cannot remove
+11-05 07:17:02.863  2805  2805 I RoadguardSession: pos=46.72543,5.59258 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:17:08.865  2805  2805 I RoadguardSession: pos=46.72448,5.59193 v=136 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:17:14.864  2805  2805 I RoadguardSession: pos=46.72353,5.59128 v=136 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:17:20.873  2805  2805 I RoadguardSession: pos=46.72258,5.59064 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:17:21.871  1630  1774 I MediaFocusControl: requestAudioFocus() from uid/pid 10059/2805 clientId=android.media.AudioManager@3b51779fr.roadguard.core.radar.AlertVoice$$ExternalSyntheticLambda0@1d80cbe callingPack=fr.roadguard.drive req=3 flags=0x0 sdk=36
+11-05 07:17:26.877  2805  2805 I RoadguardSession: pos=46.72163,5.58999 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:17:29.297  2805  2848 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 1 line
+11-05 07:17:32.879  2805  2805 I RoadguardSession: pos=46.72068,5.58934 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:17:36.861  2805  2848 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:17:38.877  2805  2805 I RoadguardSession: pos=46.71973,5.58870 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:17:42.281  2805  2848 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:17:44.878  2805  2805 I RoadguardSession: pos=46.71878,5.58805 v=70 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@471m radars=true
+11-05 07:17:50.878  2805  2805 I RoadguardSession: pos=46.71830,5.58773 v=59 cap=205 prec=20 nuit=false alerte=- radars=true
+11-05 07:17:56.881  2805  2805 I RoadguardSession: pos=46.71735,5.58708 v=70 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@296m radars=true
+11-05 07:17:58.704  2805  2848 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 1 line
+11-05 07:18:02.880  2805  2805 I RoadguardSession: pos=46.71640,5.58643 v=70 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@180m radars=true
+11-05 07:18:07.599  2805  2848 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 1 line
+11-05 07:18:08.882  2805  2805 I RoadguardSession: pos=46.71576,5.58600 v=70 cap=205 prec=20 nuit=false alerte=rg-119a4aa4e999628a4815@102m radars=true
+11-05 07:18:10.385  2805  2848 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:18:12.158  2805  2848 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:18:13.147  2805  2848 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:18:13.965  2805  2848 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:18:14.610  2805  2848 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 1 line
+11-05 07:18:14.883  2805  2805 I RoadguardSession: pos=46.71481,5.58536 v=70 cap=205 prec=20 nuit=false alerte=rg-23221914238eedc5fb8a@99m radars=true
+11-05 07:18:16.316  2805  2848 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 1 line
+11-05 07:18:18.020  2805  2848 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:18:18.884  2805  2848 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:18:19.683  2805  2848 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:18:20.518  2805  2848 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:18:20.882  2805  2805 I RoadguardSession: pos=46.71386,5.58471 v=70 cap=205 prec=20 nuit=false alerte=rg-23221914238eedc5fb8a@0m radars=true
+11-05 07:18:22.772  2805  2848 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:18:23.585  2805  2848 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:18:24.385  2805  2848 I chatty  : uid=10059(fr.roadguard.drive) AudioTrack identical 2 lines
+11-05 07:18:26.885  2805  2805 I RoadguardSession: pos=46.71291,5.58406 v=70 cap=205 prec=20 nuit=false alerte=- radars=true
