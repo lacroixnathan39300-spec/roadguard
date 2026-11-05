@@ -187,13 +187,25 @@ class DrivingSession(
         // Une position isolée sans cap fiable ne doit pas faire clignoter le bandeau : on garde
         // l'alerte précédente 4 s au plus, tant que le radar est encore devant (distance qui baisse).
         val held = alert?.takeIf { newAlert == null && !it.passed && f.timeMs - alertAt < 4_000 }?.let { a ->
-            val d = fr.roadguard.core.radar.Geo.distanceMeters(f.lat, f.lon, a.radar.lat, a.radar.lon).toInt()
-            if (d < a.distanceM + 15) a.copy(distanceM = d, isNew = false) else null
+            val raw = fr.roadguard.core.radar.Geo.distanceMeters(f.lat, f.lon, a.radar.lat, a.radar.lon)
+            val d = (raw - fr.roadguard.core.radar.AlertEngine.lagMeters(f.speedKmh)).toInt()
+            // Jamais après le radar : dès qu'il est atteint (ou derrière), l'alerte s'arrête.
+            val behind = !f.bearing.isNaN() && fr.roadguard.core.radar.Geo.headingDelta(f.bearing,
+                fr.roadguard.core.radar.Geo.bearing(f.lat, f.lon, a.radar.lat, a.radar.lon)) > 90
+            if (!behind && d > 0 && d < a.distanceM + 15) a.copy(distanceM = d, isNew = false) else null
         }
         if (newAlert != null) alertAt = f.timeMs
         // Radar franchi : compté une fois dans l'ordinateur de bord.
-        if (newAlert?.passed == true && newAlert.radar.id != lastPassedId) { lastPassedId = newAlert.radar.id; trip.onRadarPassed() }
+        val previous = alert
         alert = newAlert ?: held
+        if (alert == null && previous != null && previous.distanceM < 80 && previous.radar.id != lastPassedId) {
+            lastPassedId = previous.radar.id; trip.onRadarPassed()
+        }
+        // Excès de vitesse en approchant d'un radar : alarme forte qui réveille, jusqu'à repasser sous la limite.
+        val cur = alert
+        val limit = cur?.radar?.speedKmh
+        voice.overspeedAlarm(settings.radarAlarm && cur != null && limit != null &&
+            fr.roadguard.core.nav.SpeedLimitTracker.isOver(f.speedKmh.toInt(), limit, settings.overTolerance), limit)
         voice.proximityBeeps = settings.proximityBeeps
         val a = alert
         // Radar dépassé : bips encore le temps de parcourir les derniers mètres (40 m après le radar).

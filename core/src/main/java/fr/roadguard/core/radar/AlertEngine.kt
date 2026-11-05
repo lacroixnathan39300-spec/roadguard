@@ -16,9 +16,8 @@ data class RadarAlert(
     val distanceM: Int,
     /** true la première fois que ce radar est annoncé (bip + voix). */
     val isNew: Boolean,
-    /** Radar déjà dépassé : l'alerte continue encore [AlertEngine.AFTER_M] mètres. */
+    /** Inutilisé (ancienne prolongation après le radar) : l'alerte s'arrête désormais pile au radar. */
     val passed: Boolean = false,
-    /** Pour un radar dépassé : mètres restants avant la fin de l'alerte. */
     val remainingM: Int = 0,
 )
 
@@ -28,30 +27,25 @@ data class RadarAlert(
  */
 class AlertEngine(private val index: RadarIndex) {
     private val announced = LinkedHashMap<String, Long>()
-    /** Dernier radar annoncé devant soi : suivi après son passage pour prolonger l'alerte. */
-    private var current: Radar? = null
+
+    /** Radars déjà franchis (plus annoncés pendant 10 min). */
+    private val passedIds = HashMap<String, Long>()
 
     fun update(fix: Fix): RadarAlert? {
         if (fix.accuracyM > 60 || fix.speedKmh < 10 || fix.bearing.isNaN()) return null
-        // Radar tout juste dépassé : l'alerte continue jusqu'à AFTER_M mètres derrière.
-        current?.let { r ->
-            val d = Geo.distanceMeters(fix.lat, fix.lon, r.lat, r.lon)
-            val behind = Geo.headingDelta(fix.bearing, Geo.bearing(fix.lat, fix.lon, r.lat, r.lon)) > 90
-            if (behind) {
-                if (d <= AFTER_M) return RadarAlert(r, 0, false, passed = true, remainingM = (AFTER_M - d).toInt())
-                current = null
-            }
-        }
+        // Le GPS a environ 1 s de retard : la voiture est déjà plus loin que la position reçue.
+        // On avance donc la position de ce retard, pour que l'alerte s'arrête pile au radar (et pas après).
+        val lag = lagMeters(fix.speedKmh)
         val range = warningDistance(fix.speedKmh)
         var best: Radar? = null
         var bestDist = Double.MAX_VALUE
         for (r in index.near(fix.lat, fix.lon)) {
-            if (r.kind == RadarKind.OTHER) continue
-            val d = Geo.distanceMeters(fix.lat, fix.lon, r.lat, r.lon)
+            if (r.kind == RadarKind.OTHER || r.id in passedIds) continue
+            val d = Geo.distanceMeters(fix.lat, fix.lon, r.lat, r.lon) - lag
             if (d > range || d >= bestDist) continue
             // Devant soi : le radar doit être dans l'axe de la route suivie.
             val off = Geo.headingDelta(fix.bearing, Geo.bearing(fix.lat, fix.lon, r.lat, r.lon))
-            if (off > 90 && d > 5) continue  // déjà derrière (le prolongement de 40 m est géré plus haut)
+            if (off > 90 || d <= 0) { if (d < 30) passedIds[r.id] = fix.timeMs; continue }  // franchi (ou sur le point de l'être)
             if (d > 40 && off > 35) continue
             // Sens du radar connu : ignorer ceux qui contrôlent l'autre sens.
             val dir = r.directionDeg
@@ -60,21 +54,21 @@ class AlertEngine(private val index: RadarIndex) {
             bestDist = d
         }
         forgetOld(fix.timeMs)
-        val radar = best ?: run { current = null; return null }
-        current = radar
+        val radar = best ?: return null
         val isNew = announced.put(radar.id, fix.timeMs) == null
-        return RadarAlert(radar, bestDist.toInt(), isNew)
+        return RadarAlert(radar, bestDist.toInt().coerceAtLeast(0), isNew)
     }
 
     private fun forgetOld(now: Long) {
         // Après 10 minutes, un radar peut être annoncé de nouveau (nouveau passage).
         val it = announced.entries.iterator()
         while (it.hasNext()) if (now - it.next().value > 600_000) it.remove()
+        passedIds.entries.removeAll { now - it.value > 600_000 }
     }
 
     companion object {
-        /** L'alerte (bips) continue encore 40 m après le radar. */
-        const val AFTER_M = 40.0
+        /** Retard moyen du GPS (~1 s) converti en mètres : 20 m à 70 km/h, 36 m à 130 km/h. */
+        fun lagMeters(speedKmh: Double): Double = speedKmh / 3.6 * 1.0
 
         /** Environ 30 s de trajet : 500 m en ville, 750 m à 90 km/h, ~1 080 m à 130 km/h (max 1 200 m). */
         fun warningDistance(speedKmh: Double): Double = (speedKmh / 3.6 * 30.0).coerceIn(500.0, 1200.0)

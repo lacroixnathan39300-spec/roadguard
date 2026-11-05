@@ -30,7 +30,7 @@ Radars + bips (20 m après le radar), vitesse moyenne, guidage, communauté, Lin
 gestes sur les bords, tolérance de vitesse, annonce des limitations, signalement vocal, ordinateur de bord, carnet d'entretien,
 rappel de pause, assistant caméra (distance, collision, départ au feu), rapports de plantage, position réseau en attendant le GPS,
 style de carte ROADGUARD jour/nuit (tools/map/gen_style.py), carte Waze en direct (WebView, ouvrir/fermer), Waze en écran partagé,
-bouchons détectés automatiquement (conducteurs au pas), alertes radar 30 s avant et 40 m après.
+bouchons détectés automatiquement (conducteurs au pas), alertes radar 30 s avant, arrêt pile au radar (retard GPS compensé), alarme forte si excès devant un radar.
 
 ## À faire (prochaines étapes)
 - **Reste de l'étape 2** : zones écoles, vitesse à tenir sur les tronçons, styles de compteur, partage de trajet, itinéraire qui évite les bouchons, bulle améliorée.

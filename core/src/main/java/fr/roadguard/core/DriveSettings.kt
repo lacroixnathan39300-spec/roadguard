@@ -78,6 +78,10 @@ class DriveSettings(context: Context) {
     var wazeButton by mutableStateOf(prefs.getBoolean("waze_button", true)); private set
     fun changeWazeButton(v: Boolean) { wazeButton = v; prefs.edit().putBoolean("waze_button", v).apply() }
 
+    /** Alarme forte quand on dépasse la limite en approchant d'un radar. */
+    var radarAlarm by mutableStateOf(prefs.getBoolean("radar_alarm", true)); private set
+    fun changeRadarAlarm(v: Boolean) { radarAlarm = v; prefs.edit().putBoolean("radar_alarm", v).apply() }
+
     /** Rappel de pause après 2 h de conduite. */
     var pauseReminder by mutableStateOf(prefs.getBoolean("pause_reminder", true)); private set
     fun changePauseReminder(v: Boolean) { pauseReminder = v; prefs.edit().putBoolean("pause_reminder", v).apply() }

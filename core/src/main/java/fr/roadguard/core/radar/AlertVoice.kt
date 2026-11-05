@@ -124,6 +124,30 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
         })
     }
 
+    // Alarme d'excès de vitesse devant un radar : son aigu et fort (canal alarme), répété, plus « Ralentis ».
+    private val alarmTone by lazy { runCatching { ToneGenerator(android.media.AudioManager.STREAM_ALARM, 100) }.getOrNull() }
+    private var alarmOn = false
+    private var alarmLimit: Int? = null
+    private var lastAlarmVoice = 0L
+    private val alarmTick = object : Runnable {
+        override fun run() {
+            if (!alarmOn) return
+            duck(900)
+            alarmTone?.startTone(ToneGenerator.TONE_CDMA_HIGH_PBX_SS, 700)
+            val now = android.os.SystemClock.uptimeMillis()
+            if (now - lastAlarmVoice > 7_000) { lastAlarmVoice = now; say("Ralentis ! Limité à ${alarmLimit ?: ""}", "rg-alarm") }
+            beeper.postDelayed(this, 1_100)
+        }
+    }
+
+    /** Active ou coupe l'alarme forte (appelé à chaque position). */
+    fun overspeedAlarm(on: Boolean, limitKmh: Int?) {
+        alarmLimit = limitKmh
+        if (on == alarmOn) return
+        alarmOn = on
+        if (on) { lastAlarmVoice = 0; beeper.post(alarmTick) } else { beeper.removeCallbacks(alarmTick); alarmTone?.stopTone() }
+    }
+
     fun announce(alert: RadarAlert) {
         if (beepEnabled) { duck(600); tone?.startTone(ToneGenerator.TONE_PROP_BEEP2, 300) }
         val text = if (proximityBeeps) AlertText.spokenShort(alert) else AlertText.spoken(alert)

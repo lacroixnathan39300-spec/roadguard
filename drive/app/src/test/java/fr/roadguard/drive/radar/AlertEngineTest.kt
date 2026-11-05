@@ -20,18 +20,17 @@ class AlertEngineTest {
         val engine = AlertEngine(RadarIndex(listOf(radar("r", 46.005))))
         val first = engine.update(fix(46.0, 0))
         assertNotNull(first); assertTrue(first!!.isNew)
-        assertEquals(556.0, first.distanceM.toDouble(), 5.0)
+        assertEquals(531.0, first.distanceM.toDouble(), 5.0) // 556 m moins le retard GPS (25 m à 90 km/h)
         val second = engine.update(fix(46.001, 4000))
         assertFalse(second!!.isNew)
     }
 
-    @Test fun keepsAlertingFortyMetresAfterTheRadar() {
-        val engine = AlertEngine(RadarIndex(listOf(radar("r", 46.001))))
-        assertNotNull(engine.update(fix(46.0, 0)))
-        val past10 = engine.update(fix(46.00109, 1000)) // ~10 m après
-        assertTrue(past10!!.passed); assertEquals(30.0, past10.remainingM.toDouble(), 2.0)
-        assertTrue(engine.update(fix(46.00127, 2000))!!.passed) // ~30 m après : encore
-        assertNull(engine.update(fix(46.00150, 3000))) // ~55 m après : fini
+    @Test fun alertStopsAtTheRadarNotAfter() {
+        val engine = AlertEngine(RadarIndex(listOf(radar("r", 46.001)))) // ~111 m devant
+        assertEquals(86.0, engine.update(fix(46.0, 0))!!.distanceM.toDouble(), 3.0) // 111 - 25 m de retard GPS
+        assertNull(engine.update(fix(46.0008, 1000))) // ~22 m avant le radar : la voiture y est déjà (retard GPS)
+        assertNull(engine.update(fix(46.0012, 2000))) // après : plus rien
+        assertNull(engine.update(fix(46.0009, 3000))) // pas de nouvelle alerte pour ce radar
     }
 
     @Test fun ignoresRadarBehindOrOffAxis() {
