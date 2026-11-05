@@ -302,9 +302,12 @@ private fun DriveHome() {
         WallpaperBackground(wallpaperVersion)
         // Contenu des modules, partagé entre l'accueil en pages (façon Car Launcher) et la disposition classique.
         val mapContent: @Composable BoxScope.() -> Unit = {
-                DriveMap(reports = session.community.reports, drivers = session.community.drivers, jams = session.community.jams, position = session.here, northUp = settings.northUp, adaptiveZoom = settings.adaptiveZoom, speedKmh = session.fix?.kmh ?: 0, alternatives = session.alternatives, offlinePack = offlinePack, hasLocation = hasLocation, route = session.route, recenterRequest = session.recenter, night = session.night, visibleKinds = settings.alertKinds, roadguardStyle = settings.mapStyle == "roadguard", modifier = Modifier.fillMaxSize())
+                DriveMap(reports = session.community.reports, drivers = session.community.drivers, jams = session.community.jams, position = session.here, northUp = settings.northUp, adaptiveZoom = settings.adaptiveZoom, speedKmh = session.fix?.kmh ?: 0, alternatives = session.alternatives, offlinePack = offlinePack, hasLocation = hasLocation, route = session.route, recenterRequest = session.recenter, night = session.night, visibleKinds = settings.alertKinds, roadguardStyle = settings.mapStyle == "roadguard",
+                    // Avec Waze ouvert : carte Pilote à gauche, carte Waze à droite (les deux en même temps).
+                    modifier = if (showWaze) Modifier.fillMaxHeight().fillMaxWidth(0.5f).align(Alignment.CenterStart) else Modifier.fillMaxSize())
                 // Carte Waze en direct par-dessus la carte ROADGUARD : bouton « W » pour l'ouvrir ou la fermer.
-                if (showWaze) fr.roadguard.core.ui.WazeLiveMap(session.here?.lat, session.here?.lon, Modifier.fillMaxSize(), onClose = { showWaze = false })
+                if (showWaze) fr.roadguard.core.ui.WazeLiveMap(session.here?.lat, session.here?.lon,
+                    Modifier.fillMaxHeight().fillMaxWidth(0.5f).align(Alignment.CenterEnd).padding(start = 4.dp), onClose = { showWaze = false })
                 if (session.navigating) {
                     GuidanceBanner(session.guidanceState, session.navStatus, onStop = { session.stopNavigation() }, modifier = Modifier.align(Alignment.TopStart),
                         choices = session.alternatives, current = session.route, onChoose = session::chooseRoute, onDismissChoices = session::dismissAlternatives)

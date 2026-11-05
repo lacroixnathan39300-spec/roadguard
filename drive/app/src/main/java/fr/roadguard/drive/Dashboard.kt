@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -127,10 +128,28 @@ fun DashboardPage(
 @Composable
 private fun Widget(w: DashWidget, s: DrivingSession, music: NowPlaying?, onPlayPause: () -> Unit, onNext: () -> Unit, onPrevious: () -> Unit) {
     when (w) {
-        DashWidget.SPEED -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            // Compteur rond : toujours carré et entier, quelle que soit la forme du bloc.
-            Speedometer(kmh = s.fix?.kmh, unit = "km/h", waiting = "GPS…", limit = s.speedLimit, over = s.overSpeed,
-                modifier = Modifier.fillMaxHeight().aspectRatio(1f, matchHeightConstraintsFirst = true))
+        DashWidget.SPEED -> androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            if (maxWidth > maxHeight * 1.8f) {
+                // Bloc large et bas : grands chiffres lisibles d'un coup d'œil, avec la limite à côté.
+                val density = androidx.compose.ui.platform.LocalDensity.current
+                val big = with(density) { (maxHeight * 0.78f).toSp() }
+                val kmh = s.fix?.kmh
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                    Text(kmh?.toString() ?: "—", color = if (s.overSpeed) Color(0xFFFF5252) else Color.White, fontSize = big,
+                        fontWeight = FontWeight.Bold, fontFamily = fr.roadguard.core.ui.DriveStyle.Numbers)
+                    Text("km/h", color = DriveColors.TextSecondary, fontSize = with(density) { (maxHeight * 0.22f).toSp() })
+                    s.speedLimit?.let { lim ->
+                        Box(Modifier.size(maxHeight * 0.72f).clip(androidx.compose.foundation.shape.CircleShape).background(Color(0xFFD32F2F)).padding(maxHeight * 0.07f)
+                            .clip(androidx.compose.foundation.shape.CircleShape).background(Color.White), contentAlignment = Alignment.Center) {
+                            Text("$lim", color = Color.Black, fontSize = with(density) { (maxHeight * 0.28f).toSp() }, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+            } else {
+                // Compteur rond : toujours carré et entier, quelle que soit la forme du bloc.
+                Speedometer(kmh = s.fix?.kmh, unit = "km/h", waiting = "GPS…", limit = s.speedLimit, over = s.overSpeed,
+                    modifier = Modifier.fillMaxHeight().aspectRatio(1f, matchHeightConstraintsFirst = true))
+            }
         }
         DashWidget.CLOCK -> {
             var now by remember { mutableStateOf(Date()) }
@@ -157,9 +176,9 @@ private fun Widget(w: DashWidget, s: DrivingSession, music: NowPlaying?, onPlayP
             else Big("—", "Pas de guidage en cours")
         }
         DashWidget.MUSIC -> Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
-            Text(music?.title ?: "Aucune musique", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold,
+            Text(music?.title ?: "Aucune musique", color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Bold,
                 maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(music?.artist.orEmpty(), color = DriveColors.TextSecondary, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(music?.artist.orEmpty(), color = DriveColors.TextSecondary, fontSize = 19.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                 BigButton("⏮", DriveColors.Track, onPrevious)
                 BigButton(if (music?.playing == true) "⏸" else "▶", DriveColors.Accent, onPlayPause)
@@ -174,8 +193,9 @@ private fun Big(value: String, caption: String, color: Color = Color.White) {
     // Tailles calculées sur la hauteur du bloc : légende toujours visible, même sur un écran bas.
     androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize()) {
         val density = androidx.compose.ui.platform.LocalDensity.current
-        val valueSize = with(density) { (maxHeight * 0.42f).toSp() }.let { if (it.value > 44f) 44.sp else it }
-        val captionSize = with(density) { (maxHeight * 0.16f).toSp() }.let { if (it.value > 16f) 16.sp else it }
+        // Plus grand qu'avant : lisible d'un coup d'œil en roulant.
+        val valueSize = with(density) { (maxHeight * 0.50f).toSp() }.let { if (it.value > 64f) 64.sp else it }
+        val captionSize = with(density) { (maxHeight * 0.21f).toSp() }.let { if (it.value > 22f) 22.sp else it }
         Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
             Text(caption, color = DriveColors.TextSecondary, fontSize = captionSize, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(value, color = color, fontSize = valueSize, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, fontFamily = fr.roadguard.core.ui.DriveStyle.Numbers)

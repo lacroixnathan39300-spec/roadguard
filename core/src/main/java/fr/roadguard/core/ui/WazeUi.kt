@@ -38,7 +38,7 @@ object Waze {
     const val PACKAGE = "com.waze"
 
     fun liveMapUrl(lat: Double, lon: Double, zoom: Int = 14) =
-        "https://embed.waze.com/iframe?zoom=$zoom&lat=${"%.5f".format(java.util.Locale.US, lat)}&lon=${"%.5f".format(java.util.Locale.US, lon)}&ct=livemap&pin=1"
+        "https://embed.waze.com/fr/iframe?zoom=$zoom&lat=${"%.5f".format(java.util.Locale.US, lat)}&lon=${"%.5f".format(java.util.Locale.US, lon)}&pin=1"
 
     fun installed(context: Context) = context.packageManager.getLaunchIntentForPackage(PACKAGE) != null
 
@@ -77,6 +77,13 @@ fun WazeLiveMap(lat: Double?, lon: Double?, modifier: Modifier = Modifier, onClo
             WebView(ctx).apply {
                 settings.javaScriptEnabled = true
                 settings.domStorageEnabled = true
+                settings.databaseEnabled = true
+                settings.useWideViewPort = true
+                settings.loadWithOverviewMode = true
+                settings.mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+                // La carte Waze dessine avec la carte graphique (WebGL) : accélération matérielle obligatoire.
+                setLayerType(android.view.View.LAYER_TYPE_HARDWARE, null)
+                android.webkit.CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
                 settings.mediaPlaybackRequiresUserGesture = true
                 webViewClient = object : WebViewClient() {
                     // Les liens de la page (ouvrir Waze…) partent vers l'appli ou le navigateur, pas dans la carte.
@@ -96,7 +103,7 @@ fun WazeLiveMap(lat: Double?, lon: Double?, modifier: Modifier = Modifier, onClo
         }, modifier = Modifier.fillMaxSize(), onRelease = { it.destroy() })
         if (failed) Text("Carte Waze indisponible : pas d'Internet sur cet appareil.", color = Color.White, fontSize = 16.sp,
             modifier = Modifier.align(Alignment.Center).padding(20.dp))
-        Row(Modifier.align(Alignment.TopEnd).padding(10.dp).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(Modifier.align(Alignment.BottomStart).padding(10.dp).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             BigButton("◎", Color(0xCC101820)) { centered = null; val la = lat; val lo = lon; if (la != null && lo != null) { centered = la to lo; web?.loadUrl(Waze.liveMapUrl(la, lo)) } }
             if (Waze.installed(context)) BigButton("Appli Waze ↗", Color(0xCC33CCFF)) { Waze.openApp(context, adjacent = true) }
             if (onClose != null) BigButton("✕ Fermer", Color(0xCC101820), onClose)
