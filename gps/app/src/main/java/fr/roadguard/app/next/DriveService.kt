@@ -52,6 +52,11 @@ class DriveService : Service() {
             s.prepare()
             SpeedSource(this@DriveService).locations().collect { s.onLocation(it) }
         }
+        // Nouvelle version : notification Android, même quand l'appli est en arrière-plan (vérifié toutes les 6 h).
+        scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            kotlinx.coroutines.delay(60_000)
+            while (true) { fr.roadguard.core.ui.UpdateNotifier.checkAndNotify(this@DriveService); kotlinx.coroutines.delay(6 * 3_600_000L) }
+        }
         // Bulle par-dessus Waze, Google Maps… quand l'accueil ROADGUARD n'est pas affiché.
         val bubble = fr.roadguard.core.ui.RadarBubble(this)
         bubbleView = bubble

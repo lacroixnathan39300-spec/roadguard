@@ -63,6 +63,7 @@ fun AccountGate(extra: @Composable () -> Unit = {}, content: @Composable () -> U
             // Tutoriel au premier lancement (et à la demande depuis les réglages).
             var tutorialDone by remember { mutableStateOf(Tutorial.seen(context)) }
             if (!tutorialDone || Tutorial.forceShow) TutorialScreen(onDone = { tutorialDone = true; Tutorial.forceShow = false })
+            else UpdateBanner()
             // Fin d'essai proche : rappel discret (une fois par jour), avec le contact de l'administrateur.
             val days = account.status?.trialDaysLeft()
             val prefs = remember { context.getSharedPreferences("account", android.content.Context.MODE_PRIVATE) }
