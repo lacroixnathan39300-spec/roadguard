@@ -96,10 +96,7 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                     listOf(0 to "Ton : classique", 1 to "Ton : charme 💋", 2 to "Ton : séduction 🔥", 3 to "Ton : osé 😈").forEach { (c, label) ->
                         BigButton(label, if (settings.voiceTone == c) DriveColors.Accent else DriveColors.Panel) {
                             settings.changeVoiceTone(c)
-                            // Tons charme / séduction / osé : passe sur une voix de femme si la voix choisie est masculine ou inconnue.
-                            if (c in 1..3 && fr.roadguard.core.radar.AlertVoice.gender(settings.voiceName.orEmpty()) != 'F') {
-                                voice.femaleVoice()?.let { settings.changeVoiceName(it) }
-                            }
+                            // Le ton garde la voix choisie ci-dessus (aucun changement de voix imposé).
                             voice.configure(settings.voiceName, settings.speechRate, c)
                             voice.limitChanged(80)
                         }
