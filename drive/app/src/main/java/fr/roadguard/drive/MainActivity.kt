@@ -480,6 +480,7 @@ private fun DriveHome() {
                 onPick = { startNavigation(it) },
                 onClose = { showSearch = false },
                 starred = session.favorites, onStar = session::toggleFavorite,
+                stops = session.stops, onAddStop = session::addStop, onRemoveStop = session::removeStop,
             )
         }
         if (showTrip) {

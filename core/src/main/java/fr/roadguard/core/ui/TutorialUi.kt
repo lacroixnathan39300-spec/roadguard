@@ -111,6 +111,7 @@ private fun pages(drive: Boolean): List<Page> = listOfNotNull(
         (if (drive) "Réglages" else "Menu") + " → 🅿 Ma voiture (retour à pied, minuteur), 📍 À proximité (carburants les moins chers, bornes, parkings, aires).",
         "📒 Mes trajets : historique, éco-conduite, journal km pro/perso à exporter, carnet de carburant, entretien.",
         "🚗 Convoi entre amis et partage de trajet en direct ; 🪞 affichage tête haute pour le pare-brise.",
+        "Recherche : « ➕ Étape » pour passer par plusieurs endroits avant la destination. 📒 Mes trajets → 🏆 Badges et défis du mois.",
         if (drive) "☁ Réglages sauvegardés dans ton compte : tu les retrouves sur un autre appareil."
         else "🎤 sur la carte : « Pilote, signale la police », « coupe les radars », « rentre à la maison »… Messages lus à voix haute, dashcam, widget.",
     )),

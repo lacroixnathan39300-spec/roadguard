@@ -50,24 +50,40 @@ object ValhallaParser {
     }
 
     private fun parseTrip(trip: JSONObject, destination: LatLon): Route {
-        val leg = trip.getJSONArray("legs").getJSONObject(0)
-        val points = Polyline.decode(leg.getString("shape"), precision = 6)
-        val list = leg.getJSONArray("maneuvers")
-        val maneuvers = (0 until list.length()).map { i ->
-            val m = list.getJSONObject(i)
-            val instruction = m.optString("instruction")
-            val streets = m.optJSONArray("street_names")
-            Maneuver(
-                type = m.optInt("type"),
-                instruction = instruction,
-                verbalAlert = m.optString("verbal_transition_alert_instruction").ifBlank { instruction },
-                verbalNow = m.optString("verbal_pre_transition_instruction").ifBlank { instruction },
-                shapeIndex = m.optInt("begin_shape_index").coerceIn(0, (points.size - 1).coerceAtLeast(0)),
-                street = if (streets != null && streets.length() > 0) streets.optString(0) else "",
-                roundaboutExit = m.optInt("roundabout_exit_count", 0).takeIf { it > 0 },
-            )
+        // Plusieurs étapes = plusieurs « legs » : on les met bout à bout (une seule polyligne, une seule liste de consignes).
+        val legs = trip.getJSONArray("legs")
+        val points = ArrayList<LatLon>()
+        val maneuvers = ArrayList<Maneuver>()
+        var tollKm = 0.0
+        for (li in 0 until legs.length()) {
+            val leg = legs.getJSONObject(li)
+            val legPoints = Polyline.decode(leg.getString("shape"), precision = 6)
+            // Le premier point d'une étape répète le dernier de la précédente.
+            val skip = if (points.isNotEmpty() && legPoints.isNotEmpty()) 1 else 0
+            val offset = points.size - skip
+            points.addAll(legPoints.drop(skip))
+            val list = leg.getJSONArray("maneuvers")
+            val last = li == legs.length() - 1
+            for (i in 0 until list.length()) {
+                val m = list.getJSONObject(i)
+                var type = m.optInt("type")
+                var instruction = m.optString("instruction")
+                // Départ d'une étape intermédiaire : inutile. Arrivée à une étape : on continue.
+                if (li > 0 && type in 1..3) continue
+                if (!last && type in 4..6) { type = 8; instruction = "Étape atteinte : on continue." }
+                if (m.optBoolean("toll")) tollKm += m.optDouble("length", 0.0)
+                val streets = m.optJSONArray("street_names")
+                maneuvers += Maneuver(
+                    type = type,
+                    instruction = instruction,
+                    verbalAlert = if (!last && m.optInt("type") in 4..6) "Étape dans quelques instants." else m.optString("verbal_transition_alert_instruction").ifBlank { instruction },
+                    verbalNow = if (!last && m.optInt("type") in 4..6) "Étape atteinte. On continue." else m.optString("verbal_pre_transition_instruction").ifBlank { instruction },
+                    shapeIndex = (offset + m.optInt("begin_shape_index")).coerceIn(0, (offset + legPoints.size - 1).coerceAtLeast(0)),
+                    street = if (streets != null && streets.length() > 0) streets.optString(0) else "",
+                    roundaboutExit = m.optInt("roundabout_exit_count", 0).takeIf { it > 0 },
+                )
+            }
         }
-        val tollKm = (0 until list.length()).sumOf { i -> list.getJSONObject(i).let { m -> if (m.optBoolean("toll")) m.optDouble("length", 0.0) else 0.0 } }
         val summary = trip.getJSONObject("summary")
         return Route(
             points = points,
@@ -79,25 +95,32 @@ object ValhallaParser {
         )
     }
 
-    /** Requête Valhalla : voiture, kilomètres, consignes en français, départ dans le sens de roulage. */
+    /**
+     * Requête Valhalla : voiture, kilomètres, consignes dans la langue choisie, départ dans le sens de roulage.
+     * [vias] : étapes dans l'ordre ; [narrow] : éviter routes étroites, chemins et centres ; [eco] : plus économe (moins vite).
+     */
     fun request(
         from: LatLon, headingDeg: Double?, to: LatLon,
         alternates: Int = 0, avoidTolls: Boolean = false, avoidHighways: Boolean = false,
+        vias: List<LatLon> = emptyList(), narrow: Boolean = false, eco: Boolean = false, language: String = "fr-FR",
     ): String {
         val start = JSONObject().put("lat", from.lat).put("lon", from.lon)
         if (headingDeg != null && !headingDeg.isNaN()) start.put("heading", headingDeg.toInt()).put("heading_tolerance", 60)
-        val locations = org.json.JSONArray()
-            .put(start)
-            .put(JSONObject().put("lat", to.lat).put("lon", to.lon))
+        val locations = org.json.JSONArray().put(start)
+        vias.forEach { locations.put(JSONObject().put("lat", it.lat).put("lon", it.lon).put("type", "break")) }
+        locations.put(JSONObject().put("lat", to.lat).put("lon", to.lon))
         val auto = JSONObject()
         if (avoidTolls) auto.put("use_tolls", 0.0)
         if (avoidHighways) auto.put("use_highways", 0.0)
+        if (narrow) auto.put("use_living_streets", 0.0).put("use_tracks", 0.0).put("exclude_unpaved", true).put("service_penalty", 300).put("service_factor", 4.0)
+        // Plus économe : 110 km/h au plus (bien moins de carburant que 130), autoroutes un peu moins prisées.
+        if (eco) auto.put("top_speed", 110).put("use_highways", if (avoidHighways) 0.0 else 0.6)
         return JSONObject()
             .put("locations", locations)
             .put("costing", "auto")
-            .apply { if (alternates > 0) put("alternates", alternates) }
+            .apply { if (alternates > 0 && vias.isEmpty()) put("alternates", alternates) }
             .apply { if (auto.length() > 0) put("costing_options", JSONObject().put("auto", auto)) }
-            .put("directions_options", JSONObject().put("units", "kilometers").put("language", "fr-FR"))
+            .put("directions_options", JSONObject().put("units", "kilometers").put("language", language))
             .toString()
     }
 }

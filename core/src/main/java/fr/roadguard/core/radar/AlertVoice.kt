@@ -96,8 +96,14 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     private var appliedStyle = 0
 
     /** Voix, débit et ton choisis dans les réglages (appliqués seulement s'ils changent). */
-    fun configure(voiceName: String?, rate: Float, voiceTone: Int = style) {
+    fun configure(voiceName: String?, rate: Float, voiceTone: Int = style, language: String = pack.lang) {
         style = voiceTone
+        if (language != pack.lang) {
+            pack.lang = language
+            if (ttsReady && voiceName == null) runCatching {
+                tts.language = localeOf(language)
+            }
+        }
         if (!ttsReady) return
         if (rate != appliedRate || style != appliedStyle) {
             tts.setSpeechRate(rate * when (style) { 1 -> 0.92f; 2 -> 0.86f; 3 -> 0.84f; 4 -> 0.82f; else -> 1f })
@@ -106,10 +112,12 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
         }
         if (voiceName != appliedVoice) {
             appliedVoice = voiceName
-            if (voiceName == null) tts.language = Locale.FRANCE
+            if (voiceName == null) tts.language = localeOf(pack.lang)
             else tts.voices?.firstOrNull { it.name == voiceName }?.let { tts.voice = it }
         }
     }
+
+    private fun localeOf(l: String): Locale = when (l) { "en" -> Locale.UK; "de" -> Locale.GERMANY; "it" -> Locale.ITALY; else -> Locale.FRANCE }
 
     private fun say(text: String, id: String) {
         if (!(ttsReady && voiceEnabled) || text.isBlank()) return
@@ -196,7 +204,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
 
     fun announce(alert: RadarAlert) {
         if (beepEnabled) { duck(600); tone?.startTone(ToneGenerator.TONE_PROP_BEEP2, 300) }
-        if (proximityBeeps) line("radar", alert.radar.kind, alert.radar.speedKmh, "rg-${alert.radar.id}")
+        if (proximityBeeps || pack.lang != "fr") line("radar", alert.radar.kind, alert.radar.speedKmh, "rg-${alert.radar.id}")
         else say(AlertText.spoken(alert), "rg-${alert.radar.id}") // avec la distance : voix du téléphone
     }
 
@@ -213,7 +221,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
      * (« Mmmh… dans 300 mètres, tournez à droite, mon chéri. »). Ton classique : consigne seule.
      */
     fun guide(instruction: String) {
-        if (style <= 0 || style == VoicePack.MY_VOICE) return speak(instruction)
+        if (style <= 0 || style == VoicePack.MY_VOICE || pack.lang != "fr") return speak(instruction)
         val base = instruction.trim().trimEnd('.', ' ')
         val pre = pack.phrases(style, "guide_pre").takeIf { Math.random() < 0.45 }?.randomOrNull()
         val post = pack.phrases(style, "guide_post").takeIf { pre == null || Math.random() < 0.5 }?.randomOrNull()

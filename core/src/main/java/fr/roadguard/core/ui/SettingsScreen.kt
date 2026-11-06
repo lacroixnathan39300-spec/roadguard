@@ -94,6 +94,9 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
             Section("Itinéraire")
             ToggleRow("Éviter les péages", settings.avoidTolls, settings::changeAvoidTolls)
             ToggleRow("Éviter les autoroutes", settings.avoidHighways, settings::changeAvoidHighways)
+            ToggleRow("Éviter routes étroites, chemins et centres-villes", settings.routeNarrow, settings::changeRouteNarrow)
+            ToggleRow("Itinéraire le plus économe en carburant (110 km/h au plus)", settings.routeEco, settings::changeRouteEco)
+            ToggleRow("Étapes : dans l'ordre le plus rapide (sinon dans l'ordre choisi)", settings.optimizeStops, settings::changeOptimizeStops)
 
             if (voice != null) {
                 Section("Voix")
@@ -133,6 +136,15 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                         }
                     }
                 }
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    listOf("fr" to "🇫🇷 Français", "en" to "🇬🇧 English", "de" to "🇩🇪 Deutsch", "it" to "🇮🇹 Italiano").forEach { (l, label) ->
+                        BigButton(label, if (settings.voiceLang == l) DriveColors.Accent else DriveColors.Panel) {
+                            settings.changeVoiceLang(l); voice.configure(settings.voiceName, settings.speechRate, settings.voiceTone, l); voice.limitChanged(80)
+                        }
+                    }
+                }
+                if (settings.voiceLang != "fr") Text("Annonces des radars, limitations, réveil et guidage dans cette langue. Les tons coquins restent en français. " +
+                    "Choisis une voix de cette langue (« Autres langues » ci-dessus).", color = DriveColors.TextSecondary, fontSize = 14.sp)
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     listOf(false to "👨 Je suis un conducteur", true to "👩 Je suis une conductrice").forEach { (f, label) ->
                         BigButton(label, if (settings.driverFemale == f) DriveColors.Accent else DriveColors.Panel) {

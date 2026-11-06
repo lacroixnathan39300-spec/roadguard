@@ -32,9 +32,13 @@ object NavApi {
     suspend fun routes(
         from: LatLon, headingDeg: Double?, to: LatLon,
         alternates: Int = 0, avoidTolls: Boolean = false, avoidHighways: Boolean = false,
+        vias: List<LatLon> = emptyList(), optimize: Boolean = false, narrow: Boolean = false, eco: Boolean = false,
+        language: String = "fr-FR",
     ): List<Route> = withContext(Dispatchers.IO) {
-        val body = URLEncoder.encode(ValhallaParser.request(from, headingDeg, to, alternates, avoidTolls, avoidHighways), "UTF-8")
-        ValhallaParser.parseAll(get("$ROUTE_URL?json=$body"), to)
+        val body = URLEncoder.encode(ValhallaParser.request(from, headingDeg, to, alternates, avoidTolls, avoidHighways, vias, narrow, eco, language), "UTF-8")
+        // Plusieurs étapes, « dans l'ordre le plus rapide » : Valhalla réordonne les étapes (départ et arrivée fixes).
+        val url = if (optimize && vias.size >= 2) ROUTE_URL.replace(Regex("/route$"), "/optimized_route") else ROUTE_URL
+        ValhallaParser.parseAll(get("$url?json=$body"), to)
     }
 
     private fun get(url: String): String {

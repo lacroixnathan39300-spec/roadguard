@@ -534,6 +534,36 @@ async function modRoutes(req: Request, env: Env, me: Account, path: string): Pro
   return fail(404, "Inconnu");
 }
 
+
+// ---------- politique de confidentialité (exigée par le Play Store) ----------
+function privacyPage(): Response {
+  const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pilote · confidentialité</title><style>body{font-family:system-ui,sans-serif;max-width:760px;margin:0 auto;padding:20px;line-height:1.55;color:#1b1f24}
+h1{font-size:26px}h2{font-size:19px;margin-top:26px}</style></head><body>
+<h1>Pilote · politique de confidentialité</h1>
+<p>Dernière mise à jour : novembre 2026. Pilote (Pilote, Pilote Drive, Pilote Suite) est une application d'aide à la conduite : GPS, alertes, signalements de la communauté.</p>
+<h2>Données traitées sur ton téléphone uniquement</h2>
+<p>Historique des trajets, carnet de carburant, voiture garée, réglages, images de la caméra (anti-somnolence, assistant caméra, dashcam) et lecture des messages : tout reste sur l'appareil. Aucune image ni aucun message n'est envoyé.
+Les vidéos de la dashcam ne sont gardées que si tu le demandes ou après un choc, dans la galerie du téléphone.</p>
+<h2>Données envoyées au serveur Pilote</h2>
+<ul>
+<li><b>Compte</b> : identifiant et mot de passe (chiffré), date d'inscription, appareils connectés.</li>
+<li><b>Communauté</b> : pseudo, signalements (type, position, heure), votes, points et note de fiabilité ; ta position approximative si tu choisis de te montrer aux autres, ou pendant un convoi.</li>
+<li><b>Partage de trajet</b> : position et heure d'arrivée, seulement pendant un partage que tu lances (lien valable 12 h).</li>
+<li><b>Messages à l'administrateur</b>, rapports de plantage (texte technique), et, si tu le demandes, la sauvegarde de tes réglages.</li>
+</ul>
+<h2>Services tiers</h2>
+<p>Cartes et adresses : OpenStreetMap, Photon (Komoot) ; itinéraires et limitations : Valhalla (FOSSGIS) ; météo : Open-Meteo ; prix des carburants : données publiques de l'État français ; lieux utiles et dangers : API Overpass (OpenStreetMap). Ces services reçoivent les positions nécessaires à la requête.</p>
+<h2>SMS d'urgence</h2>
+<p>Si tu actives la détection d'accident, un SMS avec ta position est envoyé au seul contact que tu as choisi, uniquement après un choc et sans réponse de ta part pendant 30 secondes.</p>
+<h2>Durées de conservation</h2>
+<p>Signalements : quelques heures à quelques semaines selon le type (permanents pour les radars confirmés). Positions de présence : 30 minutes. Convois : 6 heures. Partages : 12 heures. Compte : jusqu'à sa suppression.</p>
+<h2>Tes droits</h2>
+<p>Pour consulter, corriger ou supprimer tes données : Réglages → ton compte → « Écrire à l'administrateur ». Aucune donnée n'est vendue ni utilisée pour la publicité.</p>
+</body></html>`;
+  return new Response(html, { headers: { "content-type": "text/html; charset=utf-8" } });
+}
+
 // ---------- convoi entre amis et partage de trajet ----------
 
 function cleanCode(raw: unknown): string | null {
@@ -644,6 +674,7 @@ export default {
         if (!data) return fail(404, "Morceau introuvable");
         return new Response(data, { headers: { "content-type": "application/octet-stream", "cache-control": "max-age=86400", ...CORS } });
       }
+      if (req.method === "GET" && (path === "/confidentialite" || path === "/privacy")) return privacyPage();
       const sp = /^\/(?:s|share)\/([0-9a-f]{20})$/.exec(path);
       if (req.method === "GET" && sp) return sharePage(sp[1]);
       const sj = /^\/v1\/share\/([0-9a-f]{20})$/.exec(path);

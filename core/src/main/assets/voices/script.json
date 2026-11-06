@@ -411,5 +411,121 @@
     "alarm": [
       "Ralentis ! Limité à"
     ]
+  },
+  "lang": {
+    "en": {
+      "kinds": {
+        "FIXED": "Speed camera",
+        "REDLIGHT": "Red light camera",
+        "AVERAGE": "Average speed check",
+        "SECTION": "Section control",
+        "MOBILE": "Mobile camera reported",
+        "OTHER": "Speed check"
+      },
+      "limited": "limit",
+      "radar": [
+        "Careful,",
+        "Heads up,"
+      ],
+      "limit": [
+        "Speed limit",
+        "New limit:"
+      ],
+      "over": [
+        "Slow down, the limit is",
+        "You are speeding, the limit is"
+      ],
+      "alarm": [
+        "Slow down now! Limit"
+      ],
+      "scold": [
+        "You have been speeding for a while. Please respect the limit.",
+        "Again too fast. Slow down, please."
+      ],
+      "wake": [
+        "Wake up! Stop as soon as possible!",
+        "Your eyes are closing! Wake up and pull over safely!"
+      ],
+      "tired": [
+        "You look tired. Take a break at the next rest area.",
+        "You keep yawning. Time for a break."
+      ]
+    },
+    "de": {
+      "kinds": {
+        "FIXED": "Blitzer",
+        "REDLIGHT": "Rotlichtblitzer",
+        "AVERAGE": "Abschnittskontrolle",
+        "SECTION": "Abschnittskontrolle",
+        "MOBILE": "Mobiler Blitzer gemeldet",
+        "OTHER": "Kontrolle"
+      },
+      "limited": "erlaubt",
+      "radar": [
+        "Achtung,",
+        "Vorsicht,"
+      ],
+      "limit": [
+        "Tempolimit",
+        "Neue Begrenzung:"
+      ],
+      "over": [
+        "Langsamer, erlaubt sind",
+        "Zu schnell, erlaubt sind"
+      ],
+      "alarm": [
+        "Sofort bremsen! Erlaubt sind"
+      ],
+      "scold": [
+        "Du fährst schon länger zu schnell. Bitte halte dich an das Limit.",
+        "Schon wieder zu schnell. Bitte langsamer."
+      ],
+      "wake": [
+        "Aufwachen! Halte so bald wie möglich an!",
+        "Deine Augen fallen zu! Wach auf und halte sicher an!"
+      ],
+      "tired": [
+        "Du wirkst müde. Mach an der nächsten Raststätte eine Pause.",
+        "Du gähnst oft. Zeit für eine Pause."
+      ]
+    },
+    "it": {
+      "kinds": {
+        "FIXED": "Autovelox",
+        "REDLIGHT": "Photored",
+        "AVERAGE": "Tutor",
+        "SECTION": "Tutor",
+        "MOBILE": "Autovelox mobile segnalato",
+        "OTHER": "Controllo"
+      },
+      "limited": "limite",
+      "radar": [
+        "Attenzione,",
+        "Occhio,"
+      ],
+      "limit": [
+        "Limite di velocità",
+        "Nuovo limite:"
+      ],
+      "over": [
+        "Rallenta, il limite è",
+        "Troppo veloce, il limite è"
+      ],
+      "alarm": [
+        "Rallenta subito! Limite"
+      ],
+      "scold": [
+        "Stai andando troppo veloce da un po'. Rispetta il limite.",
+        "Ancora troppo veloce. Rallenta, per favore."
+      ],
+      "wake": [
+        "Svegliati! Fermati appena possibile!",
+        "Ti si chiudono gli occhi! Svegliati e fermati in sicurezza!"
+      ],
+      "tired": [
+        "Sembri stanco. Fai una pausa alla prossima area di servizio.",
+        "Sbadigli spesso. È ora di una pausa."
+      ]
+    }
   }
 }

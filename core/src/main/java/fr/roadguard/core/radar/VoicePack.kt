@@ -49,9 +49,13 @@ class VoicePack(context: Context) {
     private fun tone(t: Int) = script.optJSONObject("tones")?.optJSONObject(t.coerceIn(0, 4).toString())
     /** Phrases au féminin (conductrice) : « ma belle », « ma chérie », « fatiguée »… */
     var feminine = false
+    /** Langue des annonces (fr, en, de, it). Hors français : phrases simples, sans les tons. */
+    var lang = "fr"
+    private fun langObj() = script.optJSONObject("lang")?.optJSONObject(lang)
 
     /** Phrases du ton : chaque ton reprend aussi celles des tons plus doux (osé = osé + séduction + charme). */
     fun phrases(t: Int, group: String): List<String> = when {
+        lang != "fr" && langObj() != null -> list(langObj(), group)
         t == MY_VOICE -> list(script.optJSONObject("myvoice"), group)
         t <= 0 -> list(tone(0), group)
         else -> (t downTo 1).flatMap { list(tone(it), group) }
@@ -106,7 +110,10 @@ class VoicePack(context: Context) {
         val lim = limit?.toString().orEmpty()
         return when (group) {
             "radar" -> {
-                val body = (kind?.let { AlertText.kindLabel(it) } ?: "Radar") + (limit?.let { ", $limited $it" } ?: "")
+                val lo = langObj().takeIf { lang != "fr" }
+                val label = kind?.let { k -> lo?.optJSONObject("kinds")?.optString(k.name)?.takeIf { it.isNotBlank() } ?: AlertText.kindLabel(k) } ?: "Radar"
+                val word = lo?.optString("limited")?.takeIf { it.isNotBlank() } ?: limited
+                val body = label + (limit?.let { ", $word $it" } ?: "")
                 listOfNotNull(phrases(tt, "radar").randomOrNull(), body).joinToString(" ")
             }
             else -> "${phrases(tt, group).randomOrNull() ?: ""} $lim".trim()

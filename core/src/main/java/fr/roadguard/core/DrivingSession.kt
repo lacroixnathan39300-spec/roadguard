@@ -59,6 +59,9 @@ class DrivingSession(
     /** Météo et adresse actuelle. */
     val localInfo = LocalInfo(scope)
 
+    /** Économie de batterie (batterie faible) : moins de requêtes réseau, écran moins lumineux. */
+    var batterySaving by mutableStateOf(false)
+
     /** Historique des trajets, carburant, voiture garée. */
     val tripLog = fr.roadguard.core.safety.TripLog(context)
     /** Dangers OpenStreetMap (passages à niveau, virages, écoles). */
@@ -155,6 +158,13 @@ class DrivingSession(
     private var lastAheadHazard: String? = null
     private var lastRain = false
     private fun contextAnnouncements(f: Fix, now: Long) {
+        // Étape atteinte (à moins de 80 m) : retirée de la liste, pour ne pas y retourner en cas de recalcul.
+        if (navigating && stops.isNotEmpty()) {
+            stops.firstOrNull { fr.roadguard.core.radar.Geo.distanceMeters(f.lat, f.lon, it.point.lat, it.point.lon) < 80 }?.let { reached ->
+                stops = stops - reached
+                voice.speak("Étape ${reached.name} atteinte." + if (stops.isEmpty()) " Direction l'arrivée." else " Encore ${stops.size} étape${if (stops.size > 1) "s" else ""}.")
+            }
+        }
         // Pluie, profil, vitesse perso : la limite affichée suit.
         val adj = adjusted(rawLimit)
         if (rawLimit != null && adj != speedLimit) {
@@ -189,7 +199,7 @@ class DrivingSession(
                 if (ha != null && ha != lastAheadHazard && ha != h) { lastAheadHazard = ha; voice.speak("Sur ta route, dans une vingtaine de kilomètres : $ha.") }
             }
         }
-        if (settings.hazardAlerts) hazards.onFix(f, now)?.let { voice.speak(it) }
+        if (settings.hazardAlerts && !batterySaving) hazards.onFix(f, now)?.let { voice.speak(it) }
     }
 
     // Fin de trajet : arrêt d'au moins une minute après au moins 5 min de route (ou Bluetooth de la voiture coupé).
@@ -288,6 +298,8 @@ class DrivingSession(
     init {
         scope.launch { while (true) { kotlinx.coroutines.delay(1_000); runCatching { deadReckon(System.currentTimeMillis()) } } }
         community.startConvoyLoop()
+        // Échéances de la voiture (contrôle technique, assurance…) : notification un mois avant.
+        scope.launch { kotlinx.coroutines.delay(20_000); runCatching { fr.roadguard.core.safety.Reminders.check(context) } }
     }
 
     /** À appeler une fois (bases radars chargées en arrière-plan). */
@@ -402,7 +414,7 @@ class DrivingSession(
         voice.voiceEnabled = settings.voice
         voice.beepEnabled = settings.beep
         voice.duckMusic = settings.duckMusic
-        voice.configure(settings.voiceName, settings.speechRate, settings.voiceTone)
+        voice.configure(settings.voiceName, settings.speechRate, settings.voiceTone, settings.voiceLang)
         voice.realistic = false // même voix (celle du téléphone) pour le guidage et les radars
         voice.pack.feminine = settings.driverFemale
         community.voiceAnswers = settings.voiceConfirm && settings.voice
@@ -433,7 +445,7 @@ class DrivingSession(
                 java.util.Locale.US, f.lat, f.lon, f.speedKmh, f.bearing, f.accuracyM, night,
                 alert?.let { "${it.radar.id}@${it.distanceM.toInt()}m" } ?: "-", alerts != null))
         }
-        limitTracker.add(f.lat, f.lon, f.timeMs, f.speedKmh)?.let { trail ->
+        limitTracker.add(f.lat, f.lon, f.timeMs, f.speedKmh, if (batterySaving) 8_000 else 3_000)?.let { trail ->
             if (!limitBusy) {
                 limitBusy = true
                 scope.launch { try { SpeedLimits.current(trail)?.let { onLimit(it) } } finally { limitBusy = false } }
@@ -463,6 +475,15 @@ class DrivingSession(
         }
     }
 
+    /** Étapes avant la destination (dans l'ordre choisi, ou réordonnées au plus rapide). */
+    var stops by mutableStateOf<List<Place>>(emptyList()); private set
+    fun addStop(place: Place) { stops = stops + place; if (navigating) pendingDestination?.let { computeRoute(it, announce = true) } }
+    fun removeStop(place: Place) { stops = stops - place; if (navigating) pendingDestination?.let { computeRoute(it, announce = true) } }
+    fun clearStops() { stops = emptyList() }
+
+    /** Langue Valhalla des consignes selon la langue des annonces. */
+    private fun routeLanguage() = when (settings.voiceLang) { "en" -> "en-GB"; "de" -> "de-DE"; "it" -> "it-IT"; else -> "fr-FR" }
+
     fun startNavigation(place: Place) {
         recents = recentStore.add(place)
         navigating = true; route = null; guidance = null; guidanceState = null
@@ -472,6 +493,7 @@ class DrivingSession(
     }
 
     fun stopNavigation() {
+        stops = emptyList()
         navigating = false; route = null; guidance = null; guidanceState = null; navStatus = null
         alternatives = emptyList()
         pendingDestination = null
@@ -500,8 +522,12 @@ class DrivingSession(
             runCatching {
                 // En ligne d'abord (Valhalla, avec variantes au départ) ; sans réseau, graphe routier installé.
                 runCatching {
-                    NavApi.routes(start, heading, destination, if (announce) 2 else 0, settings.avoidTolls, settings.avoidHighways)
+                    // Recalcul en route : seules les étapes encore devant (à plus de 150 m) comptent.
+                    val vias = stops.map { it.point }.filter { fr.roadguard.core.radar.Geo.distanceMeters(start.lat, start.lon, it.lat, it.lon) > 150 }
+                    NavApi.routes(start, heading, destination, if (announce) 2 else 0, settings.avoidTolls, settings.avoidHighways,
+                        vias = vias, optimize = settings.optimizeStops, narrow = settings.routeNarrow, eco = settings.routeEco, language = routeLanguage())
                 }.getOrElse { online ->
+                    if (stops.isNotEmpty()) throw online // le calcul hors ligne ne gère pas les étapes
                     val offline = fr.roadguard.core.nav.OfflineRouter.route(context, start, heading, destination)
                         ?: throw java.io.IOException(
                             if (fr.roadguard.core.nav.OfflineRouter.installed(context).isEmpty()) online.message ?: "pas de réseau"

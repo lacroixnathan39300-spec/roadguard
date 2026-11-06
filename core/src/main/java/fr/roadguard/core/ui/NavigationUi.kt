@@ -1,6 +1,8 @@
 package fr.roadguard.core.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -61,6 +63,10 @@ fun SearchScreen(
     starred: List<Place> = emptyList(),
     onStar: ((Place) -> Unit)? = null,
     initialQuery: String = "",
+    /** Étapes : ajout d'un lieu comme étape, et liste des étapes déjà choisies. */
+    stops: List<Place> = emptyList(),
+    onAddStop: ((Place) -> Unit)? = null,
+    onRemoveStop: ((Place) -> Unit)? = null,
 ) {
     // Choix de l'adresse « Maison » ou « Travail » : le prochain résultat touché est enregistré.
     var assigning by remember { mutableStateOf<String?>(null) }
@@ -137,6 +143,17 @@ fun SearchScreen(
                 onGo = { work?.let(onPick) }, onSet = { assigning = "work"; message = "Cherche puis touche l'adresse de ton travail" })
         }
         message?.let { Text(it, color = DriveColors.TextSecondary, fontSize = 18.sp, modifier = Modifier.padding(top = 12.dp)) }
+        if (stops.isNotEmpty()) {
+            // Étapes choisies : la destination se choisit ensuite comme d'habitude (toucher un lieu).
+            Row(Modifier.padding(top = 12.dp).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                Text("Étapes :", color = DriveColors.TextSecondary, fontSize = 16.sp)
+                stops.forEachIndexed { i, p ->
+                    BigButton("${i + 1}. ${p.name.take(18)} ✕", DriveColors.Panel) { onRemoveStop?.invoke(p) }
+                }
+            }
+            Text("Touche maintenant ta destination finale.", color = DriveColors.Accent, fontSize = 15.sp)
+        }
         val idle = results.isEmpty() && query.isBlank()
         val shown = if (idle) starred + favorites.filterNot { r -> starred.any { it.name == r.name && it.detail == r.detail } } else results
         if (idle && shown.isNotEmpty()) {
@@ -164,6 +181,10 @@ fun SearchScreen(
                         maxLines = 1, overflow = TextOverflow.Ellipsis)
                     if (place.detail.isNotBlank()) Text(place.detail, color = DriveColors.TextSecondary, fontSize = 16.sp,
                         maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
+                if (onAddStop != null) {
+                    Text("➕ Étape", color = DriveColors.Accent, fontSize = 15.sp,
+                        modifier = Modifier.clickable { onAddStop(place); message = "Étape ajoutée : ${place.name}" }.padding(horizontal = 10.dp, vertical = 10.dp))
                 }
                 if (onStar != null) {
                     Text(if (isStar) "★" else "☆", color = if (isStar) Color(0xFFFFC107) else DriveColors.TextSecondary,

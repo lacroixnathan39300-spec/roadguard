@@ -58,13 +58,13 @@ class SpeedLimitTracker {
     private val trail = ArrayDeque<LatLon>()
     private var lastAskAt = 0L
 
-    fun add(lat: Double, lon: Double, timeMs: Long, speedKmh: Double): List<LatLon>? {
+    fun add(lat: Double, lon: Double, timeMs: Long, speedKmh: Double, intervalMs: Long = 3_000): List<LatLon>? {
         val last = trail.lastOrNull()
         if (last == null || fr.roadguard.core.radar.Geo.distanceMeters(last.lat, last.lon, lat, lon) >= 15) {
             trail.addLast(LatLon(lat, lon))
             while (trail.size > 6) trail.removeFirst()
         }
-        if (speedKmh < 8 || trail.size < 3 || timeMs - lastAskAt < 3_000) return null
+        if (speedKmh < 8 || trail.size < 3 || timeMs - lastAskAt < intervalMs) return null
         lastAskAt = timeMs
         return trail.toList()
     }

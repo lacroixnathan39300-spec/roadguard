@@ -221,6 +221,26 @@ class DriveSettings(context: Context) {
     var defaultTripPro by mutableStateOf(prefs.getBoolean("default_trip_pro", false)); private set
     fun changeDefaultTripPro(v: Boolean) { defaultTripPro = v; put("default_trip_pro", v) }
 
+    /** Itinéraire : éviter routes étroites, chemins et centres. */
+    var routeNarrow by mutableStateOf(prefs.getBoolean("route_narrow", false)); private set
+    fun changeRouteNarrow(v: Boolean) { routeNarrow = v; put("route_narrow", v) }
+    /** Itinéraire le plus économe en carburant. */
+    var routeEco by mutableStateOf(prefs.getBoolean("route_eco", false)); private set
+    fun changeRouteEco(v: Boolean) { routeEco = v; put("route_eco", v) }
+    /** Étapes : dans l'ordre le plus rapide (sinon dans l'ordre choisi). */
+    var optimizeStops by mutableStateOf(prefs.getBoolean("optimize_stops", true)); private set
+    fun changeOptimizeStops(v: Boolean) { optimizeStops = v; put("optimize_stops", v) }
+    /** Langue des annonces : fr, en, de, it (le français garde les tons). */
+    var voiceLang by mutableStateOf(prefs.getString("voice_lang", "fr") ?: "fr"); private set
+    fun changeVoiceLang(v: String) { voiceLang = v; put("voice_lang", v) }
+    /** Économie de batterie : auto (batterie faible), toujours, jamais. 0 auto, 1 toujours, 2 jamais. */
+    var batterySaver by mutableStateOf(prefs.getInt("battery_saver", 0)); private set
+    fun changeBatterySaver(v: Int) { batterySaver = v; put("battery_saver", v) }
+    /** Rappels administratifs : date (ms) ou 0. */
+    fun reminderDate(key: String): Long = prefs.getLong("rem_$key", 0L)
+    fun setReminderDate(key: String, at: Long) { prefs.edit().putLong("rem_$key", at).apply(); reminderTick++ }
+    var reminderTick by mutableStateOf(0); private set
+
     /** Tous les réglages (sauvegarde dans le compte), avec leur type pour une restauration exacte. */
     fun exportAll(): org.json.JSONObject = org.json.JSONObject().apply {
         prefs.all.forEach { (k, v) ->

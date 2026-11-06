@@ -159,6 +159,23 @@ private fun PhoneHome() {
     }
     val s = session ?: run { Box(Modifier.fillMaxSize().background(DriveColors.Background)); return }
     val settings = s.settings
+    // Économie de batterie : batterie à 20 % ou moins (hors charge), ou toujours si choisi.
+    LaunchedEffect(settings.batterySaver) {
+        while (true) {
+            val b = context.registerReceiver(null, android.content.IntentFilter(android.content.Intent.ACTION_BATTERY_CHANGED))
+            val level = b?.let { it.getIntExtra(android.os.BatteryManager.EXTRA_LEVEL, 100) * 100 / it.getIntExtra(android.os.BatteryManager.EXTRA_SCALE, 100).coerceAtLeast(1) } ?: 100
+            val charging = (b?.getIntExtra(android.os.BatteryManager.EXTRA_PLUGGED, 0) ?: 0) != 0
+            val saving = when (settings.batterySaver) { 1 -> true; 2 -> false; else -> level <= 20 && !charging }
+            if (saving != s.batterySaving) {
+                s.batterySaving = saving
+                (context as? android.app.Activity)?.window?.let { w ->
+                    w.attributes = w.attributes.apply { screenBrightness = if (saving) 0.25f else android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE }
+                }
+                if (saving) android.widget.Toast.makeText(context, "🔋 Économie de batterie : écran moins lumineux, moins de données", android.widget.Toast.LENGTH_LONG).show()
+            }
+            kotlinx.coroutines.delay(60_000)
+        }
+    }
     // Démarrage automatique en roulant : écoute (ou non) les positions en arrière-plan selon le réglage.
     LaunchedEffect(settings.autoDrive, restart) { AutoStart.sync(context) }
 
@@ -374,6 +391,7 @@ private fun PhoneHome() {
                 onClose = { showSearch = false; searchQuery = "" },
                 starred = s.favorites, onStar = s::toggleFavorite,
                 initialQuery = searchQuery,
+                stops = s.stops, onAddStop = s::addStop, onRemoveStop = s::removeStop,
             )
         }
         if (showMenu) {

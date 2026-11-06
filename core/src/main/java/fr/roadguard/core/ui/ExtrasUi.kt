@@ -200,7 +200,7 @@ fun TripHistoryScreen(session: DrivingSession, onClose: () -> Unit) {
     }
     ScreenFrame("📒 Trajets", onClose) {
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("Trajets", "Journal km", "Carburant", "Entretien").forEachIndexed { i, l ->
+            listOf("Trajets", "Journal km", "Carburant", "Entretien", "🏆 Badges").forEachIndexed { i, l ->
                 BigButton(l, if (tab == i) DriveColors.Accent else DriveColors.Panel) { tab = i }
             }
         }
@@ -280,7 +280,14 @@ fun TripHistoryScreen(session: DrivingSession, onClose: () -> Unit) {
                     }
                 }
             }
-            else -> Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            4 -> LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                val c = session.community
+                item { Text("Défis du mois", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold) }
+                items(fr.roadguard.core.safety.Badges.challenges(trips)) { BadgeRow(it) }
+                item { Text("Badges", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 8.dp)) }
+                items(fr.roadguard.core.safety.Badges.badges(trips, log.odometerKm, c.points, c.myLevel, c.myJudged)) { BadgeRow(it) }
+            }
+            else -> Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 val odoKm = log.odometerKm
                 val due = session.settings.serviceAtKm
                 ExCard {
@@ -296,6 +303,31 @@ fun TripHistoryScreen(session: DrivingSession, onClose: () -> Unit) {
                     BigButton("Aucun", DriveColors.Track) { session.settings.changeServiceAtKm(0) }
                 }
                 Text("Ton carnet d'entretien détaillé reste dans Trajet → Entretien.", color = DriveColors.TextSecondary, fontSize = 14.sp)
+                Text("📅 Échéances (prévenu un mois avant)", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 8.dp))
+                val st = session.settings
+                @Suppress("UNUSED_VARIABLE") val tick = st.reminderTick
+                fr.roadguard.core.safety.Reminders.items.forEach { (key, label) ->
+                    val at = st.reminderDate(key)
+                    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(DriveColors.Panel).padding(10.dp),
+                        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Column(Modifier.weight(1f)) {
+                            Text(label, color = Color.White, fontSize = 16.sp)
+                            if (at > 0) {
+                                val days = ((at - System.currentTimeMillis()) / 86_400_000L).toInt()
+                                Text(java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.FRANCE).format(java.util.Date(at)) +
+                                    if (days < 0) " · dépassé !" else " · dans $days jours",
+                                    color = if (days <= 30) Color(0xFFFFC857) else DriveColors.TextSecondary, fontSize = 14.sp)
+                            }
+                        }
+                        BigButton(if (at > 0) "Changer" else "Date", DriveColors.Track) {
+                            val c = java.util.Calendar.getInstance().apply { if (at > 0) timeInMillis = at }
+                            android.app.DatePickerDialog(context, { _, y, m, d ->
+                                st.setReminderDate(key, java.util.Calendar.getInstance().apply { set(y, m, d, 9, 0, 0) }.timeInMillis)
+                            }, c.get(java.util.Calendar.YEAR), c.get(java.util.Calendar.MONTH), c.get(java.util.Calendar.DAY_OF_MONTH)).show()
+                        }
+                        if (at > 0) BigButton("✕", DriveColors.Track) { st.setReminderDate(key, 0L) }
+                    }
+                }
             }
         }
     }
@@ -542,6 +574,12 @@ fun SafetySettings(settings: fr.roadguard.core.DriveSettings) {
         }
         if (settings.dashcam) Text("La dashcam et l'anti-somnolence utilisent chacune une caméra : une seule à la fois.", color = DriveColors.TextSecondary, fontSize = 13.sp)
         CarBluetoothPicker(settings)
+        Text("🔋 Économie de batterie", color = Color.White, fontSize = 16.sp)
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf(0 to "Auto (batterie ≤ 20 %)", 1 to "Toujours", 2 to "Jamais").forEach { (v, l) ->
+                BigButton(l, if (settings.batterySaver == v) DriveColors.Accent else DriveColors.Panel) { settings.changeBatterySaver(v) }
+            }
+        }
         ToggleLine("Agenda : proposer l'itinéraire vers mes prochains rendez-vous", settings.calendarHints) { v ->
             settings.changeCalendarHints(v)
             if (v && context.checkSelfPermission(android.Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED)
@@ -587,4 +625,20 @@ private fun CarBluetoothPicker(settings: fr.roadguard.core.DriveSettings) {
         BigButton("Aucun", DriveColors.Track) { settings.changeCarBluetooth("", ""); open = false }
     }
     if (devices.isEmpty()) Text("Aucun appareil Bluetooth appairé.", color = DriveColors.TextSecondary, fontSize = 14.sp)
+}
+
+
+@Composable
+private fun BadgeRow(b: fr.roadguard.core.safety.Badge) {
+    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(if (b.done) Color(0xFF1B3A2A) else DriveColors.Panel).padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(b.emoji, fontSize = 30.sp, color = Color.White.copy(alpha = if (b.done) 1f else 0.4f))
+        Column(Modifier.weight(1f)) {
+            Text(b.title + if (b.done) " ✓" else "", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+            Text(b.detail, color = DriveColors.TextSecondary, fontSize = 14.sp)
+            if (!b.done) Box(Modifier.padding(top = 6.dp).fillMaxWidth().clip(RoundedCornerShape(4.dp)).background(DriveColors.Track)) {
+                Box(Modifier.fillMaxWidth(b.progress).padding(vertical = 3.dp).background(DriveColors.Accent))
+            }
+        }
+    }
 }
