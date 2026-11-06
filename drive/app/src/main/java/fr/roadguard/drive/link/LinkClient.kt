@@ -199,7 +199,8 @@ class LinkClient(private val context: Context) : fr.roadguard.core.net.NetRelay 
                         while (scope.isActive) {
                             val msg = s.receiveAny()
                             when {
-                                msg.json != null -> handle(msg.json)
+                                // Un message mal formé (champ manquant) est ignoré au lieu de couper toute la liaison.
+                                msg.json != null -> runCatching { handle(msg.json) }
                                 msg.type == LinkProtocol.BIN_AUDIO_PCM -> audio.feed(msg.data)
                                 else -> videoSink?.invoke(msg.type, msg.data)
                             }

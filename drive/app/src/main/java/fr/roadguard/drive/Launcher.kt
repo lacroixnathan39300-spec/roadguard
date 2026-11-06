@@ -295,7 +295,11 @@ fun LauncherPages(layout: LauncherLayout, modifier: Modifier = Modifier, onPage:
                     layout.pages.getOrNull(pager.currentPage)?.forEach { if (it.widgetId != -1) runCatching { host.deleteAppWidgetId(it.widgetId) } }
                     layout.removePage(pager.currentPage)
                 }
-                BigButton("Par défaut", DriveColors.Track) { layout.reset(); selected = null }
+                BigButton("Par défaut", DriveColors.Track) {
+                    // Les widgets Android retirés sont rendus au système (sinon ils restent réservés pour rien).
+                    layout.pages.flatten().forEach { if (it.widgetId != -1) runCatching { host.deleteAppWidgetId(it.widgetId) } }
+                    layout.reset(); selected = null
+                }
                 BigButton("✓ Terminé", Color(0xFF2E7D32)) { editing = false; selected = null; message = null }
             }
             message?.let {

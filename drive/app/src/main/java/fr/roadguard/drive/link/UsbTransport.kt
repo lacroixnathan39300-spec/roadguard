@@ -153,11 +153,15 @@ object UsbTransport {
             private var pos = 0
             private var len = 0
             private fun fill(): Boolean {
+                val since = System.currentTimeMillis()
                 while (!closed) {
                     val n = conn.bulkTransfer(inEp, buf, buf.size, 1000)
                     if (n > 0) { pos = 0; len = n; return true }
                     // n < 0 : délai dépassé sans données (normal) ou câble débranché.
                     if (n < 0 && UsbTransport.unplugged(conn)) return false
+                    // Téléphone muet depuis 20 s (appli arrêtée, câble branché) : comme en Wi-Fi, on relance la liaison
+                    // au lieu d'attendre indéfiniment (le téléphone répond aux « ping » toutes les 5 s).
+                    if (System.currentTimeMillis() - since > 20_000) throw IOException("Le téléphone ne répond plus (câble USB)")
                 }
                 return false
             }

@@ -63,3 +63,7 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
 - Communauté : police / radar mobile coupés avec les radars (interrupteur, Suisse) ; messages 💬 lus avec leur texte.
 - Drive : tableau de bord avec cadres colorés, titre et icône par bloc, textes vides explicites.
 - Reste à faire : vérification des en-têtes d'identité du site (plateforme ChatGPT Sites), « mot de passe oublié », essais en voiture.
+- Drive / Link (relecture complète) : trames limitées à 8 Ko avant authentification (`MAX_HANDSHAKE_FRAME`, essai réel OK),
+  4 connexions au plus côté téléphone, tactile du miroir accepté seulement pendant un partage d'écran, adresses locales IPv6/CGNAT
+  refusées par le relais Internet, message Link mal formé ignoré (plus de coupure), USB relancé après 20 s de silence,
+  son du téléphone sans plantage possible (`AudioPlayer`), widgets Android libérés par « Par défaut ».

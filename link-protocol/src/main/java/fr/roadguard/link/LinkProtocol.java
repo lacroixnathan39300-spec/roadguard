@@ -35,6 +35,11 @@ public final class LinkProtocol {
     public static final int PORT = 47390;
     public static final String SERVICE_TYPE = "_roadguard._tcp.";
     public static final int MAX_FRAME = 4 * 1024 * 1024;
+    /**
+     * Taille maximale d'une trame tant que l'autre appareil n'est pas authentifié : un inconnu du même Wi-Fi
+     * ne doit pas pouvoir faire réserver 4 Mo de mémoire par connexion (et faire planter l'appli).
+     */
+    public static final int MAX_HANDSHAKE_FRAME = 8 * 1024;
     static final int PAIRING_ITERATIONS = 20_000;
     private static final SecureRandom RANDOM = new SecureRandom();
 
@@ -52,8 +57,12 @@ public final class LinkProtocol {
     }
 
     public static byte[] readFrame(DataInputStream in) throws IOException {
+        return readFrame(in, MAX_FRAME);
+    }
+
+    public static byte[] readFrame(DataInputStream in, int max) throws IOException {
         int length = in.readInt();
-        if (length < 0 || length > MAX_FRAME) throw new IOException("Trame invalide");
+        if (length < 0 || length > max) throw new IOException("Trame invalide");
         byte[] data = new byte[length];
         in.readFully(data);
         return data;
@@ -134,6 +143,8 @@ public final class LinkProtocol {
         private final DataOutputStream out;
         private long sendSeq;
         private long recvSeq = -1;
+        /** Petites trames seulement jusqu'à la fin de la poignée de main. */
+        private int maxFrame = MAX_HANDSHAKE_FRAME;
 
         Session(String peerId, String peerName, byte[] secret, byte[] key, DataInputStream in, DataOutputStream out) {
             this.peerId = peerId; this.peerName = peerName; this.secret = secret; this.key = key; this.in = in; this.out = out;
@@ -174,7 +185,7 @@ public final class LinkProtocol {
         public Message receiveAny() throws IOException {
             byte[] plain;
             try {
-                plain = open(key, readFrame(in));
+                plain = open(key, readFrame(in, maxFrame));
             } catch (GeneralSecurityException e) {
                 throw new IOException("Message non authentifié", e);
             }
@@ -250,7 +261,7 @@ public final class LinkProtocol {
             JSONObject hello = new JSONObject().put("t", "hello").put("v", VERSION).put("id", myId).put("name", myName)
                 .put("n", b64(cn)).put("pair", secret == null);
             writeFrame(out, utf8(hello.toString()));
-            JSONObject reply = new JSONObject(new String(readFrame(in), StandardCharsets.UTF_8));
+            JSONObject reply = new JSONObject(new String(readFrame(in, MAX_HANDSHAKE_FRAME), StandardCharsets.UTF_8));
             if (!"hello".equals(reply.optString("t"))) throw new AuthException(reply.optString("error", "Réponse inattendue"));
             if (reply.optInt("v") != VERSION) throw new AuthException("Versions incompatibles : mettre à jour les deux applis");
             byte[] sn = unb64(reply.getString("n"));
@@ -259,7 +270,7 @@ public final class LinkProtocol {
                 if (code == null) throw new AuthException("Code d'association manquant");
                 byte[] pk = pairingKey(code, cn, sn);
                 try {
-                    s = open(pk, readFrame(in));
+                    s = open(pk, readFrame(in, MAX_HANDSHAKE_FRAME));
                 } catch (GeneralSecurityException e) {
                     throw new AuthException("Code incorrect");
                 }
@@ -269,6 +280,7 @@ public final class LinkProtocol {
             session.send(new JSONObject().put("t", "auth"));
             JSONObject ok = session.receive();
             if (!"ok".equals(ok.optString("t"))) throw new AuthException("Authentification refusée");
+            session.maxFrame = MAX_FRAME;
             return session;
         } catch (JSONException | GeneralSecurityException e) {
             throw new IOException("Poignée de main invalide", e);
@@ -293,7 +305,7 @@ public final class LinkProtocol {
         DataInputStream in = new DataInputStream(rawIn);
         DataOutputStream out = new DataOutputStream(rawOut);
         try {
-            JSONObject hello = new JSONObject(new String(readFrame(in), StandardCharsets.UTF_8));
+            JSONObject hello = new JSONObject(new String(readFrame(in, MAX_HANDSHAKE_FRAME), StandardCharsets.UTF_8));
             if (!"hello".equals(hello.optString("t"))) throw new AuthException("Message inattendu");
             String peerId = hello.getString("id");
             byte[] cn = unb64(hello.getString("n"));
@@ -327,6 +339,7 @@ public final class LinkProtocol {
             if (!"auth".equals(auth.optString("t"))) throw new AuthException("Authentification refusée");
             if (pairing) peers.paired(peerId, hello.optString("name"), secret);
             session.send(new JSONObject().put("t", "ok"));
+            session.maxFrame = MAX_FRAME;
             return session;
         } catch (JSONException | GeneralSecurityException e) {
             throw new IOException("Poignée de main invalide", e);

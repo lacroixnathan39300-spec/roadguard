@@ -168,12 +168,31 @@ public final class LinkService extends Service {
         startMedia();
     }
 
+    /** Adresse du réseau local, de l'opérateur (CGNAT) ou locale IPv6 (fc00::/7) : jamais relayée. */
+    static boolean isLocal(java.net.InetAddress a) {
+        if (a.isLoopbackAddress() || a.isSiteLocalAddress() || a.isLinkLocalAddress() || a.isAnyLocalAddress() || a.isMulticastAddress()) return true;
+        byte[] b = a.getAddress();
+        if (a instanceof java.net.Inet6Address) return (b[0] & 0xfe) == 0xfc;
+        return b.length == 4 && (b[0] & 0xff) == 100 && (b[1] & 0xc0) == 64;
+    }
+
+    /** Connexions en cours (poignée de main comprise) : au plus quelques-unes, pour qu'un inconnu ne sature pas le téléphone. */
+    private final java.util.concurrent.atomic.AtomicInteger sessions = new java.util.concurrent.atomic.AtomicInteger();
+    private static final int MAX_CONNECTIONS = 4;
+
     private void acceptLoop() {
         try {
             server = new ServerSocket(LinkProtocol.PORT);
             while (running) {
                 Socket socket = server.accept();
-                new Thread(() -> serve(socket), "roadguard-link-session").start();
+                if (sessions.incrementAndGet() > MAX_CONNECTIONS) {
+                    sessions.decrementAndGet();
+                    try { socket.close(); } catch (IOException ignored) {}
+                    continue;
+                }
+                new Thread(() -> {
+                    try { serve(socket); } finally { sessions.decrementAndGet(); }
+                }, "roadguard-link-session").start();
             }
         } catch (IOException e) {
             if (running) { Log.w(TAG, "Serveur arrêté", e); setStatus("Erreur réseau : " + e.getMessage()); }
@@ -243,8 +262,10 @@ public final class LinkService extends Service {
         }
         if ("http".equals(type)) { relayHttp(m); return; }
         if ("touch".equals(type)) {
+            // Tactile accepté seulement pendant un partage d'écran en cours (image visible sur l'autoradio) :
+            // sans cela, l'autoradio pourrait toucher l'écran du téléphone sans que personne ne le voie.
             MirrorTouchService t = MirrorTouchService.instance;
-            if (t != null) t.touch(m.optString("a"), (float) m.optDouble("x"), (float) m.optDouble("y"), m.optLong("time"));
+            if (t != null && MirrorService.instance != null) t.touch(m.optString("a"), (float) m.optDouble("x"), (float) m.optDouble("y"), m.optLong("time"));
             return;
         }
         if ("mirror_keyframe".equals(type)) {
@@ -357,8 +378,7 @@ public final class LinkService extends Service {
                 java.net.URL url = new java.net.URL(m.getString("url"));
                 if (!"https".equals(url.getProtocol())) throw new IOException("Seul HTTPS est relayé");
                 java.net.InetAddress addr = java.net.InetAddress.getByName(url.getHost());
-                if (addr.isLoopbackAddress() || addr.isSiteLocalAddress() || addr.isLinkLocalAddress() || addr.isAnyLocalAddress())
-                    throw new IOException("Adresse locale refusée");
+                if (isLocal(addr)) throw new IOException("Adresse locale refusée");
                 java.net.HttpURLConnection c = (java.net.HttpURLConnection) url.openConnection();
                 c.setConnectTimeout(10_000);
                 c.setReadTimeout(20_000);
