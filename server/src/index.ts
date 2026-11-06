@@ -481,7 +481,7 @@ async function modRoutes(req: Request, env: Env, me: Account, path: string): Pro
          FROM reports r JOIN accounts a ON a.id = r.author_id
         WHERE (r.permanent = 1 OR r.expires_at > ?) AND r.validated = 0
           AND (r.status != 'ok' OR (r.yes = 0 AND r.type IN ('radar_fixe', 'danger')))
-        ORDER BY r.created_at DESC LIMIT 100`).bind(now).all<Record<string, number> & { author: string }>();
+        ORDER BY r.created_at DESC LIMIT 100`).bind(now).all<{ good: number; bad: number; trusted: number; banned: number; suspect_until: number; [k: string]: unknown }>();
     return json({ reports: rows.results.map((r) => ({ ...r, author_stars: stars(r.good, r.bad), author_level: level(r, now) })) });
   }
   const rm = /^\/v1\/mod\/report\/([0-9a-f]{20})$/.exec(path);
@@ -512,7 +512,7 @@ async function modRoutes(req: Request, env: Env, me: Account, path: string): Pro
     const rows = await env.DB.prepare(
       `SELECT id, name, points, good, bad, trusted, banned, suspect_until, owner, created_at, last_report_at, last_seen,
               (SELECT COUNT(*) FROM reports r WHERE r.author_id = accounts.id) AS reports
-         FROM accounts ORDER BY MAX(last_report_at, last_seen) DESC LIMIT 300`).all<Record<string, number> & { name: string }>();
+         FROM accounts ORDER BY MAX(last_report_at, last_seen) DESC LIMIT 300`).all<{ good: number; bad: number; trusted: number; banned: number; suspect_until: number; [k: string]: unknown }>();
     return json({ accounts: rows.results.map((a) => withStars(a, now)) });
   }
   const am = /^\/v1\/mod\/account\/([0-9a-f]{24})$/.exec(path);
