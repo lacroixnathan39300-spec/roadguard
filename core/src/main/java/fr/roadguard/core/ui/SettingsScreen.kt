@@ -35,17 +35,19 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
     voice: fr.roadguard.core.radar.AlertVoice? = null, updateApp: String? = null, onAdmin: (() -> Unit)? = null,
     session: fr.roadguard.core.DrivingSession? = null) {
     val context = androidx.compose.ui.platform.LocalContext.current
-    // Outils (autoradio surtout) : ouverts en plein écran par-dessus les réglages.
+    // Outils : affichés en plein écran à la place des réglages, dans la même fenêtre. Une fenêtre séparée (Dialog)
+    // était décalée sur certains autoradios (réglages visibles à gauche, « Fermer » et « Y aller » coupés à droite).
     val tool = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0) }
     if (session != null && tool.value != 0) {
-        androidx.compose.ui.window.Dialog(onDismissRequest = { tool.value = 0 },
-            properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)) {
-            val close = { tool.value = 0 }
+        val close = { tool.value = 0 }
+        androidx.activity.compose.BackHandler(onBack = close)
+        androidx.compose.foundation.layout.Box(Modifier.fillMaxSize().background(DriveColors.Background)) {
             when (tool.value) {
                 1 -> ParkingScreen(session, close); 2 -> NearbyScreen(session, close); 3 -> TripHistoryScreen(session, close)
                 4 -> ConvoyScreen(session, close); else -> HudScreen(session, close)
             }
         }
+        return
     }
     Column(Modifier.fillMaxSize().background(DriveColors.Background).padding(20.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -285,6 +287,8 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                     "Les alertes complètent la signalisation : elles ne la remplacent pas.",
                 color = DriveColors.TextSecondary, fontSize = 15.sp,
             )
+            // Marge en bas : le dernier réglage peut remonter au-dessus du bandeau de mise à jour.
+            androidx.compose.foundation.layout.Spacer(Modifier.padding(bottom = 120.dp))
         }
     }
 }

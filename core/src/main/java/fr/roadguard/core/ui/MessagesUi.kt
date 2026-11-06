@@ -33,8 +33,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import fr.roadguard.core.account.AccountManager
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -114,7 +112,7 @@ fun ContactAdminScreen(onClose: () -> Unit) {
     }
     LaunchedEffect(Unit) { load() }
     val app = UpdateNotifier.appKey(context)
-    Dialog(onDismissRequest = onClose, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    FullScreenDialog(onDismissRequest = onClose) {
         Column(Modifier.fillMaxSize().background(DriveColors.Background).padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("✉ Écrire à l'administrateur", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
@@ -160,7 +158,7 @@ fun AdminMessagesScreen(onClose: () -> Unit) {
         runCatching { account.markAdminRead() }; InboxNotifier.adminUnread.intValue = 0
     }
     LaunchedEffect(Unit) { load() }
-    Dialog(onDismissRequest = onClose, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    FullScreenDialog(onDismissRequest = onClose) {
         Column(Modifier.fillMaxSize().background(DriveColors.Background).padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("✉ Messages (${list.value.size})", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))

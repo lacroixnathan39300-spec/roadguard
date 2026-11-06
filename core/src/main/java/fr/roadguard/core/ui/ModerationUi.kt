@@ -30,8 +30,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import fr.roadguard.core.community.Community
 import fr.roadguard.core.community.ReportType
 import kotlinx.coroutines.launch
@@ -57,7 +55,7 @@ fun ModerationScreen(community: Community, onClose: () -> Unit) {
     }
     LaunchedEffect(tab) { load() }
     val df = java.text.SimpleDateFormat("dd/MM HH:mm", java.util.Locale.FRANCE)
-    Dialog(onDismissRequest = onClose, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    FullScreenDialog(onDismissRequest = onClose) {
         Column(Modifier.fillMaxSize().background(DriveColors.Background).padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("🛡 Communauté", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))

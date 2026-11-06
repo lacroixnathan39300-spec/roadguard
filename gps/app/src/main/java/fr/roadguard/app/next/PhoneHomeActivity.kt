@@ -460,7 +460,7 @@ private fun PhoneHome() {
             BackHandler { showSettings = false }
             var radarCount by remember { mutableStateOf(0) }
             LaunchedEffect(Unit) { radarCount = RadarRepository.radars(context).size }
-            SettingsScreen(settings, radarCount, onClose = { showSettings = false }, onOfflineData = { showOffline = true }, voice = s.voice, updateApp = "gps", onAdmin = { showAdmin = true })
+            SettingsScreen(settings, radarCount, onClose = { showSettings = false }, onOfflineData = { showOffline = true }, voice = s.voice, updateApp = "gps", onAdmin = { showAdmin = true }, session = s)
         }
         if (showEqualizer) {
             BackHandler { showEqualizer = false }
