@@ -50,8 +50,24 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     fun frenchVoices(): List<Pair<String, String>> = runCatching {
         tts.voices.orEmpty().filter { it.locale.language == "fr" && !it.isNetworkConnectionRequired }
             .sortedBy { it.name }
-            .mapIndexed { i, v -> v.name to "Voix ${i + 1}" + (if (v.locale.country.isNotBlank()) " (${v.locale.country})" else "") }
+            .mapIndexed { i, v ->
+                val g = when (gender(v.name)) { 'F' -> " ♀ femme"; 'M' -> " ♂ homme"; else -> "" }
+                v.name to "Voix ${i + 1}$g" + (if (v.locale.country.isNotBlank()) " (${v.locale.country})" else "")
+            }
     }.getOrDefault(emptyList())
+
+    /** Première voix de femme connue (pour les tons charme / séduction / osé). */
+    fun femaleVoice(): String? = frenchVoices().map { it.first }.let { names ->
+        listOf("vlf", "frc", "fra", "cac", "caa").firstNotNullOfOrNull { code -> names.firstOrNull { it.contains("-x-$code") && it.endsWith("-local") } ?: names.firstOrNull { it.contains("-x-$code") } }
+    }
+
+    companion object {
+        /** Genre des voix Google connues (fr-fr-x-frb-local…) : 'F', 'M' ou null si inconnu. */
+        fun gender(name: String): Char? {
+            val code = Regex("-x-([a-z]{3})").find(name)?.groupValues?.get(1) ?: return null
+            return when (code) { "fra", "frc", "vlf", "caa", "cac" -> 'F'; "frb", "frd", "cab", "cad" -> 'M'; else -> null }
+        }
+    }
 
     private var appliedVoice: String? = null
     private var appliedRate = 1f
@@ -65,8 +81,8 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
         style = voiceTone
         if (!ttsReady) return
         if (rate != appliedRate || style != appliedStyle) {
-            tts.setSpeechRate(rate * when (style) { 1 -> 0.9f; 2 -> 0.82f; 3 -> 0.8f; else -> 1f })
-            tts.setPitch(when (style) { 1 -> 0.93f; 2 -> 0.88f; 3 -> 0.86f; else -> 1f })
+            tts.setSpeechRate(rate * when (style) { 1 -> 0.92f; 2 -> 0.86f; 3 -> 0.84f; else -> 1f })
+            tts.setPitch(when (style) { 1 -> 1.0f; 2 -> 0.98f; 3 -> 0.97f; else -> 1f }) // trop grave, une voix de femme sonnait masculine
             appliedRate = rate; appliedStyle = style
         }
         if (voiceName != appliedVoice) {
