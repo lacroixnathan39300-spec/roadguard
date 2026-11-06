@@ -1,6 +1,8 @@
 name: Voix — échantillons
 on:
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   samples:
     runs-on: ubuntu-latest
@@ -41,5 +43,8 @@ jobs:
         run: |
           cd out; ls -la
           for f in *.wav; do ffmpeg -loglevel error -y -i "$f" -b:a 96k "${f%.wav}.mp3"; done; rm -f *.wav; ls -la
-      - uses: actions/upload-artifact@v4
-        with: { name: voix-echantillons, path: out/*.mp3, retention-days: 1 }
+      - name: Publier sur la branche voix-echantillons
+        run: |
+          cd out && git init -q && git checkout -q -b voix-echantillons && git add *.mp3
+          git -c user.name=ci -c user.email=ci@localhost commit -qm "échantillons"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" voix-echantillons
