@@ -268,7 +268,7 @@ class DrivingSession(
             // Choix du trajet proposé au départ seulement : retiré après 1 km parcouru.
             if (alternatives.isNotEmpty() && g.route.lengthM - state.remainingM > 1000) alternatives = emptyList()
             guidanceState = state
-            state.speak?.let(voice::speak)
+            state.speak?.let(voice::guide) // consigne au ton choisi (« …, mon chéri »)
             // Sortie du trajet : nouveau calcul, au plus toutes les 15 s.
             if (state.offRoute && !rerouting && f.timeMs - lastRerouteAt > 15_000) {
                 lastRerouteAt = f.timeMs

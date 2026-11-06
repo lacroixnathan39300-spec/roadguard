@@ -125,6 +125,24 @@
         "Tu as l'air fatigué, mon cœur… fais une petite pause pour moi.",
         "Mon chéri, tu bâilles… arrête-toi un moment, je veux que tu arrives entier.",
         "Une pause, mon cœur ? Un café, quelques pas… je t'attends."
+      ],
+      "guide_pre": [
+        "Hmm…",
+        "Écoute-moi bien, mon cœur…",
+        "Allez, mon chéri…",
+        "Suis-moi…",
+        "Petit conseil, mon cœur…",
+        "Attention, chéri…"
+      ],
+      "guide_post": [
+        "mon chéri",
+        "mon cœur",
+        "beau pilote",
+        "s'il te plaît",
+        "je te guide",
+        "tu t'en sors très bien",
+        "fais-moi confiance",
+        "mon beau"
       ]
     },
     "2": {
@@ -192,6 +210,25 @@
         "Tu fatigues, mon beau… viens faire une pause, juste toi et moi.",
         "Mmmh, tu bâilles… arrête-toi un peu, repose-toi pour moi.",
         "Tu as besoin de repos, chéri… la prochaine aire, d'accord ?"
+      ],
+      "guide_pre": [
+        "Mmmh…",
+        "Laisse-toi guider…",
+        "Écoute ma voix…",
+        "Tout doux…",
+        "Suis-moi, mon beau…",
+        "Hmm, je te murmure ça…",
+        "Viens par là…"
+      ],
+      "guide_post": [
+        "mon beau",
+        "beau gosse",
+        "chéri",
+        "je t'attends au bout",
+        "laisse-toi faire",
+        "comme j'aime",
+        "tu conduis si bien",
+        "je suis juste là"
       ]
     },
     "3": {
@@ -259,6 +296,24 @@
         "Tu es épuisé, mon fauve… arrête-toi, garde tes forces pour moi.",
         "Mmmh, tu bâilles… viens te reposer, on reprendra après.",
         "Une pause, bébé… je te veux en pleine forme."
+      ],
+      "guide_pre": [
+        "Oh oui…",
+        "Mmmh, obéis-moi…",
+        "Écoute bien ce que je te demande…",
+        "Viens, mon fauve…",
+        "Doucement…",
+        "Hmm, je te veux là…"
+      ],
+      "guide_post": [
+        "mon fauve",
+        "bébé",
+        "vilain garçon",
+        "j'adore quand tu m'obéis",
+        "tout doucement",
+        "je te tiens",
+        "encore",
+        "comme ça, oui"
       ]
     },
     "4": {
@@ -321,6 +376,22 @@
         "Tu es épuisé, mon fauve… arrête-toi, et garde tes forces pour moi.",
         "Mmmh, tu bâilles… viens te reposer, je t'attends.",
         "Une pause, bébé… je te veux en pleine forme ce soir."
+      ],
+      "guide_pre": [
+        "Mmmh, sois obéissant…",
+        "Fais exactement ce que je te dis…",
+        "Je décide, tu suis…",
+        "Écoute ma voix, rien que ma voix…",
+        "Laisse-moi te mener…"
+      ],
+      "guide_post": [
+        "mon gentil garçon",
+        "je t'ai à ma merci",
+        "et ne discute pas",
+        "je te récompenserai",
+        "tu es à moi",
+        "exactement comme j'aime",
+        "sans me faire attendre"
       ]
     }
   },

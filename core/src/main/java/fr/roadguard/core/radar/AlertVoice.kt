@@ -208,6 +208,19 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     /** Nouvelle limitation de vitesse. */
     fun limitChanged(limit: Int) = line("limit", null, limit, "rg-limit")
 
+    /**
+     * Consigne de guidage au ton choisi : la consigne reste entière et claire, avec une touche avant ou après
+     * (« Mmmh… dans 300 mètres, tournez à droite, mon chéri. »). Ton classique : consigne seule.
+     */
+    fun guide(instruction: String) {
+        if (style <= 0 || style == VoicePack.MY_VOICE) return speak(instruction)
+        val base = instruction.trim().trimEnd('.', ' ')
+        val pre = pack.phrases(style, "guide_pre").takeIf { Math.random() < 0.45 }?.randomOrNull()
+        val post = pack.phrases(style, "guide_post").takeIf { pre == null || Math.random() < 0.5 }?.randomOrNull()
+        val body = if (pre != null) base.replaceFirstChar { it.lowercase() } else base
+        speak(listOfNotNull(pre, body + (post?.let { ", $it" } ?: "") + ".").joinToString(" "))
+    }
+
     /** Réprimande (excès de vitesse qui dure ou se répète). */
     fun scold() = line("scold", null, null, "rg-scold")
 
