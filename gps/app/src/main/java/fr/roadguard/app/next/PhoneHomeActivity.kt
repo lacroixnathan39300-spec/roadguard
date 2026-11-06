@@ -213,7 +213,7 @@ private fun PhoneHome() {
             alternatives = s.alternatives,
             offlinePack = offlinePack,
             hasLocation = hasLocation, route = s.route, recenterRequest = s.recenter,
-            night = s.night, visibleKinds = settings.alertKinds, roadguardStyle = settings.mapStyle == "roadguard", bottomInset = if (panelOpen) 0.30f else 0.14f, modifier = Modifier.fillMaxSize(),
+            night = s.night, visibleKinds = if (settings.radarsOn) settings.alertKinds else emptySet(), roadguardStyle = settings.mapStyle == "roadguard", bottomInset = if (panelOpen) 0.30f else 0.14f, modifier = Modifier.fillMaxSize(),
         )
         Column(Modifier.align(Alignment.TopCenter).statusBarsPadding().displayCutoutPadding().fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             if (s.navigating) {
@@ -273,15 +273,17 @@ private fun PhoneHome() {
         }
         Column(Modifier.align(Alignment.CenterEnd).padding(end = 12.dp), verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
-            // Interrupteurs rapides : un appui coupe ou rétablit les alertes radars / les annonces de limitation.
-            fr.roadguard.core.ui.QuickToggle("📷", "Radars", settings.radarsOn, onToggle = {
-                settings.changeRadarsOn(!settings.radarsOn)
-                android.widget.Toast.makeText(context, if (settings.radarsOn) "Alertes radars activées" else "Alertes radars coupées", android.widget.Toast.LENGTH_SHORT).show()
-            })
-            fr.roadguard.core.ui.QuickToggle("🚦", "Limites", settings.limitVoiceOn, onToggle = {
-                settings.changeLimitVoice(!settings.limitVoiceOn)
-                android.widget.Toast.makeText(context, if (settings.limitVoiceOn) "Annonces de limitation activées" else "Annonces de limitation coupées", android.widget.Toast.LENGTH_SHORT).show()
-            })
+            // Interrupteurs rapides (cachés avec le reste en mode épuré) : radars / annonces de limitation.
+            if (panelOpen) {
+                fr.roadguard.core.ui.QuickToggle("📷", "Radars", settings.radarsOn, onToggle = {
+                    settings.changeRadarsOn(!settings.radarsOn)
+                    android.widget.Toast.makeText(context, if (settings.radarsOn) "Alertes radars activées" else "Alertes radars coupées", android.widget.Toast.LENGTH_SHORT).show()
+                })
+                fr.roadguard.core.ui.QuickToggle("🚦", "Limites", settings.limitVoiceOn, onToggle = {
+                    settings.changeLimitVoice(!settings.limitVoiceOn)
+                    android.widget.Toast.makeText(context, if (settings.limitVoiceOn) "Annonces de limitation activées" else "Annonces de limitation coupées", android.widget.Toast.LENGTH_SHORT).show()
+                })
+            }
             MapButton("⚠", onClick = { showReport = true })
             MapButton("◎", onClick = { s.recenter++ })
         }
