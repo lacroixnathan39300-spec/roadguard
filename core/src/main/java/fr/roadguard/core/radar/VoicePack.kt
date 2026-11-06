@@ -19,12 +19,13 @@ class VoicePack(context: Context) {
             "mon gentil garçon" to "ma gentille fille", "gentil garçon" to "gentille fille", "vilain garçon" to "vilaine fille",
             "mon beau" to "ma belle", "beau pilote" to "belle pilote", "beau gosse" to "belle gosse",
             "mon chéri" to "ma chérie", "chéri" to "chérie", "mon fauve" to "ma tigresse", "maître de toi" to "maîtresse de toi",
-            "tout à moi" to "toute à moi", "Vilain" to "Vilaine", "vilain" to "vilaine", "séduisant" to "séduisante",
+            "tout à moi" to "toute à moi", "vilain" to "vilaine", "séduisant" to "séduisante",
             "fatigué" to "fatiguée", "épuisé" to "épuisée", "excité" to "excitée", "têtu" to "têtue", "obéissant" to "obéissante",
             "pressé" to "pressée", "mignon" to "mignonne", "entier" to "entière", "déchaîné" to "déchaînée",
             "bouillant" to "bouillante", "fougueux" to "fougueuse", "impatient" to "impatiente", "puni" to "punie",
             "prêt" to "prête", "seul" to "seule",
-        ).map { (m, f) -> Regex("(?<![\\p{L}])" + Regex.escape(m) + "(?![\\p{L}])") to f }
+        ).flatMap { (m, f) -> listOf(m to f, m.replaceFirstChar { it.uppercase() } to f.replaceFirstChar { it.uppercase() }) }
+            .map { (m, f) -> Regex("(?<![\\p{L}])" + Regex.escape(m) + "(?![\\p{L}])") to f }
 
         /** Met une phrase au féminin (mots entiers seulement : « pressés » au pluriel reste tel quel). */
         fun feminize(text: String): String = femaleWords.fold(text) { acc, (r, f) -> r.replace(acc, f) }
