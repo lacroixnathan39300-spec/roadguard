@@ -186,7 +186,9 @@ private fun PhoneHome() {
     var showEqualizer by remember { mutableStateOf(false) }
     var showAdmin by remember { mutableStateOf(false) }
     var showCamera by remember { mutableStateOf(false) }
-    var showDrowsy by remember { mutableStateOf(false) }
+    // Anti-somnolence : analyse invisible par la caméra avant pendant que la carte reste affichée.
+    val drowsy = rememberDrowsyGuard(s, settings.drowsyGuard)
+    var wakeDismissedAt by remember { mutableStateOf(0L) }
     // Mode épuré : en roulant, les panneaux se replient tout seuls après 8 s sans toucher l'écran
     // (reste : vitesse, limite, consigne de guidage) ; un appui sur la vitesse ou la consigne les rouvre.
     var panelOpen by remember { mutableStateOf(true) }
@@ -285,6 +287,11 @@ private fun PhoneHome() {
                     android.widget.Toast.makeText(context, if (settings.limitVoiceOn) "Annonces de limitation activées" else "Annonces de limitation coupées", android.widget.Toast.LENGTH_SHORT).show()
                 })
             }
+            if (drowsy != null) {
+                // Petit voyant de l'anti-somnolence (vert : visage suivi ; orange : fatigue ou regard ailleurs).
+                Text(if (drowsy == Alertness.AWAKE) "👁" else if (drowsy == Alertness.SEARCHING) "👁…" else "😴", fontSize = 22.sp,
+                    modifier = Modifier.clip(RoundedCornerShape(12.dp)).background(Color(drowsy.color).copy(alpha = 0.85f)).padding(horizontal = 8.dp, vertical = 4.dp))
+            }
             MapButton("⚠", onClick = { showReport = true })
             MapButton("◎", onClick = { s.recenter++ })
         }
@@ -325,7 +332,10 @@ private fun PhoneHome() {
                 }
                 fun open(tab: Int) { offlineTab = tab; showOffline = true; showMenu = false }
                 MenuEntry("📷", "Assistant caméra", "Distance avec la voiture de devant, alerte collision, départ au feu") { showMenu = false; showCamera = true }
-                MenuEntry("😴", "Anti-somnolence", "Caméra avant : alarme si tes yeux se ferment, conseil de pause si tu fatigues") { showMenu = false; showDrowsy = true }
+                MenuEntry("😴", if (settings.drowsyGuard) "Anti-somnolence : activé" else "Anti-somnolence : désactivé",
+                    "Caméra avant, sans rien afficher : alarme si tes yeux se ferment, conseil de pause si tu fatigues") {
+                    showMenu = false; settings.changeDrowsyGuard(!settings.drowsyGuard)
+                }
                 MenuEntry("📊", "Ordinateur de bord", "Distances, temps, vitesses, chronos") { showMenu = false; showTrip = true }
                 MenuEntry("👥", "Communauté", "Pseudo, points, classement, conducteurs autour") { showMenu = false; showCommunity = true }
                 MenuEntry("📍", "Mes radars", "Ajouter un radar ici, importer un fichier CSV") { open(2) }
@@ -340,9 +350,8 @@ private fun PhoneHome() {
                 }
             }
         }
-        if (showDrowsy) {
-            BackHandler { showDrowsy = false }
-            DrowsinessScreen(s, onClose = { showDrowsy = false })
+        if (drowsy == Alertness.ASLEEP && System.currentTimeMillis() - wakeDismissedAt > 3_000) {
+            WakeUpOverlay { wakeDismissedAt = System.currentTimeMillis() }
         }
         if (showCamera) {
             BackHandler { showCamera = false }

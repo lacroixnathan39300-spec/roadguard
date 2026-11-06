@@ -12,6 +12,7 @@ import java.io.File
  * Les textes viennent de assets/voices/script.json (aussi utilisés pour la voix du téléphone en repli).
  */
 class VoicePack(context: Context) {
+    companion object { const val MY_VOICE = 9 }
     private val app = context.applicationContext
     val script: JSONObject = runCatching {
         JSONObject(app.assets.open("voices/script.json").bufferedReader().use { it.readText() })
@@ -28,10 +29,10 @@ class VoicePack(context: Context) {
 
     private fun list(obj: JSONObject?, name: String): List<String> =
         obj?.optJSONArray(name)?.let { a -> (0 until a.length()).map { a.getString(it) } } ?: emptyList()
-    private fun tone(t: Int) = script.optJSONObject("tones")?.optJSONObject(t.coerceIn(0, 3).toString())
+    private fun tone(t: Int) = script.optJSONObject("tones")?.optJSONObject(t.coerceIn(0, 4).toString())
     /** Phrases du ton : chaque ton reprend aussi celles des tons plus doux (osé = osé + séduction + charme). */
     fun phrases(t: Int, group: String): List<String> = when {
-        t == 4 -> list(script.optJSONObject("myvoice"), group)
+        t == MY_VOICE -> list(script.optJSONObject("myvoice"), group)
         t <= 0 -> list(tone(0), group)
         else -> (t downTo 1).flatMap { list(tone(it), group) }
     }
@@ -45,7 +46,7 @@ class VoicePack(context: Context) {
      * [group] : radar, limit, over ou alarm.
      */
     fun clips(t: Int, group: String, kind: RadarKind?, limit: Int?): List<Clip>? {
-        if (t == 4) return myClips(group, kind, limit)
+        if (t == MY_VOICE) return myClips(group, kind, limit)
         fun gen(key: String) = if (key in generated) Clip(asset = "voices/jessica/$key.mp3") else null
         return when (group) {
             "radar" -> {
@@ -68,12 +69,12 @@ class VoicePack(context: Context) {
         return when (group) {
             "radar" -> {
                 val k = my("k.${(kind ?: return null).name}") ?: return null
-                val intro = phrases(4, "radar").indices.mapNotNull { my("t4.radar.$it") }.randomOrNull()
+                val intro = phrases(MY_VOICE, "radar").indices.mapNotNull { my("t4.radar.$it") }.randomOrNull()
                 listOfNotNull(intro, k) + (if (n != null) listOf(my("c.limited") ?: return null, n) else emptyList())
             }
             else -> {
                 if (n == null) return null
-                val p = phrases(4, group).indices.mapNotNull { my("t4.$group.$it") }.randomOrNull() ?: return null
+                val p = phrases(MY_VOICE, group).indices.mapNotNull { my("t4.$group.$it") }.randomOrNull() ?: return null
                 listOf(p, n)
             }
         }
@@ -81,7 +82,7 @@ class VoicePack(context: Context) {
 
     /** Texte de la même annonce, pour la voix du téléphone. */
     fun text(t: Int, group: String, kind: RadarKind?, limit: Int?): String {
-        val tt = if (t == 4) 0 else t
+        val tt = if (t == MY_VOICE) 0 else t
         val lim = limit?.toString().orEmpty()
         return when (group) {
             "radar" -> {
@@ -94,10 +95,10 @@ class VoicePack(context: Context) {
 
     /** Liste des phrases à enregistrer pour « Ma voix » : clé → texte à prononcer. */
     fun recordingList(): List<Pair<String, String>> = buildList {
-        phrases(4, "radar").forEachIndexed { i, p -> add("t4.radar.$i" to p) }
+        phrases(MY_VOICE, "radar").forEachIndexed { i, p -> add("t4.radar.$i" to p) }
         kinds().forEach { (k, label) -> add("k.$k" to label) }
         add("c.limited" to limited)
-        listOf("limit", "over", "alarm").forEach { g -> phrases(4, g).forEachIndexed { i, p -> add("t4.$g.$i" to p) } }
+        listOf("limit", "over", "alarm").forEach { g -> phrases(MY_VOICE, g).forEachIndexed { i, p -> add("t4.$g.$i" to p) } }
         numbers().forEach { v -> add("n.$v" to "$v  (${number(v)})") }
     }
 }

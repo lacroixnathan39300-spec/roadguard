@@ -260,6 +260,68 @@
         "Mmmh, tu bâilles… viens te reposer, on reprendra après.",
         "Une pause, bébé… je te veux en pleine forme."
       ]
+    },
+    "4": {
+      "radar": [
+        "Ralentis… je veux que tu sois tout à moi, pas à ce radar.",
+        "Mmmh, tu sais que j'adore quand tu me fais attendre…",
+        "Freine, mon beau… je te réserve toute ma chaleur pour ce soir.",
+        "Ce radar n'a pas le droit de te regarder comme moi je te regarde…",
+        "Lentement… je veux sentir chaque virage avec toi.",
+        "Garde tes ardeurs, chéri… je te promets que l'attente en vaudra la peine.",
+        "Oh, doucement… tu me rends complètement folle quand tu te maîtrises.",
+        "Ralentis… et imagine ma voix tout au creux de ton oreille.",
+        "Tu me donnes chaud… mais ici, on freine.",
+        "Mmmh, sois obéissant… et je saurai te récompenser.",
+        "Laisse-moi prendre les commandes… freine.",
+        "Tout doucement… exactement comme j'aime.",
+        "Hmm… à genoux devant la loi, mon beau… juste le temps de ce radar.",
+        "Freine… je ne partage pas, et surtout pas avec un radar.",
+        "Mmmh… ralentis, et je te dirai ce que j'ai prévu pour toi ce soir."
+      ],
+      "limit": [
+        "Mmmh… on descend, tout doucement, j'adore te sentir ralentir… on passe à",
+        "Sois mon gentil garçon… c'est",
+        "Lentement… très lentement… on est à",
+        "Je décide du rythme, chéri… limitation",
+        "Oh oui… doucement… comme ça… on passe à",
+        "Obéis-moi, mon beau… c'est",
+        "Mmmh, je te tiens en laisse… on reste à",
+        "Tout en retenue… ça me rend folle… limitation",
+        "Laisse-toi faire… on descend à",
+        "Prends ton temps, je veux que ça dure… c'est"
+      ],
+      "over": [
+        "Tu es beaucoup trop impatient… calme tes ardeurs, c'est",
+        "Oh, tu es en feu… mais tu vas devoir te retenir. On est à",
+        "Vilain… tu sais que je déteste quand tu vas trop vite. C'est",
+        "Mmmh, tant d'énergie… garde-la pour moi, pas pour la route. Limité à",
+        "Tu veux me rendre folle ? Ralentis d'abord… c'est",
+        "Pas si vite, mon fauve… je veux te faire languir. On est à",
+        "Doucement… les plaisirs pressés ne valent rien. Limité à",
+        "Tu me désobéis ? Ralentis tout de suite… c'est"
+      ],
+      "alarm": [
+        "Stop ! Freine, vilain garçon ! Limité à",
+        "Maintenant ! Tu freines pour moi ! C'est",
+        "Arrête ça tout de suite, bébé ! Limité à"
+      ],
+      "scold": [
+        "Vilain garçon… tu as désobéi trop longtemps. Tu vas devoir te faire pardonner.",
+        "Tu n'écoutes rien… si tu continues, je te prive de ma voix ce soir.",
+        "Ça suffit. Tu ralentis, tu te tiens sage, et après, peut-être, je serai gentille.",
+        "Encore trop vite ? Tu cherches vraiment à être puni, toi…"
+      ],
+      "wake": [
+        "Bébé, réveille-toi tout de suite ! Arrête-toi, je ne veux pas te perdre !",
+        "Ouvre les yeux, mon fauve ! Gare-toi immédiatement !",
+        "Réveille-toi ! Arrête-toi en sécurité, maintenant !"
+      ],
+      "tired": [
+        "Tu es épuisé, mon fauve… arrête-toi, et garde tes forces pour moi.",
+        "Mmmh, tu bâilles… viens te reposer, je t'attends.",
+        "Une pause, bébé… je te veux en pleine forme ce soir."
+      ]
     }
   },
   "myvoice": {

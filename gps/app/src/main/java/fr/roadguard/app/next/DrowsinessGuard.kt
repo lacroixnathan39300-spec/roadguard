@@ -100,35 +100,72 @@ class DrowsyMath {
 }
 
 /**
- * Anti-somnolence : téléphone sur son support, caméra avant tournée vers le conducteur.
- * Yeux qui se ferment → alarme forte et « Réveille-toi, arrête-toi ! » ; fatigue → conseil de pause.
- * Tout est analysé sur le téléphone, aucune image n'est enregistrée ni envoyée.
+ * Anti-somnolence en arrière-plan de l'accueil : la caméra avant analyse le visage sans rien afficher
+ * (la carte reste normale). Yeux fermés → sirène et « Réveille-toi, arrête-toi ! » ; fatigue → conseil de pause.
+ * Fonctionne tant que Pilote est à l'écran ; tout est analysé sur le téléphone, aucune image enregistrée ni envoyée.
+ * Renvoie l'état courant (pour le petit voyant et l'écran rouge de réveil).
  */
 @Composable
-fun DrowsinessScreen(session: DrivingSession?, onClose: () -> Unit) {
+fun rememberDrowsyGuard(session: DrivingSession?, enabled: Boolean): Alertness? {
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current
-    val view = LocalView.current
     var granted by remember { mutableStateOf(context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) }
     val ask = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted = it }
-    LaunchedEffect(Unit) { if (!granted) ask.launch(Manifest.permission.CAMERA) }
+    LaunchedEffect(enabled) { if (enabled && !granted) ask.launch(Manifest.permission.CAMERA) }
     var state by remember { mutableStateOf(Alertness.SEARCHING) }
-    var perclos by remember { mutableStateOf(0.0) }
-    var yawns by remember { mutableStateOf(0) }
-    var error by remember { mutableStateOf<String?>(null) }
+    if (!enabled || !granted) return null
+
     val math = remember { DrowsyMath() }
-    val landmarker = remember {
-        runCatching {
+    val main = remember { android.os.Handler(android.os.Looper.getMainLooper()) }
+    DisposableEffect(lifecycle) {
+        val executor = Executors.newSingleThreadExecutor()
+        val landmarker = runCatching {
             FaceLandmarker.createFromOptions(context, FaceLandmarker.FaceLandmarkerOptions.builder()
                 .setBaseOptions(BaseOptions.builder().setModelAssetPath("models/face_landmarker.task").build())
                 .setRunningMode(RunningMode.VIDEO).setNumFaces(1).setOutputFaceBlendshapes(true).build())
-        }.onFailure { error = "Modèle de visage absent de cette version : ${it.message}" }.getOrNull()
+        }.getOrNull()
+        val providerFuture = ProcessCameraProvider.getInstance(context)
+        var analysis: ImageAnalysis? = null
+        if (landmarker != null) providerFuture.addListener({
+            runCatching {
+                val provider = providerFuture.get()
+                val a = ImageAnalysis.Builder()
+                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                    .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
+                    .setTargetResolution(android.util.Size(480, 640))
+                    .build()
+                var lastRun = 0L
+                a.setAnalyzer(executor) { proxy ->
+                    try {
+                        // 8 images par seconde suffisent, et ménagent la batterie.
+                        val now = SystemClock.uptimeMillis()
+                        if (now - lastRun < 120) return@setAnalyzer
+                        lastRun = now
+                        val raw = proxy.toBitmap()
+                        val rot = proxy.imageInfo.rotationDegrees
+                        val bmp = if (rot == 0) raw else Bitmap.createBitmap(raw, 0, 0, raw.width, raw.height, Matrix().apply { postRotate(rot.toFloat()) }, true)
+                        val r = landmarker.detectForVideo(BitmapImageBuilder(bmp).build(), now)
+                        val shapes = r.faceBlendshapes().orElse(null)?.firstOrNull()
+                        fun score(name: String) = shapes?.firstOrNull { it.categoryName() == name }?.score() ?: 0f
+                        val blink = (score("eyeBlinkLeft") + score("eyeBlinkRight")) / 2f
+                        val st = math.update(shapes != null, blink, score("jawOpen"), SystemClock.elapsedRealtime())
+                        main.post { if (st != state) state = st }
+                    } catch (_: Throwable) {
+                    } finally { proxy.close() }
+                }
+                analysis = a
+                provider.bindToLifecycle(lifecycle, CameraSelector.DEFAULT_FRONT_CAMERA, a)
+            }
+        }, ContextCompat.getMainExecutor(context))
+        onDispose {
+            runCatching { analysis?.let { providerFuture.get().unbind(it) } }
+            executor.shutdown(); runCatching { landmarker?.close() }
+        }
     }
-    val tones = remember { runCatching { ToneGenerator(AudioManager.STREAM_ALARM, 100) }.getOrNull() }
-    val executor = remember { Executors.newSingleThreadExecutor() }
-    DisposableEffect(Unit) { onDispose { executor.shutdown(); runCatching { landmarker?.close() }; tones?.release() } }
 
-    // Sons : endormi → sirène continue + voix toutes les 4 s ; fatigue → conseil de pause toutes les 5 min.
+    // Sons : endormi → sirène + voix toutes les 4 s ; fatigue → conseil de pause toutes les 5 min.
+    val tones = remember { runCatching { ToneGenerator(AudioManager.STREAM_ALARM, 100) }.getOrNull() }
+    DisposableEffect(Unit) { onDispose { tones?.release() } }
     var lastTired by remember { mutableStateOf(0L) }
     LaunchedEffect(state) {
         when (state) {
@@ -144,62 +181,22 @@ fun DrowsinessScreen(session: DrivingSession?, onClose: () -> Unit) {
                 val now = SystemClock.elapsedRealtime()
                 if (lastTired == 0L || now - lastTired > 300_000) { lastTired = now; tones?.startTone(ToneGenerator.TONE_PROP_BEEP2, 400); session?.voice?.tired() }
             }
-            Alertness.AWAY -> tones?.startTone(ToneGenerator.TONE_PROP_BEEP, 200)
             else -> Unit
         }
         Unit
     }
+    return state
+}
 
-    Box(Modifier.fillMaxSize().background(Color.Black)) {
-        if (granted && landmarker != null) {
-            AndroidView(factory = { ctx ->
-                val previewView = PreviewView(ctx).apply { scaleType = PreviewView.ScaleType.FILL_CENTER }
-                val providerFuture = ProcessCameraProvider.getInstance(ctx)
-                providerFuture.addListener({
-                    runCatching {
-                        val provider = providerFuture.get()
-                        val preview = Preview.Builder().build().also { it.setSurfaceProvider(previewView.surfaceProvider) }
-                        val analysis = ImageAnalysis.Builder()
-                            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                            .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
-                            .build()
-                        analysis.setAnalyzer(executor) { proxy ->
-                            try {
-                                val raw = proxy.toBitmap()
-                                val rot = proxy.imageInfo.rotationDegrees
-                                val bmp = if (rot == 0) raw else Bitmap.createBitmap(raw, 0, 0, raw.width, raw.height, Matrix().apply { postRotate(rot.toFloat()) }, true)
-                                val r = landmarker.detectForVideo(BitmapImageBuilder(bmp).build(), SystemClock.uptimeMillis())
-                                val shapes = r.faceBlendshapes().orElse(null)?.firstOrNull()
-                                fun score(name: String) = shapes?.firstOrNull { it.categoryName() == name }?.score() ?: 0f
-                                val blink = (score("eyeBlinkLeft") + score("eyeBlinkRight")) / 2f
-                                val st = math.update(shapes != null, blink, score("jawOpen"), SystemClock.elapsedRealtime())
-                                view.post { if (st != state) state = st; perclos = math.perclos; yawns = math.yawnCount }
-                            } catch (_: Throwable) {
-                            } finally { proxy.close() }
-                        }
-                        provider.unbindAll()
-                        provider.bindToLifecycle(lifecycle, CameraSelector.DEFAULT_FRONT_CAMERA, preview, analysis)
-                    }.onFailure { error = "Caméra avant indisponible : ${it.message}" }
-                }, ContextCompat.getMainExecutor(ctx))
-                previewView
-            }, modifier = Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(12.dp).size(150.dp, 200.dp).clip(RoundedCornerShape(18.dp)))
-        }
-
-        Row(Modifier.align(Alignment.TopStart).statusBarsPadding().padding(12.dp)) {
-            BigButton("✕ Fermer", Color(0xCC000000), onClose)
-        }
-
-        Column(
-            Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(12.dp).fillMaxWidth()
-                .clip(RoundedCornerShape(22.dp)).background(Color(state.color).copy(alpha = 0.92f)).padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Text(error ?: if (!granted) "Autorise la caméra pour la détection de somnolence" else state.text,
-                color = Color.White, fontSize = if (state == Alertness.ASLEEP) 40.sp else 28.sp, fontWeight = FontWeight.Black)
-            Text("Yeux fermés : ${(perclos * 100).toInt()} % de la dernière minute · bâillements : $yawns (10 min)",
-                color = Color.White, fontSize = 16.sp)
-            Text("Place le téléphone face à toi (caméra avant). Analyse sur le téléphone, aucune image enregistrée. " +
-                "C'est une aide : au moindre signe de fatigue, arrête-toi.", color = Color(0xDDFFFFFF), fontSize = 13.sp)
+/** Écran rouge plein écran quand le conducteur s'endort (un appui le ferme). */
+@Composable
+fun WakeUpOverlay(onDismiss: () -> Unit) {
+    Box(Modifier.fillMaxSize().background(Color(0xF0D32F2F)).padding(24.dp), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Text("😴", fontSize = 72.sp)
+            Text("RÉVEILLE-TOI !", color = Color.White, fontSize = 46.sp, fontWeight = FontWeight.Black)
+            Text("Arrête-toi dès que possible, en sécurité.", color = Color.White, fontSize = 22.sp)
+            BigButton("Je suis réveillé", Color(0xFF1B1B1B), onDismiss)
         }
     }
 }

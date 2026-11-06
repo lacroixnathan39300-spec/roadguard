@@ -100,8 +100,8 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
         style = voiceTone
         if (!ttsReady) return
         if (rate != appliedRate || style != appliedStyle) {
-            tts.setSpeechRate(rate * when (style) { 1 -> 0.92f; 2 -> 0.86f; 3 -> 0.84f; else -> 1f })
-            tts.setPitch(when (style) { 1 -> 1.0f; 2 -> 0.98f; 3 -> 0.97f; else -> 1f }) // trop grave, une voix de femme sonnait masculine
+            tts.setSpeechRate(rate * when (style) { 1 -> 0.92f; 2 -> 0.86f; 3 -> 0.84f; 4 -> 0.82f; else -> 1f })
+            tts.setPitch(when (style) { 1 -> 1.0f; 2 -> 0.98f; 3 -> 0.97f; 4 -> 0.96f; else -> 1f }) // trop grave, une voix de femme sonnait masculine
             appliedRate = rate; appliedStyle = style
         }
         if (voiceName != appliedVoice) {

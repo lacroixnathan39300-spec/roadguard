@@ -78,6 +78,9 @@ class DriveSettings(context: Context) {
     /** Alarme forte quand on dépasse la limite en approchant d'un radar. */
     var radarAlarm by mutableStateOf(prefs.getBoolean("radar_alarm", true)); private set
     fun changeRadarAlarm(v: Boolean) { radarAlarm = v; prefs.edit().putBoolean("radar_alarm", v).apply() }
+    // Anti-somnolence (caméra avant, Pilote téléphone).
+    var drowsyGuard by mutableStateOf(prefs.getBoolean("drowsy_guard", false)); private set
+    fun changeDrowsyGuard(v: Boolean) { drowsyGuard = v; prefs.edit().putBoolean("drowsy_guard", v).apply() }
     // Réprimandes si l'excès de vitesse dure ou se répète.
     var scold by mutableStateOf(prefs.getBoolean("scold", true)); private set
     fun changeScold(v: Boolean) { scold = v; prefs.edit().putBoolean("scold", v).apply() }
