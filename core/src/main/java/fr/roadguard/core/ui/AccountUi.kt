@@ -54,6 +54,11 @@ fun AccountGate(extra: @Composable () -> Unit = {}, content: @Composable () -> U
     LaunchedEffect(account.loggedIn) {
         while (account.loggedIn) { account.refresh(); delay(6 * 3_600_000L) }
     }
+    // Messages : nouveaux messages (administrateur) ou réponses, vérifiés toutes les 2 min appli ouverte.
+    LaunchedEffect(account.loggedIn) {
+        delay(5_000)
+        while (account.loggedIn) { InboxNotifier.check(context); delay(120_000) }
+    }
     when {
         account.testBuild -> content()
         !account.loggedIn -> LoginScreen(account, extra)
@@ -189,11 +194,22 @@ fun AccountCard(onAdmin: () -> Unit) {
     var old by remember { mutableStateOf("") }
     var new by remember { mutableStateOf("") }
     var message by remember { mutableStateOf<String?>(null) }
+    var showContact by remember { mutableStateOf(false) }
+    var showInbox by remember { mutableStateOf(false) }
+    if (showContact) ContactAdminScreen { showContact = false }
+    if (showInbox) AdminMessagesScreen { showInbox = false }
     Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(DriveColors.Panel).padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text("👤 ${s.username}", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Text(s.label, color = DriveColors.TextSecondary, fontSize = 15.sp)
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             if (s.admin) BigButton("🛡 Gérer les comptes", DriveColors.Accent, onAdmin)
+            val unread = InboxNotifier.adminUnread.intValue
+            if (s.admin) BigButton(if (unread > 0) "✉ Messages reçus ($unread)" else "✉ Messages reçus", if (unread > 0) Color(0xFFD63031) else DriveColors.Accent) { showInbox = true }
+            else {
+                val replies = InboxNotifier.repliesUnread.intValue
+                BigButton(if (replies > 0) "✉ Écrire à l'administrateur ($replies)" else "✉ Écrire à l'administrateur",
+                    if (replies > 0) Color(0xFFD63031) else DriveColors.Accent) { showContact = true }
+            }
             BigButton("Mot de passe", DriveColors.Track) { changing = !changing; message = null }
             BigButton("Se déconnecter", Color(0xFF7F1D1D)) { scope.launch { account.logout() } }
         }

@@ -58,6 +58,11 @@ class DriveService : Service() {
             kotlinx.coroutines.delay(60_000)
             while (true) { fr.roadguard.core.ui.UpdateNotifier.checkAndNotify(this@DriveService); kotlinx.coroutines.delay(6 * 3_600_000L) }
         }
+        // Messages (réponse de l'administrateur, ou nouveau message pour l'administrateur) : toutes les 5 min.
+        scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            kotlinx.coroutines.delay(30_000)
+            while (true) { runCatching { fr.roadguard.core.ui.InboxNotifier.check(this@DriveService) }; kotlinx.coroutines.delay(300_000) }
+        }
         // Bulle par-dessus Waze, Google Maps… quand l'accueil ROADGUARD n'est pas affiché.
         val bubble = fr.roadguard.core.ui.RadarBubble(this)
         bubbleView = bubble

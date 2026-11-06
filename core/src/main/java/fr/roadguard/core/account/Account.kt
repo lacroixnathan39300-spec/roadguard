@@ -139,6 +139,27 @@ class AccountManager private constructor(context: Context) {
         request("POST", "/v1/admin/config", JSONObject().put("contact", contact))
     }
 
+    // ---------- Messagerie avec l'administrateur ----------
+    suspend fun sendMessage(text: String, app: String) = withContext(Dispatchers.IO) {
+        request("POST", "/v1/auth/message", JSONObject().put("text", text).put("app", app))
+    }
+    suspend fun myMessages(): List<JSONObject> = withContext(Dispatchers.IO) {
+        val a = request("GET", "/v1/auth/messages", null).optJSONArray("messages") ?: JSONArray()
+        (0 until a.length()).map { a.getJSONObject(it) }
+    }
+    suspend fun markRepliesSeen() = withContext(Dispatchers.IO) { request("POST", "/v1/auth/messages/seen", JSONObject()) }
+    /** Compteurs : réponses non lues, messages non lus (administrateur), dernier message. */
+    suspend fun inbox(): JSONObject = withContext(Dispatchers.IO) { request("GET", "/v1/auth/inbox", null) }
+    suspend fun adminMessages(): List<JSONObject> = withContext(Dispatchers.IO) {
+        val a = request("GET", "/v1/admin/messages", null).optJSONArray("messages") ?: JSONArray()
+        (0 until a.length()).map { a.getJSONObject(it) }
+    }
+    suspend fun markAdminRead() = withContext(Dispatchers.IO) { request("POST", "/v1/admin/messages/read", JSONObject()) }
+    suspend fun replyTo(id: Long, text: String) = withContext(Dispatchers.IO) {
+        request("POST", "/v1/admin/messages/$id/reply", JSONObject().put("text", text))
+    }
+    suspend fun clearMessages() = withContext(Dispatchers.IO) { request("POST", "/v1/admin/messages/clear", JSONObject()) }
+
     /** Derniers plantages remontés (administrateur). */
     suspend fun crashes(): List<JSONObject> = withContext(Dispatchers.IO) {
         val a = request("GET", "/v1/admin/crashes", null).optJSONArray("crashes") ?: JSONArray()

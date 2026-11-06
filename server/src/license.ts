@@ -185,7 +185,53 @@ export async function licenseRoutes(req: Request, env: LicEnv, path: string): Pr
     return json({ ok: true });
   }
 
+  // Messagerie avec l'administrateur.
+  if (req.method === "POST" && path === "/v1/auth/message") {
+    const b = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+    const text = String(b.text ?? "").replace(/[\u0000-\u0008\u000b-\u001f]/g, "").trim().slice(0, 2000);
+    if (!text) return fail(400, "Message vide");
+    const recent = await env.DB.prepare("SELECT COUNT(*) AS n FROM messages WHERE username = ? AND at > ?").bind(me.username, now - 3_600_000).first<{ n: number }>();
+    if ((recent?.n ?? 0) >= 20) return fail(429, "Trop de messages : réessaie dans une heure");
+    await env.DB.prepare("INSERT INTO messages (at, username, app, text) VALUES (?, ?, ?, ?)")
+      .bind(now, me.username, String(b.app ?? "?").slice(0, 10), text).run();
+    return json({ ok: true });
+  }
+  if (req.method === "GET" && path === "/v1/auth/messages") {
+    const rows = await env.DB.prepare("SELECT id, at, text, reply, reply_at, read_user FROM messages WHERE username = ? ORDER BY id DESC LIMIT 50").bind(me.username).all();
+    return json({ messages: rows.results });
+  }
+  if (req.method === "POST" && path === "/v1/auth/messages/seen") {
+    await env.DB.prepare("UPDATE messages SET read_user = 1 WHERE username = ?").bind(me.username).run();
+    return json({ ok: true });
+  }
+  if (req.method === "GET" && path === "/v1/auth/inbox") {
+    // Compteurs pour les notifications : réponses non lues, et (administrateur) messages non lus.
+    const r = await env.DB.prepare("SELECT COUNT(*) AS n FROM messages WHERE username = ? AND read_user = 0").bind(me.username).first<{ n: number }>();
+    const a = me.admin ? await env.DB.prepare("SELECT COUNT(*) AS n, MAX(id) AS last FROM messages WHERE read_admin = 0").first<{ n: number; last: number | null }>() : null;
+    return json({ replies: r?.n ?? 0, admin: a?.n ?? 0, adminLast: a?.last ?? 0 });
+  }
+
   if (!me.admin) return fail(403, "Réservé à l'administrateur");
+  if (req.method === "GET" && path === "/v1/admin/messages") {
+    const rows = await env.DB.prepare("SELECT * FROM messages ORDER BY id DESC LIMIT 200").all();
+    return json({ messages: rows.results });
+  }
+  if (req.method === "POST" && path === "/v1/admin/messages/read") {
+    await env.DB.prepare("UPDATE messages SET read_admin = 1 WHERE read_admin = 0").run();
+    return json({ ok: true });
+  }
+  const replyMatch = path.match(/^\/v1\/admin\/messages\/(\d+)\/reply$/);
+  if (req.method === "POST" && replyMatch) {
+    const b = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+    const text = String(b.text ?? "").replace(/[\u0000-\u0008\u000b-\u001f]/g, "").trim().slice(0, 2000);
+    if (!text) return fail(400, "Réponse vide");
+    await env.DB.prepare("UPDATE messages SET reply = ?, reply_at = ?, read_user = 0, read_admin = 1 WHERE id = ?").bind(text, now, Number(replyMatch[1])).run();
+    return json({ ok: true });
+  }
+  if (req.method === "POST" && path === "/v1/admin/messages/clear") {
+    await env.DB.prepare("DELETE FROM messages").run();
+    return json({ ok: true });
+  }
   if (req.method === "GET" && path === "/v1/admin/crashes") {
     const rows = await env.DB.prepare("SELECT * FROM crashes ORDER BY id DESC LIMIT 100").all();
     return json({ crashes: rows.results });
