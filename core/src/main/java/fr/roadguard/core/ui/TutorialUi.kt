@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.sp
 
 /** Tutoriel de bienvenue : montré une fois au premier lancement, puis depuis Réglages → « Revoir le tutoriel ». */
 object Tutorial {
-    private const val KEY = "tutorial_seen_v1"
+    private const val KEY = "tutorial_seen_v2" // v2 : nouveautés, montré à nouveau une fois
     var forceShow by mutableStateOf(false)
     fun seen(context: Context) = context.getSharedPreferences("tutorial", Context.MODE_PRIVATE).getBoolean(KEY, false)
     fun markSeen(context: Context) = context.getSharedPreferences("tutorial", Context.MODE_PRIVATE).edit().putBoolean(KEY, true).apply()
@@ -41,26 +41,56 @@ object Tutorial {
 
 private data class Page(val emoji: String, val title: String, val lines: List<String>)
 
-private fun pages(drive: Boolean): List<Page> = listOf(
+private fun pages(drive: Boolean): List<Page> = listOfNotNull(
     Page("👋", if (drive) "Bienvenue sur Pilote Drive" else "Bienvenue sur Pilote", listOf(
-        "GPS, radars et alertes, signalements de la communauté, musique et trafic, réunis dans une seule appli.",
+        "GPS, radars, limitations, signalements de la communauté, musique et trafic, réunis dans une seule appli.",
         if (drive) "Pilote Drive transforme ton autoradio en tableau de bord complet." else "Pilote fonctionne seul sur le téléphone, et avec Pilote Drive sur l'autoradio.",
+        "Ce petit tour prend une minute. Tu peux le revoir dans Réglages → « Revoir le tutoriel ».",
     )),
     Page("📷", "Les radars", listOf(
-        "Annonce environ 30 s avant chaque radar, avec des bips de plus en plus rapides jusqu'au radar.",
-        "Trop vite à l'approche d'un radar : alarme forte « Ralentis ! ».",
-        "Tronçons de vitesse moyenne : ta moyenne en direct, et si elle est bonne ou non.",
-        "Réglages → Annonces : voix, bips, tolérance de vitesse, types d'alertes.",
+        "Annonce à 1 km, puis des bips de plus en plus rapides jusqu'au radar, qui s'arrêtent pile au radar.",
+        "Seulement le radar qui est sur TA route : avec un itinéraire, ceux du tracé ; sinon, ceux de ton couloir qui se rapprochent vraiment.",
+        "Trop vite à l'approche : alarme stridente « Ralentis ! ». Tronçons : ta vitesse moyenne en direct.",
+        if (drive) "Réglages → Annonces : couper les radars, les bips, l'alarme." else "Bouton rond 📷 à droite de la carte : coupe ou remet les radars (et leurs points sur la carte).",
     )),
-    Page("🗺", "Radars et cartes hors ligne", listOf(
-        "France et Suisse sont déjà incluses.",
-        (if (drive) "Réglages → « Cartes hors ligne… »" else "Menu → « Radars par pays »") + " : ajoute d'autres pays.",
-        (if (drive) "Réglages → « Cartes hors ligne… »" else "Menu → « Cartes hors ligne »") + " : « Télécharger ma région » pour rouler sans Internet.",
+    Page("🚦", "Limitations de vitesse", listOf(
+        "La limitation de la route s'affiche à côté de ta vitesse, et change en quelques secondes avec la zone.",
+        if (drive) "Réglages → Annonces : annonces « Limitation 50 » et avertissement de dépassement." else "Bouton 🚦 : coupe ou remet les annonces « Limitation 50 » et de dépassement.",
+        "Option : alarme forte dès que tu dépasses, même sans radar. Et si tu insistes, elle te réprimande !",
+    )),
+    Page("💋", "La voix et ses tons", listOf(
+        "Réglages → Voix : choisis la voix (♀ / ♂), le débit, et le ton : classique, charme 💋, séduction 🔥, osé 😈, extrême 🔥😈.",
+        "Le ton s'applique à tout : radars, limitations, réprimandes, et même le guidage (« tournez à droite, mon chéri »).",
+        "Plus le ton monte, plus il reprend aussi les phrases des tons d'en dessous : jamais deux fois la même chose.",
+        "« ⬇ Télécharger d'autres voix » : ajoute des voix d'Android, y compris d'autres langues.",
     )),
     Page("⚠️", "Signaler en un appui", listOf(
         "Bouton ⚠ : police, radar mobile, accident, bouchon, travaux, danger, ou un 💬 message visible 24 h.",
-        "🎤 « Dire » : signale à la voix, les mains sur le volant.",
-        "Les autres confirment ou non : les signalements faux disparaissent tout seuls.",
+        "🎤 « Dire » : signale à la voix, les mains sur le volant. Ton signalement apparaît tout de suite sur la carte.",
+        "Les signalements devant toi sont annoncés à 1 km. Les autres confirment ou non : les faux disparaissent seuls.",
+    )),
+    if (drive) null else Page("🧭", "Plus de place pour la carte", listOf(
+        "Plein écran : glisse depuis le haut ou le bas pour voir les barres d'Android un instant.",
+        "En roulant, sans toucher l'écran 8 s, les panneaux se replient : il reste la vitesse et la consigne.",
+        "Touche la pastille de vitesse ou la consigne pour tout faire revenir.",
+        "La recherche propose des résultats dès 3 lettres, pendant que tu tapes.",
+    )),
+    if (drive) null else Page("🫧", "La bulle par-dessus Waze", listOf(
+        "Carte « 🫧 Bulle » de l'accueil → Activer : Pilote démarre tout seul dès 20 km/h, même fermé.",
+        "La bulle (vitesse, limite, radar) s'affiche sur Waze ou Maps, avec les bips ; rouge en alerte, cachée à l'arrêt.",
+        "Un appui sur la bulle ouvre Pilote. Arrêt automatique après 10 min à l'arrêt.",
+        "Xiaomi : infos de l'appli → « Démarrage automatique » et batterie « Aucune restriction ».",
+    )),
+    if (drive) null else Page("😴", "Anti-somnolence et caméra", listOf(
+        "Menu → « Anti-somnolence » : la caméra avant surveille tes yeux, sans rien afficher (voyant 👁 sur la carte).",
+        "Yeux qui se ferment : écran rouge, sirène et « Réveille-toi ! ». Fatigue, bâillements : conseil de pause.",
+        "Menu → « Assistant caméra » : téléphone au pare-brise, distance avec la voiture de devant.",
+        "Tout est analysé sur le téléphone : aucune image enregistrée ni envoyée.",
+    )),
+    Page("🗺", "Radars et cartes hors ligne", listOf(
+        "France, Suisse, Belgique, Allemagne, Italie, Espagne et Luxembourg sont déjà inclus.",
+        (if (drive) "Réglages → « Cartes hors ligne… »" else "Menu → « Radars par pays »") + " : plus de 100 autres pays à télécharger.",
+        (if (drive) "Réglages → « Cartes hors ligne… »" else "Menu → « Cartes hors ligne »") + " : « Télécharger ma région » pour rouler sans Internet.",
     )),
     if (drive) Page("✎", "Ton accueil, à ta façon", listOf(
         "Plusieurs pages : passe de l'une à l'autre avec ‹ › en bas.",
@@ -69,12 +99,16 @@ private fun pages(drive: Boolean): List<Page> = listOf(
     )) else Page("🚗", "Avec l'autoradio", listOf(
         "Menu → « Pilote Link » : relie le téléphone à l'autoradio (Wi-Fi ou câble).",
         "L'autoradio reçoit ta position, ta musique, tes messages, et Internet par le téléphone.",
-        "Menu → « Assistant caméra » : téléphone au pare-brise, distance avec la voiture de devant.",
+    )),
+    Page("✉", "Une question ? Écris-moi", listOf(
+        "Réglages → ton compte → « ✉ Écrire à l'administrateur » : bug, idée, question.",
+        "La réponse arrive dans la même conversation, avec une notification.",
+        "Les mises à jour sont signalées par un bandeau et une notification : un appui pour installer.",
     )),
     Page("🔒", "Les autorisations", listOf(
-        "Position : indispensable pour les radars et le GPS.",
-        "Notifications : pour les alertes quand l'appli est en arrière-plan.",
-        "Affichage par-dessus les autres applis : pour la bulle sur Waze ou Google Maps.",
+        "Position (« Toujours autoriser » pour la bulle automatique) : indispensable pour les radars et le GPS.",
+        "Notifications : alertes, messages et mises à jour quand l'appli est en arrière-plan.",
+        if (drive) "Micro : pour signaler à la voix." else "Affichage par-dessus les autres applis : pour la bulle. Caméra : seulement si tu actives l'anti-somnolence ou l'assistant.",
         "Tout se règle ensuite dans Réglages. Bonne route ! 🚀",
     )),
 )
