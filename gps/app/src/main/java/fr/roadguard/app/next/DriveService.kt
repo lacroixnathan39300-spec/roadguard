@@ -63,12 +63,17 @@ class DriveService : Service() {
         bubbleView = bubble
         scope.launch {
             var stillSince = System.currentTimeMillis()
+            var stoppedSince = 0L
             while (true) {
-                if (s.settings.bubble && !PhoneHomeActivity.visible && bubble.allowed) bubble.show(s) else bubble.hide()
-                // Démarré tout seul en roulant : arrêt tout seul après 10 min à l'arrêt, appli fermée.
                 val now = System.currentTimeMillis()
-                if ((s.fix?.kmh ?: 0) >= 5 || PhoneHomeActivity.visible) stillSince = now
-                if (autoStarted && !s.navigating && now - stillSince > 10 * 60_000L) { stopSelf(); break }
+                val kmh = s.fix?.kmh ?: 0
+                // À l'arrêt (moins de 5 km/h pendant 8 s) : bulle cachée ; elle revient dès 10 km/h ou si une alerte arrive.
+                if (kmh >= 10) stoppedSince = 0L else if (kmh < 5 && stoppedSince == 0L) stoppedSince = now
+                val stopped = stoppedSince != 0L && now - stoppedSince > 8_000 && s.alert == null
+                if (s.settings.bubble && !PhoneHomeActivity.visible && bubble.allowed && !stopped) bubble.show(s) else bubble.hide()
+                // Démarré tout seul en roulant : arrêt tout seul après 10 min à l'arrêt, appli fermée.
+                if (kmh >= 5 || PhoneHomeActivity.visible) stillSince = now
+                if (autoStarted && !s.navigating && now - stillSince > 10 * 60_000L) { bubble.hide(); stopSelf(); break }
                 kotlinx.coroutines.delay(1000)
             }
         }
