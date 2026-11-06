@@ -208,6 +208,18 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     /** Nouvelle limitation de vitesse. */
     fun limitChanged(limit: Int) = line("limit", null, limit, "rg-limit")
 
+    /** Réprimande (excès de vitesse qui dure ou se répète). */
+    fun scold() = line("scold", null, null, "rg-scold")
+
+    /** Somnolence : réveil d'urgence, ou conseil de pause. */
+    fun wakeUp() {
+        // Toujours dit, même quand les annonces sont coupées.
+        if (!ttsReady) return
+        speaking++; duck()
+        tts.speak(pack.text(style, "wake", null, null), TextToSpeech.QUEUE_ADD, null, "rg-wake")
+    }
+    fun tired() = line("tired", null, null, "rg-tired")
+
     /** Dépassement de la limitation (hors radar). */
     fun overLimit(limit: Int?) = line("over", null, limit, "rg-over")
 

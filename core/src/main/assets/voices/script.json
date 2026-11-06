@@ -43,6 +43,21 @@
         "Ralentis ! Limité à",
         "Attention ! Ralentis, limité à",
         "Freine ! C'est limité à"
+      ],
+      "scold": [
+        "Tu roules trop vite depuis un moment. Respecte la limitation.",
+        "Ça fait plusieurs fois que tu dépasses. Lève le pied, s'il te plaît.",
+        "Sérieusement, ralentis. Ton permis et ta vie en dépendent."
+      ],
+      "wake": [
+        "Réveille-toi ! Arrête-toi dès que possible !",
+        "Attention, tes yeux se ferment ! Réveille-toi !",
+        "Danger ! Tu t'endors, arrête-toi tout de suite en sécurité !"
+      ],
+      "tired": [
+        "Tu sembles fatigué. Fais une pause à la prochaine aire.",
+        "Signes de fatigue détectés. Arrête-toi vingt minutes pour te reposer.",
+        "Tu bâilles souvent. Une pause s'impose."
       ]
     },
     "1": {
@@ -95,6 +110,21 @@
         "Doucement, mon cœur ! C'est",
         "Freine pour moi, chéri ! Limité à",
         "Attention, mon beau ! On est à"
+      ],
+      "scold": [
+        "Mon chéri, ça fait trop longtemps que tu roules trop vite. Je ne suis pas contente.",
+        "Je te l'ai déjà dit, mon cœur… ralentis, tu me fais vraiment peur.",
+        "Ce n'est pas raisonnable, chéri. Tu lèves le pied, maintenant."
+      ],
+      "wake": [
+        "Mon chéri, réveille-toi ! Arrête-toi, je t'en supplie !",
+        "Hé ! Ouvre les yeux, mon cœur ! Arrête-toi dès que tu peux !",
+        "Réveille-toi, chéri ! Gare-toi en sécurité, tout de suite !"
+      ],
+      "tired": [
+        "Tu as l'air fatigué, mon cœur… fais une petite pause pour moi.",
+        "Mon chéri, tu bâilles… arrête-toi un moment, je veux que tu arrives entier.",
+        "Une pause, mon cœur ? Un café, quelques pas… je t'attends."
       ]
     },
     "2": {
@@ -147,6 +177,21 @@
         "Chéri, freine maintenant ! C'est",
         "Mon beau, doucement, tout de suite ! Limité à",
         "Hé, tu me fais peur ! Ralentis, on est à"
+      ],
+      "scold": [
+        "Tu es têtu, mon beau… ça fait trop longtemps que tu vas trop vite. Je n'aime pas ça du tout.",
+        "Encore ? Je t'ai demandé gentiment… maintenant, tu ralentis.",
+        "Tu me déçois, chéri. Si tu continues, je ne te parle plus."
+      ],
+      "wake": [
+        "Chéri ! Réveille-toi ! Arrête-toi tout de suite, je ne veux pas te perdre !",
+        "Ouvre les yeux, mon beau ! Gare-toi maintenant !",
+        "Réveille-toi ! Tu t'endors… arrête-toi dès que possible !"
+      ],
+      "tired": [
+        "Tu fatigues, mon beau… viens faire une pause, juste toi et moi.",
+        "Mmmh, tu bâilles… arrête-toi un peu, repose-toi pour moi.",
+        "Tu as besoin de repos, chéri… la prochaine aire, d'accord ?"
       ]
     },
     "3": {
@@ -199,6 +244,21 @@
         "Bébé, freine tout de suite ! C'est",
         "Oh non, trop vite ! Ralentis pour moi, limité à",
         "Freine, mon chéri, maintenant ! On est à"
+      ],
+      "scold": [
+        "Vilain garçon… ça fait trop longtemps que tu roules trop vite. Tu mérites une punition.",
+        "Tu n'écoutes pas, hein ? Ralentis tout de suite, ou je me fâche vraiment.",
+        "Ça suffit maintenant. Tu lèves le pied, et tu restes sage."
+      ],
+      "wake": [
+        "Bébé ! Réveille-toi ! Arrête-toi immédiatement !",
+        "Ouvre les yeux, mon fauve ! Gare-toi tout de suite !",
+        "Réveille-toi ! Tu t'endors, arrête-toi en sécurité maintenant !"
+      ],
+      "tired": [
+        "Tu es épuisé, mon fauve… arrête-toi, garde tes forces pour moi.",
+        "Mmmh, tu bâilles… viens te reposer, on reprendra après.",
+        "Une pause, bébé… je te veux en pleine forme."
       ]
     }
   },

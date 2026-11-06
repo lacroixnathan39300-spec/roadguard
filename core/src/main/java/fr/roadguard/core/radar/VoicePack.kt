@@ -29,7 +29,12 @@ class VoicePack(context: Context) {
     private fun list(obj: JSONObject?, name: String): List<String> =
         obj?.optJSONArray(name)?.let { a -> (0 until a.length()).map { a.getString(it) } } ?: emptyList()
     private fun tone(t: Int) = script.optJSONObject("tones")?.optJSONObject(t.coerceIn(0, 3).toString())
-    fun phrases(t: Int, group: String) = if (t == 4) list(script.optJSONObject("myvoice"), group) else list(tone(t), group)
+    /** Phrases du ton : chaque ton reprend aussi celles des tons plus doux (osé = osé + séduction + charme). */
+    fun phrases(t: Int, group: String): List<String> = when {
+        t == 4 -> list(script.optJSONObject("myvoice"), group)
+        t <= 0 -> list(tone(0), group)
+        else -> (t downTo 1).flatMap { list(tone(it), group) }
+    }
     fun number(v: Int): String? = script.optJSONObject("numbers")?.optString(v.toString())?.takeIf { it.isNotBlank() }
     fun numbers(): List<Int> = script.optJSONObject("numbers")?.keys()?.asSequence()?.mapNotNull { it.toIntOrNull() }?.sorted()?.toList() ?: emptyList()
     fun kinds(): Map<String, String> = script.optJSONObject("kinds")?.let { o -> o.keys().asSequence().associateWith { o.getString(it) } } ?: emptyMap()

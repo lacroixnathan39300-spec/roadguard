@@ -186,6 +186,7 @@ private fun PhoneHome() {
     var showEqualizer by remember { mutableStateOf(false) }
     var showAdmin by remember { mutableStateOf(false) }
     var showCamera by remember { mutableStateOf(false) }
+    var showDrowsy by remember { mutableStateOf(false) }
     // Mode épuré : en roulant, les panneaux se replient tout seuls après 8 s sans toucher l'écran
     // (reste : vitesse, limite, consigne de guidage) ; un appui sur la vitesse ou la consigne les rouvre.
     var panelOpen by remember { mutableStateOf(true) }
@@ -324,6 +325,7 @@ private fun PhoneHome() {
                 }
                 fun open(tab: Int) { offlineTab = tab; showOffline = true; showMenu = false }
                 MenuEntry("📷", "Assistant caméra", "Distance avec la voiture de devant, alerte collision, départ au feu") { showMenu = false; showCamera = true }
+                MenuEntry("😴", "Anti-somnolence", "Caméra avant : alarme si tes yeux se ferment, conseil de pause si tu fatigues") { showMenu = false; showDrowsy = true }
                 MenuEntry("📊", "Ordinateur de bord", "Distances, temps, vitesses, chronos") { showMenu = false; showTrip = true }
                 MenuEntry("👥", "Communauté", "Pseudo, points, classement, conducteurs autour") { showMenu = false; showCommunity = true }
                 MenuEntry("📍", "Mes radars", "Ajouter un radar ici, importer un fichier CSV") { open(2) }
@@ -337,6 +339,10 @@ private fun PhoneHome() {
                     showMenu = false; context.startActivity(Intent(context, fr.roadguard.app.MainActivity::class.java))
                 }
             }
+        }
+        if (showDrowsy) {
+            BackHandler { showDrowsy = false }
+            DrowsinessScreen(s, onClose = { showDrowsy = false })
         }
         if (showCamera) {
             BackHandler { showCamera = false }

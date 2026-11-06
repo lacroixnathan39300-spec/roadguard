@@ -60,6 +60,9 @@ jobs:
           curl -fsSL --retry 3 -o gps/app/src/main/assets/models/efficientdet_lite0.tflite \
             https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/int8/latest/efficientdet_lite0.tflite \
             && ls -la gps/app/src/main/assets/models || echo "::warning::Modèle caméra non téléchargé"
+          curl -fsSL --retry 3 -o gps/app/src/main/assets/models/face_landmarker.task \
+            https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker.task \
+            || echo "::warning::Modèle visage non téléchargé"
       - name: Compiler et tester
         env:
           VERSION_CODE: ${{ github.run_number }}

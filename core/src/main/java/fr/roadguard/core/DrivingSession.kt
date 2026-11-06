@@ -99,6 +99,9 @@ class DrivingSession(
         }
     }
     private var limitCandidate: Int? = null
+    private var overSince = 0L
+    private val overEpisodes = ArrayDeque<Long>()
+    private var lastScold = 0L
     @Volatile private var limitBusy = false
 
     /**
@@ -217,6 +220,13 @@ class DrivingSession(
         val roadOver = settings.alarmAnywhere && roadLimit != null &&
             fr.roadguard.core.nav.SpeedLimitTracker.isOver(f.speedKmh.toInt(), roadLimit, settings.overTolerance)
         voice.overspeedAlarm(radarOver || roadOver, if (radarOver) limit else roadLimit)
+        // Réprimande : excès qui dure (plus de 15 s) ou qui se répète (3 fois en 10 min), au plus toutes les 45 s.
+        val overNow = radarOver || (roadLimit != null && fr.roadguard.core.nav.SpeedLimitTracker.isOver(f.speedKmh.toInt(), roadLimit, settings.overTolerance))
+        if (overNow) { if (overSince == 0L) { overSince = f.timeMs; overEpisodes.addLast(f.timeMs) } } else overSince = 0L
+        while (overEpisodes.isNotEmpty() && f.timeMs - overEpisodes.first() > 600_000) overEpisodes.removeFirst()
+        if (settings.scold && overNow && (f.timeMs - overSince > 15_000 || overEpisodes.size >= 3) && f.timeMs - lastScold > 45_000) {
+            lastScold = f.timeMs; voice.scold()
+        }
         voice.proximityBeeps = settings.proximityBeeps
         val a = alert
         // Radar dépassé : bips encore le temps de parcourir les derniers mètres (40 m après le radar).
