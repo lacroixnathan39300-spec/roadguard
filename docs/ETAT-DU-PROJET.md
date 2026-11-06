@@ -37,3 +37,16 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
 - **Reste de l'étape 2** : zones écoles, vitesse à tenir sur les tronçons, styles de compteur, partage de trajet, itinéraire qui évite les bouchons, bulle améliorée.
 - **Étape 3** : indication des voies, prix des carburants, OBD2, commandes vocales « OK ROADGUARD », affichage tête haute, groupes d'amis.
 - À valider en voiture : position (build 147+), accueil DRIVE et widgets, connexion sur l'autoradio, assistant caméra.
+
+## Session du 06/11/2026 (builds 170 → 190 env.)
+- Limitations interrogées toutes les 3 s ; recherche avec suggestions pendant la frappe.
+- Accueil Pilote : interrupteurs 📷 Radars / 🚦 Limites (cachés en mode épuré), plein écran (barres Android masquées), mode épuré auto après 8 s en roulant.
+- Signalements : pseudo communauté auto (identifiant Pilote), affichage immédiat.
+- Bulle par-dessus Waze : démarrage auto dès 20 km/h (`AutoStart.kt`, position passive + réseau, permission arrière-plan), cachée à l'arrêt, carte d'activation sur l'accueil.
+- Radars : `AlertEngine` = couloir + rapprochement réel + verrouillage, suivi du tracé en guidage, alerte à 1 km ; signalements à 1 km dans le couloir.
+- Radars par pays : 100+ pays, MapAtlas + OpenStreetMap (Overpass) fusionnés.
+- Voix : tons 0 classique → 4 extrême (`core/src/main/assets/voices/script.json`, cumulatifs), guidage au ton (`AlertVoice.guide`), réprimandes, voix d'autres langues. Voix réaliste/« Ma voix » retirées (code `VoicePack` conservé, `realistic=false`).
+- Alarme : un seul ToneGenerator ; option alarme hors radar.
+- Anti-somnolence invisible (caméra avant, MediaPipe Face Landmarker, `DrowsinessGuard.kt`, modèle téléchargé en CI).
+- Messagerie utilisateur ↔ administrateur (migration 0007, `/v1/auth/message(s)`, `/v1/admin/messages`, `InboxNotifier`).
+- Tutoriel v2.
