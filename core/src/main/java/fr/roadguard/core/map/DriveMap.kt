@@ -447,7 +447,7 @@ private fun messagesLayer() = org.maplibre.android.style.layers.SymbolLayer("roa
 
 /** Signalements : pastille de la couleur du type, contour blanc épais. */
 private fun communityLayer() = CircleLayer(COMMUNITY_SOURCE, COMMUNITY_SOURCE).withProperties(
-    PropertyFactory.circleRadius(Expression.interpolate(Expression.linear(), Expression.zoom(), Expression.stop(9, 4f), Expression.stop(16, 11f))),
+    PropertyFactory.circleRadius(Expression.interpolate(Expression.linear(), Expression.zoom(), Expression.stop(9, 6f), Expression.stop(16, 15f))),
     PropertyFactory.circleColor(Expression.toColor(Expression.get("color"))),
     PropertyFactory.circleStrokeColor(android.graphics.Color.WHITE),
     PropertyFactory.circleStrokeWidth(3f),

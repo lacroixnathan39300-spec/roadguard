@@ -52,6 +52,7 @@ data class VotePrompt(val report: Report, val shownAt: Long)
  * vérification par les conducteurs, points et classement, conducteurs proches et coucous.
  */
 class Community(context: Context, private val scope: CoroutineScope, private val speak: (String) -> Unit) {
+    private val appContext = context.applicationContext
     private val prefs = context.applicationContext.getSharedPreferences("community", Context.MODE_PRIVATE)
 
     var reports by mutableStateOf<List<Report>>(emptyList()); private set
@@ -144,16 +145,27 @@ class Community(context: Context, private val scope: CoroutineScope, private val
     }
 
     fun report(type: ReportType, text: String? = null) {
-        val f = here ?: return show("Position GPS indisponible")
-        if (!hasAccount) return show("Choisis d'abord ton pseudo dans Menu → Communauté")
+        val f = here ?: return show("Position GPS indisponible : signalement non envoyé")
         scope.launch {
+            // Pas encore de pseudo communauté sur cet appareil : on le crée avec l'identifiant Pilote,
+            // au lieu de refuser le signalement (c'était la cause des signalements « perdus »).
+            if (!hasAccount) {
+                val auto = fr.roadguard.core.account.AccountManager.get(appContext).status?.username?.takeIf { it.length >= 2 } ?: "Pilote"
+                if (setName(auto).isFailure) return@launch show("Signalement impossible : pas de connexion au serveur")
+            }
             runCatching {
                 post("/v1/reports", JSONObject().put("type", type.code).put("lat", f.lat).put("lon", f.lon)
                     .apply { if (!f.bearing.isNaN()) put("heading", f.bearing.toInt()); if (text != null) put("text", text) })
             }.onSuccess { r ->
+                // Affiché tout de suite sur la carte, sans attendre la prochaine mise à jour.
+                val id = r.optString("id")
+                if (r.optBoolean("created") && id.isNotBlank() && reports.none { it.id == id }) {
+                    reports = reports + Report(id = id, type = type, lat = f.lat, lon = f.lon, author = name.orEmpty(),
+                        createdAt = System.currentTimeMillis(), yes = 0, permanent = false, mine = true, voted = false, text = text)
+                }
                 show(if (type == ReportType.MESSAGE) "Message publié pour 24 h, merci ! +5 points"
                     else if (r.optBoolean("created")) "${type.label} signalé, merci ! +5 points" else "Déjà signalé : ta confirmation est comptée")
-            }.onFailure { show("Signalement impossible : ${it.message}") }
+            }.onFailure { show("Signalement impossible : ${it.message}"); speak("Signalement non envoyé") }
             runCatching { refresh() }
         }
     }
