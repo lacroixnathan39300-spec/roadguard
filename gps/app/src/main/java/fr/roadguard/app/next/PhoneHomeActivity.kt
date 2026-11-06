@@ -98,6 +98,7 @@ class PhoneHomeActivity : ComponentActivity() {
         fr.roadguard.core.map.OfflineRegions.enlargeAmbientCache(this)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         hideNavigationBar()
+        destinationText(intent)?.let { incomingDestination.value = it }
         setContent { fr.roadguard.core.ui.CarFontScale { fr.roadguard.core.ui.AccountGate { PhoneHome() } } }
     }
 
@@ -118,12 +119,36 @@ class PhoneHomeActivity : ComponentActivity() {
         }
     }
 
+    /** Adresse ou lieu ouvert depuis une autre appli (« Itinéraire avec Pilote ») pendant que Pilote est déjà ouvert. */
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        destinationText(intent)?.let { incomingDestination.value = it }
+    }
+
     override fun onStart() { super.onStart(); visible = true }
     override fun onStop() { super.onStop(); visible = false }
 
     companion object {
         /** L'accueil est-il à l'écran ? Sinon, la bulle prend le relais par-dessus les autres applis. */
         @Volatile var visible = false
+
+        /** Destination reçue d'une autre appli (lien geo: ou google.navigation:), lancée dès que le guidage est prêt. */
+        val incomingDestination = mutableStateOf<String?>(null)
+
+        /** Texte de destination d'un lien « geo:46.7,5.8 », « geo:0,0?q=1 rue…, Ville » ou « google.navigation:q=… ». */
+        fun destinationText(i: Intent?): String? {
+            val u = i?.data ?: return null
+            if (u.scheme != "geo" && u.scheme != "google.navigation") return null
+            val raw = u.toString()
+            val q = Regex("[?&:]q=([^&]+)").find(raw)?.groupValues?.get(1)
+                ?.let { runCatching { java.net.URLDecoder.decode(it, "UTF-8") }.getOrNull() }
+            val text = q?.trim()?.takeIf { it.isNotEmpty() } ?: return raw
+            // Coordonnées (« 46.67,5.55 » ou « 46.7187,5.8335(Maison) ») : nom du lieu puis position, compris par la recherche.
+            val c = Regex("^(-?\\d{1,2}\\.\\d+),\\s*(-?\\d{1,3}\\.\\d+)\\s*(?:\\((.*)\\))?").find(text) ?: return text
+            val name = c.groupValues[3].trim().ifEmpty { "Destination partagée" }
+            return "$name\ngeo:${c.groupValues[1]},${c.groupValues[2]}"
+        }
     }
 }
 
@@ -159,6 +184,15 @@ private fun PhoneHome() {
     }
     val s = session ?: run { Box(Modifier.fillMaxSize().background(DriveColors.Background)); return }
     val settings = s.settings
+    // Lieu ouvert depuis une autre appli (contacts, agenda, Google Maps, lien d'adresse) : guidage direct dans Pilote.
+    val incomingDest = PhoneHomeActivity.incomingDestination.value
+    LaunchedEffect(incomingDest, s) {
+        val text = incomingDest ?: return@LaunchedEffect
+        PhoneHomeActivity.incomingDestination.value = null
+        val place = runCatching { fr.roadguard.core.nav.SharedDestination.resolve(text, s.here?.let { LatLon(it.lat, it.lon) }) }.getOrNull()
+        if (place != null) { s.voice.speak("Destination reçue. Calcul du trajet."); s.startNavigation(place) }
+        else android.widget.Toast.makeText(context, "Destination introuvable : $text", android.widget.Toast.LENGTH_LONG).show()
+    }
     // Économie de batterie : batterie à 20 % ou moins (hors charge), ou toujours si choisi.
     LaunchedEffect(settings.batterySaver) {
         var lastCharging: Boolean? = null

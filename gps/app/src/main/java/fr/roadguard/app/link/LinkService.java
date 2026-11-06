@@ -142,7 +142,7 @@ public final class LinkService extends Service {
         PendingIntent stop = PendingIntent.getService(this, 1, new Intent(this, LinkService.class).setAction(ACTION_STOP), PendingIntent.FLAG_IMMUTABLE);
         Notification n = new Notification.Builder(this, CHANNEL)
             .setSmallIcon(android.R.drawable.stat_sys_data_bluetooth)
-            .setContentTitle("ROADGUARD Link")
+            .setContentTitle("Pilote Link")
             .setContentText(status)
             .setContentIntent(open)
             .addAction(new Notification.Action.Builder(null, "Arrêter", stop).build())

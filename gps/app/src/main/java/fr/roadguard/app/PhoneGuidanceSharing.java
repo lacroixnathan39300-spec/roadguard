@@ -17,9 +17,9 @@ final class PhoneGuidanceSharing {
   nm.createNotificationChannel(new NotificationChannel(CHANNEL,"Guidage partagé avec Compagnon",NotificationManager.IMPORTANCE_LOW));
   Bundle extras=new Bundle();extras.putBoolean("roadguard_guidance",true);extras.putLong("roadguard_guidance_at",System.currentTimeMillis());
   if(route!=null)extras.putString("roadguard_route_v1",route.toString());
-  Intent open=new Intent(a,MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+  Intent open=new Intent(a,fr.roadguard.app.next.PhoneHomeActivity.class).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
   Notification.Builder builder=new Notification.Builder(a,CHANNEL).setSmallIcon(android.R.drawable.ic_menu_directions)
-   .setContentTitle("ROADGUARD · Guidage").setContentText(text).setStyle(new Notification.BigTextStyle().bigText(text))
+   .setContentTitle("Pilote · Guidage").setContentText(text).setStyle(new Notification.BigTextStyle().bigText(text))
    .setCategory("navigation").setVisibility(Notification.VISIBILITY_PRIVATE).setOngoing(true).setOnlyAlertOnce(true)
    .setContentIntent(PendingIntent.getActivity(a,ID,open,PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE)).addExtras(extras);
   if(route!=null){

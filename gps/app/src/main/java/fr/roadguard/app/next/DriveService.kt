@@ -94,12 +94,12 @@ class DriveService : Service() {
 
     private fun startForegroundNow() {
         val nm = getSystemService(NotificationManager::class.java)
-        nm.createNotificationChannel(NotificationChannel(CHANNEL, "ROADGUARD en route", NotificationManager.IMPORTANCE_LOW))
+        nm.createNotificationChannel(NotificationChannel(CHANNEL, "Pilote en route", NotificationManager.IMPORTANCE_LOW))
         val open = PendingIntent.getActivity(this, 0, Intent(this, PhoneHomeActivity::class.java), PendingIntent.FLAG_IMMUTABLE)
         val stop = PendingIntent.getService(this, 1, Intent(this, DriveService::class.java).setAction(ACTION_STOP), PendingIntent.FLAG_IMMUTABLE)
         val n = Notification.Builder(this, CHANNEL)
             .setSmallIcon(android.R.drawable.ic_menu_mylocation)
-            .setContentTitle("ROADGUARD actif")
+            .setContentTitle("Pilote actif")
             .setContentText("Alertes radars et guidage vocal, même écran éteint")
             .setContentIntent(open)
             .addAction(Notification.Action.Builder(null, "Arrêter", stop).build())

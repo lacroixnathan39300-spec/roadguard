@@ -57,7 +57,7 @@ final class RadarBubbleOverlay {
   void show(){
     if(bubble!=null||windows==null||!Settings.canDrawOverlays(context))return;
     bounds();loadAnchor();bubble=new AccessibleBubble(context);bubble.setElevation(dp(18));bubble.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);bubble.setFocusable(true);
-    bubble.setOnClickListener(v->{try{context.startActivity(new Intent(context,MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP));}catch(RuntimeException unavailable){Toast.makeText(context,"Ouverture de ROADGUARD indisponible",Toast.LENGTH_SHORT).show();}});
+    bubble.setOnClickListener(v->{try{context.startActivity(new Intent(context,fr.roadguard.app.next.PhoneHomeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP));}catch(RuntimeException unavailable){Toast.makeText(context,"Ouverture de ROADGUARD indisponible",Toast.LENGTH_SHORT).show();}});
     bubble.setOnLongClickListener(v->{longClicked=true;chooseReport();return true;});
     text=new TextView(context);text.setGravity(Gravity.CENTER);text.setTextColor(Color.WHITE);text.setTypeface(null,android.graphics.Typeface.BOLD);text.setMaxLines(3);text.setEllipsize(android.text.TextUtils.TruncateAt.END);text.setPadding(dp(8),dp(6),dp(8),dp(6));text.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);bubble.addView(text,new FrameLayout.LayoutParams(-1,-1));
     params=window(dp(COMPACT_DP),dp(COMPACT_DP));renderText();placeBody();

@@ -70,9 +70,9 @@ public final class MapPackDownloadService extends Service {
   }
   private void publishNotice(Notification notice){if(activeDownloader==this)notifications.notify(NOTIFICATION,notice);}
   private Notification notice(String message,int percent,boolean ongoing){
-    PendingIntent open=PendingIntent.getActivity(this,0,new Intent(this,MainActivity.class),PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
+    PendingIntent open=PendingIntent.getActivity(this,0,new Intent(this,fr.roadguard.app.next.PhoneHomeActivity.class),PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
     Notification.Builder b=new Notification.Builder(this,CHANNEL).setSmallIcon(android.R.drawable.stat_sys_download)
-      .setContentTitle("ROADGUARD · carte hors connexion").setContentText(message).setContentIntent(open).setOnlyAlertOnce(true).setOngoing(ongoing);
+      .setContentTitle("Pilote · carte hors ligne").setContentText(message).setContentIntent(open).setOnlyAlertOnce(true).setOngoing(ongoing);
     if(ongoing){PendingIntent stop=PendingIntent.getService(this,1,new Intent(this,MapPackDownloadService.class).setAction(ACTION_CANCEL),PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
       b.setProgress(100,percent,false).addAction(android.R.drawable.ic_menu_close_clear_cancel,"Suspendre",stop);}
     return b.build();
