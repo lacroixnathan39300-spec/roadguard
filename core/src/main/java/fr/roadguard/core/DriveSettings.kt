@@ -106,6 +106,10 @@ class DriveSettings(context: Context) {
     val limitVoiceOn get() = announceLimit || speedLimitWarning
     fun changeLimitVoice(v: Boolean) { changeAnnounceLimit(v); changeSpeedLimitWarning(v) }
 
+    // Pilote (téléphone) : démarrage automatique en roulant, dès 20 km/h, avec la bulle par-dessus Waze.
+    var autoDrive by mutableStateOf(prefs.getBoolean("auto_drive", false)); private set
+    fun changeAutoDrive(v: Boolean) { autoDrive = v; prefs.edit().putBoolean("auto_drive", v).apply() }
+
     var announceLimit by mutableStateOf(prefs.getBoolean("announce_limit", true)); private set
     fun changeAnnounceLimit(v: Boolean) { announceLimit = v; prefs.edit().putBoolean("announce_limit", v).apply() }
 

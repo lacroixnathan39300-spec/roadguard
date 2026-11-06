@@ -101,6 +101,40 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
             if (settings.bubble && !bubbleHelper.allowed) {
                 BigButton("Autoriser l'affichage par-dessus les autres applis", DriveColors.Accent) { bubbleHelper.requestPermission() }
             }
+            if (!context.packageName.contains("drive")) {
+                // Démarrage tout seul dès 20 km/h : il faut la position « Toujours autoriser ».
+                fun bgGranted() = android.os.Build.VERSION.SDK_INT < 29 || context.checkSelfPermission(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) ==
+                    android.content.pm.PackageManager.PERMISSION_GRANTED
+                val bgState = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(bgGranted()) }
+                val bgOk = bgState.value
+                val askBg = androidx.activity.compose.rememberLauncherForActivityResult(
+                    androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) {
+                    bgState.value = it || bgGranted()
+                    // Refus déjà donné : Android n'affiche plus la question, on ouvre la page de l'appli.
+                    if (!bgState.value) runCatching {
+                        context.startActivity(android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                            android.net.Uri.parse("package:${context.packageName}")).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
+                    }
+                }
+                fun askBackground() {
+                    if (android.os.Build.VERSION.SDK_INT >= 29) askBg.launch(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                }
+                ToggleRow("Démarrer tout seul en roulant (dès 20 km/h), avec la bulle et les bips", settings.autoDrive) { v ->
+                    settings.changeAutoDrive(v)
+                    if (v) {
+                        if (!settings.bubble) settings.changeBubble(true)
+                        if (!bgOk) askBackground() else if (!bubbleHelper.allowed) bubbleHelper.requestPermission()
+                    }
+                }
+                if (settings.autoDrive && !bgOk) {
+                    Text("Position : choisis « Toujours autoriser », sinon Pilote ne peut pas voir que tu roules quand il est fermé.",
+                        color = DriveColors.TextSecondary, fontSize = 15.sp)
+                    BigButton("Autoriser la position en permanence", DriveColors.Accent) { askBackground() }
+                }
+                if (settings.autoDrive && bgOk && !bubbleHelper.allowed) {
+                    BigButton("Autoriser l'affichage par-dessus les autres applis", DriveColors.Accent) { bubbleHelper.requestPermission() }
+                }
+            }
 
             Section("Alertes affichées et annoncées")
             listOf(RadarKind.FIXED, RadarKind.REDLIGHT, RadarKind.AVERAGE, RadarKind.MOBILE).forEach { kind ->

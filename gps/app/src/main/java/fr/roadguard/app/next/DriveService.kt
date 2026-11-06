@@ -38,6 +38,7 @@ class DriveService : Service() {
         startForegroundNow()
         // Compte ROADGUARD sans accès (essai fini, bloqué ou déconnecté) : pas d'alertes en arrière-plan.
         if (!fr.roadguard.core.account.AccountManager.get(this).allowed) { stopSelf(); return START_NOT_STICKY }
+        if (intent?.getBooleanExtra(EXTRA_AUTO, false) == true && session == null) autoStarted = true
         if (session == null) start()
         return START_STICKY
     }
@@ -61,8 +62,13 @@ class DriveService : Service() {
         val bubble = fr.roadguard.core.ui.RadarBubble(this)
         bubbleView = bubble
         scope.launch {
+            var stillSince = System.currentTimeMillis()
             while (true) {
                 if (s.settings.bubble && !PhoneHomeActivity.visible && bubble.allowed) bubble.show(s) else bubble.hide()
+                // Démarré tout seul en roulant : arrêt tout seul après 10 min à l'arrêt, appli fermée.
+                val now = System.currentTimeMillis()
+                if ((s.fix?.kmh ?: 0) >= 5 || PhoneHomeActivity.visible) stillSince = now
+                if (autoStarted && !s.navigating && now - stillSince > 10 * 60_000L) { stopSelf(); break }
                 kotlinx.coroutines.delay(1000)
             }
         }
@@ -86,6 +92,7 @@ class DriveService : Service() {
     }
 
     private var bubbleView: fr.roadguard.core.ui.RadarBubble? = null
+    private var autoStarted = false
 
     override fun onDestroy() {
         bubbleView?.hide()
@@ -99,6 +106,7 @@ class DriveService : Service() {
         private const val CHANNEL = "roadguard_drive"
         private const val NOTIFICATION_ID = 4741
         const val ACTION_STOP = "fr.roadguard.app.next.DRIVE_STOP"
+        const val EXTRA_AUTO = "auto"
 
         /** Session en cours (lue par l'accueil), ou null si le service est arrêté. */
         @Volatile var session: DrivingSession? = null; private set

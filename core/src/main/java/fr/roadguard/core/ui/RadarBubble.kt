@@ -28,6 +28,8 @@ class RadarBubble(context: Context) {
     private lateinit var speed: TextView
     private lateinit var limit: TextView
     private lateinit var alert: TextView
+    private lateinit var info: TextView
+    private lateinit var bg: GradientDrawable
     private val density = app.resources.displayMetrics.density
 
     val allowed: Boolean get() = Settings.canDrawOverlays(app)
@@ -48,7 +50,7 @@ class RadarBubble(context: Context) {
         val box = LinearLayout(app).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER_HORIZONTAL
-            background = pill(Color.argb(235, 18, 24, 32), 22)
+            bg = pill(Color.argb(235, 18, 24, 32), 22); background = bg
             setPadding(dp(12), dp(8), dp(12), dp(8))
         }
         val row = LinearLayout(app).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
@@ -63,7 +65,13 @@ class RadarBubble(context: Context) {
             setTextColor(Color.WHITE); textSize = 14f; paint.isFakeBoldText = true
             background = pill(Color.rgb(198, 40, 40), 10); setPadding(dp(8), dp(3), dp(8), dp(3))
         }
-        box.addView(row); box.addView(alert)
+        // Informations de la communauté (police, accident, bouchon…) annoncées en route.
+        info = TextView(app).apply {
+            setTextColor(Color.WHITE); textSize = 13f; maxWidth = dp(220); maxLines = 2
+            background = pill(Color.rgb(21, 101, 192), 10); setPadding(dp(8), dp(3), dp(8), dp(3))
+        }
+        box.addView(row); box.addView(alert); box.addView(info)
+        (info.layoutParams as LinearLayout.LayoutParams).topMargin = dp(4)
 
         val lp = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT,
@@ -81,7 +89,16 @@ class RadarBubble(context: Context) {
                     lp.x = startX + (e.rawX - touchX).toInt(); lp.y = startY + (e.rawY - touchY).toInt()
                     runCatching { wm.updateViewLayout(v, lp) }; true
                 }
-                MotionEvent.ACTION_UP -> { prefs.edit().putInt("x", lp.x).putInt("y", lp.y).apply(); true }
+                MotionEvent.ACTION_UP -> {
+                    prefs.edit().putInt("x", lp.x).putInt("y", lp.y).apply()
+                    // Simple appui (sans glisser) : ouvre Pilote.
+                    if (Math.abs(e.rawX - touchX) < dp(10) && Math.abs(e.rawY - touchY) < dp(10)) runCatching {
+                        app.packageManager.getLaunchIntentForPackage(app.packageName)?.let {
+                            app.startActivity(it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT))
+                        }
+                    }
+                    true
+                }
                 else -> false
             }
         }
@@ -102,6 +119,11 @@ class RadarBubble(context: Context) {
         val a = s.alert
         alert.visibility = if (a != null) android.view.View.VISIBLE else android.view.View.GONE
         if (a != null) alert.text = "${AlertText.kindLabel(a.radar.kind)} · ${AlertText.roundedDistance(a.distanceM)} m"
+        // Fond rouge pendant une alerte radar ou un excès de vitesse, sombre sinon.
+        bg.setColor(if (a != null || s.overSpeed) Color.argb(240, 150, 20, 28) else Color.argb(235, 18, 24, 32))
+        val t = s.community.toast
+        info.visibility = if (t != null) android.view.View.VISIBLE else android.view.View.GONE
+        info.text = t.orEmpty()
         r.alpha = 1f
     }
 

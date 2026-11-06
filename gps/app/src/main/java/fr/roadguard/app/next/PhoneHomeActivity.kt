@@ -140,7 +140,10 @@ private fun PhoneHome() {
     val owner = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(owner) {
         // Service arrêté depuis la notification puis appli rouverte : on le relance.
-        val obs = LifecycleEventObserver { _, e -> if (e == Lifecycle.Event.ON_RESUME && DriveService.session !== session) restart++ }
+        val obs = LifecycleEventObserver { _, e ->
+            if (e == Lifecycle.Event.ON_RESUME) AutoStart.sync(context)
+            if (e == Lifecycle.Event.ON_RESUME && DriveService.session !== session) restart++
+        }
         owner.addObserver(obs)
         onDispose { owner.removeObserver(obs) }
     }
@@ -153,6 +156,8 @@ private fun PhoneHome() {
     }
     val s = session ?: run { Box(Modifier.fillMaxSize().background(DriveColors.Background)); return }
     val settings = s.settings
+    // Démarrage automatique en roulant : écoute (ou non) les positions en arrière-plan selon le réglage.
+    LaunchedEffect(settings.autoDrive, restart) { AutoStart.sync(context) }
 
     val media = remember { MediaHub(context, ComponentName(context, SpotifySessionListener::class.java)) }
     var hasMediaAccess by remember { mutableStateOf(media.hasAccess()) }
