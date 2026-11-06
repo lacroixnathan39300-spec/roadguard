@@ -91,9 +91,9 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                     }
                 }
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    listOf(false to "Ton : classique", true to "Ton : charme 💋").forEach { (c, label) ->
-                        BigButton(label, if (settings.charmVoice == c) DriveColors.Accent else DriveColors.Panel) {
-                            settings.changeCharmVoice(c); voice.configure(settings.voiceName, settings.speechRate, c)
+                    listOf(0 to "Ton : classique", 1 to "Ton : charme 💋", 2 to "Ton : séduction 🔥").forEach { (c, label) ->
+                        BigButton(label, if (settings.voiceTone == c) DriveColors.Accent else DriveColors.Panel) {
+                            settings.changeVoiceTone(c); voice.configure(settings.voiceName, settings.speechRate, c)
                             voice.limitChanged(80)
                         }
                     }

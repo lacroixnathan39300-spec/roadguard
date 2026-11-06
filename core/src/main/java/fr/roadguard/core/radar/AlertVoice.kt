@@ -56,18 +56,18 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     private var appliedVoice: String? = null
     private var appliedRate = 1f
 
-    /** Ton « Charme » : voix un peu plus grave et plus lente, phrases complices. */
-    var charm = false
-    private var appliedCharm = false
+    /** Ton : 0 classique, 1 charme (complice), 2 séduction (aguicheuse) ; voix plus grave et plus lente. */
+    var tone = 0
+    private var appliedTone = 0
 
-    /** Voix et débit choisis dans les réglages (appliqués seulement s'ils changent). */
-    fun configure(voiceName: String?, rate: Float, charmTone: Boolean = charm) {
-        charm = charmTone
+    /** Voix, débit et ton choisis dans les réglages (appliqués seulement s'ils changent). */
+    fun configure(voiceName: String?, rate: Float, voiceTone: Int = tone) {
+        tone = voiceTone
         if (!ttsReady) return
-        if (rate != appliedRate || charm != appliedCharm) {
-            tts.setSpeechRate(if (charm) rate * 0.9f else rate)
-            tts.setPitch(if (charm) 0.93f else 1f)
-            appliedRate = rate; appliedCharm = charm
+        if (rate != appliedRate || tone != appliedTone) {
+            tts.setSpeechRate(rate * when (tone) { 1 -> 0.9f; 2 -> 0.82f; else -> 1f })
+            tts.setPitch(when (tone) { 1 -> 0.93f; 2 -> 0.88f; else -> 1f })
+            appliedRate = rate; appliedTone = tone
         }
         if (voiceName != appliedVoice) {
             appliedVoice = voiceName
@@ -146,7 +146,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
             if (!alarmOn) return
             if (!beeping) { duck(900); tone?.startTone(ToneGenerator.TONE_CDMA_HIGH_PBX_SS, 700) }
             val now = android.os.SystemClock.uptimeMillis()
-            if (now - lastAlarmVoice > 7_000) { lastAlarmVoice = now; say(Charm.alarm(charm, alarmLimit), "rg-alarm") }
+            if (now - lastAlarmVoice > 7_000) { lastAlarmVoice = now; say(Charm.alarm(tone, alarmLimit), "rg-alarm") }
             beeper.postDelayed(this, 1_100)
         }
     }
@@ -162,7 +162,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     fun announce(alert: RadarAlert) {
         if (beepEnabled) { duck(600); tone?.startTone(ToneGenerator.TONE_PROP_BEEP2, 300) }
         val text = if (proximityBeeps) AlertText.spokenShort(alert) else AlertText.spoken(alert)
-        say(if (charm) Charm.radar(text) else text, "rg-${alert.radar.id}")
+        say(Charm.radar(tone, text), "rg-${alert.radar.id}")
     }
 
     fun announceAverageResult(status: AverageStatus) {
@@ -171,10 +171,10 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     }
 
     /** Nouvelle limitation de vitesse. */
-    fun limitChanged(limit: Int) = speak(Charm.limit(charm, limit))
+    fun limitChanged(limit: Int) = speak(Charm.limit(tone, limit))
 
     /** Dépassement de la limitation (hors radar). */
-    fun overLimit(limit: Int?) = speak(Charm.over(charm, limit))
+    fun overLimit(limit: Int?) = speak(Charm.over(tone, limit))
 
     /** Consigne de guidage ou message libre, à la suite des annonces en cours. */
     fun speak(text: String) {
@@ -190,30 +190,48 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     }
 }
 
-/** Phrases du ton « Charme » : complices, un brin taquines, tirées au hasard pour ne pas lasser. */
+/** Phrases des tons « Charme » (complice) et « Séduction » (aguicheuse), tirées au hasard pour ne pas lasser. */
 object Charm {
     private fun pick(vararg options: String) = options.random()
 
-    fun radar(base: String) = pick(
-        "Hmm… doucement, mon chéri. $base",
-        "Attention à toi… $base",
-        "Lève un peu le pied pour moi… $base",
-        "Sois sage… $base",
-    )
+    fun radar(tone: Int, base: String) = when (tone) {
+        1 -> pick("Hmm… doucement, mon chéri. $base", "Attention à toi… $base", "Lève un peu le pied pour moi… $base", "Sois sage… $base")
+        2 -> pick(
+            "Mmmh… ralentis pour moi, mon beau… $base",
+            "Tout doux, chéri… j'aime quand tu prends ton temps. $base",
+            "Hmm… garde tes points, j'ai d'autres projets pour toi ce soir. $base",
+            "Doucement… on n'est pas pressés, toi et moi. $base",
+            "Sois sage maintenant… tu pourras être vilain plus tard. $base",
+        )
+        else -> base
+    }
 
-    fun limit(charm: Boolean, v: Int) = if (!charm) "Limitation $v" else pick(
-        "On passe à $v… tout en douceur.",
-        "Limitation $v, mon cœur.",
-        "$v maintenant… prends ton temps.",
-    )
+    fun limit(tone: Int, v: Int) = when (tone) {
+        1 -> pick("On passe à $v… tout en douceur.", "Limitation $v, mon cœur.", "$v maintenant… prends ton temps.")
+        2 -> pick(
+            "Mmmh… $v maintenant. Tout en douceur, comme j'aime.",
+            "On descend à $v, chéri… prends ton temps avec moi.",
+            "$v… doucement, beau pilote. Fais durer le plaisir.",
+            "Limitation $v… laisse-toi guider par ma voix.",
+        )
+        else -> "Limitation $v"
+    }
 
-    fun over(charm: Boolean, v: Int?) = if (!charm) "Attention, limité à $v" else pick(
-        "Tu vas un peu trop vite pour moi… c'est limité à $v.",
-        "Doucement, beau pilote… limité à $v.",
-        "Pas si vite… on est à $v ici.",
-    )
+    fun over(tone: Int, v: Int?) = when (tone) {
+        1 -> pick("Tu vas un peu trop vite pour moi… c'est limité à $v.", "Doucement, beau pilote… limité à $v.", "Pas si vite… on est à $v ici.")
+        2 -> pick(
+            "Hmm… tu vas trop vite, mon beau. C'est $v ici… calme-toi pour moi.",
+            "Oh… tu es fougueux aujourd'hui. Mais c'est limité à $v.",
+            "Pas si vite, chéri… les meilleures choses se font lentement. $v.",
+        )
+        else -> "Attention, limité à $v"
+    }
 
-    fun alarm(charm: Boolean, v: Int?) = if (!charm) "Ralentis ! Limité à ${v ?: ""}" else "Ralentis, mon chéri ! Limité à ${v ?: ""}"
+    fun alarm(tone: Int, v: Int?) = when (tone) {
+        1 -> "Ralentis, mon chéri ! Limité à ${v ?: ""}"
+        2 -> "Ralentis tout de suite, mon beau ! Limité à ${v ?: ""}"
+        else -> "Ralentis ! Limité à ${v ?: ""}"
+    }
 }
 
 /** Textes des alertes (purs, testables). */
