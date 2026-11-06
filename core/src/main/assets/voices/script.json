@@ -1,39 +1,222 @@
 {
   "_doc": "Phrases des annonces. Le nombre (limitation) est toujours dit à la fin. Lu par l'appli (repli voix du téléphone) et par tools/voice/generate.py (voix réaliste).",
-  "numbers": {"20": "vingt", "30": "trente", "40": "quarante", "50": "cinquante", "60": "soixante", "70": "soixante-dix", "80": "quatre-vingts", "90": "quatre-vingt-dix", "100": "cent", "110": "cent dix", "120": "cent vingt", "130": "cent trente"},
-  "kinds": {"FIXED": "Radar fixe", "REDLIGHT": "Radar feu rouge", "AVERAGE": "Vitesse moyenne", "SECTION": "Tronçon contrôlé", "MOBILE": "Radar mobile signalé", "OTHER": "Contrôle"},
+  "numbers": {
+    "20": "vingt",
+    "30": "trente",
+    "40": "quarante",
+    "50": "cinquante",
+    "60": "soixante",
+    "70": "soixante-dix",
+    "80": "quatre-vingts",
+    "90": "quatre-vingt-dix",
+    "100": "cent",
+    "110": "cent dix",
+    "120": "cent vingt",
+    "130": "cent trente"
+  },
+  "kinds": {
+    "FIXED": "Radar fixe",
+    "REDLIGHT": "Radar feu rouge",
+    "AVERAGE": "Vitesse moyenne",
+    "SECTION": "Tronçon contrôlé",
+    "MOBILE": "Radar mobile signalé",
+    "OTHER": "Contrôle"
+  },
   "limited": "limité à",
   "tones": {
     "0": {
       "radar": [],
-      "limit": ["Limitation"],
-      "over": ["Attention, limité à"],
-      "alarm": ["Ralentis ! Limité à"]
+      "limit": [
+        "Limitation",
+        "Nouvelle limitation :",
+        "Vitesse limitée à",
+        "On passe à",
+        "Attention, limitation"
+      ],
+      "over": [
+        "Attention, limité à",
+        "Tu dépasses, c'est limité à",
+        "Ralentis un peu, la limite est à",
+        "Trop vite, limitation"
+      ],
+      "alarm": [
+        "Ralentis ! Limité à",
+        "Attention ! Ralentis, limité à",
+        "Freine ! C'est limité à"
+      ]
     },
     "1": {
-      "radar": ["Hmm… doucement, mon chéri.", "Attention à toi…", "Lève un peu le pied pour moi…", "Sois sage…"],
-      "limit": ["Tout en douceur… on passe à", "Mon cœur… limitation", "Prends ton temps… on est à"],
-      "over": ["Tu vas un peu trop vite pour moi… c'est limité à", "Doucement, beau pilote… limité à", "Pas si vite… on est à"],
-      "alarm": ["Ralentis, mon chéri ! Limité à"]
+      "radar": [
+        "Hmm… doucement, mon chéri.",
+        "Attention à toi…",
+        "Lève un peu le pied pour moi…",
+        "Sois sage…",
+        "Fais-moi plaisir, ralentis un peu…",
+        "Oh, regarde qui nous attend…",
+        "Doucement, mon cœur…",
+        "Tu sais que je tiens à toi… ralentis.",
+        "Prudence, mon beau…",
+        "Un petit radar juste devant, mon chéri…",
+        "On reste raisonnables, d'accord ?",
+        "Garde ton sourire, pas ta photo…",
+        "Je veille sur toi… attention.",
+        "Allez, sois mignon, lève le pied…",
+        "Pas de bêtise maintenant…",
+        "Tout en douceur, comme toujours…"
+      ],
+      "limit": [
+        "Tout en douceur… on passe à",
+        "Mon cœur… limitation",
+        "Prends ton temps… on est à",
+        "On ralentit gentiment, mon chéri… limitation",
+        "Pour moi, tu restes à",
+        "Doucement, mon beau… on passe à",
+        "Ici, mon cœur, c'est",
+        "Petite pause dans la vitesse… on est à",
+        "On se calme un peu… limitation",
+        "Sois sage, chéri… c'est",
+        "Tranquillement… on descend à",
+        "Comme j'aime, tout doux… limitation"
+      ],
+      "over": [
+        "Tu vas un peu trop vite pour moi… c'est limité à",
+        "Doucement, beau pilote… limité à",
+        "Pas si vite… on est à",
+        "Hé, tu files trop vite, mon chéri… c'est",
+        "Je préfère te garder entier… limité à",
+        "Ralentis un peu pour moi… on est à",
+        "Tu me fais peur, mon cœur… c'est",
+        "Allez, lève le pied… limité à",
+        "Pas besoin de te presser, je suis là… c'est",
+        "Tu oublies la limite, chéri… on est à"
+      ],
+      "alarm": [
+        "Ralentis, mon chéri ! Limité à",
+        "Doucement, mon cœur ! C'est",
+        "Freine pour moi, chéri ! Limité à",
+        "Attention, mon beau ! On est à"
+      ]
     },
     "2": {
-      "radar": ["Mmmh… ralentis pour moi, mon beau…", "Tout doux, chéri… j'aime quand tu prends ton temps.", "Hmm… garde tes points, j'ai d'autres projets pour toi ce soir.", "Doucement… on n'est pas pressés, toi et moi.", "Sois sage maintenant… tu pourras être vilain plus tard."],
-      "limit": ["Mmmh… tout en douceur, comme j'aime. On passe à", "Prends ton temps avec moi, chéri… on descend à", "Fais durer le plaisir, beau pilote… on est à", "Laisse-toi guider par ma voix… limitation"],
-      "over": ["Hmm… tu vas trop vite, mon beau. Calme-toi pour moi, c'est", "Oh… tu es fougueux aujourd'hui. Mais c'est limité à", "Pas si vite, chéri… les meilleures choses se font lentement. On est à"],
-      "alarm": ["Ralentis tout de suite, mon beau ! Limité à"]
+      "radar": [
+        "Mmmh… ralentis pour moi, mon beau…",
+        "Tout doux, chéri… j'aime quand tu prends ton temps.",
+        "Hmm… garde tes points, j'ai d'autres projets pour toi ce soir.",
+        "Doucement… on n'est pas pressés, toi et moi.",
+        "Sois sage maintenant… tu pourras être vilain plus tard.",
+        "Mmmh… ce radar me jalouse, il veut te prendre en photo.",
+        "Ralentis, mon chéri… je veux profiter du voyage avec toi.",
+        "Hmm, tu es si séduisant quand tu conduis prudemment…",
+        "Lève le pied, beau gosse… garde ta fougue pour moi.",
+        "Tout doucement… comme une caresse.",
+        "Mmmh, laisse-moi te murmurer un secret… il y a un radar.",
+        "Prends ton temps, mon beau… le meilleur reste à venir.",
+        "Je te veux sage… juste quelques secondes.",
+        "Hmm… ralentis, que je te garde rien que pour moi.",
+        "Doucement, chéri… je n'aime pas les flashs, je préfère la lumière tamisée.",
+        "Tu me rends folle… mais ralentis quand même."
+      ],
+      "limit": [
+        "Mmmh… tout en douceur, comme j'aime. On passe à",
+        "Prends ton temps avec moi, chéri… on descend à",
+        "Fais durer le plaisir, beau pilote… on est à",
+        "Laisse-toi guider par ma voix… limitation",
+        "Hmm… ralentis tout doucement pour moi… on passe à",
+        "Savoure chaque mètre, mon beau… c'est",
+        "Doucement… j'adore quand tu ralentis… limitation",
+        "Pas de précipitation, chéri… on reste à",
+        "Mmmh, on prend notre temps tous les deux… on est à",
+        "Tout en lenteur, comme une danse… limitation",
+        "Laisse-moi te calmer, mon beau… c'est",
+        "Hmm… un peu plus doux maintenant… on passe à"
+      ],
+      "over": [
+        "Hmm… tu vas trop vite, mon beau. Calme-toi pour moi, c'est",
+        "Oh… tu es fougueux aujourd'hui. Mais c'est limité à",
+        "Pas si vite, chéri… les meilleures choses se font lentement. On est à",
+        "Mmmh, tu t'emballes… garde ça pour plus tard. C'est",
+        "Tu es pressé de me retrouver ? Ralentis quand même… limité à",
+        "Oh là, tout doux, beau pilote… on est à",
+        "Je sens que tu t'impatientes… mais c'est",
+        "Hmm, j'aime ton énergie… mais pas sur la route. Limité à",
+        "Calme ta fougue, chéri… c'est",
+        "Doucement, mon fauve… on reste à"
+      ],
+      "alarm": [
+        "Ralentis tout de suite, mon beau ! Limité à",
+        "Chéri, freine maintenant ! C'est",
+        "Mon beau, doucement, tout de suite ! Limité à",
+        "Hé, tu me fais peur ! Ralentis, on est à"
+      ]
     },
     "3": {
-      "radar": ["Oh oui… ralentis… doucement… encore…", "Mmmh, freine pour moi… je préfère quand c'est moi qui te fais monter en pression.", "Tout doux, mon fauve… garde ton énergie pour ce soir.", "Un flash ? Le seul flash que je veux, c'est quand tu me regardes.", "Ralentis, mon beau… j'adore quand tu y vas lentement."],
-      "limit": ["On ralentit… j'aime sentir le rythme descendre. On passe à", "Prends le temps de bien faire les choses, chéri… on passe à", "Doucement… comme ça, c'est parfait. On est à", "Tu sais que j'adore quand tu m'obéis… limitation"],
-      "over": ["Hmm, tu es bien excité aujourd'hui… calme-toi, c'est", "Trop vite, mon beau… tu vas finir avant moi. On reste à", "Oh… tu me fais de l'effet quand tu roules comme ça… mais c'est"],
-      "alarm": ["Stop, stop, stop… freine, mon fauve ! Limité à"]
+      "radar": [
+        "Oh oui… ralentis… doucement… encore…",
+        "Mmmh, freine pour moi… je préfère quand c'est moi qui te fais monter en pression.",
+        "Tout doux, mon fauve… garde ton énergie pour ce soir.",
+        "Un flash ? Le seul flash que je veux, c'est quand tu me regardes.",
+        "Ralentis, mon beau… j'adore quand tu y vas lentement.",
+        "Mmmh… tu sais ce que j'aime ? Quand tu prends tout ton temps.",
+        "Oh… doucement… j'ai envie que ça dure.",
+        "Freine, mon chéri… garde tes réflexes pour la nuit.",
+        "Hmm, lève le pied… je veux te sentir maître de toi.",
+        "Tout doux… encore un peu plus lentement… parfait.",
+        "Mmmh, ralentis… tu vas me faire rougir.",
+        "Ce radar veut te photographier… moi, je préfère te regarder en vrai.",
+        "Doucement, bébé… on n'est pas pressés d'arriver… au contraire.",
+        "Mmmh… freine pour moi, comme si je te le murmurais à l'oreille.",
+        "Garde ta puissance pour moi, chéri… pas pour ce radar.",
+        "Oh oui… comme ça… tout doucement…"
+      ],
+      "limit": [
+        "On ralentit… j'aime sentir le rythme descendre. On passe à",
+        "Prends le temps de bien faire les choses, chéri… on passe à",
+        "Doucement… comme ça, c'est parfait. On est à",
+        "Tu sais que j'adore quand tu m'obéis… limitation",
+        "Mmmh… lentement… j'adore ce rythme… on descend à",
+        "Laisse-moi mener la danse, mon beau… c'est",
+        "Oh… encore un peu plus doux… on est à",
+        "Fais-moi frissonner, ralentis… limitation",
+        "Mmmh, on va y aller tout en lenteur… on passe à",
+        "Sois docile, chéri… c'est",
+        "Tout doucement… savoure… on reste à",
+        "Ralentis, que je profite de chaque seconde… limitation"
+      ],
+      "over": [
+        "Hmm, tu es bien excité aujourd'hui… calme-toi, c'est",
+        "Trop vite, mon beau… tu vas finir avant moi. On reste à",
+        "Oh… tu me fais de l'effet quand tu roules comme ça… mais c'est",
+        "Mmmh, tu es bouillant… refroidis un peu, c'est limité à",
+        "Pas si vite, bébé… j'aime quand ça dure. On est à",
+        "Tu t'emballes, mon fauve… calme-toi pour moi. C'est",
+        "Oh, tu es déchaîné… garde ça pour ce soir. Limité à",
+        "Hmm… tant de fougue… mais ici, c'est",
+        "Doucement, chéri… tu me fais tourner la tête. On est à",
+        "Tu vas trop vite pour moi… j'aime prendre mon temps. Limité à"
+      ],
+      "alarm": [
+        "Stop, stop, stop… freine, mon fauve ! Limité à",
+        "Bébé, freine tout de suite ! C'est",
+        "Oh non, trop vite ! Ralentis pour moi, limité à",
+        "Freine, mon chéri, maintenant ! On est à"
+      ]
     }
   },
   "myvoice": {
     "_doc": "Phrases à enregistrer soi-même (ton « Ma voix ») : courtes, assemblées à la suite.",
-    "radar": ["Attention, radar devant !", "Ouvre l'œil…", "Doucement…"],
-    "limit": ["Limitation"],
-    "over": ["Attention, tu dépasses, c'est limité à"],
-    "alarm": ["Ralentis ! Limité à"]
+    "radar": [
+      "Attention, radar devant !",
+      "Ouvre l'œil…",
+      "Doucement…"
+    ],
+    "limit": [
+      "Limitation"
+    ],
+    "over": [
+      "Attention, tu dépasses, c'est limité à"
+    ],
+    "alarm": [
+      "Ralentis ! Limité à"
+    ]
   }
 }
