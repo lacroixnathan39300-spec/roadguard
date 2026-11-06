@@ -65,8 +65,8 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
         tone = voiceTone
         if (!ttsReady) return
         if (rate != appliedRate || tone != appliedTone) {
-            tts.setSpeechRate(rate * when (tone) { 1 -> 0.9f; 2 -> 0.82f; else -> 1f })
-            tts.setPitch(when (tone) { 1 -> 0.93f; 2 -> 0.88f; else -> 1f })
+            tts.setSpeechRate(rate * when (tone) { 1 -> 0.9f; 2 -> 0.82f; 3 -> 0.8f; else -> 1f })
+            tts.setPitch(when (tone) { 1 -> 0.93f; 2 -> 0.88f; 3 -> 0.86f; else -> 1f })
             appliedRate = rate; appliedTone = tone
         }
         if (voiceName != appliedVoice) {
@@ -203,6 +203,13 @@ object Charm {
             "Doucement… on n'est pas pressés, toi et moi. $base",
             "Sois sage maintenant… tu pourras être vilain plus tard. $base",
         )
+        3 -> pick(
+            "Oh oui… ralentis… doucement… encore… $base",
+            "Mmmh, freine pour moi… je préfère quand c'est moi qui te fais monter en pression. $base",
+            "Tout doux, mon fauve… garde ton énergie pour ce soir. $base",
+            "Un flash ? Le seul flash que je veux, c'est quand tu me regardes. $base",
+            "Ralentis, mon beau… j'adore quand tu y vas lentement. $base",
+        )
         else -> base
     }
 
@@ -214,6 +221,12 @@ object Charm {
             "$v… doucement, beau pilote. Fais durer le plaisir.",
             "Limitation $v… laisse-toi guider par ma voix.",
         )
+        3 -> pick(
+            "$v… on ralentit… j'aime sentir le rythme descendre.",
+            "Passe à $v, chéri… prends le temps de bien faire les choses.",
+            "$v maintenant… doucement… comme ça, c'est parfait.",
+            "Limitation $v… tu sais que j'adore quand tu m'obéis.",
+        )
         else -> "Limitation $v"
     }
 
@@ -224,12 +237,18 @@ object Charm {
             "Oh… tu es fougueux aujourd'hui. Mais c'est limité à $v.",
             "Pas si vite, chéri… les meilleures choses se font lentement. $v.",
         )
+        3 -> pick(
+            "Hmm, tu es bien excité aujourd'hui… calme-toi, c'est $v ici.",
+            "Trop vite, mon beau… tu vas finir avant moi. On reste à $v.",
+            "Oh… tu me fais de l'effet quand tu roules comme ça… mais c'est $v.",
+        )
         else -> "Attention, limité à $v"
     }
 
     fun alarm(tone: Int, v: Int?) = when (tone) {
         1 -> "Ralentis, mon chéri ! Limité à ${v ?: ""}"
         2 -> "Ralentis tout de suite, mon beau ! Limité à ${v ?: ""}"
+        3 -> "Stop, stop, stop… freine, mon fauve ! Limité à ${v ?: ""}"
         else -> "Ralentis ! Limité à ${v ?: ""}"
     }
 }
