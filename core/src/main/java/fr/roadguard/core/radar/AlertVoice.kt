@@ -107,14 +107,16 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
         }
         if (!ttsReady) return
         if (rate != appliedRate || style != appliedStyle) {
-            tts.setSpeechRate(rate * when (style) { 1 -> 0.92f; 2 -> 0.86f; 3 -> 0.84f; 4 -> 0.82f; else -> 1f })
-            tts.setPitch(when (style) { 1 -> 1.0f; 2 -> 0.98f; 3 -> 0.97f; 4 -> 0.96f; else -> 1f }) // trop grave, une voix de femme sonnait masculine
+            tts.setSpeechRate(rate * when (style) { 1 -> 0.92f; 2 -> 0.86f; 3 -> 0.84f; 4, VoicePack.XXL -> 0.82f; else -> 1f })
+            tts.setPitch(when (style) { 1 -> 1.0f; 2 -> 0.98f; 3 -> 0.97f; 4, VoicePack.XXL -> 0.96f; else -> 1f }) // trop grave, une voix de femme sonnait masculine
             appliedRate = rate; appliedStyle = style
         }
         if (voiceName != appliedVoice) {
             appliedVoice = voiceName
             if (voiceName == null) tts.language = localeOf(pack.lang)
             else tts.voices?.firstOrNull { it.name == voiceName }?.let { tts.voice = it }
+            // Voix d'homme ou de femme : accords de celui ou celle qui parle (« je suis prêt » / « je suis prête »).
+            pack.speakerMale = (voiceName ?: runCatching { tts.voice?.name }.getOrNull())?.let { gender(it) } == 'M'
         }
     }
 
@@ -213,17 +215,23 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
 
     fun announce(alert: RadarAlert) {
         if (beepEnabled) { duck(600); tone?.startTone(ToneGenerator.TONE_PROP_BEEP2, 300) }
+        xxlRadar(alert)?.let { say(it, "rg-${alert.radar.id}"); return }
         if (proximityBeeps || pack.lang != "fr") line("radar", alert.radar.kind, alert.radar.speedKmh, "rg-${alert.radar.id}")
         else say(AlertText.spoken(alert), "rg-${alert.radar.id}") // avec la distance : voix du téléphone
     }
 
     fun announceAverageResult(status: AverageStatus) {
         if (status.over && beepEnabled) { duck(700); tone?.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 400) }
-        say(AlertText.averageSpoken(status), "rg-average")
+        // « Coquin XXL » : seulement si la moyenne est bonne, et la moyenne mesurée est toujours dite.
+        val x = if (!status.over && status.limitKmh != null) xxl("avg_ok")?.let { "$it Moyenne ${status.averageKmh}." } else null
+        say(x ?: AlertText.averageSpoken(status), "rg-average")
     }
 
     /** Nouvelle limitation de vitesse. */
-    fun limitChanged(limit: Int) = line("limit", null, limit, "rg-limit")
+    fun limitChanged(limit: Int) {
+        xxl("limit", mapOf("vitesse" to "$limit"))?.let { say(it, "rg-limit"); return }
+        line("limit", null, limit, "rg-limit")
+    }
 
     /**
      * Consigne de guidage au ton choisi : la consigne reste entière et claire, avec une touche avant ou après
@@ -250,8 +258,113 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     }
     fun tired() = line("tired", null, null, "rg-tired")
 
-    /** Dépassement de la limitation (hors radar). */
-    fun overLimit(limit: Int?) = line("over", null, limit, "rg-over")
+    /**
+     * Dépassement de la limitation (hors radar). [kmh] : vitesse actuelle. En « Coquin XXL », la phrase qui donne un écart
+     * chiffré (« dix km/h de trop ») n'est dite que si l'écart réel est bien celui-là ; la limite est toujours rappelée.
+     */
+    fun overLimit(limit: Int?, kmh: Int = 0) {
+        if (xxlOn && limit != null && kmh > limit) {
+            val over = kmh - limit
+            val p = when (over) { in 5..7 -> xxl("over_5"); in 9..12 -> xxl("over_10"); in 18..23 -> xxl("over_20"); in 28..33 -> xxl("over_30"); else -> null }
+                ?: xxl("over_any")
+            if (p != null) { say("$p Limite $limit.", "rg-over"); return }
+        }
+        line("over", null, limit, "rg-over")
+    }
+
+    // ---------- « Coquin XXL » : bibliothèque de phrases (toujours la vraie consigne, la vraie limite) ----------
+
+    /** Ton « Coquin XXL » actif (en français). */
+    val xxlOn: Boolean get() = style == VoicePack.XXL && pack.lang == "fr"
+
+    /** Phrase « Coquin XXL » du groupe, ou null (ton différent, ou rien de juste pour cette situation). */
+    fun xxl(group: String, vars: Map<String, String> = emptyMap()): String? = if (xxlOn) pack.xxl(group, vars) else null
+
+    private fun distanceWords(m: Int): String = fr.roadguard.core.nav.Guidance.roundDistance(m.toDouble())
+
+    /** Radar : phrase du bon type (fixe, mobile, feu rouge, vitesse moyenne) ; le type et la limite restent dits. */
+    private fun xxlRadar(a: RadarAlert): String? {
+        if (!xxlOn) return null
+        val group = when (a.radar.kind) {
+            RadarKind.FIXED, RadarKind.OTHER -> "radar_fixed"
+            RadarKind.MOBILE -> "radar_mobile"
+            RadarKind.REDLIGHT -> "radar_red"
+            RadarKind.AVERAGE, RadarKind.SECTION -> "avg_start"
+        }
+        val p = pack.xxl(group, mapOf("distance" to distanceWords(AlertText.roundedDistance(a.distanceM)))) ?: return null
+        // Phrase sans le mot « radar » (« Attention au photographe… ») : le type est dit avant.
+        val named = listOf("radar", "feu", "contrôle", "vitesse moyenne").any { p.contains(it, ignoreCase = true) }
+        val body = if (named) p else "${AlertText.kindLabel(a.radar.kind)}. $p"
+        return body + (a.radar.speedKmh?.let { " Limité à $it." } ?: "")
+    }
+
+    /**
+     * Consigne de guidage. En « Coquin XXL », une phrase de la bibliothèque qui dit exactement la même manœuvre
+     * (même direction, même distance, même sortie de rond-point) ; sinon la consigne au ton choisi ([guide]).
+     */
+    fun guideStep(instruction: String, m: fr.roadguard.core.nav.Maneuver?, toNextM: Int, kind: Int, hasThen: Boolean) {
+        val x = if (xxlOn && !hasThen) xxlManeuver(instruction, m, toNextM, kind) else null
+        if (x != null) speak(x) else guide(instruction)
+    }
+
+    private fun xxlManeuver(instruction: String, m: fr.roadguard.core.nav.Maneuver?, toNextM: Int, kind: Int): String? {
+        if (kind == fr.roadguard.core.nav.GuidanceState.START) return pack.xxl("start")?.let { "$it ${instruction.trim()}" }
+        if (m == null || m.instruction.startsWith("Étape")) return null // étape intermédiaire : annonce habituelle
+        val early = kind == fr.roadguard.core.nav.GuidanceState.EARLY
+        val d = mapOf("distance" to distanceWords(toNextM))
+        return when (m.type) {
+            9, 10, 11 -> pack.xxl(if (early) "right_early" else "right_now", d)
+            14, 15, 16 -> pack.xxl(if (early) "left_early" else "left_now", d)
+            8, 22 -> if (early) null else pack.xxl("straight_now")
+            23 -> if (early) null else pack.xxl("stay_right")
+            24 -> if (early) null else pack.xxl("stay_left")
+            26 -> {
+                val n = m.roundaboutExit
+                val exit = if (n != null && n in 1..5) pack.xxl("rb_exit_$n") else null
+                when {
+                    exit == null -> null
+                    early -> pack.xxl("rb_early", d)?.let { "$it $exit" }
+                    else -> exit
+                }
+            }
+            27 -> if (early) null else pack.xxl("rb_out")
+            12, 13 -> if (early) null else pack.xxl("uturn")
+            20, 21 -> if (early) pack.xxl("exit_early", d) else null
+            25, 37, 38 -> if (early) null else pack.xxl("merge")
+            4 -> if (early) null else pack.xxl("arrival")
+            5 -> if (early) null else pack.xxl("arrival")?.let { "$it Ta destination est à droite." }
+            6 -> if (early) null else pack.xxl("arrival")?.let { "$it Ta destination est à gauche." }
+            else -> null
+        }
+    }
+
+    /** Signalement de la communauté devant soi ([code] du serveur), à [meters] mètres. */
+    fun xxlReport(code: String, meters: Int, confirmations: Int): String? {
+        if (!xxlOn) return null
+        val d = mapOf("distance" to distanceWords(meters))
+        return when (code) {
+            "police" -> pack.xxl("police", d)
+            "radar_mobile" -> pack.xxl("radar_mobile", d)
+            "bouchon" -> pack.xxl("jam", d)
+            "travaux" -> pack.xxl("works", d)
+            "accident" -> pack.xxl("accident")
+            "danger" -> if (confirmations >= 2) pack.xxl("danger_confirmed") else null
+            else -> null
+        }
+    }
+
+    /** Danger de la route (passage à niveau, virage, école) : la phrase exacte d'abord, la touche coquine ensuite. */
+    fun xxlHazard(text: String): String? {
+        if (!xxlOn) return null
+        val g = when {
+            text.startsWith("Passage à niveau") -> "crossing"
+            text.startsWith("Virage") -> "curve"
+            text.startsWith("École") -> "school"
+            else -> return null
+        }
+        val tail = pack.xxl(g)?.substringAfter(", ", "")?.trim()?.replaceFirstChar { it.uppercase() }.orEmpty()
+        return if (tail.isBlank()) null else "${text.trimEnd('.')}. $tail"
+    }
 
     /** Annonce par phrases enregistrées si elles existent, sinon par la voix du téléphone. */
     private fun line(group: String, kind: RadarKind?, limit: Int?, id: String) {

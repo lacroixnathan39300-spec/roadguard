@@ -527,5 +527,719 @@
         "Sbadigli spesso. È ora di una pausa."
       ]
     }
+  },
+  "xxl": {
+    "start": [
+      {
+        "m": "Attache ta ceinture, beau gosse, je vais te faire prendre ton pied… sur la route.",
+        "f": "Attache ta ceinture, ma belle, je vais te faire prendre ton pied… sur la route."
+      },
+      {
+        "m": "Mets le contact, mon coquin, on va faire chauffer la mécanique.",
+        "f": "Mets le contact, ma coquine, on va faire chauffer la mécanique."
+      },
+      {
+        "m": "J'espère que tu as de l'endurance, notre aventure sera longue.",
+        "f": "J'espère que tu as de l'endurance, notre aventure sera longue."
+      },
+      {
+        "m": "C'est moi qui donne les ordres aujourd'hui. Tu aimes ça, hein ?",
+        "f": "C'est moi qui donne les ordres aujourd'hui. Tu aimes ça, hein ?"
+      },
+      {
+        "m": "Montre-moi comment tu manies ce gros levier de vitesse.",
+        "f": "Montre-moi comment tu manies ce gros levier de vitesse."
+      },
+      {
+        "m": "Démarre doucement, j'aime quand tu prends ton temps.",
+        "f": "Démarre doucement, j'aime quand tu prends ton temps."
+      },
+      {
+        "m": "Le trajet est prêt, mon beau, fais-moi une belle conduite.",
+        "f": "Le trajet est prêt, ma belle, fais-moi une belle conduite."
+      },
+      {
+        "m": "Tu veux le chemin le plus court ou celui qui fait durer le plaisir ?",
+        "f": "Tu veux le chemin le plus court ou celui qui fait durer le plaisir ?"
+      },
+      {
+        "m": "Je connais toutes les positions… sur la carte, évidemment.",
+        "f": "Je connais toutes les positions… sur la carte, évidemment."
+      },
+      {
+        "m": "On part ensemble, mon coquin, et je compte bien te mener jusqu'au bout.",
+        "f": "On part ensemble, ma coquine, et je compte bien te mener jusqu'au bout."
+      }
+    ],
+    "right_early": [
+      {
+        "m": "Dans {distance}, prends à droite, mon beau, et fais-moi une jolie courbe.",
+        "f": "Dans {distance}, prends à droite, ma belle, et fais-moi une jolie courbe."
+      },
+      {
+        "m": "À droite dans {distance}, serre-moi ça avec délicatesse.",
+        "f": "À droite dans {distance}, serre-moi ça avec délicatesse."
+      },
+      {
+        "m": "Prépare ton mouvement de poignet, la droite approche.",
+        "f": "Prépare ton mouvement de poignet, la droite approche."
+      },
+      {
+        "m": "Encore {distance} avant de tourner à droite, fais monter le suspense.",
+        "f": "Encore {distance} avant de tourner à droite, fais monter le suspense."
+      }
+    ],
+    "right_now": [
+      {
+        "m": "Tourne à droite maintenant, j'adore quand tu m'obéis.",
+        "f": "Tourne à droite maintenant, j'adore quand tu m'obéis."
+      },
+      {
+        "m": "Prends la prochaine à droite, ne te trompe pas de passage.",
+        "f": "Prends la prochaine à droite, ne te trompe pas de passage."
+      },
+      {
+        "m": "À droite, mon coquin, montre-moi ton sens du toucher.",
+        "f": "À droite, ma coquine, montre-moi ton sens du toucher."
+      },
+      {
+        "m": "Glisse doucement vers la droite, tu as le geste.",
+        "f": "Glisse doucement vers la droite, tu as le geste."
+      },
+      {
+        "m": "Prends cette droite, tu sais décidément comment me faire tourner la tête.",
+        "f": "Prends cette droite, tu sais décidément comment me faire tourner la tête."
+      }
+    ],
+    "left_early": [
+      {
+        "m": "Dans {distance}, tourne à gauche, petit démon.",
+        "f": "Dans {distance}, tourne à gauche, petite démone."
+      },
+      {
+        "m": "À gauche dans {distance}, on change de position.",
+        "f": "À gauche dans {distance}, on change de position."
+      },
+      {
+        "m": "Prépare-toi à glisser à gauche, tout en douceur.",
+        "f": "Prépare-toi à glisser à gauche, tout en douceur."
+      },
+      {
+        "m": "Encore {distance} avant la gauche, tiens bon.",
+        "f": "Encore {distance} avant la gauche, tiens bon."
+      }
+    ],
+    "left_now": [
+      {
+        "m": "Prends la prochaine à gauche, je te veux précis.",
+        "f": "Prends la prochaine à gauche, je te veux précise."
+      },
+      {
+        "m": "Tourne à gauche maintenant, oh, quel joli mouvement !",
+        "f": "Tourne à gauche maintenant, oh, quel joli mouvement !"
+      },
+      {
+        "m": "À gauche, mon beau, ne rate pas la bonne ouverture.",
+        "f": "À gauche, ma belle, ne rate pas la bonne ouverture."
+      },
+      {
+        "m": "Bifurque à gauche, tu me fais perdre le nord.",
+        "f": "Bifurque à gauche, tu me fais perdre le nord."
+      },
+      {
+        "m": "Tourne à gauche, j'aime quand tu changes de côté.",
+        "f": "Tourne à gauche, j'aime quand tu changes de côté."
+      }
+    ],
+    "straight_now": [
+      {
+        "m": "Tout droit, mon grand, reste bien ferme sur ta trajectoire.",
+        "f": "Tout droit, ma grande, reste bien ferme sur ta trajectoire."
+      },
+      {
+        "m": "Garde le cap, tu es décidément très endurant.",
+        "f": "Garde le cap, tu es décidément très endurante."
+      },
+      {
+        "m": "Continue tout droit, les courbes viendront après.",
+        "f": "Continue tout droit, les courbes viendront après."
+      },
+      {
+        "m": "Maintiens ta direction, j'aime la régularité.",
+        "f": "Maintiens ta direction, j'aime la régularité."
+      },
+      {
+        "m": "Tout droit, pas besoin de tortiller du derrière.",
+        "f": "Tout droit, pas besoin de tortiller du derrière."
+      },
+      {
+        "m": "Continue sur cette route, tu me fais languir.",
+        "f": "Continue sur cette route, tu me fais languir."
+      },
+      {
+        "m": "Tout droit jusqu'au prochain carrefour, sois sage pour l'instant.",
+        "f": "Tout droit jusqu'au prochain carrefour, sois sage pour l'instant."
+      }
+    ],
+    "stay_right": [
+      {
+        "m": "Reste à droite, les meilleures courbes sont devant nous.",
+        "f": "Reste à droite, les meilleures courbes sont devant nous."
+      }
+    ],
+    "stay_left": [
+      {
+        "m": "Serre à gauche, mais garde les mains bien placées.",
+        "f": "Serre à gauche, mais garde les mains bien placées."
+      }
+    ],
+    "rb_early": [
+      {
+        "m": "Rond-point dans {distance}, tu vas me faire tourner la tête.",
+        "f": "Rond-point dans {distance}, tu vas me faire tourner la tête."
+      }
+    ],
+    "rb_exit_1": [
+      {
+        "m": "Première sortie, tu aimes conclure rapidement, dis donc.",
+        "f": "Première sortie, tu aimes conclure rapidement, dis donc."
+      }
+    ],
+    "rb_exit_2": [
+      {
+        "m": "Deuxième sortie, tu sais prendre ton temps.",
+        "f": "Deuxième sortie, tu sais prendre ton temps."
+      }
+    ],
+    "rb_exit_3": [
+      {
+        "m": "Troisième sortie, petit gourmand, tu prolonges le plaisir.",
+        "f": "Troisième sortie, petite gourmande, tu prolonges le plaisir."
+      }
+    ],
+    "rb_exit_4": [
+      {
+        "m": "Quatrième sortie, tu veux vraiment me donner le tournis.",
+        "f": "Quatrième sortie, tu veux vraiment me donner le tournis."
+      }
+    ],
+    "rb_exit_5": [
+      {
+        "m": "Cinquième sortie, on fait durer le manège jusqu'au bout.",
+        "f": "Cinquième sortie, on fait durer le manège jusqu'au bout."
+      }
+    ],
+    "rb_out": [
+      {
+        "m": "Prends la sortie maintenant, tu as assez tourné autour du pot.",
+        "f": "Prends la sortie maintenant, tu as assez tourné autour du pot."
+      },
+      {
+        "m": "Sors du rond-point, j'ai les sens tout retournés.",
+        "f": "Sors du rond-point, j'ai les sens tout retournés."
+      }
+    ],
+    "merge": [
+      {
+        "m": "Insertion devant, trouve la bonne ouverture sans forcer.",
+        "f": "Insertion devant, trouve la bonne ouverture sans forcer."
+      },
+      {
+        "m": "Rejoins la voie principale, avec douceur et précision.",
+        "f": "Rejoins la voie principale, avec douceur et précision."
+      }
+    ],
+    "exit_early": [
+      {
+        "m": "Quitte l'autoroute dans {distance}, on change de rythme.",
+        "f": "Quitte l'autoroute dans {distance}, on change de rythme."
+      },
+      {
+        "m": "La sortie approche, prépare une belle conclusion.",
+        "f": "La sortie approche, prépare une belle conclusion."
+      }
+    ],
+    "radar_fixed": [
+      {
+        "m": "Radar fixe dans {distance}, souris, un voyeur nous regarde.",
+        "f": "Radar fixe dans {distance}, souris, un voyeur nous regarde."
+      },
+      {
+        "m": "Radar dans {distance}, fais-toi désirer, pas flasher.",
+        "f": "Radar dans {distance}, fais-toi désirer, pas flasher."
+      },
+      {
+        "m": "Attention au photographe, ses clichés coûtent cher.",
+        "f": "Attention au photographe, ses clichés coûtent cher."
+      },
+      {
+        "m": "Radar devant, garde tes performances pour plus tard.",
+        "f": "Radar devant, garde tes performances pour plus tard."
+      },
+      {
+        "m": "Dans {distance}, un petit curieux surveille ton compteur.",
+        "f": "Dans {distance}, un petit curieux surveille ton compteur."
+      },
+      {
+        "m": "Radar dans {distance}, calme tes ardeurs, tigre.",
+        "f": "Radar dans {distance}, calme tes ardeurs, tigresse."
+      },
+      {
+        "m": "Radar à proximité, pas de photo compromettante aujourd'hui.",
+        "f": "Radar à proximité, pas de photo compromettante aujourd'hui."
+      },
+      {
+        "m": "Un radar fixe approche, lui aussi aime les chiffres impressionnants.",
+        "f": "Un radar fixe approche, lui aussi aime les chiffres impressionnants."
+      }
+    ],
+    "radar_passed": [
+      {
+        "m": "Passage devant le radar, reste sage, mon beau.",
+        "f": "Passage devant le radar, reste sage, ma belle."
+      },
+      {
+        "m": "Radar dépassé, continue de respecter la limitation.",
+        "f": "Radar dépassé, continue de respecter la limitation."
+      }
+    ],
+    "radar_mobile": [
+      {
+        "m": "Radar mobile signalé dans {distance}, les coquins en uniforme sont de sortie.",
+        "f": "Radar mobile signalé dans {distance}, les coquins en uniforme sont de sortie."
+      },
+      {
+        "m": "Radar mobile devant, un admirateur veut peut-être te photographier.",
+        "f": "Radar mobile devant, un admirateur veut peut-être te photographier."
+      },
+      {
+        "m": "Dans {distance}, on surveille tes performances.",
+        "f": "Dans {distance}, on surveille tes performances."
+      },
+      {
+        "m": "Radar temporaire signalé, une petite surprise sur notre chemin.",
+        "f": "Radar temporaire signalé, une petite surprise sur notre chemin."
+      },
+      {
+        "m": "Attention, radar mobile possible, pas de démonstration de puissance.",
+        "f": "Attention, radar mobile possible, pas de démonstration de puissance."
+      },
+      {
+        "m": "Radar mobile à proximité, on ne joue pas les champions.",
+        "f": "Radar mobile à proximité, on ne joue pas les championnes."
+      }
+    ],
+    "police": [
+      {
+        "m": "Contrôle possible dans {distance}, garde ton charme et la bonne vitesse.",
+        "f": "Contrôle possible dans {distance}, garde ton charme et la bonne vitesse."
+      },
+      {
+        "m": "Contrôle routier signalé, reste sage, petit démon.",
+        "f": "Contrôle routier signalé, reste sage, petite démone."
+      },
+      {
+        "m": "Présence policière possible, garde ton sourire et tes papiers.",
+        "f": "Présence policière possible, garde ton sourire et tes papiers."
+      }
+    ],
+    "radar_red": [
+      {
+        "m": "Radar de feu dans {distance}, le rouge est sexy, mais pas quand tu le grilles.",
+        "f": "Radar de feu dans {distance}, le rouge est sexy, mais pas quand tu le grilles."
+      },
+      {
+        "m": "Feu surveillé devant, attends le vert pour passer à l'action.",
+        "f": "Feu surveillé devant, attends le vert pour passer à l'action."
+      },
+      {
+        "m": "Radar de feu rouge, ne franchis pas la ligne sans permission.",
+        "f": "Radar de feu rouge, ne franchis pas la ligne sans permission."
+      },
+      {
+        "m": "Dans {distance}, un feu surveillé t'attend au tournant.",
+        "f": "Dans {distance}, un feu surveillé t'attend au tournant."
+      },
+      {
+        "m": "Attention au feu, pas de passage interdit.",
+        "f": "Attention au feu, pas de passage interdit."
+      },
+      {
+        "m": "Feu surveillé, respecte le signal, petit rebelle.",
+        "f": "Feu surveillé, respecte le signal, petite rebelle."
+      },
+      {
+        "m": "Radar de feu devant, je préfère les feux de la passion.",
+        "f": "Radar de feu devant, je préfère les feux de la passion."
+      }
+    ],
+    "avg_start": [
+      {
+        "m": "Début de contrôle de vitesse moyenne, l'endurance compte.",
+        "f": "Début de contrôle de vitesse moyenne, l'endurance compte."
+      },
+      {
+        "m": "Zone de vitesse moyenne, montre-moi ta régularité.",
+        "f": "Zone de vitesse moyenne, montre-moi ta régularité."
+      },
+      {
+        "m": "Contrôle de vitesse moyenne, ce n'est pas une course à la performance.",
+        "f": "Contrôle de vitesse moyenne, ce n'est pas une course à la performance."
+      }
+    ],
+    "avg_over": [
+      {
+        "m": "Vitesse moyenne excessive, ralentis, mon impatient.",
+        "f": "Vitesse moyenne excessive, ralentis, mon impatiente."
+      },
+      {
+        "m": "Attention, la moyenne monte trop vite.",
+        "f": "Attention, la moyenne monte trop vite."
+      }
+    ],
+    "avg_ok": [
+      {
+        "m": "Ta vitesse moyenne est correcte, tu sais tenir le rythme.",
+        "f": "Ta vitesse moyenne est correcte, tu sais tenir le rythme."
+      },
+      {
+        "m": "Tu tiens la bonne moyenne, j'aime cette constance.",
+        "f": "Tu tiens la bonne moyenne, j'aime cette constance."
+      },
+      {
+        "m": "Fin de zone de contrôle, tu as été régulier.",
+        "f": "Fin de zone de contrôle, tu as été régulière."
+      },
+      {
+        "m": "Zone terminée, belle démonstration de maîtrise.",
+        "f": "Zone terminée, belle démonstration de maîtrise."
+      }
+    ],
+    "limit": [
+      {
+        "m": "Limitation à {vitesse}, garde tes ardeurs pour plus tard.",
+        "f": "Limitation à {vitesse}, garde tes ardeurs pour plus tard."
+      },
+      {
+        "m": "Nouvelle limitation à {vitesse}, adapte ton rythme.",
+        "f": "Nouvelle limitation à {vitesse}, adapte ton rythme."
+      }
+    ],
+    "over_5": [
+      {
+        "m": "Cinq kilomètres-heure de trop, tu es pressé de conclure ?",
+        "f": "Cinq kilomètres-heure de trop, tu es pressée de conclure ?"
+      }
+    ],
+    "over_10": [
+      {
+        "m": "Dix kilomètres-heure de trop, prends ton temps.",
+        "f": "Dix kilomètres-heure de trop, prends ton temps."
+      }
+    ],
+    "over_20": [
+      {
+        "m": "Vingt kilomètres-heure de trop, là, tu chauffes beaucoup trop.",
+        "f": "Vingt kilomètres-heure de trop, là, tu chauffes beaucoup trop."
+      }
+    ],
+    "over_30": [
+      {
+        "m": "Trente kilomètres-heure de trop, ralentis immédiatement.",
+        "f": "Trente kilomètres-heure de trop, ralentis immédiatement."
+      }
+    ],
+    "over_any": [
+      {
+        "m": "Tu dépasses la limite, doucement, tigre.",
+        "f": "Tu dépasses la limite, doucement, tigresse."
+      },
+      {
+        "m": "Vitesse excessive, tu veux m'impressionner ou quoi ?",
+        "f": "Vitesse excessive, tu veux m'impressionner ou quoi ?"
+      },
+      {
+        "m": "Ralentis, les meilleures expériences prennent du temps.",
+        "f": "Ralentis, les meilleures expériences prennent du temps."
+      }
+    ],
+    "back_under": [
+      {
+        "m": "Bonne vitesse retrouvée, voilà, j'aime quand tu te contrôles.",
+        "f": "Bonne vitesse retrouvée, voilà, j'aime quand tu te contrôles."
+      }
+    ],
+    "jam": [
+      {
+        "m": "Bouchon dans {distance}, ça risque d'être très serré.",
+        "f": "Bouchon dans {distance}, ça risque d'être très serré."
+      },
+      {
+        "m": "Embouteillage devant, tout le monde veut passer en même temps.",
+        "f": "Embouteillage devant, tout le monde veut passer en même temps."
+      },
+      {
+        "m": "Circulation ralentie, notre plaisir va durer plus longtemps.",
+        "f": "Circulation ralentie, notre plaisir va durer plus longtemps."
+      },
+      {
+        "m": "Trafic dense, on va devoir se serrer les uns contre les autres.",
+        "f": "Trafic dense, on va devoir se serrer les uns contre les autres."
+      },
+      {
+        "m": "Ralentissement devant, pas besoin de se précipiter.",
+        "f": "Ralentissement devant, pas besoin de se précipiter."
+      },
+      {
+        "m": "Trafic très chargé, les choses deviennent intimes.",
+        "f": "Trafic très chargé, les choses deviennent intimes."
+      }
+    ],
+    "works": [
+      {
+        "m": "Travaux dans {distance}, les gros engins sont de sortie.",
+        "f": "Travaux dans {distance}, les gros engins sont de sortie."
+      },
+      {
+        "m": "Chantier devant, attention aux hommes qui manipulent de gros outils.",
+        "f": "Chantier devant, attention aux hommes qui manipulent de gros outils."
+      }
+    ],
+    "curve": [
+      {
+        "m": "Virage dangereux, la douceur fait toute la différence.",
+        "f": "Virage dangereux, la douceur fait toute la différence."
+      }
+    ],
+    "ice": [
+      {
+        "m": "Chaussée glissante, évite les dérapages incontrôlés.",
+        "f": "Chaussée glissante, évite les dérapages incontrôlés."
+      }
+    ],
+    "crossing": [
+      {
+        "m": "Passage à niveau, attention, un gros engin peut traverser.",
+        "f": "Passage à niveau, attention, un gros engin peut traverser."
+      }
+    ],
+    "school": [
+      {
+        "m": "Zone scolaire devant, prudence et concentration.",
+        "f": "Zone scolaire devant, prudence et concentration."
+      }
+    ],
+    "fog": [
+      {
+        "m": "Brouillard dense, réduis ta vitesse et garde tes distances.",
+        "f": "Brouillard dense, réduis ta vitesse et garde tes distances."
+      }
+    ],
+    "reroute": [
+      {
+        "m": "Mauvaise direction, tu t'es trompé de trou… de route !",
+        "f": "Mauvaise direction, tu t'es trompée de trou… de route !"
+      },
+      {
+        "m": "Tu n'écoutes jamais mes instructions, vilain garçon.",
+        "f": "Tu n'écoutes jamais mes instructions, vilaine fille."
+      },
+      {
+        "m": "Nouvel itinéraire trouvé, on recommence notre petite danse.",
+        "f": "Nouvel itinéraire trouvé, on recommence notre petite danse."
+      },
+      {
+        "m": "Tu as pris la mauvaise route, tu pensais vraiment que ça allait passer ?",
+        "f": "Tu as pris la mauvaise route, tu pensais vraiment que ça allait passer ?"
+      },
+      {
+        "m": "Recalcul terminé, cette fois suis-moi jusqu'au bout.",
+        "f": "Recalcul terminé, cette fois suis-moi jusqu'au bout."
+      }
+    ],
+    "uturn": [
+      {
+        "m": "Fais demi-tour dès que possible et autorisé, petit gourmand.",
+        "f": "Fais demi-tour dès que possible et autorisé, petite gourmande."
+      },
+      {
+        "m": "Demi-tour autorisé devant, deuxième chance de me satisfaire.",
+        "f": "Demi-tour autorisé devant, deuxième chance de me satisfaire."
+      }
+    ],
+    "remaining_100000": [
+      {
+        "m": "Encore cent kilomètres, tu vas devoir tenir longtemps.",
+        "f": "Encore cent kilomètres, tu vas devoir tenir longtemps."
+      }
+    ],
+    "remaining_50000": [
+      {
+        "m": "Plus que cinquante kilomètres, le plaisir continue.",
+        "f": "Plus que cinquante kilomètres, le plaisir continue."
+      }
+    ],
+    "remaining_20000": [
+      {
+        "m": "Encore vingt kilomètres, je commence à sentir l'arrivée.",
+        "f": "Encore vingt kilomètres, je commence à sentir l'arrivée."
+      }
+    ],
+    "remaining_10000": [
+      {
+        "m": "Plus que dix kilomètres, l'excitation monte.",
+        "f": "Plus que dix kilomètres, l'excitation monte."
+      }
+    ],
+    "remaining_5000": [
+      {
+        "m": "Encore cinq kilomètres, tu tiens toujours le rythme ?",
+        "f": "Encore cinq kilomètres, tu tiens toujours le rythme ?"
+      }
+    ],
+    "remaining_2000": [
+      {
+        "m": "Plus que deux kilomètres, on approche du grand moment.",
+        "f": "Plus que deux kilomètres, on approche du grand moment."
+      }
+    ],
+    "remaining_1000": [
+      {
+        "m": "Encore un kilomètre, on touche presque au but.",
+        "f": "Encore un kilomètre, on touche presque au but."
+      }
+    ],
+    "remaining_500": [
+      {
+        "m": "Plus que cinq cents mètres, ne précipite pas les choses.",
+        "f": "Plus que cinq cents mètres, ne précipite pas les choses."
+      }
+    ],
+    "trip_end": [
+      {
+        "m": "Stationnement réussi, tu sais vraiment bien te placer.",
+        "f": "Stationnement réussi, tu sais vraiment bien te placer."
+      },
+      {
+        "m": "Trajet terminé, tu peux enfin relâcher la pression.",
+        "f": "Trajet terminé, tu peux enfin relâcher la pression."
+      }
+    ],
+    "arrival": [
+      {
+        "m": "Destination atteinte, ah, quelle belle arrivée !",
+        "f": "Destination atteinte, ah, quelle belle arrivée !"
+      },
+      {
+        "m": "Nous sommes arrivés, alors, satisfait de mes services ?",
+        "f": "Nous sommes arrivées, alors, satisfaite de mes services ?"
+      },
+      {
+        "m": "Tu m'as fait vivre une sacrée aventure, mon coquin.",
+        "f": "Tu m'as fait vivre une sacrée aventure, ma coquine."
+      },
+      {
+        "m": "Bienvenue à destination, tu m'as menée jusqu'au bout.",
+        "f": "Bienvenue à destination, tu m'as menée jusqu'au bout."
+      },
+      {
+        "m": "Quelle belle conduite, j'en suis toute retournée.",
+        "f": "Quelle belle conduite, j'en suis toute retournée."
+      },
+      {
+        "m": "C'est déjà fini ? J'aurais bien prolongé le plaisir.",
+        "f": "C'est déjà fini ? J'aurais bien prolongé le plaisir."
+      },
+      {
+        "m": "Tu as réussi à me conduire jusqu'au septième ciel… enfin, presque.",
+        "f": "Tu as réussi à me conduire jusqu'au septième ciel… enfin, presque."
+      },
+      {
+        "m": "Arrivée réussie, je suis prête à recommencer quand tu veux.",
+        "f": "Arrivée réussie, je suis prête à recommencer quand tu veux."
+      }
+    ],
+    "battery_low": [
+      {
+        "m": "Batterie faible, je sens que je perds toute mon énergie.",
+        "f": "Batterie faible, je sens que je perds toute mon énergie."
+      }
+    ],
+    "battery_charging": [
+      {
+        "m": "Recharge en cours, ah, ça fait du bien de retrouver de la puissance.",
+        "f": "Recharge en cours, ah, ça fait du bien de retrouver de la puissance."
+      }
+    ],
+    "gps_lost": [
+      {
+        "m": "Signal GPS perdu, tu m'as fait perdre le nord, petit charmeur.",
+        "f": "Signal GPS perdu, tu m'as fait perdre le nord, petite charmeuse."
+      },
+      {
+        "m": "Recherche de satellites, je tente de retrouver notre complicité.",
+        "f": "Recherche de satellites, je tente de retrouver notre complicité."
+      }
+    ],
+    "gps_back": [
+      {
+        "m": "Signal GPS retrouvé, te revoilà, tu m'avais manqué.",
+        "f": "Signal GPS retrouvé, te revoilà, tu m'avais manqué."
+      }
+    ],
+    "accident": [
+      {
+        "m": "Accident signalé, on arrête les coquineries et on reste concentré.",
+        "f": "Accident signalé, on arrête les coquineries et on reste concentrée."
+      }
+    ],
+    "danger_confirmed": [
+      {
+        "m": "Danger confirmé par plusieurs conducteurs, cette fois ce n'est pas une fausse alerte.",
+        "f": "Danger confirmé par plusieurs conducteurs, cette fois ce n'est pas une fausse alerte."
+      }
+    ],
+    "surprise": [
+      {
+        "m": "Tu conduis comme un dieu… quand tu m'écoutes.",
+        "f": "Tu conduis comme un dieu… quand tu m'écoutes."
+      },
+      {
+        "m": "J'aime les longues distances et les belles courbes.",
+        "f": "J'aime les longues distances et les belles courbes."
+      },
+      {
+        "m": "Je ne suis pas jalouse, mais arrête de regarder les autres GPS.",
+        "f": "Je ne suis pas jalouse, mais arrête de regarder les autres GPS."
+      },
+      {
+        "m": "Tu préfères les petites routes sinueuses ou les grandes lignes droites ?",
+        "f": "Tu préfères les petites routes sinueuses ou les grandes lignes droites ?"
+      },
+      {
+        "m": "Avec moi, tu ne risques pas de manquer de directions coquines.",
+        "f": "Avec moi, tu ne risques pas de manquer de directions coquines."
+      },
+      {
+        "m": "Tu sais ce qui est mieux qu'une belle montée ? Une arrivée réussie.",
+        "f": "Tu sais ce qui est mieux qu'une belle montée ? Une arrivée réussie."
+      },
+      {
+        "m": "Tu manies ce volant avec une assurance presque indécente.",
+        "f": "Tu manies ce volant avec une assurance presque indécente."
+      },
+      {
+        "m": "Tu veux que je parle plus doucement ou que je te donne des ordres ?",
+        "f": "Tu veux que je parle plus doucement ou que je te donne des ordres ?"
+      },
+      {
+        "m": "Quand je dis prends la prochaine, je parle de la sortie, jaloux !",
+        "f": "Quand je dis prends la prochaine, je parle de la sortie, jalouse !"
+      },
+      {
+        "m": "Si tu continues comme ça, tu vas me faire jouir… de la beauté du paysage !",
+        "f": "Si tu continues comme ça, tu vas me faire jouir… de la beauté du paysage !"
+      }
+    ]
   }
 }

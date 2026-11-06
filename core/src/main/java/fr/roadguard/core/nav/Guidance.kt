@@ -16,7 +16,15 @@ data class GuidanceState(
     val speak: String?,
     /** Manœuvre qui suit de près la prochaine (moins de 250 m) : « puis… ». */
     val then: Maneuver? = null,
-)
+    /** Nature de [speak] : [START] (départ), [EARLY] (à l'approche, « Dans 500 mètres… ») ou [NOW] (au moment de la manœuvre). */
+    val speakKind: Int = 0,
+) {
+    companion object {
+        const val START = 1
+        const val EARLY = 2
+        const val NOW = 3
+    }
+}
 
 /**
  * Suit la progression sur le tracé : point le plus proche (recherche locale autour du dernier
@@ -74,17 +82,21 @@ class Guidance(val route: Route) {
         val then = following?.takeIf { f -> next != null && !next.isArrival &&
             cumulative[f.shapeIndex.coerceAtMost(cumulative.size - 1)] - cumulative[next.shapeIndex] < THEN_M }
         var speak: String? = null
+        var speakKind = 0
         if (!spokeStart) {
             spokeStart = true
             speak = route.maneuvers.firstOrNull()?.verbalNow
+            speakKind = GuidanceState.START
         } else if (next != null && onRoute) {
             val early = earlyDistance(speedKmh)
             if (toNext <= nowDistance(speedKmh) && spokenNow.add(nextIndex)) {
                 spokenEarly.add(nextIndex)
                 speak = then?.let { "${next.verbalNow.trimEnd('.', ' ')}, puis ${it.verbalAlert.replaceFirstChar { c -> c.lowercase() }}" }
                     ?: next.verbalNow
+                speakKind = GuidanceState.NOW
             } else if (toNext <= early && toNext > nowDistance(speedKmh) * 2 && spokenEarly.add(nextIndex)) {
                 speak = "Dans ${roundDistance(toNext)}, ${next.verbalAlert.replaceFirstChar { it.lowercase() }}"
+                speakKind = GuidanceState.EARLY
             }
         }
 
@@ -97,6 +109,7 @@ class Guidance(val route: Route) {
             arrived = arrived,
             speak = speak,
             then = then,
+            speakKind = speakKind,
         )
     }
 

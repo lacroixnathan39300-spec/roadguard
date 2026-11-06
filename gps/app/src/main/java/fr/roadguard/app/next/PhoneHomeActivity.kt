@@ -161,6 +161,7 @@ private fun PhoneHome() {
     val settings = s.settings
     // Économie de batterie : batterie à 20 % ou moins (hors charge), ou toujours si choisi.
     LaunchedEffect(settings.batterySaver) {
+        var lastCharging: Boolean? = null
         while (true) {
             val b = context.registerReceiver(null, android.content.IntentFilter(android.content.Intent.ACTION_BATTERY_CHANGED))
             val level = b?.let { it.getIntExtra(android.os.BatteryManager.EXTRA_LEVEL, 100) * 100 / it.getIntExtra(android.os.BatteryManager.EXTRA_SCALE, 100).coerceAtLeast(1) } ?: 100
@@ -172,7 +173,11 @@ private fun PhoneHome() {
                     w.attributes = w.attributes.apply { screenBrightness = if (saving) 0.25f else android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE }
                 }
                 if (saving) android.widget.Toast.makeText(context, "🔋 Économie de batterie : écran moins lumineux, moins de données", android.widget.Toast.LENGTH_LONG).show()
+                if (saving && settings.batterySaver == 0) s.voice.xxl("battery_low")?.let(s.voice::speak)
             }
+            // « Coquin XXL » : téléphone branché en roulant.
+            if (lastCharging == false && charging && (s.fix?.kmh ?: 0) >= 10) s.voice.xxl("battery_charging")?.let(s.voice::speak)
+            lastCharging = charging
             kotlinx.coroutines.delay(60_000)
         }
     }

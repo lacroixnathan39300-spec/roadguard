@@ -14,6 +14,15 @@ import java.io.File
 class VoicePack(context: Context) {
     companion object {
         const val MY_VOICE = 9
+        /** Ton « Coquin XXL » : bibliothèque de phrases liées aux vraies situations de route (section « xxl » du script). */
+        const val XXL = 5
+
+        /** Voix d'homme : les phrases (écrites pour une voix de femme) passent au masculin pour celui qui parle. */
+        private val maleSpeaker = listOf(
+            "je suis prête" to "je suis prêt", "je suis de nouveau prête" to "je suis de nouveau prêt",
+            "toute retournée" to "tout retourné", "m'as menée" to "m'as mené", "plus performante" to "plus performant",
+            "pas jalouse" to "pas jaloux", "sommes arrivées" to "sommes arrivés",
+        )
 
         private val femaleWords = listOf(
             "mon gentil garçon" to "ma gentille fille", "gentil garçon" to "gentille fille", "vilain garçon" to "vilaine fille",
@@ -58,8 +67,31 @@ class VoicePack(context: Context) {
         lang != "fr" && langObj() != null -> list(langObj(), group)
         t == MY_VOICE -> list(script.optJSONObject("myvoice"), group)
         t <= 0 -> list(tone(0), group)
-        else -> (t downTo 1).flatMap { list(tone(it), group) }
+        // « Coquin XXL » reprend aussi toutes les phrases des tons 1 à 4 pour ce qui n'est pas dans sa bibliothèque.
+        else -> (t.coerceAtMost(4) downTo 1).flatMap { list(tone(it), group) }
     }.let { l -> if (feminine) l.map(::feminize) else l }
+
+    /** La voix qui parle est une voix d'homme (accords « je suis prêt », « tout retourné »…). */
+    var speakerMale = false
+
+    /**
+     * Phrase « Coquin XXL » du groupe [group] : variante conducteur ou conductrice, accordée à la voix,
+     * variables ({distance}, {vitesse}) remplacées. Une phrase dont une variable n'est pas connue est écartée.
+     * null s'il n'y a rien (le reste de l'appli reprend alors l'annonce habituelle).
+     */
+    fun xxl(group: String, vars: Map<String, String> = emptyMap()): String? {
+        if (lang != "fr") return null
+        val a = script.optJSONObject("xxl")?.optJSONArray(group) ?: return null
+        val options = (0 until a.length()).mapNotNull { i ->
+            val o = a.optJSONObject(i) ?: return@mapNotNull null
+            var t = o.optString(if (feminine) "f" else "m").ifBlank { o.optString("m") }
+            vars.forEach { (k, v) -> t = t.replace("{$k}", v) }
+            t.takeIf { it.isNotBlank() && '{' !in it }
+        }
+        var s = options.randomOrNull() ?: return null
+        if (speakerMale) maleSpeaker.forEach { (f, m) -> s = s.replace(f, m) }
+        return s
+    }
     fun number(v: Int): String? = script.optJSONObject("numbers")?.optString(v.toString())?.takeIf { it.isNotBlank() }
     fun numbers(): List<Int> = script.optJSONObject("numbers")?.keys()?.asSequence()?.mapNotNull { it.toIntOrNull() }?.sorted()?.toList() ?: emptyList()
     fun kinds(): Map<String, String> = script.optJSONObject("kinds")?.let { o -> o.keys().asSequence().associateWith { o.getString(it) } } ?: emptyMap()

@@ -79,6 +79,8 @@ class Community(context: Context, private val scope: CoroutineScope, private val
     var voiceAnswers = true
     /** Pose une question à la voix puis lance la suite une fois la phrase finie (fourni par la session). */
     var askAloud: ((String, () -> Unit) -> Unit)? = null
+    /** Annonce d'un signalement au ton choisi (« Coquin XXL ») : (signalement, mètres) → phrase, ou null pour l'annonce habituelle. */
+    var announceAloud: ((Report, Int) -> String?)? = null
     /** Annonces police / radar mobile permises (radars activés, et pas en Suisse où c'est interdit). */
     var radarAlertsAllowed = true
     var shareLocation by mutableStateOf(prefs.getBoolean("share", false)); private set
@@ -152,10 +154,11 @@ class Community(context: Context, private val scope: CoroutineScope, private val
             val radarLike = r.type == ReportType.POLICE || r.type == ReportType.MOBILE
             if (radarLike && !radarAlertsAllowed) continue
             if (d < 1000 && ahead && announced.add(r.id) && r.type != ReportType.FIXED) {
-                val where = if (d > 150) "à ${((d + 25) / 50).toInt() * 50} mètres" else "tout près"
+                val meters = ((d + 25) / 50).toInt() * 50
+                val where = if (d > 150) "à $meters mètres" else "tout près"
                 val msg = r.text
                 speak(if (r.type == ReportType.MESSAGE && !msg.isNullOrBlank()) "Message d'un conducteur, $where : $msg"
-                    else "${r.type.label} signalé $where")
+                    else announceAloud?.invoke(r, meters.coerceAtLeast(50)) ?: "${r.type.label} signalé $where")
             }
             if (d < 120 && !r.mine && !r.voted && prompt == null && asked.add(r.id)) {
                 prompt = VotePrompt(r, f.timeMs)

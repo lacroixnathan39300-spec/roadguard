@@ -67,3 +67,9 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
   4 connexions au plus côté téléphone, tactile du miroir accepté seulement pendant un partage d'écran, adresses locales IPv6/CGNAT
   refusées par le relais Internet, message Link mal formé ignoré (plus de coupure), USB relancé après 20 s de silence,
   son du téléphone sans plantage possible (`AudioPlayer`), widgets Android libérés par « Par défaut ».
+- Ton « Coquin XXL » (`VoicePack.XXL = 5`, section `xxl` de `script.json`, 58 groupes, 298 phrases sur 460 de la bibliothèque fournie,
+  18 fautes d'accord corrigées). Variante conducteur / conductrice (`m` / `f`), accord de la voix d'homme (`speakerMale`).
+  Phrase dite seulement si elle correspond à une donnée réelle : manœuvre Valhalla (droite, gauche, tout droit, sortie 1 à 5 de rond-point,
+  demi-tour, sortie, insertion, arrivée), radar par type (+ limite toujours dite), limitation, écart chiffré exact, retour sous la limite,
+  vitesse moyenne, signalements (police, radar mobile, bouchon, travaux, accident, danger confirmé), dangers OSM, météo, recalcul,
+  distances restantes, fin de trajet, GPS perdu / retrouvé, batterie, surprises (25 à 45 min). Sinon : annonce habituelle.

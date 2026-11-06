@@ -95,6 +95,34 @@ class DrivingSession(
     private var pendingDestination: LatLon? = null
     private val limitTracker = SpeedLimitTracker()
     private var lastOverWarning = 0L
+    private var overWarned = false
+    private var avgOverSaid = false
+    private var nextSurpriseAt = 0L
+
+    /** « Coquin XXL » : une phrase surprise de temps en temps (25 à 45 min), jamais près d'une manœuvre ni d'un radar. */
+    private fun surprise(f: Fix) {
+        if (!voice.xxlOn || f.speedKmh < 20) return
+        if (nextSurpriseAt == 0L) { nextSurpriseAt = f.timeMs + 20 * 60_000L; return }
+        if (f.timeMs < nextSurpriseAt || alert != null || (guidanceState?.toNextM ?: Int.MAX_VALUE) < 1500) return
+        nextSurpriseAt = f.timeMs + (25 + (Math.random() * 20).toInt()) * 60_000L
+        voice.xxl("surprise")?.let(voice::speak)
+    }
+
+    /** « Coquin XXL » : distances restantes (100, 50, 20, 10, 5, 2, 1 km, 500 m), une fois chacune par itinéraire. */
+    private val milestones = listOf(100_000, 50_000, 20_000, 10_000, 5_000, 2_000, 1_000, 500)
+    private val milestonesDone = HashSet<Int>()
+    private var milestoneRoute: Route? = null
+    private fun remainingMilestone(r: Route, state: GuidanceState) {
+        if (milestoneRoute !== r) {
+            milestoneRoute = r; milestonesDone.clear()
+            milestones.filter { it >= state.remainingM }.forEach { milestonesDone.add(it) } // déjà en dessous au départ
+            return
+        }
+        val due = milestones.firstOrNull { it !in milestonesDone && state.remainingM <= it } ?: return
+        milestones.filter { it >= due }.forEach { milestonesDone.add(it) }
+        // Pas en même temps qu'une consigne, ni juste avant une manœuvre.
+        if (voice.xxlOn && state.speak == null && state.toNextM > 300 && !state.arrived) voice.xxl("remaining_$due")?.let(voice::speak)
+    }
     private var alerts: AlertEngine? = null
     private var averages: AverageSpeedTracker? = null
 
@@ -188,11 +216,16 @@ class DrivingSession(
             val h = localInfo.hazard
             if (h != null && (h != lastHazard || now - lastHazardAt > 30 * 60_000)) {
                 lastHazard = h; lastHazardAt = now
-                voice.speak(when (h) {
+                val plain = when (h) {
                     "Risque de verglas", "Pluie verglaçante" -> "Attention : $h. Roule doucement et garde tes distances."
                     "Brouillard" -> "Brouillard : allume tes feux et garde tes distances."
                     else -> "Attention : $h. Adapte ta vitesse."
-                })
+                }
+                voice.speak(when (h) {
+                    "Brouillard" -> voice.xxl("fog")
+                    "Risque de verglas", "Pluie verglaçante" -> voice.xxl("ice")?.let { "Attention : $h. $it" }
+                    else -> null
+                } ?: plain)
             } else if (h == null) lastHazard = null
             // Point situé 20 km DEVANT sur le tracé (et non le premier point à plus de 20 km, qui peut être derrière).
             val g = guidance
@@ -205,7 +238,7 @@ class DrivingSession(
                 if (ha != null && ha != lastAheadHazard && ha != h) { lastAheadHazard = ha; voice.speak("Sur ta route, dans une vingtaine de kilomètres : $ha.") }
             }
         }
-        if (settings.hazardAlerts && !batterySaving) hazards.onFix(f, now)?.let { voice.speak(it) }
+        if (settings.hazardAlerts && !batterySaving) hazards.onFix(f, now)?.let { voice.speak(voice.xxlHazard(it) ?: it) }
     }
 
     // Fin de trajet : arrêt d'au moins 3 min après au moins 5 min de route (ou Bluetooth de la voiture coupé).
@@ -224,6 +257,7 @@ class DrivingSession(
         tripLog.addTrip(rec)
         lastTrip = rec
         if (lat != null && lon != null) tripLog.parking = fr.roadguard.core.safety.Parking(lat, lon, System.currentTimeMillis(), localInfo.address, 0)
+        voice.xxl("trip_end")?.let(voice::speak)
         if (settings.forgetReminder) voice.speak("Fin du trajet. Pense à vérifier : rien oublié à l'arrière ? Enfant, animal, sac ?")
         val due = settings.serviceAtKm
         if (due > 0 && tripLog.odometerKm >= due) voice.speak("Rappel : l'entretien de la voiture est à prévoir.")
@@ -272,10 +306,16 @@ class DrivingSession(
     // ---------- Tunnels : position estimée quand le GPS ne répond plus ----------
     private var lastRealFixAt = 0L
     private var lastReal: Fix? = null
+    private var gpsLostSaid = false
     private fun deadReckon(now: Long) {
         crashTimeout(now)
         val f0 = lastReal ?: return
         val lost = now - lastRealFixAt
+        // « Coquin XXL » : signal GPS perdu en roulant pendant un guidage (tunnel…), dit une fois.
+        if (navigating && !gpsLostSaid && lost in 8_000L..120_000L && f0.speedKmh >= 30) {
+            gpsLostSaid = true
+            voice.xxl("gps_lost")?.let(voice::speak)
+        }
         if (lost < 2_500 || lost > 120_000 || f0.speedKmh < 30 || f0.bearing.isNaN()) return
         val d = f0.speedKmh / 3.6 * lost / 1000.0
         val (lat, lon) = advance(f0.lat, f0.lon, f0.bearing, d)
@@ -305,6 +345,7 @@ class DrivingSession(
     init {
         scope.launch { while (true) { kotlinx.coroutines.delay(1_000); runCatching { deadReckon(System.currentTimeMillis()) } } }
         community.askAloud = { text, then -> voice.speakThen(text, then) }
+        community.announceAloud = { r, meters -> voice.xxlReport(r.type.code, meters, r.yes) }
         community.startConvoyLoop()
         // Échéances de la voiture (contrôle technique, assurance…) : notification un mois avant.
         scope.launch { kotlinx.coroutines.delay(20_000); runCatching { fr.roadguard.core.safety.Reminders.check(context) } }
@@ -389,6 +430,7 @@ class DrivingSession(
         alert = newAlert ?: held
         if (alert == null && previous != null && previous.distanceM < 80 && previous.radar.id != lastPassedId) {
             lastPassedId = previous.radar.id; trip.onRadarPassed(); meter.radars++
+            if (Math.random() < 0.5) voice.xxl("radar_passed")?.let(voice::speak)
         }
         // Excès de vitesse en approchant d'un radar : alarme forte qui réveille, jusqu'à repasser sous la limite.
         val cur = alert
@@ -433,6 +475,7 @@ class DrivingSession(
         here = f
 
         lastReal = f; lastRealFixAt = System.currentTimeMillis()
+        if (gpsLostSaid) { gpsLostSaid = false; voice.xxl("gps_back")?.let(voice::speak) }
         radarStep(f)
         community.onFix(f)
         trip.onFix(f.lat, f.lon, f.speedKmh, f.accuracyM, f.timeMs, if (location.hasAltitude()) location.altitude else null)
@@ -444,6 +487,12 @@ class DrivingSession(
         tracks.onFix(f.lat, f.lon, f.speedKmh, if (location.hasAltitude()) location.altitude else null, f.timeMs)
         val newAverage = averages?.update(f)
         if (newAverage?.finished == true && average?.finished != true) voice.announceAverageResult(newAverage)
+        // « Coquin XXL » : moyenne au-dessus de la limite pendant le tronçon (une fois par tronçon).
+        if (newAverage != null && !newAverage.finished && newAverage.over && newAverage.meters > 500 && !avgOverSaid) {
+            avgOverSaid = true
+            voice.xxl("avg_over")?.let { voice.speak("$it Moyenne ${newAverage.averageKmh}, limite ${newAverage.limitKmh}.") }
+        }
+        if (newAverage == null || newAverage.finished) avgOverSaid = false
         average = newAverage
 
         autoNight = DayNight.isNight(f.lat, f.lon, System.currentTimeMillis())
@@ -461,10 +510,17 @@ class DrivingSession(
             }
         }
         val kmh = fix?.kmh ?: 0
-        if (settings.speedLimitWarning && SpeedLimitTracker.isOver(kmh, speedLimit, settings.overTolerance) && f.timeMs - lastOverWarning > 30_000) {
+        val overNowLimit = SpeedLimitTracker.isOver(kmh, speedLimit, settings.overTolerance)
+        if (settings.speedLimitWarning && overNowLimit && f.timeMs - lastOverWarning > 30_000) {
             lastOverWarning = f.timeMs
-            voice.overLimit(speedLimit)
+            overWarned = true
+            voice.overLimit(speedLimit, kmh)
         }
+        // « Coquin XXL » : retour sous la limite après un avertissement.
+        val lim = speedLimit
+        if (overWarned && lim != null && kmh <= lim) { overWarned = false; voice.xxl("back_under")?.let(voice::speak) }
+        if (lim == null) overWarned = false
+        surprise(f)
         pauseReminder(f.speedKmh, f.timeMs)
 
         if (navigating && route == null && !rerouting && navStatus?.startsWith("En attente du GPS") == true) {
@@ -475,7 +531,10 @@ class DrivingSession(
             // Choix du trajet proposé au départ seulement : retiré après 1 km parcouru.
             if (alternatives.isNotEmpty() && g.route.lengthM - state.remainingM > 1000) alternatives = emptyList()
             guidanceState = state
-            state.speak?.let(voice::guide) // consigne au ton choisi (« …, mon chéri »)
+            // Consigne au ton choisi ; en « Coquin XXL », phrase de la bibliothèque qui dit la même manœuvre.
+            state.speak?.let { voice.guideStep(it, state.next, state.toNextM, state.speakKind,
+                hasThen = state.speakKind == GuidanceState.NOW && state.then != null) }
+            remainingMilestone(g.route, state)
             // Arrivé : le guidage s'arrête de lui-même (1 min après, ou dès qu'on s'éloigne pour se garer),
             // au lieu de recalculer un trajet pour revenir à la destination.
             if (state.arrived && stops.isEmpty()) {
@@ -564,7 +623,7 @@ class DrivingSession(
                 val r = all.first()
                 alternatives = if (announce && all.size > 1) all else emptyList()
                 route = r; guidance = Guidance(r); guidanceState = null; navStatus = null
-                if (!announce) voice.speak("Nouvel itinéraire")
+                if (!announce) voice.speak(voice.xxl("reroute") ?: "Nouvel itinéraire")
             }.onFailure {
                 if (navigating && req == routeRequest) navStatus = "Trajet impossible : ${it.message ?: "pas de réseau"}"
             }

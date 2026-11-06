@@ -153,7 +153,8 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                     }
                 }
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    listOf(0 to "Ton : classique", 1 to "Ton : charme 💋", 2 to "Ton : séduction 🔥", 3 to "Ton : osé 😈", 4 to "Ton : extrême 🔥😈").forEach { (c, label) ->
+                    listOf(0 to "Ton : classique", 1 to "Ton : charme 💋", 2 to "Ton : séduction 🔥", 3 to "Ton : osé 😈", 4 to "Ton : extrême 🔥😈",
+                        fr.roadguard.core.radar.VoicePack.XXL to "Ton : Coquin XXL 🎭").forEach { (c, label) ->
                         BigButton(label, if (settings.voiceTone == c) DriveColors.Accent else DriveColors.Panel) {
                             settings.changeVoiceTone(c)
                             // Le ton garde la voix choisie ci-dessus (aucun changement de voix imposé).
@@ -162,7 +163,10 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                         }
                     }
                 }
-                Text("Le ton change les phrases des radars et des limitations, avec la même voix que le guidage.",
+                Text(if (settings.voiceTone == fr.roadguard.core.radar.VoicePack.XXL)
+                        "Coquin XXL : près de 300 phrases (guidage, ronds-points, radars, limitations, bouchons, arrivée…), au masculin ou au féminin. " +
+                        "Une phrase n'est dite que si elle correspond à la situation réelle ; la direction, la distance et la limite restent toujours exactes."
+                    else "Le ton change les phrases des radars et des limitations, avec la même voix que le guidage.",
                     color = DriveColors.TextSecondary, fontSize = 14.sp)
             }
 
