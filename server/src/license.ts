@@ -138,14 +138,13 @@ export async function licenseRoutes(req: Request, env: LicEnv, path: string): Pr
         if (existing.pass_hash === (await hashPassword(password, existing.salt))) return openSession(env, existing, device, app, now);
         return fail(409, "Cet identifiant est déjà pris");
       }
-      const first = !(await env.DB.prepare("SELECT 1 FROM users LIMIT 1").first());
       // Un seul essai gratuit par appareil : un 2e compte créé sur le même appareil démarre sans essai.
       const usedTrial = await env.DB.prepare("SELECT username FROM trials WHERE device = ?").bind(device).first<{ username: string }>();
       const salt = random(16);
       const user: User = {
         username, pass_hash: await hashPassword(password, salt), salt, created_at: now,
         access_until: usedTrial ? now - 1 : now + TRIAL_MS, plan: usedTrial ? "expired" : "trial",
-        blocked: 0, admin: first ? 1 : 0, last_seen: now,
+        blocked: 0, admin: 0, last_seen: now,
       };
       const stmts = [env.DB.prepare("INSERT INTO users (username, pass_hash, salt, created_at, access_until, plan, blocked, admin, last_seen) VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?)")
         .bind(user.username, user.pass_hash, user.salt, now, user.access_until, user.plan, user.admin, now)];
@@ -276,14 +275,8 @@ export async function licenseRoutes(req: Request, env: LicEnv, path: string): Pr
     const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
     const action = String(body.action ?? "");
     if (action === "password") {
-      // Nouveau mot de passe choisi par l'administrateur (utilisateur qui a oublié le sien).
-      const pw = body.password;
-      if (!validPassword(pw)) return fail(400, "Mot de passe : au moins 6 caractères");
-      const salt = random(16);
-      await env.DB.batch([
-        env.DB.prepare("UPDATE users SET pass_hash = ?, salt = ? WHERE username = ?").bind(await hashPassword(pw, salt), salt, u.username),
-        env.DB.prepare("DELETE FROM sessions WHERE username = ?").bind(u.username),
-      ]);
+      // Volontairement absent : l'administrateur ne peut pas changer le mot de passe d'un autre compte.
+      return fail(400, "Action non disponible");
     } else if (action === "block" || action === "unblock") {
       if (u.admin) return fail(400, "Impossible de bloquer l'administrateur");
       await env.DB.prepare("UPDATE users SET blocked = ? WHERE username = ?").bind(action === "block" ? 1 : 0, u.username).run();
