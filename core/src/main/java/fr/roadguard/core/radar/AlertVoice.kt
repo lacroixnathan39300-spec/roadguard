@@ -79,7 +79,8 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     var beepEnabled = true
     /** Bips de proximité façon détecteur de métaux (sinon : la distance est dite à voix haute). */
     var proximityBeeps = true
-    private val tone = runCatching { ToneGenerator(AudioManager.STREAM_MUSIC, 90) }.getOrNull()
+    // Un seul générateur de sons : deux en même temps (bips + alarme) se coupaient l'un l'autre sur certains téléphones.
+    private val tone = runCatching { ToneGenerator(AudioManager.STREAM_MUSIC, 100) }.getOrNull()
     private val beeper = android.os.Handler(android.os.Looper.getMainLooper())
     @Volatile private var proximityM: Int? = null
     private var beeping = false
@@ -107,7 +108,9 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
             if (d == null) { beeping = false; scheduleRelease(); return }
             val interval = BeepCadence.intervalMs(d, startM)
             duck(interval + 200)
-            tone?.startTone(ToneGenerator.TONE_PROP_BEEP, BeepCadence.toneMs(d))
+            // Trop vite devant le radar : les bips deviennent l'alarme aiguë (même rythme, même générateur).
+            if (alarmOn) tone?.startTone(ToneGenerator.TONE_CDMA_HIGH_PBX_SS, minOf(interval - 40, 600L).toInt().coerceAtLeast(120))
+            else tone?.startTone(ToneGenerator.TONE_PROP_BEEP, BeepCadence.toneMs(d))
             beeper.postDelayed(this, interval)
         }
     }
@@ -124,28 +127,27 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
         })
     }
 
-    // Alarme d'excès de vitesse devant un radar : son aigu et fort (canal alarme), répété, plus « Ralentis ».
-    private val alarmTone by lazy { runCatching { ToneGenerator(android.media.AudioManager.STREAM_ALARM, 100) }.getOrNull() }
+    // Alarme d'excès de vitesse devant un radar : son aigu répété, plus « Ralentis » à la voix.
+    // Pendant les bips de proximité, ce sont les bips eux-mêmes qui passent en alarme (voir beepTick).
     private var alarmOn = false
     private var alarmLimit: Int? = null
     private var lastAlarmVoice = 0L
     private val alarmTick = object : Runnable {
         override fun run() {
             if (!alarmOn) return
-            duck(900)
-            alarmTone?.startTone(ToneGenerator.TONE_CDMA_HIGH_PBX_SS, 700)
+            if (!beeping) { duck(900); tone?.startTone(ToneGenerator.TONE_CDMA_HIGH_PBX_SS, 700) }
             val now = android.os.SystemClock.uptimeMillis()
             if (now - lastAlarmVoice > 7_000) { lastAlarmVoice = now; say("Ralentis ! Limité à ${alarmLimit ?: ""}", "rg-alarm") }
             beeper.postDelayed(this, 1_100)
         }
     }
 
-    /** Active ou coupe l'alarme forte (appelé à chaque position). */
+    /** Active ou coupe l'alarme (appelé à chaque position). */
     fun overspeedAlarm(on: Boolean, limitKmh: Int?) {
         alarmLimit = limitKmh
         if (on == alarmOn) return
         alarmOn = on
-        if (on) { lastAlarmVoice = 0; beeper.post(alarmTick) } else { beeper.removeCallbacks(alarmTick); alarmTone?.stopTone() }
+        if (on) { lastAlarmVoice = 0; beeper.post(alarmTick) } else beeper.removeCallbacks(alarmTick)
     }
 
     fun announce(alert: RadarAlert) {

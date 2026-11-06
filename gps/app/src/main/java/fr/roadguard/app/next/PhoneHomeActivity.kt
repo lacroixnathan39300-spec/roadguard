@@ -32,6 +32,8 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.displayCutoutPadding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -104,13 +106,13 @@ class PhoneHomeActivity : ComponentActivity() {
     }
 
     /**
-     * Barre du bas d'Android (accueil, retour, applis récentes, ou la ligne des gestes) masquée pour gagner
-     * de la place ; un glissement depuis le bas la fait réapparaître un instant. La barre du haut reste.
+     * Plein écran : barre du haut (heure, batterie, réseau) et barre du bas (accueil, retour, gestes) masquées ;
+     * un glissement depuis le haut ou le bas les fait réapparaître un instant.
      */
     private fun hideNavigationBar() {
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
         androidx.core.view.WindowInsetsControllerCompat(window, window.decorView).apply {
-            hide(androidx.core.view.WindowInsetsCompat.Type.navigationBars())
+            hide(androidx.core.view.WindowInsetsCompat.Type.systemBars())
             systemBarsBehavior = androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
     }
@@ -213,12 +215,13 @@ private fun PhoneHome() {
             hasLocation = hasLocation, route = s.route, recenterRequest = s.recenter,
             night = s.night, visibleKinds = settings.alertKinds, roadguardStyle = settings.mapStyle == "roadguard", bottomInset = if (panelOpen) 0.30f else 0.14f, modifier = Modifier.fillMaxSize(),
         )
-        Column(Modifier.align(Alignment.TopCenter).statusBarsPadding().fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(Modifier.align(Alignment.TopCenter).statusBarsPadding().displayCutoutPadding().fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             if (s.navigating) {
                 GuidanceBanner(s.guidanceState, s.navStatus, onStop = { s.stopNavigation() }, compact = !panelOpen, onTap = openPanel,
                     choices = s.alternatives, current = s.route, onChoose = s::chooseRoute, onDismissChoices = s::dismissAlternatives)
             }
             AlertBanners(s.alert, s.average)
+            if (!s.navigating) BubbleSetupCard(settings)
             s.community.prompt?.let { fr.roadguard.core.ui.VotePromptCard(it, s.community::answer) }
             s.community.toast?.let { fr.roadguard.core.ui.CommunityToast(it, s.community::dismissToast) }
         }
@@ -389,6 +392,68 @@ private fun MenuEntry(icon: String, title: String, detail: String, onClick: () -
             androidx.compose.material3.Text(title, color = androidx.compose.ui.graphics.Color.White, fontSize = 19.sp,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
             androidx.compose.material3.Text(detail, color = DriveColors.TextSecondary, fontSize = 14.sp)
+        }
+    }
+}
+
+/**
+ * Carte d'accueil pour la bulle par-dessus Waze : l'active en un appui (démarrage tout seul dès 20 km/h)
+ * et enchaîne les autorisations nécessaires. Disparaît quand tout est prêt ou après « Plus tard ».
+ */
+@Composable
+private fun BubbleSetupCard(settings: fr.roadguard.core.DriveSettings) {
+    val context = LocalContext.current
+    val prefs = remember { context.getSharedPreferences("bubble_card", android.content.Context.MODE_PRIVATE) }
+    var hidden by remember { mutableStateOf(prefs.getBoolean("later", false)) }
+    var tick by remember { mutableStateOf(0) }
+    // Revérifie les autorisations au retour des écrans d'Android.
+    val owner = LocalLifecycleOwner.current.lifecycle
+    DisposableEffect(owner) {
+        val obs = LifecycleEventObserver { _, e -> if (e == Lifecycle.Event.ON_RESUME) tick++ }
+        owner.addObserver(obs); onDispose { owner.removeObserver(obs) }
+    }
+    val overlayOk = remember(tick) { android.provider.Settings.canDrawOverlays(context) }
+    val bgOk = remember(tick) { AutoStart.hasBackgroundLocation(context) }
+    fun openOverlay() = runCatching {
+        context.startActivity(Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION, android.net.Uri.parse("package:${context.packageName}")))
+    }
+    fun openAppSettings() = runCatching {
+        context.startActivity(Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, android.net.Uri.parse("package:${context.packageName}")))
+    }
+    val askBg = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { ok ->
+        tick++
+        if (!ok && !AutoStart.hasBackgroundLocation(context)) openAppSettings() else if (!android.provider.Settings.canDrawOverlays(context)) openOverlay()
+    }
+    val ready = settings.autoDrive && settings.bubble && overlayOk && bgOk
+    if (ready || (hidden && !settings.autoDrive)) return
+    val (title, detail, button) = when {
+        !settings.autoDrive || !settings.bubble -> Triple("🫧 Bulle par-dessus Waze",
+            "Pilote démarre tout seul dès 20 km/h : bulle vitesse et radars, bips et alarme, même sans ouvrir l'appli.", "Activer")
+        !bgOk -> Triple("🫧 Bulle : étape 1 sur 2", "Position : choisis « Toujours autoriser ».", "Autoriser")
+        else -> Triple("🫧 Bulle : étape 2 sur 2", "Active « Afficher par-dessus les autres applis » pour Pilote.", "Autoriser")
+    }
+    Column(
+        Modifier.padding(horizontal = 12.dp, vertical = 6.dp).widthIn(max = 560.dp).fillMaxWidth()
+            .clip(RoundedCornerShape(18.dp)).background(Color(0xF0123A6B)).padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(title, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        Text(detail, color = Color(0xFFCFE3FF), fontSize = 15.sp)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Action(button, Modifier.weight(1f), primary = true) {
+                if (!settings.autoDrive) settings.changeAutoDrive(true)
+                if (!settings.bubble) settings.changeBubble(true)
+                when {
+                    !AutoStart.hasBackgroundLocation(context) -> if (Build.VERSION.SDK_INT >= 29) askBg.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                    !android.provider.Settings.canDrawOverlays(context) -> openOverlay()
+                }
+                tick++
+            }
+            Action("Plus tard", Modifier.weight(1f)) {
+                prefs.edit().putBoolean("later", true).apply(); hidden = true
+                if (!ready) settings.changeAutoDrive(false)
+            }
         }
     }
 }
