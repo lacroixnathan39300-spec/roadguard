@@ -57,17 +57,17 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     private var appliedRate = 1f
 
     /** Ton : 0 classique, 1 charme (complice), 2 séduction (aguicheuse) ; voix plus grave et plus lente. */
-    var tone = 0
-    private var appliedTone = 0
+    var style = 0
+    private var appliedStyle = 0
 
     /** Voix, débit et ton choisis dans les réglages (appliqués seulement s'ils changent). */
-    fun configure(voiceName: String?, rate: Float, voiceTone: Int = tone) {
-        tone = voiceTone
+    fun configure(voiceName: String?, rate: Float, voiceTone: Int = style) {
+        style = voiceTone
         if (!ttsReady) return
-        if (rate != appliedRate || tone != appliedTone) {
-            tts.setSpeechRate(rate * when (tone) { 1 -> 0.9f; 2 -> 0.82f; 3 -> 0.8f; else -> 1f })
-            tts.setPitch(when (tone) { 1 -> 0.93f; 2 -> 0.88f; 3 -> 0.86f; else -> 1f })
-            appliedRate = rate; appliedTone = tone
+        if (rate != appliedRate || style != appliedStyle) {
+            tts.setSpeechRate(rate * when (style) { 1 -> 0.9f; 2 -> 0.82f; 3 -> 0.8f; else -> 1f })
+            tts.setPitch(when (style) { 1 -> 0.93f; 2 -> 0.88f; 3 -> 0.86f; else -> 1f })
+            appliedRate = rate; appliedStyle = style
         }
         if (voiceName != appliedVoice) {
             appliedVoice = voiceName
@@ -146,7 +146,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
             if (!alarmOn) return
             if (!beeping) { duck(900); tone?.startTone(ToneGenerator.TONE_CDMA_HIGH_PBX_SS, 700) }
             val now = android.os.SystemClock.uptimeMillis()
-            if (now - lastAlarmVoice > 7_000) { lastAlarmVoice = now; say(Charm.alarm(tone, alarmLimit), "rg-alarm") }
+            if (now - lastAlarmVoice > 7_000) { lastAlarmVoice = now; say(Charm.alarm(style, alarmLimit), "rg-alarm") }
             beeper.postDelayed(this, 1_100)
         }
     }
@@ -162,7 +162,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     fun announce(alert: RadarAlert) {
         if (beepEnabled) { duck(600); tone?.startTone(ToneGenerator.TONE_PROP_BEEP2, 300) }
         val text = if (proximityBeeps) AlertText.spokenShort(alert) else AlertText.spoken(alert)
-        say(Charm.radar(tone, text), "rg-${alert.radar.id}")
+        say(Charm.radar(style, text), "rg-${alert.radar.id}")
     }
 
     fun announceAverageResult(status: AverageStatus) {
@@ -171,10 +171,10 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     }
 
     /** Nouvelle limitation de vitesse. */
-    fun limitChanged(limit: Int) = speak(Charm.limit(tone, limit))
+    fun limitChanged(limit: Int) = speak(Charm.limit(style, limit))
 
     /** Dépassement de la limitation (hors radar). */
-    fun overLimit(limit: Int?) = speak(Charm.over(tone, limit))
+    fun overLimit(limit: Int?) = speak(Charm.over(style, limit))
 
     /** Consigne de guidage ou message libre, à la suite des annonces en cours. */
     fun speak(text: String) {
