@@ -103,6 +103,24 @@ fun ReportSheet(onPick: (ReportType, String?) -> Unit, onClose: () -> Unit) {
     }
 }
 
+/** « ★4,6 », « 👑 confiance », ou « nouveau ». */
+fun trustBadge(stars: Double?, trusted: Boolean): String = when {
+    trusted -> " 👑"
+    stars != null -> " ★" + String.format(java.util.Locale.FRANCE, "%.1f", stars)
+    else -> " 🆕"
+}
+
+/** Libellé du niveau de fiabilité. */
+fun levelLabel(level: String): String = when (level) {
+    "trusted" -> "👑 Personne de confiance"
+    "reliable" -> "⭐ Fiable : tes signalements sont validés tout de suite"
+    "normal" -> "✔ Fiabilité correcte"
+    "low" -> "⚠ Peu fiable : tes signalements doivent être confirmés"
+    "suspect" -> "🚫 Signalements suspendus 24 h (trop de signalements)"
+    "banned" -> "🚫 Signalements désactivés"
+    else -> "🆕 Nouveau : tes signalements seront validés quand d'autres les confirmeront"
+}
+
 /** « Police toujours là ? » en passant près d'un signalement. */
 @Composable
 fun VotePromptCard(prompt: VotePrompt, onAnswer: (Boolean) -> Unit, modifier: Modifier = Modifier) {
@@ -113,7 +131,8 @@ fun VotePromptCard(prompt: VotePrompt, onAnswer: (Boolean) -> Unit, modifier: Mo
     ) {
         Column(Modifier.padding(end = 10.dp)) {
             Text("${r.type.emoji} ${r.type.label} toujours là ?", color = Color.White, fontSize = 19.sp, fontWeight = FontWeight.Bold)
-            Text("Signalé par ${r.author}" + if (r.yes > 0) " · confirmé ${r.yes} fois" else "", color = Color.White.copy(alpha = 0.85f), fontSize = 14.sp)
+            Text("Signalé par ${r.author}" + trustBadge(r.authorStars, r.authorTrusted) + (if (r.yes > 0) " · confirmé ${r.yes} fois" else "") +
+                (if (r.pending) " · à confirmer" else ""), color = Color.White.copy(alpha = 0.85f), fontSize = 14.sp)
         }
         BigButton("👍", Color(0xFF2E7D32)) { onAnswer(true) }
         Spacer(Modifier.width(8.dp))
@@ -156,6 +175,8 @@ fun CommunityScreen(community: Community, hereLat: Double?, hereLon: Double?, on
         LazyColumn(Modifier.padding(top = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             item {
                 Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(DriveColors.Panel).padding(14.dp)) {
+                    if (community.hasAccount) Text("Fiabilité : " + (community.myStars?.let { "★" + String.format(java.util.Locale.FRANCE, "%.1f", it) + " · " } ?: "") +
+                        levelLabel(community.myLevel) + " (${community.myJudged} signalement(s) jugé(s))", color = DriveColors.TextSecondary, fontSize = 14.sp)
                     Text(if (community.hasAccount) "${community.name} · ${community.points} points" else "Choisis ton pseudo",
                         color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                     Text("Ton pseudo apparaît sur tes signalements et dans le classement.", color = DriveColors.TextSecondary, fontSize = 14.sp)

@@ -7,7 +7,8 @@
  * - Conducteurs à proximité (seulement s'ils partagent leur position) et « coucou ».
  */
 
-import { licenseRoutes } from "./license.ts";
+import { licenseRoutes, currentUser } from "./license.ts";
+import { stars, level, placement, suspicious, isEarlyNo, TRUST, type Level } from "./trust.ts";
 
 export interface Env {
   DB: D1Database;
@@ -134,6 +135,8 @@ interface Account {
   name: string;
   points: number;
   last_report_at: number;
+  good: number; bad: number; trusted: number; banned: number; suspect_until: number;
+  owner: string | null; rep_lat: number | null; rep_lon: number | null; last_seen: number;
 }
 
 async function auth(req: Request, env: Env): Promise<Account | null> {
@@ -142,7 +145,8 @@ async function auth(req: Request, env: Env): Promise<Account | null> {
   const h = req.headers.get("authorization") ?? `Bearer ${new URL(req.url).searchParams.get("key") ?? ""}`;
   const m = /^Bearer ([0-9a-f]{24})\.([0-9a-f]{64})$/.exec(h);
   if (!m) return null;
-  const row = await env.DB.prepare("SELECT id, name, points, last_report_at, secret_hash FROM accounts WHERE id = ?")
+  const row = await env.DB.prepare(`SELECT id, name, points, last_report_at, secret_hash, good, bad, trusted, banned, suspect_until,
+      owner, rep_lat, rep_lon, last_seen FROM accounts WHERE id = ?`)
     .bind(m[1]).first<Account & { secret_hash: string }>();
   if (!row || row.secret_hash !== (await sha256(m[2]))) return null;
   return row;
@@ -176,14 +180,16 @@ async function reportsNear(url: URL, env: Env, me: Account | null): Promise<Resp
   const now = Date.now();
   const b = box(lat, lon, radius);
   const rows = await env.DB.prepare(
-    `SELECT r.id, r.type, r.lat, r.lon, r.heading, r.created_at, r.expires_at, r.yes, r.no, r.permanent, r.text,
-            a.name AS author, (r.author_id = ?) AS mine,
+    `SELECT r.id, r.type, r.lat, r.lon, r.heading, r.created_at, r.expires_at, r.yes, r.no, r.permanent, r.text, r.status,
+            a.name AS author, a.good AS a_good, a.bad AS a_bad, a.trusted AS a_trusted, (r.author_id = ?) AS mine,
             (SELECT still FROM votes v WHERE v.report_id = r.id AND v.account_id = ?) AS my_vote
        FROM reports r JOIN accounts a ON a.id = r.author_id
       WHERE r.lat BETWEEN ? AND ? AND r.lon BETWEEN ? AND ? AND (r.permanent = 1 OR r.expires_at > ?)
+        AND (r.status != 'hidden' OR r.author_id = ? OR r.yes > 0) AND a.banned = 0
       LIMIT 2000`,
-  ).bind(me?.id ?? "", me?.id ?? "", b.minLat, b.maxLat, b.minLon, b.maxLon, now).all();
-  return json({ now, reports: rows.results });
+  ).bind(me?.id ?? "", me?.id ?? "", b.minLat, b.maxLat, b.minLon, b.maxLon, now, me?.id ?? "").all<Record<string, unknown>>();
+  const reports = rows.results.map((r) => ({ ...r, author_stars: stars(Number(r.a_good), Number(r.a_bad)), author_trusted: r.a_trusted === 1 }));
+  return json({ now, reports });
 }
 
 async function createReport(req: Request, env: Env, me: Account): Promise<Response> {
@@ -196,6 +202,7 @@ async function createReport(req: Request, env: Env, me: Account): Promise<Respon
   const text = type === "message" ? cleanMessage(body.text) : null;
   if (type === "message" && !text) return fail(400, "Message de 3 à 100 caractères, sans insulte");
   const now = Date.now();
+  if (me.banned) return fail(403, "Signalements désactivés pour ce compte");
   if (now - me.last_report_at < RULES.reportCooldown) return fail(429, "Patiente quelques secondes entre deux signalements");
 
   // Déjà signalé tout près : on confirme au lieu de créer un doublon.
@@ -208,20 +215,42 @@ async function createReport(req: Request, env: Env, me: Account): Promise<Respon
   // Les messages ne se fusionnent pas : chacun garde son texte.
   if (existing && type !== "message") return vote(env, me, existing.id, true, now, true);
 
+  // Confiance : anti-abus, niveau de l'auteur, région en lancement, radar déjà connu des bases.
+  const lastHour = (await env.DB.prepare("SELECT COUNT(*) AS n FROM reports WHERE author_id = ? AND created_at > ?")
+    .bind(me.id, now - HOUR).first<{ n: number }>())?.n ?? 0;
+  const why = me.trusted ? null : suspicious(lastHour, me.rep_lat != null && me.rep_lon != null ? { lat: me.rep_lat, lon: me.rep_lon, at: me.last_report_at } : null,
+    lat, lon, now, distanceM);
+  if (why) {
+    me.suspect_until = now + TRUST.suspectFor;
+    await env.DB.batch([
+      env.DB.prepare("UPDATE accounts SET suspect_until = ? WHERE id = ?").bind(me.suspect_until, me.id),
+      env.DB.prepare("INSERT INTO messages (at, username, app, text) VALUES (?, ?, 'srv', ?)")
+        .bind(now, "⚠ Système", `Compte communauté suspect : ${me.name} (${why}). Ses signalements sont masqués 24 h ; vérifie-le dans Réglages → Administration → Communauté.`),
+    ]);
+  }
+  const lv = level(me, now);
+  const p = placement(lv, type, TYPES[type].canBePermanent, await isLaunchArea(env, lat, lon, now), body.known === true);
+  const expires = now + (p.pendingLife ?? TYPES[type].life * p.lifeFactor);
   const id = randomId(10);
-  await env.DB.prepare(
-    "INSERT INTO reports (id, type, lat, lon, heading, author_id, created_at, expires_at, last_yes_at, text) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-  ).bind(id, type, lat, lon, heading == null ? null : Math.round(heading), me.id, now, now + TYPES[type].life, now, text).run();
+  await env.DB.batch([
+    env.DB.prepare(
+      "INSERT INTO reports (id, type, lat, lon, heading, author_id, created_at, expires_at, last_yes_at, text, status, permanent, validated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    ).bind(id, type, lat, lon, heading == null ? null : Math.round(heading), me.id, now, expires, now, text, p.status, p.permanent ? 1 : 0, p.permanent ? 1 : 0),
+    env.DB.prepare("UPDATE accounts SET rep_lat = ?, rep_lon = ?" + (body.known === true && type === "radar_fixe" ? ", good = good + 1" : "") + " WHERE id = ?").bind(lat, lon, me.id),
+  ]);
   await addPoints(env, me.id, RULES.pointsReport, now);
-  return json({ id, created: true, points: me.points + RULES.pointsReport });
+  return json({ id, created: true, points: me.points + RULES.pointsReport, status: p.status, level: lv, permanent: p.permanent });
 }
 
 async function vote(env: Env, me: Account, reportId: string, still: boolean, now = Date.now(), merged = false): Promise<Response> {
   const r = await env.DB.prepare("SELECT * FROM reports WHERE id = ?").bind(reportId).first<{
     id: string; type: string; author_id: string; created_at: number; expires_at: number; yes: number; no: number;
-    last_yes_at: number; permanent: number;
+    last_yes_at: number; permanent: number; status: string;
   }>();
   if (!r) return fail(404, "Signalement introuvable");
+  if (me.banned) return fail(403, "Votes désactivés pour ce compte");
+  const voterLevel = level(me, now);
+  if (voterLevel === "suspect") return json({ id: r.id, ignored: true });
   if (r.author_id === me.id) {
     // L'auteur peut retirer son propre signalement (« plus là »), sans perte de points.
     if (!still) await env.DB.prepare("DELETE FROM reports WHERE id = ?").bind(r.id).run();
@@ -237,12 +266,24 @@ async function vote(env: Env, me: Account, reportId: string, still: boolean, now
 
   if (still) {
     const distinctYes = (await env.DB.prepare("SELECT COUNT(*) AS n FROM votes WHERE report_id = ? AND still = 1").bind(r.id).first<{ n: number }>())?.n ?? 0;
-    const permanent = r.permanent === 1 || shouldBecomePermanent(r.type, distinctYes, r.created_at, now);
-    await env.DB.prepare("UPDATE reports SET yes = yes + 1, last_yes_at = ?, expires_at = ?, permanent = ? WHERE id = ?")
-      .bind(now, extendedExpiry(r.type, r.expires_at, now), permanent ? 1 : 0, r.id).run();
+    const author = await env.DB.prepare("SELECT good, bad, trusted, banned, suspect_until FROM accounts WHERE id = ?").bind(r.author_id)
+      .first<{ good: number; bad: number; trusted: number; banned: number; suspect_until: number }>();
+    const authorLevel: Level = author ? level(author, now) : "new";
+    // Radar gardé à vie : règle normale, ou tout de suite si l'auteur est fiable ou si une personne de confiance confirme.
+    const fast = TYPES[r.type]?.canBePermanent && (authorLevel === "reliable" || authorLevel === "trusted" || voterLevel === "trusted");
+    const permanent = r.permanent === 1 || fast || shouldBecomePermanent(r.type, distinctYes, r.created_at, now);
+    // Un signalement « à confirmer » qui l'est retrouve sa durée normale.
+    const life = r.status === "pending" ? Math.max(r.expires_at, now + (TYPES[r.type]?.life ?? HOUR)) : extendedExpiry(r.type, r.expires_at, now);
+    await env.DB.batch([
+      env.DB.prepare("UPDATE reports SET yes = yes + 1, last_yes_at = ?, expires_at = ?, permanent = ?, status = 'ok', validated = MAX(validated, ?) WHERE id = ?")
+        .bind(now, life, permanent ? 1 : 0, voterLevel === "trusted" ? 1 : 0, r.id),
+      env.DB.prepare("UPDATE accounts SET good = good + ? WHERE id = ?").bind(voterLevel === "trusted" ? 2 : 1, r.author_id),
+    ]);
     await addPoints(env, r.author_id, RULES.pointsConfirmed, now);
     return json({ id: r.id, confirmed: true, permanent, merged });
   }
+  // Démenti rapide : erreur de l'auteur (une fin naturelle, police partie au bout d'une heure, ne compte pas).
+  if (isEarlyNo(r.type, r.created_at, now, r.yes)) await env.DB.prepare("UPDATE accounts SET bad = bad + 1 WHERE id = ?").bind(r.author_id).run();
   const noSince = (await env.DB.prepare("SELECT COUNT(*) AS n FROM votes WHERE report_id = ? AND still = 0 AND at >= ?")
     .bind(r.id, r.last_yes_at).first<{ n: number }>())?.n ?? 0;
   if (shouldRemove(r.yes, noSince, r.permanent === 1)) {
@@ -343,7 +384,12 @@ async function sync(req: Request, env: Env, me: Account | null): Promise<Respons
     await env.DB.prepare("DELETE FROM presence WHERE account_id = ?").bind(me.id).run();
   }
   const waves = ((await (await inbox(env, me)).json()) as { waves: unknown[] }).waves;
-  return json({ reports: reports.reports, drivers, waves, points: me.points, name: me.name, jams: await jamsNear(lat, lon, env) });
+  // Dernière position connue (au plus toutes les 10 min) : sert à savoir si la région est « en lancement ».
+  if (Date.now() - me.last_seen > 10 * MIN) {
+    await env.DB.prepare("UPDATE accounts SET last_lat = ?, last_lon = ?, last_seen = ? WHERE id = ?").bind(lat, lon, Date.now(), me.id).run();
+  }
+  return json({ reports: reports.reports, drivers, waves, points: me.points, name: me.name, jams: await jamsNear(lat, lon, env),
+    stars: stars(me.good, me.bad), level: level(me, Date.now()), judged: me.good + me.bad });
 }
 
 /**
@@ -395,6 +441,98 @@ async function cleanup(env: Env) {
   ]);
 }
 
+
+
+// ---------- confiance : région en lancement, liaison au compte Pilote, modération ----------
+
+async function isLaunchArea(env: Env, lat: number, lon: number, now: number): Promise<boolean> {
+  const b = box(lat, lon, TRUST.launchRadiusM);
+  const n = (await env.DB.prepare("SELECT COUNT(*) AS n FROM accounts WHERE last_seen > ? AND last_lat BETWEEN ? AND ? AND last_lon BETWEEN ? AND ?")
+    .bind(now - 30 * DAY, b.minLat, b.maxLat, b.minLon, b.maxLon).first<{ n: number }>())?.n ?? 0;
+  return n < TRUST.launchDrivers;
+}
+
+/** Relie le compte communauté au compte Pilote connecté : l'administrateur devient « de confiance ». */
+async function linkAccount(req: Request, env: Env, me: Account): Promise<Response> {
+  const u = await currentUser(req, env);
+  if (!u) return fail(401, "Connexion Pilote requise");
+  await env.DB.prepare("UPDATE accounts SET owner = ?, trusted = CASE WHEN ? = 1 THEN 1 ELSE trusted END WHERE id = ?").bind(u.username, u.admin, me.id).run();
+  return json({ ok: true, owner: u.username, trusted: u.admin === 1 || me.trusted === 1 });
+}
+
+async function isModerator(env: Env, me: Account): Promise<boolean> {
+  if (!me.owner) return false;
+  const u = await env.DB.prepare("SELECT admin FROM users WHERE username = ?").bind(me.owner).first<{ admin: number }>();
+  return u?.admin === 1;
+}
+
+function withStars<T extends { good: number; bad: number; trusted: number; banned: number; suspect_until: number }>(a: T, now: number) {
+  return { ...a, stars: stars(a.good, a.bad), level: level(a, now) };
+}
+
+async function modRoutes(req: Request, env: Env, me: Account, path: string): Promise<Response | null> {
+  if (!path.startsWith("/v1/mod")) return null;
+  if (!(await isModerator(env, me))) return fail(403, "Réservé à l'administrateur");
+  const now = Date.now();
+  if (req.method === "GET" && path === "/v1/mod/pending") {
+    const rows = await env.DB.prepare(
+      `SELECT r.id, r.type, r.lat, r.lon, r.created_at, r.expires_at, r.yes, r.no, r.status, r.text, r.author_id,
+              a.name AS author, a.good, a.bad, a.trusted, a.banned, a.suspect_until
+         FROM reports r JOIN accounts a ON a.id = r.author_id
+        WHERE (r.permanent = 1 OR r.expires_at > ?) AND r.validated = 0
+          AND (r.status != 'ok' OR (r.yes = 0 AND r.type IN ('radar_fixe', 'danger')))
+        ORDER BY r.created_at DESC LIMIT 100`).bind(now).all<Record<string, number> & { author: string }>();
+    return json({ reports: rows.results.map((r) => ({ ...r, author_stars: stars(r.good, r.bad), author_level: level(r, now) })) });
+  }
+  const rm = /^\/v1\/mod\/report\/([0-9a-f]{20})$/.exec(path);
+  if (req.method === "POST" && rm) {
+    const b = (await req.json().catch(() => ({}))) as { action?: string };
+    const r = await env.DB.prepare("SELECT type, author_id, expires_at FROM reports WHERE id = ?").bind(rm[1]).first<{ type: string; author_id: string; expires_at: number }>();
+    if (!r) return fail(404, "Signalement introuvable");
+    if (b.action === "validate") {
+      const perm = TYPES[r.type]?.canBePermanent ? 1 : 0;
+      await env.DB.batch([
+        env.DB.prepare("UPDATE reports SET status = 'ok', validated = 1, permanent = MAX(permanent, ?), expires_at = MAX(expires_at, ?), yes = yes + 1, last_yes_at = ? WHERE id = ?")
+          .bind(perm, now + (TYPES[r.type]?.life ?? HOUR), now, rm[1]),
+        env.DB.prepare("UPDATE accounts SET good = good + 3 WHERE id = ?").bind(r.author_id),
+      ]);
+      return json({ ok: true, validated: true });
+    }
+    if (b.action === "reject") {
+      await env.DB.batch([
+        env.DB.prepare("DELETE FROM votes WHERE report_id = ?").bind(rm[1]),
+        env.DB.prepare("DELETE FROM reports WHERE id = ?").bind(rm[1]),
+        env.DB.prepare("UPDATE accounts SET bad = bad + 2 WHERE id = ?").bind(r.author_id),
+      ]);
+      return json({ ok: true, removed: true });
+    }
+    return fail(400, "Action inconnue");
+  }
+  if (req.method === "GET" && path === "/v1/mod/accounts") {
+    const rows = await env.DB.prepare(
+      `SELECT id, name, points, good, bad, trusted, banned, suspect_until, owner, created_at, last_report_at, last_seen,
+              (SELECT COUNT(*) FROM reports r WHERE r.author_id = accounts.id) AS reports
+         FROM accounts ORDER BY MAX(last_report_at, last_seen) DESC LIMIT 300`).all<Record<string, number> & { name: string }>();
+    return json({ accounts: rows.results.map((a) => withStars(a, now)) });
+  }
+  const am = /^\/v1\/mod\/account\/([0-9a-f]{24})$/.exec(path);
+  if (req.method === "POST" && am) {
+    const b = (await req.json().catch(() => ({}))) as { action?: string };
+    const sql: Record<string, string> = {
+      trust: "UPDATE accounts SET trusted = 1, suspect_until = 0 WHERE id = ?",
+      untrust: "UPDATE accounts SET trusted = 0 WHERE id = ?",
+      ban: "UPDATE accounts SET banned = 1, trusted = 0 WHERE id = ?",
+      unban: "UPDATE accounts SET banned = 0, suspect_until = 0 WHERE id = ?",
+      clear: "UPDATE accounts SET suspect_until = 0 WHERE id = ?",
+    };
+    const q = sql[b.action ?? ""];
+    if (!q) return fail(400, "Action inconnue");
+    await env.DB.prepare(q).bind(am[1]).run();
+    if (b.action === "ban") await env.DB.prepare("UPDATE reports SET status = 'hidden' WHERE author_id = ? AND permanent = 0").bind(am[1]).run();
+    return json({ ok: true });
+  }
+  return fail(404, "Inconnu");
+}
 
 // ---------- convoi entre amis et partage de trajet ----------
 
@@ -515,6 +653,9 @@ export default {
       }
       if (req.method === "POST" && path === "/v1/share/update") return shareUpdate(req, env);
       if (!me) return fail(401, "Compte requis");
+      if (req.method === "POST" && path === "/v1/account/link") return linkAccount(req, env, me);
+      const mod = await modRoutes(req, env, me, path);
+      if (mod) return mod;
       if (req.method === "POST" && path === "/v1/convoy") return convoyUpdate(req, env, me);
       if (req.method === "POST" && path === "/v1/convoy/leave") return convoyLeave(req, env, me);
       if (req.method === "POST" && path === "/v1/share/start") return shareStart(req, env, me);

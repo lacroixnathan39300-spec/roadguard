@@ -67,7 +67,8 @@ private fun pages(drive: Boolean): List<Page> = listOfNotNull(
     Page("⚠️", "Signaler en un appui", listOf(
         "Bouton ⚠ : police, radar mobile, accident, bouchon, travaux, danger, ou un 💬 message visible 24 h.",
         "🎤 « Dire » : signale à la voix, les mains sur le volant. Ton signalement apparaît tout de suite sur la carte.",
-        "Les signalements devant toi sont annoncés à 1 km. Les autres confirment ou non : les faux disparaissent seuls.",
+        "Les signalements devant toi sont annoncés à 1 km. En passant, « toujours là ? » : réponds oui ou non à la voix.",
+        "⭐ Ta fiabilité monte quand les autres confirment tes signalements : les tiens sont alors validés tout de suite.",
     )),
     if (drive) null else Page("🧭", "Plus de place pour la carte", listOf(
         "Plein écran : glisse depuis le haut ou le bas pour voir les barres d'Android un instant.",

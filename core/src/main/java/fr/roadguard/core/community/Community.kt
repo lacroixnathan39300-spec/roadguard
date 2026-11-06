@@ -38,6 +38,11 @@ data class Report(
     val createdAt: Long, val yes: Int, val permanent: Boolean, val mine: Boolean, val voted: Boolean,
     /** Texte d'un signalement « Message » (visible 24 h). */
     val text: String? = null,
+    /** Fiabilité de l'auteur (étoiles, null = pas encore noté) et personne de confiance. */
+    val authorStars: Double? = null,
+    val authorTrusted: Boolean = false,
+    /** « À confirmer » : auteur nouveau, signalement pas encore vérifié. */
+    val pending: Boolean = false,
 )
 
 data class Driver(val id: String, val name: String, val lat: Double, val lon: Double, val speed: Int?)
@@ -64,6 +69,14 @@ class Community(context: Context, private val scope: CoroutineScope, private val
     var toast by mutableStateOf<String?>(null); private set
     var name by mutableStateOf(prefs.getString("name", null)); private set
     var points by mutableStateOf(prefs.getInt("points", 0)); private set
+    /** Ma fiabilité : étoiles (null tant que pas assez de signalements jugés), niveau, signalements jugés. */
+    var myStars by mutableStateOf<Double?>(null); private set
+    var myLevel by mutableStateOf("new"); private set
+    var myJudged by mutableStateOf(0); private set
+    /** Radar déjà connu des bases à cette position (fourni par la session) : radar fixe validé d'office. */
+    var knownRadarNear: ((Double, Double) -> Boolean)? = null
+    /** Question « toujours là ? » posée à la voix, avec réponse « oui / non » à la voix. */
+    var voiceAnswers = true
     var shareLocation by mutableStateOf(prefs.getBoolean("share", false)); private set
 
     val baseUrl: String get() = prefs.getString("url", null)?.takeIf { it.isNotBlank() } ?: DEFAULT_URL
@@ -117,6 +130,10 @@ class Community(context: Context, private val scope: CoroutineScope, private val
             speak("${from.first()} vous fait signe")
         }
         if (!o.isNull("points") && o.has("points")) o.optInt("points").let { points = it; prefs.edit().putInt("points", it).apply() }
+        myStars = if (o.isNull("stars") || !o.has("stars")) null else o.optDouble("stars")
+        o.optString("level").takeIf { it.isNotBlank() }?.let { myLevel = it }
+        myJudged = o.optInt("judged")
+        linkOnce()
     }
 
     /** Annonce des signalements devant soi et question « toujours là ? » en passant à côté. */
@@ -130,8 +147,13 @@ class Community(context: Context, private val scope: CoroutineScope, private val
             if (d < 1000 && ahead && announced.add(r.id) && r.type != ReportType.FIXED) {
                 speak("${r.type.label} signalé ${if (d > 150) "à ${((d + 25) / 50).toInt() * 50} mètres" else "tout près"}")
             }
-            if (d < 120 && !r.mine && !r.voted && hasAccount && prompt == null && asked.add(r.id)) {
+            if (d < 120 && !r.mine && !r.voted && prompt == null && asked.add(r.id)) {
                 prompt = VotePrompt(r, f.timeMs)
+                // Question à la voix, réponse « oui » / « non » à la voix : on confirme sans lâcher le volant.
+                if (voiceAnswers && r.type != ReportType.MESSAGE) {
+                    speak("${r.type.label} toujours là ? Réponds oui ou non.")
+                    VoiceYesNo.ask(appContext, delayMs = 2_600) { yes -> if (prompt?.report?.id == r.id) answer(yes) }
+                }
             }
         }
     }
@@ -140,6 +162,7 @@ class Community(context: Context, private val scope: CoroutineScope, private val
         val p = prompt ?: return
         prompt = null
         scope.launch {
+            runCatching { ensureAccount() }
             runCatching { post("/v1/reports/${p.report.id}/vote", JSONObject().put("still", still)) }
                 .onSuccess { show(if (still) "Merci, signalement confirmé (+1 point)" else "Merci, c'est noté (+1 point)") }
             runCatching { refresh() }
@@ -157,7 +180,11 @@ class Community(context: Context, private val scope: CoroutineScope, private val
             }
             runCatching {
                 post("/v1/reports", JSONObject().put("type", type.code).put("lat", f.lat).put("lon", f.lon)
-                    .apply { if (!f.bearing.isNaN()) put("heading", f.bearing.toInt()); if (text != null) put("text", text) })
+                    .apply {
+                        if (!f.bearing.isNaN()) put("heading", f.bearing.toInt()); if (text != null) put("text", text)
+                        // Radar fixe déjà dans les bases (officielle, MapAtlas, OpenStreetMap) : validé d'office.
+                        if (type == ReportType.FIXED && knownRadarNear?.invoke(f.lat, f.lon) == true) put("known", true)
+                    })
             }.onSuccess { r ->
                 // Affiché tout de suite sur la carte, sans attendre la prochaine mise à jour.
                 val id = r.optString("id")
@@ -165,8 +192,14 @@ class Community(context: Context, private val scope: CoroutineScope, private val
                     reports = reports + Report(id = id, type = type, lat = f.lat, lon = f.lon, author = name.orEmpty(),
                         createdAt = System.currentTimeMillis(), yes = 0, permanent = false, mine = true, voted = false, text = text)
                 }
-                show(if (type == ReportType.MESSAGE) "Message publié pour 24 h, merci ! +5 points"
-                    else if (r.optBoolean("created")) "${type.label} signalé, merci ! +5 points" else "Déjà signalé : ta confirmation est comptée")
+                show(when {
+                    type == ReportType.MESSAGE -> "Message publié pour 24 h, merci ! +5 points"
+                    r.optString("status") == "pending" -> "${type.label} signalé, à confirmer par d'autres conducteurs (+5 points)"
+                    r.optString("status") == "hidden" -> "${type.label} signalé : il sera visible une fois confirmé"
+                    r.optBoolean("permanent") -> "${type.label} signalé et validé, merci ! +5 points"
+                    r.optBoolean("created") -> "${type.label} signalé, merci ! +5 points"
+                    else -> "Déjà signalé : ta confirmation est comptée"
+                })
             }.onFailure { show("Signalement impossible : ${it.message}"); speak("Signalement non envoyé") }
             runCatching { refresh() }
         }
@@ -215,6 +248,33 @@ class Community(context: Context, private val scope: CoroutineScope, private val
     private suspend fun post(path: String, body: JSONObject): JSONObject = withContext(Dispatchers.IO) { request("POST", path, body, auth = true) }
 
     private fun getJson(path: String): JSONObject = request("GET", path, null, auth = true)
+
+    /** Relie (une fois) le compte communauté au compte Pilote : l'administrateur devient « de confiance ». */
+    private fun linkOnce() {
+        if (!hasAccount || prefs.getBoolean("linked", false)) return
+        val token = fr.roadguard.core.account.AccountManager.get(appContext).sessionToken() ?: return
+        scope.launch(Dispatchers.IO) {
+            runCatching { request("POST", "/v1/account/link?session=$token", JSONObject(), auth = true) }
+                .onSuccess { prefs.edit().putBoolean("linked", true).apply() }
+        }
+    }
+
+    // ---------- Modération (administrateur) ----------
+    suspend fun modPending(): List<JSONObject> = withContext(Dispatchers.IO) {
+        val a = request("GET", "/v1/mod/pending", null, auth = true).optJSONArray("reports") ?: JSONArray()
+        (0 until a.length()).map { a.getJSONObject(it) }
+    }
+    suspend fun modReport(id: String, validate: Boolean) = withContext(Dispatchers.IO) {
+        request("POST", "/v1/mod/report/$id", JSONObject().put("action", if (validate) "validate" else "reject"), auth = true)
+    }
+    suspend fun modAccounts(): List<JSONObject> = withContext(Dispatchers.IO) {
+        val a = request("GET", "/v1/mod/accounts", null, auth = true).optJSONArray("accounts") ?: JSONArray()
+        (0 until a.length()).map { a.getJSONObject(it) }
+    }
+    suspend fun modAccount(id: String, action: String) = withContext(Dispatchers.IO) {
+        request("POST", "/v1/mod/account/$id", JSONObject().put("action", action), auth = true)
+    }
+    suspend fun modLink() { prefs.edit().putBoolean("linked", false).apply(); ensureAccount(); linkOnce() }
 
     /** Pseudo communauté créé au besoin avec l'identifiant Pilote (convoi, partage). */
     private suspend fun ensureAccount() {
@@ -326,6 +386,9 @@ class Community(context: Context, private val scope: CoroutineScope, private val
             author = o.optString("author"), createdAt = o.optLong("created_at"), yes = o.optInt("yes"),
             permanent = o.optInt("permanent") == 1, mine = o.optInt("mine") == 1, voted = !o.isNull("my_vote") && o.has("my_vote"),
             text = o.optString("text").takeIf { !o.isNull("text") && it.isNotBlank() },
+            authorStars = if (o.isNull("author_stars") || !o.has("author_stars")) null else o.optDouble("author_stars"),
+            authorTrusted = o.optBoolean("author_trusted"),
+            pending = o.optString("status") == "pending",
         )
     }
 

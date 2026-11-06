@@ -128,11 +128,14 @@ class DrivingSession(
      * Nouvelle limite lue (une lecture toutes les 3 s) : retenue quand deux lectures de suite concordent,
      * soit quelques secondes après l'entrée dans la zone, et sans fausse annonce au passage d'un carrefour.
      */
-    private fun onLimit(v: Int) {
+    private fun onLimit(read: Int) {
+        // 0 : tronçon sans limite connue (route de campagne non renseignée…) : on n'affiche plus l'ancienne limite.
+        val v: Int? = read.takeIf { it > 0 }
         val old = rawLimit
-        if (old == null) { rawLimit = v; speedLimit = adjusted(v); limitCandidate = null; return }
+        if (old == null && v == null) { limitCandidate = null; return }
         if (v == old) { limitCandidate = null; return }
-        if (limitCandidate != v) { limitCandidate = v; return }
+        val key = v ?: 0
+        if (old != null && limitCandidate != key) { limitCandidate = key; return }
         limitCandidate = null
         rawLimit = v
         val adj = adjusted(v)
@@ -290,6 +293,8 @@ class DrivingSession(
     /** À appeler une fois (bases radars chargées en arrière-plan). */
     suspend fun prepare() {
         val index = RadarRepository.index(context)
+        // Radar fixe signalé là où un radar est déjà connu des bases : validé d'office.
+        community.knownRadarNear = { lat, lon -> index.near(lat, lon).any { fr.roadguard.core.radar.Geo.distanceMeters(lat, lon, it.lat, it.lon) < 100 } }
         alerts = AlertEngine(index)
         averages = AverageSpeedTracker(index)
     }
@@ -400,6 +405,7 @@ class DrivingSession(
         voice.configure(settings.voiceName, settings.speechRate, settings.voiceTone)
         voice.realistic = false // même voix (celle du téléphone) pour le guidage et les radars
         voice.pack.feminine = settings.driverFemale
+        community.voiceAnswers = settings.voiceConfirm && settings.voice
         val f = completeFix(location.toAlertFix())
         // Vitesse calculée par ROADGUARD si le GPS ne la donne pas (certains postes).
         fix = location.toSpeedFix().let { sf -> if (!location.hasSpeed() && f.speedKmh > 0) sf.copy(kmh = f.speedKmh.toInt()) else sf }

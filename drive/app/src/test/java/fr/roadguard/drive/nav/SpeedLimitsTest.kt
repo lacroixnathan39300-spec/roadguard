@@ -8,8 +8,10 @@ import org.junit.Test
 
 class SpeedLimitsTest {
     @Test fun takesLastKnownLimit() {
-        assertEquals(50, SpeedLimits.parse("""{"edges":[{"speed_limit":80},{"speed_limit":50},{}]}"""))
-        assertNull(SpeedLimits.parse("""{"edges":[{"speed_limit":0}]}"""))
+        assertEquals(50, SpeedLimits.parse("""{"edges":[{"speed_limit":80},{"speed_limit":50}]}"""))
+        // Dernier tronçon sans limite : « inconnue » (0), pas la limite du tronçon précédent.
+        assertEquals(0, SpeedLimits.parse("""{"edges":[{"speed_limit":50},{}]}"""))
+        assertEquals(0, SpeedLimits.parse("""{"edges":[{"speed_limit":0}]}"""))
         assertNull(SpeedLimits.parse("""{"edges":[]}"""))
     }
 

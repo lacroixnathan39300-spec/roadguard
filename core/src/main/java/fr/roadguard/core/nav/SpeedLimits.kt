@@ -12,7 +12,7 @@ import org.json.JSONObject
 object SpeedLimits {
     private const val URL_TRACE = "https://valhalla1.openstreetmap.de/trace_attributes"
 
-    /** Limite du dernier tronçon parcouru, ou null si inconnue. */
+    /** Limite du tronçon où l'on roule ; 0 si ce tronçon n'a pas de limite connue ; null si la requête a échoué. */
     suspend fun current(trail: List<LatLon>): Int? = withContext(Dispatchers.IO) {
         if (trail.size < 2) return@withContext null
         runCatching { parse(post(request(trail))) }.getOrNull()
@@ -25,18 +25,22 @@ object SpeedLimits {
             .put("shape", shape)
             .put("costing", "auto")
             .put("shape_match", "map_snap")
-            .put("filters", JSONObject().put("attributes", JSONArray().put("edge.speed_limit")).put("action", "include"))
+            .put("filters", JSONObject().put("attributes", JSONArray().put("edge.speed_limit").put("edge.road_class")).put("action", "include"))
             .toString()
     }
 
-    /** Dernier tronçon portant une limite plausible (5 à 150 km/h). */
+    /**
+     * Limite du DERNIER tronçon (celui où l'on roule). S'il n'en porte pas, on renvoie 0 (« inconnue ») au lieu de
+     * reprendre celle d'un tronçon précédent : en sortant d'un village, l'ancien 50 restait affiché sur la route à 80 / 90.
+     */
     fun parse(json: String): Int? {
         val edges = JSONObject(json).optJSONArray("edges") ?: return null
-        for (i in edges.length() - 1 downTo 0) {
-            val limit = edges.getJSONObject(i).optInt("speed_limit", 0)
-            if (limit in 5..150) return limit
-        }
-        return null
+        if (edges.length() == 0) return null
+        val last = edges.getJSONObject(edges.length() - 1)
+        val limit = last.optInt("speed_limit", 0)
+        if (limit in 5..150) return limit
+        // Autoroute sans limite renseignée : 130 (règle générale).
+        return if (last.optString("road_class") == "motorway") 130 else 0
     }
 
     private fun post(body: String): String {

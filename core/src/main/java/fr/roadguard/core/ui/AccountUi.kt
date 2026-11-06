@@ -241,7 +241,7 @@ fun AccountCard(onAdmin: () -> Unit) {
 
 /** Gestion des comptes (administrateur) : chiffres, contact, plantages, et par compte : accès, mot de passe, blocage. */
 @Composable
-fun AdminScreen(onClose: () -> Unit) {
+fun AdminScreen(onClose: () -> Unit, community: fr.roadguard.core.community.Community? = null) {
     val context = LocalContext.current
     val account = remember { AccountManager.get(context) }
     val scope = rememberCoroutineScope()
@@ -254,6 +254,8 @@ fun AdminScreen(onClose: () -> Unit) {
     var newPassword by remember { mutableStateOf("") }
     var contact by remember { mutableStateOf(account.status?.contact ?: "") }
     var crashes by remember { mutableStateOf<List<org.json.JSONObject>?>(null) }
+    var moderation by remember { mutableStateOf(false) }
+    if (moderation && community != null) ModerationScreen(community) { moderation = false }
     fun reload() = scope.launch { runCatching { account.users() }.fold({ users = it; error = null }, { error = it.message }) }
     LaunchedEffect(Unit) { reload() }
     fun act(u: String, action: String) = scope.launch {
@@ -297,6 +299,7 @@ fun AdminScreen(onClose: () -> Unit) {
             color = DriveColors.TextSecondary, fontSize = 15.sp, modifier = Modifier.padding(vertical = 6.dp),
         )
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            if (community != null) BigButton("🛡 Communauté (à valider, comptes)", DriveColors.Accent) { moderation = true }
             BigButton("🐞 Plantages", DriveColors.Track) { scope.launch { runCatching { account.crashes() }.fold({ crashes = it }, { error = it.message }) } }
         }
         Row(verticalAlignment = Alignment.CenterVertically) {

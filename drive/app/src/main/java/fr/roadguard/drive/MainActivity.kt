@@ -448,7 +448,7 @@ private fun DriveHome() {
         }
         if (showAdmin) {
             BackHandler { showAdmin = false }
-            fr.roadguard.core.ui.AdminScreen(onClose = { showAdmin = false })
+            fr.roadguard.core.ui.AdminScreen(onClose = { showAdmin = false }, community = session.community)
         } else if (showOffline) {
             BackHandler { showOffline = false }
             fr.roadguard.core.ui.OfflineDataScreen(setOf("FR", "CH"), onClose = { showOffline = false }, here = session.here?.let { it.lat to it.lon })

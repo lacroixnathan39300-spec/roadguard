@@ -139,6 +139,9 @@ class AccountManager private constructor(context: Context) {
         request("POST", "/v1/admin/config", JSONObject().put("contact", contact))
     }
 
+    /** Jeton de session (liaison du compte communauté au compte Pilote). */
+    fun sessionToken(): String? = token
+
     // ---------- Sauvegarde des réglages dans le compte ----------
     suspend fun saveSettings(data: JSONObject) = withContext(Dispatchers.IO) { request("POST", "/v1/auth/settings", data) }
     suspend fun loadSettings(): JSONObject? = withContext(Dispatchers.IO) { request("GET", "/v1/auth/settings", null).optJSONObject("settings") }

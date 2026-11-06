@@ -428,7 +428,7 @@ private fun PhoneHome() {
         }
         if (showAdmin) {
             BackHandler { showAdmin = false }
-            fr.roadguard.core.ui.AdminScreen(onClose = { showAdmin = false })
+            fr.roadguard.core.ui.AdminScreen(onClose = { showAdmin = false }, community = s.community)
         } else if (showOffline) {
             BackHandler { showOffline = false }
             fr.roadguard.core.ui.OfflineDataScreen(setOf("FR", "CH"), onClose = { showOffline = false },

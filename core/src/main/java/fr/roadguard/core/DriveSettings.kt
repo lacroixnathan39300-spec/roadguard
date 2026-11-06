@@ -202,6 +202,9 @@ class DriveSettings(context: Context) {
     /** Boutons du volant : appui long sur « suivant » = signaler un radar mobile. */
     var wheelReport by mutableStateOf(prefs.getBoolean("wheel_report", false)); private set
     fun changeWheelReport(v: Boolean) { wheelReport = v; put("wheel_report", v) }
+    /** « Police toujours là ? » posé à la voix, réponse « oui / non » à la voix. */
+    var voiceConfirm by mutableStateOf(prefs.getBoolean("voice_confirm", true)); private set
+    fun changeVoiceConfirm(v: Boolean) { voiceConfirm = v; put("voice_confirm", v) }
     /** Notification vibrante à chaque radar (relayée sur la montre connectée). */
     var watchAlerts by mutableStateOf(prefs.getBoolean("watch_alerts", false)); private set
     fun changeWatchAlerts(v: Boolean) { watchAlerts = v; put("watch_alerts", v) }

@@ -512,6 +512,11 @@ fun SafetySettings(settings: fr.roadguard.core.DriveSettings) {
     ToggleLine("Météo dangereuse : verglas, brouillard, fortes pluies (ici et sur l'itinéraire)", settings.weatherAlerts, settings::changeWeatherAlerts)
     ToggleLine("Passages à niveau, virages dangereux, écoles", settings.hazardAlerts, settings::changeHazardAlerts)
     ToggleLine("Fin de trajet : « rien oublié à l'arrière ? »", settings.forgetReminder, settings::changeForgetReminder)
+    ToggleLine("Signalements : « toujours là ? » à la voix, réponse « oui / non » à la voix", settings.voiceConfirm) { v ->
+        settings.changeVoiceConfirm(v)
+        if (v && context.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
+            (context as? android.app.Activity)?.requestPermissions(arrayOf(android.Manifest.permission.RECORD_AUDIO), 81)
+    }
     if (phone) {
         ToggleLine("Détection d'accident (choc + arrêt → SMS au contact d'urgence après 30 s)", settings.crashDetect) { v ->
             settings.changeCrashDetect(v)

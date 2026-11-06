@@ -97,6 +97,9 @@ async function openSession(env: LicEnv, u: User, device: string, app: string, no
   return json({ token, ...status(u, now), contact: await contact(env) });
 }
 
+/** Compte Pilote connecté (session), pour relier le compte communauté. */
+export async function currentUser(req: Request, env: LicEnv): Promise<User | null> { return sessionUser(req, env); }
+
 async function sessionUser(req: Request, env: LicEnv): Promise<User | null> {
   // En-tête, ou « ?session= » (les requêtes relayées par le téléphone n'ont pas d'en-têtes personnalisés).
   const t = req.headers.get("x-rg-session") ?? new URL(req.url).searchParams.get("session") ?? "";

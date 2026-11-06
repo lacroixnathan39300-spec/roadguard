@@ -31,6 +31,8 @@ class RadarBubble(context: Context) {
     private lateinit var info: TextView
     private lateinit var bg: GradientDrawable
     private lateinit var picker: LinearLayout
+    private lateinit var voteRow: LinearLayout
+    private lateinit var voteLabel: TextView
     private var session: fr.roadguard.core.DrivingSession? = null
     private val handler = android.os.Handler(android.os.Looper.getMainLooper())
     private val hidePicker = Runnable { if (::picker.isInitialized) picker.visibility = android.view.View.GONE }
@@ -99,7 +101,20 @@ class RadarBubble(context: Context) {
                 }
             })
         }
-        box.addView(row); box.addView(alert); box.addView(info); box.addView(reportBtn); box.addView(picker)
+        // « Police toujours là ? » : 👍 / 👎 directement dans la bulle.
+        voteRow = LinearLayout(app).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL; visibility = android.view.View.GONE }
+        voteLabel = TextView(app).apply { setTextColor(Color.WHITE); textSize = 13f; maxWidth = dp(150); setPadding(0, 0, dp(6), 0) }
+        voteRow.addView(voteLabel)
+        listOf(true to "👍", false to "👎").forEach { (yes, e) ->
+            voteRow.addView(TextView(app).apply {
+                text = e; textSize = 22f; gravity = Gravity.CENTER
+                background = pill(if (yes) Color.rgb(46, 125, 50) else Color.rgb(66, 66, 66), 12); setPadding(dp(8), dp(2), dp(8), dp(2))
+                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { setMargins(dp(2), 0, dp(2), 0) }
+                setOnClickListener { session?.community?.answer(yes); voteRow.visibility = android.view.View.GONE }
+            })
+        }
+        box.addView(row); box.addView(alert); box.addView(info); box.addView(voteRow); box.addView(reportBtn); box.addView(picker)
+        (voteRow.layoutParams as LinearLayout.LayoutParams).topMargin = dp(6)
         (info.layoutParams as LinearLayout.LayoutParams).topMargin = dp(4)
         (reportBtn.layoutParams as LinearLayout.LayoutParams).topMargin = dp(6)
         (picker.layoutParams as LinearLayout.LayoutParams).topMargin = dp(6)
@@ -153,6 +168,9 @@ class RadarBubble(context: Context) {
         if (a != null) alert.text = "${AlertText.kindLabel(a.radar.kind)} · ${AlertText.roundedDistance(a.distanceM)} m"
         // Fond rouge pendant une alerte radar ou un excès de vitesse, sombre sinon.
         bg.setColor(if (a != null || s.overSpeed) Color.argb(240, 150, 20, 28) else Color.argb(235, 18, 24, 32))
+        val pr = s.community.prompt
+        voteRow.visibility = if (pr != null) android.view.View.VISIBLE else android.view.View.GONE
+        if (pr != null) voteLabel.text = "${pr.report.type.emoji} toujours là ?"
         val t = s.community.toast
         info.visibility = if (t != null) android.view.View.VISIBLE else android.view.View.GONE
         info.text = t.orEmpty()
