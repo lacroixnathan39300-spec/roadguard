@@ -124,8 +124,10 @@ class Community(context: Context, private val scope: CoroutineScope, private val
         prompt?.let { if (f.timeMs - it.shownAt > 20_000) prompt = null }
         for (r in reports) {
             val d = Geo.distanceMeters(f.lat, f.lon, r.lat, r.lon)
-            val ahead = !f.bearing.isNaN() && Geo.headingDelta(f.bearing, Geo.bearing(f.lat, f.lon, r.lat, r.lon)) < 40
-            if (d < 600 && ahead && announced.add(r.id) && r.type != ReportType.FIXED) {
+            // Devant et sur l'axe suivi (couloir étroit, pas un cône) : pas les signalements des routes voisines.
+            val off = if (f.bearing.isNaN()) 180.0 else Geo.headingDelta(f.bearing, Geo.bearing(f.lat, f.lon, r.lat, r.lon))
+            val ahead = off < 60 && d * kotlin.math.sin(Math.toRadians(off)) < 60 + 0.06 * d
+            if (d < 1000 && ahead && announced.add(r.id) && r.type != ReportType.FIXED) {
                 speak("${r.type.label} signalé ${if (d > 150) "à ${((d + 25) / 50).toInt() * 50} mètres" else "tout près"}")
             }
             if (d < 120 && !r.mine && !r.voted && hasAccount && prompt == null && asked.add(r.id)) {

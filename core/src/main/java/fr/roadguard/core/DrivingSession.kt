@@ -187,6 +187,7 @@ class DrivingSession(
         fix = location.toSpeedFix().let { sf -> if (!location.hasSpeed() && f.speedKmh > 0) sf.copy(kmh = f.speedKmh.toInt()) else sf }
         here = f
 
+        alerts?.route = route?.points // radars comptés seulement sur le tracé pendant un guidage
         val newAlert = alerts?.update(f)?.takeIf { settings.radarsOn && it.radar.kind in settings.alertKinds }
         if (newAlert?.isNew == true) voice.announce(newAlert)
         // Une position isolée sans cap fiable ne doit pas faire clignoter le bandeau : on garde
