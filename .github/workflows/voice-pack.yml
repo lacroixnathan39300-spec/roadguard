@@ -1,0 +1,26 @@
+name: Voix — pack réaliste
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Outils
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg >/dev/null
+          pip install -q piper-tts==1.2.0
+          H=https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/fr/fr_FR/upmc/medium
+          curl -sSLf -O $H/fr_FR-upmc-medium.onnx -O $H/fr_FR-upmc-medium.onnx.json
+      - name: Génération
+        run: python tools/voice/generate.py core/src/main/assets/voices/script.json fr_FR-upmc-medium.onnx pack && du -sh pack && ls pack | wc -l
+      - name: Publier sur la branche voix-pack
+        run: |
+          cd pack && git init -q && git checkout -q -b voix-pack && git add *.mp3
+          git -c user.name=ci -c user.email=ci@localhost commit -qm "pack voix"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" voix-pack
