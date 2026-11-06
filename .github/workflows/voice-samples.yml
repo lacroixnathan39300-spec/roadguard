@@ -1,0 +1,45 @@
+name: Voix — échantillons
+on:
+  workflow_dispatch:
+jobs:
+  samples:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Outils
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq espeak-ng ffmpeg >/dev/null
+          pip install -q piper-tts==1.2.0 "kokoro>=0.9.4" soundfile "misaki[fr]" || pip install -q piper-tts==1.2.0
+      - name: Voix Piper
+        run: |
+          set -x
+          H=https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/fr/fr_FR
+          for v in siwis/medium/fr_FR-siwis-medium upmc/medium/fr_FR-upmc-medium mls/medium/fr_FR-mls-medium; do
+            curl -sSLf -O "$H/$v.onnx" && curl -sSLf -O "$H/$v.onnx.json" || true
+          done
+          T="Mmmh… ralentis pour moi, mon beau… Radar fixe, limité à quatre-vingts."
+          mkdir -p out
+          say() { echo "$T" | piper --model "$1" --output_file "out/$2.wav" --length_scale 1.15 ${3:+--speaker $3} || true; }
+          say fr_FR-siwis-medium.onnx A-siwis
+          say fr_FR-upmc-medium.onnx B-upmc-jessica 0
+          for s in 2 5 9 13 17; do say fr_FR-mls-medium.onnx C-mls-$s $s; done
+      - name: Voix Kokoro
+        continue-on-error: true
+        run: |
+          python - <<'PY'
+          from kokoro import KPipeline
+          import soundfile as sf, numpy as np
+          p = KPipeline(lang_code='f')
+          t = "Mmmh… ralentis pour moi, mon beau… Radar fixe, limité à quatre-vingts."
+          for speed in (0.85,):
+              audio = np.concatenate([a for _, _, a in p(t, voice='ff_siwis', speed=speed)])
+              sf.write(f"out/D-kokoro-siwis.wav", audio, 24000)
+          PY
+      - name: Conversion
+        run: |
+          cd out; ls -la
+          for f in *.wav; do ffmpeg -loglevel error -y -i "$f" -b:a 96k "${f%.wav}.mp3"; done; rm -f *.wav; ls -la
+      - uses: actions/upload-artifact@v4
+        with: { name: voix-echantillons, path: out/*.mp3, retention-days: 1 }
