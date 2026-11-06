@@ -18,7 +18,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
         ClipPlayer(context, onStart = { speaking++; duck() }, onEnd = { speaking = (speaking - 1).coerceAtLeast(0); scheduleRelease() })
     }
     /** Voix réaliste au lieu de la voix du téléphone pour les annonces radars et limitations. */
-    var realistic = true
+    var realistic = false
 
     // ---- Baisse du volume de la musique pendant les annonces et les bips ----
     private val audio = context.applicationContext.getSystemService(AudioManager::class.java)
@@ -202,7 +202,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     /** Annonce par phrases enregistrées si elles existent, sinon par la voix du téléphone. */
     private fun line(group: String, kind: RadarKind?, limit: Int?, id: String) {
         if (!voiceEnabled) return
-        val parts = if (realistic || style == 4) pack.clips(style, group, kind, limit) else null
+        val parts = if (realistic) pack.clips(style, group, kind, limit) else null
         if (parts != null) clips.play(parts) else say(pack.text(style, group, kind, limit), id)
     }
 

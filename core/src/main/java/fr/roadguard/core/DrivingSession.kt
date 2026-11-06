@@ -181,7 +181,7 @@ class DrivingSession(
         voice.beepEnabled = settings.beep
         voice.duckMusic = settings.duckMusic
         voice.configure(settings.voiceName, settings.speechRate, settings.voiceTone)
-        voice.realistic = settings.realVoice
+        voice.realistic = false // même voix (celle du téléphone) pour le guidage et les radars
         val f = completeFix(location.toAlertFix())
         // Vitesse calculée par ROADGUARD si le GPS ne la donne pas (certains postes).
         fix = location.toSpeedFix().let { sf -> if (!location.hasSpeed() && f.speedKmh > 0) sf.copy(kmh = f.speedKmh.toInt()) else sf }
