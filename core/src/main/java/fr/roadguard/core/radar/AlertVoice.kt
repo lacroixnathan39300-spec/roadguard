@@ -63,6 +63,18 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
             }
     }.getOrDefault(emptyList())
 
+    /** Voix des autres langues installées (anglais, allemand, italien…), après téléchargement dans Android. */
+    fun otherVoices(): List<Pair<String, String>> = runCatching {
+        tts.voices.orEmpty().filter { it.locale.language != "fr" && !it.isNetworkConnectionRequired }
+            .sortedWith(compareBy({ it.locale.getDisplayLanguage(java.util.Locale.FRENCH) }, { it.name }))
+            .groupBy { it.locale.getDisplayLanguage(java.util.Locale.FRENCH).replaceFirstChar { c -> c.uppercase() } }
+            .flatMap { (lang, vs) ->
+                vs.mapIndexed { i, v ->
+                    v.name to "$lang ${i + 1}" + (if (v.locale.country.isNotBlank()) " (${v.locale.country})" else "")
+                }
+            }
+    }.getOrDefault(emptyList())
+
     /** Première voix de femme connue (pour les tons charme / séduction / osé). */
     fun femaleVoice(): String? = frenchVoices().map { it.first }.let { names ->
         listOf("vlf", "frc", "fra", "cac", "caa").firstNotNullOfOrNull { code -> names.firstOrNull { it.contains("-x-$code") && it.endsWith("-local") } ?: names.firstOrNull { it.contains("-x-$code") } }

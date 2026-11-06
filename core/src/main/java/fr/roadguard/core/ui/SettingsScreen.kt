@@ -85,6 +85,24 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                         }
                     }
                 }
+                // Autres langues : voix téléchargées dans Android (moteur de synthèse vocale).
+                val others = androidx.compose.runtime.remember { voice.otherVoices() }
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    BigButton("⬇ Télécharger d'autres voix", DriveColors.Track) {
+                        val ok = runCatching {
+                            context.startActivity(android.content.Intent(android.speech.tts.TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)
+                                .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
+                        }.isSuccess
+                        if (!ok) runCatching {
+                            context.startActivity(android.content.Intent("com.android.settings.TTS_SETTINGS").addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
+                        }
+                    }
+                    others.forEach { (name, label) ->
+                        BigButton(label, if (settings.voiceName == name) DriveColors.Accent else DriveColors.Panel) {
+                            settings.changeVoiceName(name); voice.configure(name, settings.speechRate); voice.limitChanged(80)
+                        }
+                    }
+                }
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     listOf(0.85f to "Lente", 1f to "Normale", 1.2f to "Rapide").forEach { (r, label) ->
                         BigButton("Débit : $label", if (settings.speechRate == r) DriveColors.Accent else DriveColors.Panel) {

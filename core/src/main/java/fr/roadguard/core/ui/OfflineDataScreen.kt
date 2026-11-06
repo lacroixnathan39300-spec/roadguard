@@ -82,8 +82,9 @@ fun OfflineDataScreen(nearCountries: Set<String>, onClose: () -> Unit, here: Pai
             }
         } else {
             Text(
-                "France, Suisse, Belgique, Allemagne, Italie, Espagne et Luxembourg sont déjà inclus. Autres pays : base " +
-                    "communautaire MapAtlas (CC BY 4.0), à vérifier sur place. Respecte la loi du pays visité.",
+                "France, Suisse, Belgique, Allemagne, Italie, Espagne et Luxembourg sont déjà inclus. Plus de 100 autres pays : " +
+                    "bases ouvertes MapAtlas (CC BY 4.0) et OpenStreetMap (© contributeurs OSM, ODbL) réunies, à vérifier sur place. " +
+                    "Respecte la loi du pays visité.",
                 color = DriveColors.TextSecondary, fontSize = 15.sp,
             )
             LazyColumn(Modifier.padding(top = 10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
