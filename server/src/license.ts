@@ -211,6 +211,20 @@ export async function licenseRoutes(req: Request, env: LicEnv, path: string): Pr
     return json({ replies: r?.n ?? 0, admin: a?.n ?? 0, adminLast: a?.last ?? 0 });
   }
 
+  // Sauvegarde des réglages (changement de téléphone).
+  if (req.method === "POST" && path === "/v1/auth/settings") {
+    const text = await req.text();
+    if (text.length > 60_000) return fail(413, "Réglages trop volumineux");
+    try { JSON.parse(text); } catch { return fail(400, "Réglages invalides"); }
+    await env.DB.prepare("INSERT INTO user_settings (username, data, at) VALUES (?, ?, ?) ON CONFLICT(username) DO UPDATE SET data = excluded.data, at = excluded.at")
+      .bind(me.username, text, now).run();
+    return json({ ok: true, at: now });
+  }
+  if (req.method === "GET" && path === "/v1/auth/settings") {
+    const r = await env.DB.prepare("SELECT data, at FROM user_settings WHERE username = ?").bind(me.username).first<{ data: string; at: number }>();
+    return r ? json({ settings: JSON.parse(r.data), at: r.at }) : fail(404, "Aucune sauvegarde");
+  }
+
   if (!me.admin) return fail(403, "Réservé à l'administrateur");
   if (req.method === "GET" && path === "/v1/admin/messages") {
     const rows = await env.DB.prepare("SELECT * FROM messages ORDER BY id DESC LIMIT 200").all();

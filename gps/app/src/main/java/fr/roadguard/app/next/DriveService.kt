@@ -49,6 +49,9 @@ class DriveService : Service() {
         val v = AlertVoice(this).also { voice = it }
         val s = DrivingSession(applicationContext, scope, v, DriveSettings(applicationContext))
         session = s
+        s.sendEmergency = { phone, text -> sendSms(phone, text) }
+        s.community.startConvoyLoop()
+        startImpactSensor(s)
         scope.launch {
             s.prepare()
             SpeedSource(this@DriveService).locations().collect { s.onLocation(it) }
@@ -76,6 +79,11 @@ class DriveService : Service() {
                 if (kmh >= 10) stoppedSince = 0L else if (kmh < 5 && stoppedSince == 0L) stoppedSince = now
                 val stopped = stoppedSince != 0L && now - stoppedSince > 8_000 && s.alert == null
                 if (s.settings.bubble && !PhoneHomeActivity.visible && bubble.allowed && !stopped) bubble.show(s) else bubble.hide()
+                // Widget de l'écran d'accueil, et vibration sur la montre à chaque nouveau radar.
+                PiloteWidget.update(this@DriveService, s)
+                val a = s.alert
+                if (a != null && a.radar.id != lastWatchRadar) { lastWatchRadar = a.radar.id; if (s.settings.watchAlerts) watchAlert(a) }
+                if (a == null) lastWatchRadar = null
                 // Démarré tout seul en roulant : arrêt tout seul après 10 min à l'arrêt, appli fermée.
                 if (kmh >= 5 || PhoneHomeActivity.visible) stillSince = now
                 if (autoStarted && !s.navigating && now - stillSince > 10 * 60_000L) { bubble.hide(); stopSelf(); break }
@@ -103,9 +111,53 @@ class DriveService : Service() {
 
     private var bubbleView: fr.roadguard.core.ui.RadarBubble? = null
     private var autoStarted = false
+    private var lastWatchRadar: String? = null
+    private var sensorListener: android.hardware.SensorEventListener? = null
+
+    /** Accéléromètre : chocs violents (accident, dashcam). */
+    private fun startImpactSensor(s: DrivingSession) {
+        val sm = getSystemService(android.hardware.SensorManager::class.java) ?: return
+        val acc = sm.getDefaultSensor(android.hardware.Sensor.TYPE_ACCELEROMETER) ?: return
+        val l = object : android.hardware.SensorEventListener {
+            override fun onSensorChanged(e: android.hardware.SensorEvent) {
+                val g = Math.sqrt((e.values[0] * e.values[0] + e.values[1] * e.values[1] + e.values[2] * e.values[2]).toDouble()) / 9.81
+                if (g >= 3.0) s.onImpact(g)
+            }
+            override fun onAccuracyChanged(sensor: android.hardware.Sensor?, accuracy: Int) {}
+        }
+        sensorListener = l
+        sm.registerListener(l, acc, android.hardware.SensorManager.SENSOR_DELAY_GAME)
+    }
+
+    /** SMS au contact d'urgence (autorisation « SMS » donnée dans les réglages). */
+    @android.annotation.SuppressLint("MissingPermission")
+    private fun sendSms(phone: String, text: String): Boolean = runCatching {
+        if (checkSelfPermission(android.Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) return false
+        @Suppress("DEPRECATION")
+        val sms = (if (Build.VERSION.SDK_INT >= 31) getSystemService(android.telephony.SmsManager::class.java) else android.telephony.SmsManager.getDefault()) ?: return false
+        sms.sendMultipartTextMessage(phone, null, sms.divideMessage(text), null, null)
+        true
+    }.getOrDefault(false)
+
+    /** Notification vibrante : relayée sur la montre connectée (Wear OS, Galaxy Watch, Mi Band…). */
+    private fun watchAlert(a: fr.roadguard.core.radar.RadarAlert) = runCatching {
+        if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) return@runCatching
+        val nm = getSystemService(NotificationManager::class.java)
+        nm.createNotificationChannel(NotificationChannel(WATCH_CHANNEL, "Radars (montre)", NotificationManager.IMPORTANCE_HIGH).apply {
+            enableVibration(true); vibrationPattern = longArrayOf(0, 300, 150, 300); setSound(null, null)
+        })
+        val limit = a.radar.speedKmh?.let { " · limité à $it" } ?: ""
+        nm.notify(WATCH_ID, Notification.Builder(this, WATCH_CHANNEL).setSmallIcon(android.R.drawable.ic_dialog_alert)
+            .setContentTitle("📷 ${fr.roadguard.core.radar.AlertText.kindLabel(a.radar.kind)}")
+            .setContentText("À ${a.distanceM} m$limit").setTimeoutAfter(25_000).setAutoCancel(true)
+            .setOnlyAlertOnce(false).build())
+    }
 
     override fun onDestroy() {
         bubbleView?.hide()
+        sensorListener?.let { getSystemService(android.hardware.SensorManager::class.java)?.unregisterListener(it) }
+        session?.endTrip()
+        PiloteWidget.update(this, null)
         session = null
         scope.cancel()
         voice?.release()
@@ -115,6 +167,8 @@ class DriveService : Service() {
     companion object {
         private const val CHANNEL = "roadguard_drive"
         private const val NOTIFICATION_ID = 4741
+        private const val WATCH_CHANNEL = "pilote_watch"
+        private const val WATCH_ID = 4742
         const val ACTION_STOP = "fr.roadguard.app.next.DRIVE_STOP"
         const val EXTRA_AUTO = "auto"
 

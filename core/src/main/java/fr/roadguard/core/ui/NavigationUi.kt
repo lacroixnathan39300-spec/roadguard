@@ -60,10 +60,11 @@ fun SearchScreen(
     onClose: () -> Unit,
     starred: List<Place> = emptyList(),
     onStar: ((Place) -> Unit)? = null,
+    initialQuery: String = "",
 ) {
     // Choix de l'adresse « Maison » ou « Travail » : le prochain résultat touché est enregistré.
     var assigning by remember { mutableStateOf<String?>(null) }
-    var query by remember { mutableStateOf("") }
+    var query by remember { mutableStateOf(initialQuery) }
     var results by remember { mutableStateOf<List<Place>>(emptyList()) }
     var message by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
@@ -281,7 +282,8 @@ fun RouteChoices(
                 Text("${i + 1}. $dur", color = Color.White, fontSize = 18.sp * DriveColors.Scale, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.width(10.dp))
                 val extra = ((r.durationS - fastest) / 60).toInt()
-                Text("%.0f km".format(r.lengthM / 1000) + if (extra > 0) " · +$extra min" else " · le plus rapide",
+                Text("%.0f km".format(r.lengthM / 1000) + (if (extra > 0) " · +$extra min" else " · le plus rapide") +
+                    (r.tollEuros?.let { " · péages ~$it €" } ?: " · sans péage"),
                     color = Color.White.copy(alpha = 0.85f), fontSize = 15.sp * DriveColors.Scale)
             }
         }

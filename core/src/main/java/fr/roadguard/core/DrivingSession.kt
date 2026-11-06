@@ -59,6 +59,22 @@ class DrivingSession(
     /** Météo et adresse actuelle. */
     val localInfo = LocalInfo(scope)
 
+    /** Historique des trajets, carburant, voiture garée. */
+    val tripLog = fr.roadguard.core.safety.TripLog(context)
+    /** Dangers OpenStreetMap (passages à niveau, virages, écoles). */
+    private val hazards = fr.roadguard.core.safety.HazardWatch(scope)
+    private val meter = fr.roadguard.core.safety.TripMeter()
+    /** Dernier trajet terminé (bilan affiché) ; null une fois vu. */
+    var lastTrip by mutableStateOf<fr.roadguard.core.safety.TripRecord?>(null)
+    /** Choc détecté : heure (compte à rebours de 30 s avant de prévenir le contact d'urgence), 0 sinon. */
+    var crashAt by mutableStateOf(0L); private set
+    /** Envoi du SMS d'urgence (fourni par l'appli téléphone) : (numéro, texte). */
+    var sendEmergency: ((String, String) -> Boolean)? = null
+    /** Limite lue sur la carte, avant ajustement (pluie, profil, vitesse perso). */
+    private var rawLimit: Int? = null
+    /** En Suisse (annonces de radars interdites) : radars coupés automatiquement. */
+    val radarsBlockedHere: Boolean get() = settings.swissMode && localInfo.country == "CH"
+
     /** Signalements et conducteurs de la communauté ROADGUARD. */
     val community = fr.roadguard.core.community.Community(context, scope) { voice.speak(it) }
 
@@ -91,11 +107,15 @@ class DrivingSession(
         if (!settings.pauseReminder) return
         if (kmh < 5) { if (stoppedAt == 0L) stoppedAt = now; if (stoppedAt != 0L && now - stoppedAt > 15 * 60_000) { drivingSince = 0; nextPauseAt = 0 }; return }
         stoppedAt = 0
-        if (drivingSince == 0L) { drivingSince = now; nextPauseAt = now + 2 * 3_600_000L }
+        // De 2 h à 5 h du matin, la vigilance baisse : rappel après 1 h 30, puis toutes les 20 min.
+        val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
+        val night = hour in 2..4
+        if (drivingSince == 0L) { drivingSince = now; nextPauseAt = now + if (night) 90 * 60_000L else 2 * 3_600_000L }
         if (now >= nextPauseAt) {
             val h = (now - drivingSince) / 3_600_000.0
-            voice.speak(if (h < 2.2) "Deux heures de route. Pense à faire une pause." else "Cela fait %.0f heures de route. Une pause s'impose.".format(java.util.Locale.FRANCE, h))
-            nextPauseAt = now + 30 * 60_000L
+            if (night) voice.speak("Il est tard et tu roules depuis un moment : la vigilance baisse. Fais une pause.")
+            else voice.speak(if (h < 2.2) "Deux heures de route. Pense à faire une pause." else "Cela fait %.0f heures de route. Une pause s'impose.".format(java.util.Locale.FRANCE, h))
+            nextPauseAt = now + if (night) 20 * 60_000L else 30 * 60_000L
         }
     }
     private var limitCandidate: Int? = null
@@ -109,13 +129,162 @@ class DrivingSession(
      * soit quelques secondes après l'entrée dans la zone, et sans fausse annonce au passage d'un carrefour.
      */
     private fun onLimit(v: Int) {
-        val old = speedLimit
-        if (old == null) { speedLimit = v; limitCandidate = null; return }
+        val old = rawLimit
+        if (old == null) { rawLimit = v; speedLimit = adjusted(v); limitCandidate = null; return }
         if (v == old) { limitCandidate = null; return }
         if (limitCandidate != v) { limitCandidate = v; return }
         limitCandidate = null
-        speedLimit = v
-        if (settings.announceLimit && alert == null) voice.limitChanged(v)
+        rawLimit = v
+        val adj = adjusted(v)
+        val changed = adj != speedLimit
+        speedLimit = adj
+        if (changed && adj != null && settings.announceLimit && alert == null) voice.limitChanged(adj)
+    }
+
+    /** Limite à respecter : pluie, jeune conducteur, vitesse maximale personnelle. */
+    private fun adjusted(v: Int?): Int? = fr.roadguard.core.safety.RoadRules.adjust(v, localInfo.country,
+        rain = settings.rainLimits && localInfo.raining, young = settings.driverProfile == 1, personalMax = settings.personalMax)
+
+    // Annonces liées au pays, à la météo et aux dangers.
+    private var lastCountry: String? = null
+    private var lastHazard: String? = null
+    private var lastHazardAt = 0L
+    private var lastAheadHazard: String? = null
+    private var lastRain = false
+    private fun contextAnnouncements(f: Fix, now: Long) {
+        // Pluie, profil, vitesse perso : la limite affichée suit.
+        val adj = adjusted(rawLimit)
+        if (rawLimit != null && adj != speedLimit) {
+            speedLimit = adj
+            if (settings.announceLimit && adj != null) voice.speak(if (localInfo.raining && settings.rainLimits) "Il pleut : limitation abaissée à $adj" else "Limitation $adj")
+        }
+        if (localInfo.raining != lastRain) { lastRain = localInfo.raining }
+        // Suisse : annonces de radars interdites.
+        val c = localInfo.country
+        if (c != null && c != lastCountry) {
+            if (lastCountry != null && settings.swissMode) {
+                if (c == "CH") voice.speak("Tu entres en Suisse : les alertes radars sont coupées, comme l'exige la loi suisse.")
+                else if (lastCountry == "CH") voice.speak("Tu quittes la Suisse : alertes radars rétablies.")
+            }
+            lastCountry = c
+        }
+        // Météo dangereuse ici, puis sur l'itinéraire.
+        if (settings.weatherAlerts) {
+            val h = localInfo.hazard
+            if (h != null && (h != lastHazard || now - lastHazardAt > 30 * 60_000)) {
+                lastHazard = h; lastHazardAt = now
+                voice.speak(when (h) {
+                    "Risque de verglas", "Pluie verglaçante" -> "Attention : $h. Roule doucement et garde tes distances."
+                    "Brouillard" -> "Brouillard : allume tes feux et garde tes distances."
+                    else -> "Attention : $h. Adapte ta vitesse."
+                })
+            } else if (h == null) lastHazard = null
+            route?.points?.let { pts ->
+                val ahead = pts.firstOrNull { fr.roadguard.core.radar.Geo.distanceMeters(f.lat, f.lon, it.lat, it.lon) > 20_000 }
+                if (ahead != null) localInfo.checkAhead(ahead.lat, ahead.lon, now)
+                val ha = localInfo.hazardAhead
+                if (ha != null && ha != lastAheadHazard && ha != h) { lastAheadHazard = ha; voice.speak("Sur ta route, dans une vingtaine de kilomètres : $ha.") }
+            }
+        }
+        if (settings.hazardAlerts) hazards.onFix(f, now)?.let { voice.speak(it) }
+    }
+
+    // Fin de trajet : arrêt d'au moins une minute après au moins 5 min de route (ou Bluetooth de la voiture coupé).
+    private var slowSince = 0L
+    private fun tripStep(f: Fix, now: Long) {
+        meter.onFix(f.lat, f.lon, f.speedKmh, overSpeed, f.timeMs, localInfo.address)
+        if (f.speedKmh >= 5) { slowSince = 0; return }
+        if (slowSince == 0L) slowSince = now
+        if (meter.active && now - slowSince > 60_000 && now - meter.start > 5 * 60_000) endTrip(f.lat, f.lon)
+    }
+
+    /** Termine le trajet en cours : bilan, voiture garée, rappels. */
+    fun endTrip(lat: Double? = here?.lat, lon: Double? = here?.lon) {
+        val rec = meter.finish(System.currentTimeMillis(), localInfo.address, settings.defaultTripPro) ?: return
+        tripLog.addTrip(rec)
+        lastTrip = rec
+        if (lat != null && lon != null) tripLog.parking = fr.roadguard.core.safety.Parking(lat, lon, System.currentTimeMillis(), localInfo.address, 0)
+        if (settings.forgetReminder) voice.speak("Fin du trajet. Pense à vérifier : rien oublié à l'arrière ? Enfant, animal, sac ?")
+        val due = settings.serviceAtKm
+        if (due > 0 && tripLog.odometerKm >= due) voice.speak("Rappel : l'entretien de la voiture est à prévoir.")
+    }
+
+    // ---------- Détection d'accident ----------
+    private var lastFastAt = 0L
+    private var impactAt = 0L
+    /** Choc mesuré par l'accéléromètre (en g), fourni par l'appli téléphone. */
+    /** Nombre de chocs mesurés (la dashcam garde alors la vidéo). */
+    var impacts by mutableIntStateOf(0); private set
+    private var lastImpactCount = 0L
+    fun onImpact(g: Double) {
+        val t = System.currentTimeMillis()
+        if (g >= 3.0 && t - lastImpactCount > 3_000) { lastImpactCount = t; impacts++ }
+        if (!settings.crashDetect || g < 4.0 || crashAt != 0L) return
+        val now = System.currentTimeMillis()
+        if (now - lastFastAt < 6_000) impactAt = now
+    }
+    fun cancelCrash() { crashAt = 0L; impactAt = 0L; voice.speak("D'accord. Bonne route, et prends soin de toi.") }
+    private fun crashStep(kmh: Double, now: Long) {
+        if (kmh >= 25) lastFastAt = now
+        // Choc puis arrêt dans les 15 s : on demande si tout va bien.
+        if (impactAt != 0L && crashAt == 0L) {
+            if (kmh < 5) {
+                crashAt = now; impactAt = 0L
+                val who = settings.emergencyName.ifBlank { "ton contact d'urgence" }
+                voice.wakeUp()
+                voice.speak("Choc détecté. Tout va bien ? Touche « Je vais bien ». Sinon, je préviens $who dans trente secondes.")
+            } else if (now - impactAt > 15_000) impactAt = 0L
+        }
+    }
+    private fun crashTimeout(now: Long) {
+        if (crashAt == 0L || now - crashAt < 30_000) return
+        crashAt = 0L
+        val p = here
+        val phone = settings.emergencyPhone
+        if (phone.isBlank()) { voice.speak("Aucun contact d'urgence enregistré. Appelle le 112 si tu as besoin d'aide."); return }
+        val pos = p?.let { "https://maps.google.com/?q=%.5f,%.5f".format(java.util.Locale.US, it.lat, it.lon) } ?: "position inconnue"
+        val text = "Pilote : un choc a été détecté et le conducteur ne répond pas. Position : $pos. " +
+            "Appelle-le, et le 112 si besoin."
+        val ok = sendEmergency?.invoke(phone, text) == true
+        voice.speak(if (ok) "Message envoyé à ${settings.emergencyName.ifBlank { "ton contact" }}." else "Impossible d'envoyer le message. Appelle le 112 si tu as besoin d'aide.")
+    }
+
+    // ---------- Tunnels : position estimée quand le GPS ne répond plus ----------
+    private var lastRealFixAt = 0L
+    private var lastReal: Fix? = null
+    private fun deadReckon(now: Long) {
+        crashTimeout(now)
+        val f0 = lastReal ?: return
+        val lost = now - lastRealFixAt
+        if (lost < 2_500 || lost > 120_000 || f0.speedKmh < 30 || f0.bearing.isNaN()) return
+        val d = f0.speedKmh / 3.6 * lost / 1000.0
+        val (lat, lon) = advance(f0.lat, f0.lon, f0.bearing, d)
+        radarStep(f0.copy(lat = lat, lon = lon, timeMs = f0.timeMs + lost, accuracyM = 30.0))
+    }
+    /** Avance de [m] mètres : le long de l'itinéraire s'il y en a un, sinon tout droit. */
+    private fun advance(lat: Double, lon: Double, bearing: Double, m: Double): Pair<Double, Double> {
+        val pts = route?.points
+        if (pts != null && pts.size > 1) {
+            var i = pts.indices.minByOrNull { fr.roadguard.core.radar.Geo.distanceMeters(lat, lon, pts[it].lat, pts[it].lon) } ?: 0
+            if (fr.roadguard.core.radar.Geo.distanceMeters(lat, lon, pts[i].lat, pts[i].lon) < 80) {
+                var left = m; var cLat = lat; var cLon = lon
+                while (i < pts.size - 1) {
+                    val seg = fr.roadguard.core.radar.Geo.distanceMeters(cLat, cLon, pts[i + 1].lat, pts[i + 1].lon)
+                    if (seg >= left) { val t = left / seg; return (cLat + (pts[i + 1].lat - cLat) * t) to (cLon + (pts[i + 1].lon - cLon) * t) }
+                    left -= seg; cLat = pts[i + 1].lat; cLon = pts[i + 1].lon; i++
+                }
+                return cLat to cLon
+            }
+        }
+        val r = Math.toRadians(bearing)
+        val dLat = m * Math.cos(r) / 111_320.0
+        val dLon = m * Math.sin(r) / (111_320.0 * Math.cos(Math.toRadians(lat)))
+        return (lat + dLat) to (lon + dLon)
+    }
+
+    init {
+        scope.launch { while (true) { kotlinx.coroutines.delay(1_000); runCatching { deadReckon(System.currentTimeMillis()) } } }
+        community.startConvoyLoop()
     }
 
     /** À appeler une fois (bases radars chargées en arrière-plan). */
@@ -174,28 +343,14 @@ class DrivingSession(
         return f.copy(speedKmh = speed, bearing = bearing)
     }
 
-    fun onLocation(location: Location) {
-        // Pays de radars ajouté ou retiré : on recharge les bases en arrière-plan.
-        if (radarVersion != RadarRepository.version.value) {
-            radarVersion = RadarRepository.version.value
-            if (alerts != null) scope.launch { prepare() }
-        }
-        voice.voiceEnabled = settings.voice
-        voice.beepEnabled = settings.beep
-        voice.duckMusic = settings.duckMusic
-        voice.configure(settings.voiceName, settings.speechRate, settings.voiceTone)
-        voice.realistic = false // même voix (celle du téléphone) pour le guidage et les radars
-        val f = completeFix(location.toAlertFix())
-        // Vitesse calculée par ROADGUARD si le GPS ne la donne pas (certains postes).
-        fix = location.toSpeedFix().let { sf -> if (!location.hasSpeed() && f.speedKmh > 0) sf.copy(kmh = f.speedKmh.toInt()) else sf }
-        here = f
-
+    /** Radars : alerte, bips, alarme et réprimandes pour une position (réelle, ou estimée dans un tunnel). */
+    private fun radarStep(f: Fix) {
         alerts?.route = route?.points // radars comptés seulement sur le tracé pendant un guidage
-        val newAlert = alerts?.update(f)?.takeIf { settings.radarsOn && it.radar.kind in settings.alertKinds }
+        val newAlert = alerts?.update(f)?.takeIf { settings.radarsOn && !radarsBlockedHere && it.radar.kind in settings.alertKinds }
         if (newAlert?.isNew == true) voice.announce(newAlert)
         // Une position isolée sans cap fiable ne doit pas faire clignoter le bandeau : on garde
         // l'alerte précédente 4 s au plus, tant que le radar est encore devant (distance qui baisse).
-        val held = alert?.takeIf { settings.radarsOn && newAlert == null && !it.passed && f.timeMs - alertAt < 4_000 }?.let { a ->
+        val held = alert?.takeIf { settings.radarsOn && !radarsBlockedHere && newAlert == null && !it.passed && f.timeMs - alertAt < 4_000 }?.let { a ->
             val raw = fr.roadguard.core.radar.Geo.distanceMeters(f.lat, f.lon, a.radar.lat, a.radar.lon)
             val d = (raw - fr.roadguard.core.radar.AlertEngine.lagMeters(f.speedKmh)).toInt()
             // Jamais après le radar : dès qu'il est atteint (ou derrière), l'alerte s'arrête.
@@ -208,7 +363,7 @@ class DrivingSession(
         val previous = alert
         alert = newAlert ?: held
         if (alert == null && previous != null && previous.distanceM < 80 && previous.radar.id != lastPassedId) {
-            lastPassedId = previous.radar.id; trip.onRadarPassed()
+            lastPassedId = previous.radar.id; trip.onRadarPassed(); meter.radars++
         }
         // Excès de vitesse en approchant d'un radar : alarme forte qui réveille, jusqu'à repasser sous la limite.
         val cur = alert
@@ -231,9 +386,33 @@ class DrivingSession(
         val a = alert
         // Radar dépassé : bips encore le temps de parcourir les derniers mètres (40 m après le radar).
         voice.proximity(a?.distanceM, if (a?.passed == true) (a.remainingM / (f.speedKmh / 3.6).coerceAtLeast(2.0) * 1000).toLong().coerceAtLeast(1) else 0)
+    }
+
+    fun onLocation(location: Location) {
+        // Pays de radars ajouté ou retiré : on recharge les bases en arrière-plan.
+        if (radarVersion != RadarRepository.version.value) {
+            radarVersion = RadarRepository.version.value
+            if (alerts != null) scope.launch { prepare() }
+        }
+        voice.voiceEnabled = settings.voice
+        voice.beepEnabled = settings.beep
+        voice.duckMusic = settings.duckMusic
+        voice.configure(settings.voiceName, settings.speechRate, settings.voiceTone)
+        voice.realistic = false // même voix (celle du téléphone) pour le guidage et les radars
+        val f = completeFix(location.toAlertFix())
+        // Vitesse calculée par ROADGUARD si le GPS ne la donne pas (certains postes).
+        fix = location.toSpeedFix().let { sf -> if (!location.hasSpeed() && f.speedKmh > 0) sf.copy(kmh = f.speedKmh.toInt()) else sf }
+        here = f
+
+        lastReal = f; lastRealFixAt = System.currentTimeMillis()
+        radarStep(f)
         community.onFix(f)
         trip.onFix(f.lat, f.lon, f.speedKmh, f.accuracyM, f.timeMs, if (location.hasAltitude()) location.altitude else null)
         localInfo.onFix(f.lat, f.lon, System.currentTimeMillis())
+        val nowMs = System.currentTimeMillis()
+        contextAnnouncements(f, nowMs)
+        tripStep(f, nowMs)
+        crashStep(f.speedKmh, nowMs)
         tracks.onFix(f.lat, f.lon, f.speedKmh, if (location.hasAltitude()) location.altitude else null, f.timeMs)
         val newAverage = averages?.update(f)
         if (newAverage?.finished == true && average?.finished != true) voice.announceAverageResult(newAverage)
@@ -245,7 +424,7 @@ class DrivingSession(
             lastLogAt = f.timeMs
             android.util.Log.i("RoadguardSession", "pos=%.5f,%.5f v=%.0f cap=%.0f prec=%.0f nuit=%b alerte=%s radars=%b".format(
                 java.util.Locale.US, f.lat, f.lon, f.speedKmh, f.bearing, f.accuracyM, night,
-                newAlert?.let { "${it.radar.id}@${it.distanceM.toInt()}m" } ?: "-", alerts != null))
+                alert?.let { "${it.radar.id}@${it.distanceM.toInt()}m" } ?: "-", alerts != null))
         }
         limitTracker.add(f.lat, f.lon, f.timeMs, f.speedKmh)?.let { trail ->
             if (!limitBusy) {

@@ -32,8 +32,21 @@ import fr.roadguard.core.radar.RadarKind
 @Composable
 fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit, onOfflineData: (() -> Unit)? = null, showAutostart: Boolean = false,
     onCommunity: (() -> Unit)? = null, onMusicPlayer: (() -> Unit)? = null, onPersonalize: (() -> Unit)? = null,
-    voice: fr.roadguard.core.radar.AlertVoice? = null, updateApp: String? = null, onAdmin: (() -> Unit)? = null) {
+    voice: fr.roadguard.core.radar.AlertVoice? = null, updateApp: String? = null, onAdmin: (() -> Unit)? = null,
+    session: fr.roadguard.core.DrivingSession? = null) {
     val context = androidx.compose.ui.platform.LocalContext.current
+    // Outils (autoradio surtout) : ouverts en plein écran par-dessus les réglages.
+    val tool = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0) }
+    if (session != null && tool.value != 0) {
+        androidx.compose.ui.window.Dialog(onDismissRequest = { tool.value = 0 },
+            properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)) {
+            val close = { tool.value = 0 }
+            when (tool.value) {
+                1 -> ParkingScreen(session, close); 2 -> NearbyScreen(session, close); 3 -> TripHistoryScreen(session, close)
+                4 -> ConvoyScreen(session, close); else -> HudScreen(session, close)
+            }
+        }
+    }
     Column(Modifier.fillMaxSize().background(DriveColors.Background).padding(20.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Réglages", color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
@@ -44,6 +57,13 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             AccountCard(onAdmin = { onAdmin?.invoke() })
+            if (session != null) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                BigButton("🅿 Ma voiture", DriveColors.Panel) { tool.value = 1 }
+                BigButton("📍 À proximité", DriveColors.Panel) { tool.value = 2 }
+                BigButton("📒 Mes trajets", DriveColors.Panel) { tool.value = 3 }
+                BigButton("🚗 Convoi et partage", DriveColors.Panel) { tool.value = 4 }
+                BigButton("🪞 Tête haute", DriveColors.Panel) { tool.value = 5 }
+            }
             BigButton("📖 Revoir le tutoriel", DriveColors.Panel) { Tutorial.forceShow = true; onClose() }
             if (onPersonalize != null) BigButton("🖼 Fond d'écran et logo de démarrage", DriveColors.Accent, onPersonalize)
             if (onMusicPlayer != null) BigButton("🎵 Lecteur de musique (Bluetooth du poste…)", DriveColors.Accent, onMusicPlayer)
@@ -68,6 +88,7 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
             ToggleRow("Alarme forte si je suis trop vite en approchant d'un radar", settings.radarAlarm, settings::changeRadarAlarm)
             ToggleRow("Alarme forte aussi sans radar, dès que je dépasse la limitation", settings.alarmAnywhere, settings::changeAlarmAnywhere)
             ToggleRow("Me réprimander si je roule trop vite trop longtemps ou trop souvent", settings.scold, settings::changeScold)
+            SafetySettings(settings)
             ToggleRow("Rappel de pause après 2 h de conduite", settings.pauseReminder, settings::changePauseReminder)
 
             Section("Itinéraire")

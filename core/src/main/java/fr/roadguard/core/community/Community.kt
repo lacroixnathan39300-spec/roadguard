@@ -216,6 +216,99 @@ class Community(context: Context, private val scope: CoroutineScope, private val
 
     private fun getJson(path: String): JSONObject = request("GET", path, null, auth = true)
 
+    /** Pseudo communauté créé au besoin avec l'identifiant Pilote (convoi, partage). */
+    private suspend fun ensureAccount() {
+        if (hasAccount) return
+        val auto = fr.roadguard.core.account.AccountManager.get(appContext).status?.username?.takeIf { it.length >= 2 } ?: "Pilote"
+        setName(auto).getOrThrow()
+    }
+
+    // ---------- Convoi entre amis ----------
+    var convoyCode by androidx.compose.runtime.mutableStateOf<String?>(prefs.getString("convoy", null)); private set
+    var convoy by androidx.compose.runtime.mutableStateOf<List<Driver>>(emptyList()); private set
+    private val heardMessages = HashSet<String>()
+    private var convoyJob: Job? = null
+    private var pendingConvoyMessage: String? = null
+
+    fun joinConvoy(code: String) {
+        val c = code.uppercase().filter { it.isLetterOrDigit() }.take(8)
+        if (c.length < 4) return show("Code de convoi : 4 à 8 lettres ou chiffres")
+        convoyCode = c; prefs.edit().putString("convoy", c).apply()
+        startConvoyLoop()
+        show("Convoi $c rejoint : partage ce code avec tes amis")
+    }
+    fun leaveConvoy() {
+        val c = convoyCode ?: return
+        convoyCode = null; convoy = emptyList(); prefs.edit().remove("convoy").apply()
+        convoyJob?.cancel(); convoyJob = null
+        scope.launch(Dispatchers.IO) { runCatching { request("POST", "/v1/convoy/leave", JSONObject().put("code", c), auth = true) } }
+    }
+    fun convoyMessage(text: String) { pendingConvoyMessage = text; show("Message envoyé au convoi") }
+    fun startConvoyLoop() {
+        if (convoyCode == null || convoyJob?.isActive == true) return
+        convoyJob = scope.launch {
+            while (convoyCode != null) {
+                runCatching {
+                    ensureAccount()
+                    val f = here
+                    val body = JSONObject().put("code", convoyCode)
+                    if (f != null) body.put("lat", f.lat).put("lon", f.lon).put("speed", f.speedKmh.toInt())
+                    pendingConvoyMessage?.let { body.put("message", it); pendingConvoyMessage = null }
+                    val o = withContext(Dispatchers.IO) { request("POST", "/v1/convoy", body, auth = true) }
+                    val me = o.optString("me")
+                    val a = o.optJSONArray("members") ?: JSONArray()
+                    convoy = (0 until a.length()).mapNotNull { i ->
+                        val m = a.getJSONObject(i)
+                        val id = m.optString("account_id")
+                        // Message d'un ami : dit une fois.
+                        val msg = m.optString("message").takeIf { it.isNotBlank() && it != "null" }
+                        val key = "$id:${m.optLong("message_at")}"
+                        if (msg != null && id != me && heardMessages.add(key) && System.currentTimeMillis() - m.optLong("message_at") < 5 * 60_000) {
+                            speak("Convoi, ${m.optString("name")} : $msg")
+                        }
+                        if (id == me || m.isNull("lat")) null
+                        else Driver("convoy-$id", "🚗 " + m.optString("name"), m.getDouble("lat"), m.getDouble("lon"), m.optInt("speed").takeIf { it > 0 })
+                    }
+                }
+                delay(10_000)
+            }
+        }
+    }
+
+    // ---------- Partage de trajet en direct ----------
+    var shareLink by androidx.compose.runtime.mutableStateOf<String?>(null); private set
+    private var shareToken: String? = null
+    private var shareJob: Job? = null
+    /** Démarre le partage : renvoie le lien à envoyer. [info] donne (destination, arrivée prévue en ms). */
+    suspend fun startShare(info: () -> Pair<String?, Long?>): Result<String> = runCatching {
+        ensureAccount()
+        val o = withContext(Dispatchers.IO) { request("POST", "/v1/share/start", JSONObject(), auth = true) }
+        val t = o.getString("token")
+        shareToken = t
+        val link = baseUrl.trimEnd('/') + "/s/" + t
+        shareLink = link
+        shareJob?.cancel()
+        shareJob = scope.launch {
+            while (shareToken == t) {
+                runCatching {
+                    val f = here
+                    val (dest, eta) = info()
+                    val body = JSONObject().put("token", t)
+                    if (f != null) body.put("lat", f.lat).put("lon", f.lon).put("speed", f.speedKmh.toInt())
+                    dest?.let { body.put("dest", it) }; eta?.let { body.put("eta", it) }
+                    withContext(Dispatchers.IO) { request("POST", "/v1/share/update", body, auth = false) }
+                }
+                delay(15_000)
+            }
+        }
+        link
+    }
+    fun stopShare() {
+        val t = shareToken ?: return
+        shareToken = null; shareLink = null; shareJob?.cancel()
+        scope.launch(Dispatchers.IO) { runCatching { request("POST", "/v1/share/update", JSONObject().put("token", t).put("stop", true), auth = false) } }
+    }
+
     private fun request(method: String, path: String, body: JSONObject?, auth: Boolean): JSONObject {
         val key = if (auth) prefs.getString("id", null)?.let { id -> "$id.${prefs.getString("secret", "")}" } else null
         val sep = if ('?' in path) '&' else '?'

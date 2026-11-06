@@ -60,6 +60,7 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name="fr.roadguard.core.ui.ParkingAlarmReceiver" android:exported="false" />
         <provider
             android:name="fr.roadguard.core.update.UpdateProvider"
             android:authorities="${applicationId}.roadguard.updates"

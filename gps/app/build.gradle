@@ -3,7 +3,7 @@ apply plugin: 'org.jetbrains.kotlin.android'
 apply plugin: 'org.jetbrains.kotlin.plugin.compose'
 // Keep the phone build independent of AndroidX Car when CodeAssist cannot resolve it.
 def roadguardAndroidAuto = project.findProperty('roadguardAndroidAuto') != 'false'
-android { lint { if (project.hasProperty('roadguardApiLint')) checkOnly 'NewApi', 'InlinedApi' }; buildFeatures { aidl true; compose true }; androidResources { noCompress 'tflite' }; namespace 'fr.roadguard.app'; compileSdk 36
+android { lint { if (project.hasProperty('roadguardApiLint')) checkOnly 'NewApi', 'InlinedApi' }; buildFeatures { aidl true; compose true }; androidResources { noCompress 'tflite', 'task' }; namespace 'fr.roadguard.app'; compileSdk 36
  defaultConfig { resValue 'bool', 'rg_emulator_test', project.hasProperty('emulator') ? 'true' : 'false'; applicationId 'fr.roadguard.gps'; minSdk 26; targetSdk 36; versionCode 600+(System.getenv('VERSION_CODE')?:'0').toInteger(); versionName '11.15.'+(System.getenv('VERSION_CODE')?:'0') }
  signingConfigs { debug { if (System.getenv('ROADGUARD_GPS_DEBUG_KEYSTORE')) storeFile file(System.getenv('ROADGUARD_GPS_DEBUG_KEYSTORE')); v1SigningEnabled true; v2SigningEnabled true } }
  // Clé ROADGUARD : fournie par la CI (déchiffrée depuis keys/), jamais versionnée en clair.
@@ -57,6 +57,7 @@ dependencies {
  implementation 'androidx.camera:camera-camera2:1.4.1'
  implementation 'androidx.camera:camera-lifecycle:1.4.1'
  implementation 'androidx.camera:camera-view:1.4.1'
+ implementation 'androidx.camera:camera-video:1.4.1'
  implementation 'com.google.mediapipe:tasks-vision:0.10.14'
  implementation 'com.squareup.okhttp3:okhttp:4.12.0'
  implementation('com.graphhopper:graphhopper-core:5.3') {

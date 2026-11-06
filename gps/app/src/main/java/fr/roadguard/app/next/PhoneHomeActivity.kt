@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -186,6 +187,42 @@ private fun PhoneHome() {
     var showEqualizer by remember { mutableStateOf(false) }
     var showAdmin by remember { mutableStateOf(false) }
     var showCamera by remember { mutableStateOf(false) }
+    var showParking by remember { mutableStateOf(false) }
+    var showTrips by remember { mutableStateOf(false) }
+    var showNearby by remember { mutableStateOf(false) }
+    var showHud by remember { mutableStateOf(false) }
+    var showConvoy by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+    // Dashcam (caméra arrière en boucle) : une seule caméra à la fois avec l'anti-somnolence.
+    rememberDashcam(s, settings.dashcam && !settings.drowsyGuard)
+    // Commandes vocales : bouton 🎤 de la carte.
+    val voiceActions = remember {
+        object : VoiceActions {
+            override fun openParking() { showParking = true }
+            override fun openNearby() { showNearby = true }
+            override fun openSearch(query: String?) { searchQuery = query.orEmpty(); showSearch = true }
+            override fun openTrips() { showTrips = true }
+            override fun openHud() { showHud = true }
+        }
+    }
+    val listen = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()) { r ->
+        val text = r.data?.getStringArrayListExtra(android.speech.RecognizerIntent.EXTRA_RESULTS)?.firstOrNull() ?: return@rememberLauncherForActivityResult
+        s.voice.speak(VoiceCommands.handle(text, s, voiceActions))
+    }
+    fun startListening() = runCatching {
+        listen.launch(android.content.Intent(android.speech.RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+            .putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE_MODEL, android.speech.RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            .putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE, "fr-FR")
+            .putExtra(android.speech.RecognizerIntent.EXTRA_PROMPT, "Pilote, je t'écoute…"))
+    }
+    // Réponse dictée au dernier message lu.
+    val incoming = MessageReader.last.value
+    val replyTo = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()) { r ->
+        val text = r.data?.getStringArrayListExtra(android.speech.RecognizerIntent.EXTRA_RESULTS)?.firstOrNull() ?: return@rememberLauncherForActivityResult
+        val m = MessageReader.last.value ?: return@rememberLauncherForActivityResult
+        s.voice.speak(if (MessageReader.reply(context, m, text)) "Réponse envoyée à ${m.from}" else "Impossible de répondre depuis Pilote à ce message")
+        MessageReader.last.value = null
+    }
     // Anti-somnolence : analyse invisible par la caméra avant pendant que la carte reste affichée.
     val drowsy = rememberDrowsyGuard(s, settings.drowsyGuard)
     var wakeDismissedAt by remember { mutableStateOf(0L) }
@@ -211,12 +248,12 @@ private fun PhoneHome() {
         }
     }) {
         DriveMap(
-            reports = s.community.reports, drivers = s.community.drivers, jams = s.community.jams,
+            reports = s.community.reports, drivers = s.community.drivers + s.community.convoy, jams = s.community.jams,
             position = s.here, northUp = settings.northUp, adaptiveZoom = settings.adaptiveZoom, speedKmh = s.fix?.kmh ?: 0,
             alternatives = s.alternatives,
             offlinePack = offlinePack,
             hasLocation = hasLocation, route = s.route, recenterRequest = s.recenter,
-            night = s.night, visibleKinds = if (settings.radarsOn) settings.alertKinds else emptySet(), roadguardStyle = settings.mapStyle == "roadguard", bottomInset = if (panelOpen) 0.30f else 0.14f, modifier = Modifier.fillMaxSize(),
+            night = s.night, visibleKinds = if (settings.radarsOn && !s.radarsBlockedHere) settings.alertKinds else emptySet(), roadguardStyle = settings.mapStyle == "roadguard", bottomInset = if (panelOpen) 0.30f else 0.14f, modifier = Modifier.fillMaxSize(),
         )
         Column(Modifier.align(Alignment.TopCenter).statusBarsPadding().displayCutoutPadding().fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             if (s.navigating) {
@@ -225,6 +262,24 @@ private fun PhoneHome() {
             }
             AlertBanners(s.alert, s.average)
             if (!s.navigating) BubbleSetupCard(settings)
+            fr.roadguard.core.ui.TripSummaryCard(s, Modifier.padding(horizontal = 12.dp, vertical = 6.dp))
+            if (incoming != null && System.currentTimeMillis() - incoming.at < 120_000) {
+                // Dernier message lu à voix haute : réponse dictée en un appui.
+                Row(Modifier.padding(horizontal = 12.dp, vertical = 6.dp).widthIn(max = 560.dp).fillMaxWidth().clip(RoundedCornerShape(16.dp))
+                    .background(Color(0xF01B5E20)).padding(12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("💬 ${incoming.app} · ${incoming.from} : ${incoming.text}", color = Color.White, fontSize = 15.sp, maxLines = 2, modifier = Modifier.weight(1f))
+                    if (incoming.reply != null) fr.roadguard.core.ui.BigButton("🎤 Répondre", DriveColors.Accent) {
+                        runCatching {
+                            replyTo.launch(android.content.Intent(android.speech.RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                                .putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE_MODEL, android.speech.RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                                .putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE, "fr-FR")
+                                .putExtra(android.speech.RecognizerIntent.EXTRA_PROMPT, "Ta réponse à ${incoming.from}"))
+                        }
+                    }
+                    fr.roadguard.core.ui.BigButton("✕", DriveColors.Panel) { MessageReader.last.value = null }
+                }
+            }
+            CalendarHint(s, settings.calendarHints)
             s.community.prompt?.let { fr.roadguard.core.ui.VotePromptCard(it, s.community::answer) }
             s.community.toast?.let { fr.roadguard.core.ui.CommunityToast(it, s.community::dismissToast) }
         }
@@ -292,6 +347,7 @@ private fun PhoneHome() {
                 Text(if (drowsy == Alertness.AWAKE) "👁" else if (drowsy == Alertness.SEARCHING) "👁…" else "😴", fontSize = 22.sp,
                     modifier = Modifier.clip(RoundedCornerShape(12.dp)).background(Color(drowsy.color).copy(alpha = 0.85f)).padding(horizontal = 8.dp, vertical = 4.dp))
             }
+            MapButton("🎤", onClick = { startListening() })
             MapButton("⚠", onClick = { showReport = true })
             MapButton("◎", onClick = { s.recenter++ })
         }
@@ -315,14 +371,15 @@ private fun PhoneHome() {
                 favorites = s.recents, home = s.home, work = s.work,
                 onSave = s::saveSlot,
                 onPick = { showSearch = false; s.startNavigation(it) },
-                onClose = { showSearch = false },
+                onClose = { showSearch = false; searchQuery = "" },
                 starred = s.favorites, onStar = s::toggleFavorite,
+                initialQuery = searchQuery,
             )
         }
         if (showMenu) {
             BackHandler { showMenu = false }
             Column(
-                Modifier.fillMaxSize().background(DriveColors.Background).statusBarsPadding().navigationBarsPadding().padding(16.dp),
+                Modifier.fillMaxSize().background(DriveColors.Background).statusBarsPadding().navigationBarsPadding().padding(16.dp).verticalScroll(androidx.compose.foundation.rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -335,7 +392,13 @@ private fun PhoneHome() {
                 MenuEntry("😴", if (settings.drowsyGuard) "Anti-somnolence : activé" else "Anti-somnolence : désactivé",
                     "Caméra avant, sans rien afficher : alarme si tes yeux se ferment, conseil de pause si tu fatigues") {
                     showMenu = false; settings.changeDrowsyGuard(!settings.drowsyGuard)
+                    if (settings.drowsyGuard && settings.dashcam) settings.changeDashcam(false)
                 }
+                MenuEntry("🅿", "Ma voiture", "Où est garée ta voiture, retour à pied, minuteur de stationnement") { showMenu = false; showParking = true }
+                MenuEntry("📍", "À proximité", "Carburants les moins chers, bornes, parkings, aires, toilettes") { showMenu = false; showNearby = true }
+                MenuEntry("📒", "Mes trajets", "Historique, éco-conduite, journal km pro/perso, carburant, entretien") { showMenu = false; showTrips = true }
+                MenuEntry("🚗", "Convoi et partage", "Rouler à plusieurs, partager ton trajet en direct") { showMenu = false; showConvoy = true }
+                MenuEntry("🪞", "Affichage tête haute", "Vitesse et consigne en miroir, pour le pare-brise la nuit") { showMenu = false; showHud = true }
                 MenuEntry("📊", "Ordinateur de bord", "Distances, temps, vitesses, chronos") { showMenu = false; showTrip = true }
                 MenuEntry("👥", "Communauté", "Pseudo, points, classement, conducteurs autour") { showMenu = false; showCommunity = true }
                 MenuEntry("📍", "Mes radars", "Ajouter un radar ici, importer un fichier CSV") { open(2) }
@@ -353,6 +416,12 @@ private fun PhoneHome() {
         if (drowsy == Alertness.ASLEEP && System.currentTimeMillis() - wakeDismissedAt > 3_000) {
             WakeUpOverlay { wakeDismissedAt = System.currentTimeMillis() }
         }
+        if (showParking) { BackHandler { showParking = false }; fr.roadguard.core.ui.ParkingScreen(s) { showParking = false } }
+        if (showTrips) { BackHandler { showTrips = false }; fr.roadguard.core.ui.TripHistoryScreen(s) { showTrips = false } }
+        if (showNearby) { BackHandler { showNearby = false }; fr.roadguard.core.ui.NearbyScreen(s) { showNearby = false } }
+        if (showConvoy) { BackHandler { showConvoy = false }; fr.roadguard.core.ui.ConvoyScreen(s) { showConvoy = false } }
+        if (showHud) { BackHandler { showHud = false }; fr.roadguard.core.ui.HudScreen(s) { showHud = false } }
+        fr.roadguard.core.ui.CrashOverlay(s)
         if (showCamera) {
             BackHandler { showCamera = false }
             CameraAssistScreen(s, onClose = { showCamera = false })

@@ -139,6 +139,10 @@ class AccountManager private constructor(context: Context) {
         request("POST", "/v1/admin/config", JSONObject().put("contact", contact))
     }
 
+    // ---------- Sauvegarde des réglages dans le compte ----------
+    suspend fun saveSettings(data: JSONObject) = withContext(Dispatchers.IO) { request("POST", "/v1/auth/settings", data) }
+    suspend fun loadSettings(): JSONObject? = withContext(Dispatchers.IO) { request("GET", "/v1/auth/settings", null).optJSONObject("settings") }
+
     // ---------- Messagerie avec l'administrateur ----------
     suspend fun sendMessage(text: String, app: String) = withContext(Dispatchers.IO) {
         request("POST", "/v1/auth/message", JSONObject().put("text", text).put("app", app))

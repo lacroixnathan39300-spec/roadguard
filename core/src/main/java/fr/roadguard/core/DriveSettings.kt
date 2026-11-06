@@ -150,6 +150,94 @@ class DriveSettings(context: Context) {
         prefs.edit().putStringSet("alert_kinds", alertKinds.map { it.name }.toSet()).apply()
     }
 
+
+    // ---------- Sécurité et pratique (lot du 06/11) ----------
+    private fun put(key: String, v: Any) = prefs.edit().apply {
+        when (v) { is Boolean -> putBoolean(key, v); is Int -> putInt(key, v); is String -> putString(key, v); is Float -> putFloat(key, v) }
+    }.apply()
+
+    /** Suisse : annonces de radars interdites, coupées automatiquement dans le pays. */
+    var swissMode by mutableStateOf(prefs.getBoolean("swiss_mode", true)); private set
+    fun changeSwissMode(v: Boolean) { swissMode = v; put("swiss_mode", v) }
+    /** France : limitations abaissées par temps de pluie (130→110, 110→100, 90→80). */
+    var rainLimits by mutableStateOf(prefs.getBoolean("rain_limits", true)); private set
+    fun changeRainLimits(v: Boolean) { rainLimits = v; put("rain_limits", v) }
+    /** Profil : 0 normal, 1 jeune conducteur (France : 110 / 100 / 80). */
+    var driverProfile by mutableStateOf(prefs.getInt("driver_profile", 0)); private set
+    fun changeDriverProfile(v: Int) { driverProfile = v; put("driver_profile", v) }
+    /** Vitesse maximale personnelle (remorque, caravane…), 0 = aucune. */
+    var personalMax by mutableStateOf(prefs.getInt("personal_max", 0)); private set
+    fun changePersonalMax(v: Int) { personalMax = v; put("personal_max", v) }
+    /** Annonces météo dangereuse (verglas, brouillard, fortes pluies, neige). */
+    var weatherAlerts by mutableStateOf(prefs.getBoolean("weather_alerts", true)); private set
+    fun changeWeatherAlerts(v: Boolean) { weatherAlerts = v; put("weather_alerts", v) }
+    /** Virages dangereux, passages à niveau, écoles (OpenStreetMap). */
+    var hazardAlerts by mutableStateOf(prefs.getBoolean("hazard_alerts", true)); private set
+    fun changeHazardAlerts(v: Boolean) { hazardAlerts = v; put("hazard_alerts", v) }
+    /** Rappel « rien oublié à l'arrière ? » en fin de trajet. */
+    var forgetReminder by mutableStateOf(prefs.getBoolean("forget_reminder", false)); private set
+    fun changeForgetReminder(v: Boolean) { forgetReminder = v; put("forget_reminder", v) }
+    /** Détection d'accident et contact d'urgence prévenu par SMS. */
+    var crashDetect by mutableStateOf(prefs.getBoolean("crash_detect", false)); private set
+    fun changeCrashDetect(v: Boolean) { crashDetect = v; put("crash_detect", v) }
+    var emergencyName by mutableStateOf(prefs.getString("emergency_name", "") ?: ""); private set
+    var emergencyPhone by mutableStateOf(prefs.getString("emergency_phone", "") ?: ""); private set
+    fun changeEmergency(name: String, phone: String) { emergencyName = name; emergencyPhone = phone; put("emergency_name", name); put("emergency_phone", phone) }
+    /** Bluetooth de la voiture : Pilote démarre à la connexion (adresse de l'appareil, vide = non). */
+    var carBluetooth by mutableStateOf(prefs.getString("car_bt", "") ?: ""); private set
+    var carBluetoothName by mutableStateOf(prefs.getString("car_bt_name", "") ?: ""); private set
+    fun changeCarBluetooth(address: String, name: String) { carBluetooth = address; carBluetoothName = name; put("car_bt", address); put("car_bt_name", name) }
+    /** Dashcam : enregistre en boucle avec la caméra arrière et garde la vidéo en cas de choc. */
+    var dashcam by mutableStateOf(prefs.getBoolean("dashcam", false)); private set
+    fun changeDashcam(v: Boolean) { dashcam = v; put("dashcam", v) }
+    /** Coupe automatiquement les messages, à part l'essentiel, en mode moto (gros boutons, casque). */
+    var motoMode by mutableStateOf(prefs.getBoolean("moto_mode", false)); private set
+    fun changeMotoMode(v: Boolean) { motoMode = v; put("moto_mode", v) }
+    /** Écran tête haute : affichage en miroir pour le pare-brise. */
+    var hudMirror by mutableStateOf(prefs.getBoolean("hud_mirror", true)); private set
+    fun changeHudMirror(v: Boolean) { hudMirror = v; put("hud_mirror", v) }
+    /** Boutons du volant : appui long sur « suivant » = signaler un radar mobile. */
+    var wheelReport by mutableStateOf(prefs.getBoolean("wheel_report", false)); private set
+    fun changeWheelReport(v: Boolean) { wheelReport = v; put("wheel_report", v) }
+    /** Notification vibrante à chaque radar (relayée sur la montre connectée). */
+    var watchAlerts by mutableStateOf(prefs.getBoolean("watch_alerts", false)); private set
+    fun changeWatchAlerts(v: Boolean) { watchAlerts = v; put("watch_alerts", v) }
+    /** Lecture des notifications de messages (SMS, WhatsApp…) à voix haute. */
+    var speakNotifications by mutableStateOf(prefs.getBoolean("speak_notifications", false)); private set
+    fun changeSpeakNotifications(v: Boolean) { speakNotifications = v; put("speak_notifications", v) }
+    /** Rappel d'entretien : kilomètres de la prochaine vidange (0 = aucun). */
+    var serviceAtKm by mutableStateOf(prefs.getInt("service_at_km", 0)); private set
+    fun changeServiceAtKm(v: Int) { serviceAtKm = v; put("service_at_km", v) }
+    /** Rendez-vous de l'agenda : propose l'itinéraire et l'heure de départ. */
+    var calendarHints by mutableStateOf(prefs.getBoolean("calendar_hints", false)); private set
+    fun changeCalendarHints(v: Boolean) { calendarHints = v; put("calendar_hints", v) }
+    /** Classement des trajets par défaut : true = pro. */
+    var defaultTripPro by mutableStateOf(prefs.getBoolean("default_trip_pro", false)); private set
+    fun changeDefaultTripPro(v: Boolean) { defaultTripPro = v; put("default_trip_pro", v) }
+
+    /** Tous les réglages (sauvegarde dans le compte), avec leur type pour une restauration exacte. */
+    fun exportAll(): org.json.JSONObject = org.json.JSONObject().apply {
+        prefs.all.forEach { (k, v) ->
+            val t = when (v) { is Boolean -> "b"; is Int -> "i"; is Long -> "l"; is Float -> "f"; is String -> "s"; is Set<*> -> "S"; else -> null } ?: return@forEach
+            put(k, org.json.JSONObject().put("t", t).put("v", if (v is Set<*>) org.json.JSONArray(v.toList()) else v))
+        }
+    }
+    /** Restaure les réglages sauvegardés (pris en compte au prochain démarrage de l'appli). */
+    fun importAll(o: org.json.JSONObject) {
+        val e = prefs.edit()
+        o.keys().forEach { k ->
+            val x = o.optJSONObject(k) ?: return@forEach
+            runCatching {
+                when (x.getString("t")) {
+                    "b" -> e.putBoolean(k, x.getBoolean("v")); "i" -> e.putInt(k, x.getInt("v")); "l" -> e.putLong(k, x.getLong("v"))
+                    "f" -> e.putFloat(k, x.getDouble("v").toFloat()); "s" -> e.putString(k, x.getString("v"))
+                    "S" -> x.getJSONArray("v").let { a -> e.putStringSet(k, (0 until a.length()).map { a.getString(it) }.toSet()) }
+                }
+            }
+        }
+        e.apply()
+    }
+
     fun isNight(autoNight: Boolean): Boolean = when (theme) {
         ThemeMode.AUTO -> autoNight
         ThemeMode.DAY -> false

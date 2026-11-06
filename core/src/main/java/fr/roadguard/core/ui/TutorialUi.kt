@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.sp
 
 /** Tutoriel de bienvenue : montré une fois au premier lancement, puis depuis Réglages → « Revoir le tutoriel ». */
 object Tutorial {
-    private const val KEY = "tutorial_seen_v2" // v2 : nouveautés, montré à nouveau une fois
+    private const val KEY = "tutorial_seen_v3" // v2 : nouveautés, montré à nouveau une fois
     var forceShow by mutableStateOf(false)
     fun seen(context: Context) = context.getSharedPreferences("tutorial", Context.MODE_PRIVATE).getBoolean(KEY, false)
     fun markSeen(context: Context) = context.getSharedPreferences("tutorial", Context.MODE_PRIVATE).edit().putBoolean(KEY, true).apply()
@@ -99,6 +99,19 @@ private fun pages(drive: Boolean): List<Page> = listOfNotNull(
     )) else Page("🚗", "Avec l'autoradio", listOf(
         "Menu → « Pilote Link » : relie le téléphone à l'autoradio (Wi-Fi ou câble).",
         "L'autoradio reçoit ta position, ta musique, tes messages, et Internet par le téléphone.",
+    )),
+    Page("🛡", "Sécurité automatique", listOf(
+        "Suisse : alertes radars coupées toutes seules (interdites là-bas), rétablies en France.",
+        "Pluie : limitations abaissées (130→110, 110→100, 90→80). Jeune conducteur et vitesse max perso dans Réglages.",
+        "Météo dangereuse, passages à niveau, virages, écoles annoncés. Radars suivis même dans les tunnels.",
+        if (drive) "Fin de trajet : voiture garée mémorisée, et rappel « rien oublié ? » si tu l'actives." else "Détection d'accident : choc + arrêt → « Tout va bien ? », puis SMS à ton contact d'urgence.",
+    )),
+    Page("🧰", "Les outils", listOf(
+        (if (drive) "Réglages" else "Menu") + " → 🅿 Ma voiture (retour à pied, minuteur), 📍 À proximité (carburants les moins chers, bornes, parkings, aires).",
+        "📒 Mes trajets : historique, éco-conduite, journal km pro/perso à exporter, carnet de carburant, entretien.",
+        "🚗 Convoi entre amis et partage de trajet en direct ; 🪞 affichage tête haute pour le pare-brise.",
+        if (drive) "☁ Réglages sauvegardés dans ton compte : tu les retrouves sur un autre appareil."
+        else "🎤 sur la carte : « Pilote, signale la police », « coupe les radars », « rentre à la maison »… Messages lus à voix haute, dashcam, widget.",
     )),
     Page("✉", "Une question ? Écris-moi", listOf(
         "Réglages → ton compte → « ✉ Écrire à l'administrateur » : bug, idée, question.",

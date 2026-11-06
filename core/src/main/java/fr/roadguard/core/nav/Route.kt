@@ -26,7 +26,12 @@ data class Route(
     val lengthM: Double,
     val durationS: Double,
     val destination: LatLon,
-)
+    /** Kilomètres sur routes à péage (estimation du coût : ~0,10 €/km pour une voiture en France). */
+    val tollKm: Double = 0.0,
+) {
+    /** Coût estimé des péages en euros (null s'il n'y en a pas). */
+    val tollEuros: Int? get() = if (tollKm < 1) null else Math.round(tollKm * 0.10).toInt().coerceAtLeast(1)
+}
 
 /** Lecture de la réponse du calculateur d'itinéraire Valhalla (consignes en français). */
 object ValhallaParser {
@@ -62,6 +67,7 @@ object ValhallaParser {
                 roundaboutExit = m.optInt("roundabout_exit_count", 0).takeIf { it > 0 },
             )
         }
+        val tollKm = (0 until list.length()).sumOf { i -> list.getJSONObject(i).let { m -> if (m.optBoolean("toll")) m.optDouble("length", 0.0) else 0.0 } }
         val summary = trip.getJSONObject("summary")
         return Route(
             points = points,
@@ -69,6 +75,7 @@ object ValhallaParser {
             lengthM = summary.optDouble("length") * 1000.0,
             durationS = summary.optDouble("time"),
             destination = destination,
+            tollKm = tollKm,
         )
     }
 

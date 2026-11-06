@@ -390,7 +390,80 @@ async function cleanup(env: Env) {
     env.DB.prepare("DELETE FROM presence WHERE at < ?").bind(now - 30 * MIN),
     env.DB.prepare("DELETE FROM waves WHERE at < ?").bind(now - DAY),
     env.DB.prepare("DELETE FROM points_log WHERE at < ?").bind(now - 60 * DAY),
+    env.DB.prepare("DELETE FROM convoy WHERE at < ?").bind(now - 6 * HOUR),
+    env.DB.prepare("DELETE FROM shares WHERE expires_at < ?").bind(now - DAY),
   ]);
+}
+
+
+// ---------- convoi entre amis et partage de trajet ----------
+
+function cleanCode(raw: unknown): string | null {
+  const c = String(raw ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  return c.length >= 4 && c.length <= 8 ? c : null;
+}
+
+async function convoyUpdate(req: Request, env: Env, me: Account): Promise<Response> {
+  const b = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+  const code = cleanCode(b.code);
+  if (!code) return fail(400, "Code de convoi invalide");
+  const now = Date.now();
+  const lat = typeof b.lat === "number" ? b.lat : null, lon = typeof b.lon === "number" ? b.lon : null;
+  const speed = typeof b.speed === "number" ? Math.round(b.speed) : null;
+  const msg = typeof b.message === "string" ? b.message.replace(/[\u0000-\u001f<>]/g, "").trim().slice(0, 140) : null;
+  await env.DB.prepare(`INSERT INTO convoy (code, account_id, name, lat, lon, speed, message, message_at, at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(code, account_id) DO UPDATE SET name = excluded.name, lat = COALESCE(excluded.lat, lat), lon = COALESCE(excluded.lon, lon),
+    speed = COALESCE(excluded.speed, speed), message = COALESCE(excluded.message, message), message_at = COALESCE(excluded.message_at, message_at), at = excluded.at`)
+    .bind(code, me.id, me.name, lat, lon, speed, msg || null, msg ? now : null, now).run();
+  const rows = await env.DB.prepare("SELECT account_id, name, lat, lon, speed, message, message_at, at FROM convoy WHERE code = ? AND at > ?")
+    .bind(code, now - 30 * MIN).all();
+  return json({ code, me: me.id, members: rows.results });
+}
+
+async function convoyLeave(req: Request, env: Env, me: Account): Promise<Response> {
+  const b = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+  const code = cleanCode(b.code);
+  if (code) await env.DB.prepare("DELETE FROM convoy WHERE code = ? AND account_id = ?").bind(code, me.id).run();
+  return json({ ok: true });
+}
+
+async function shareStart(req: Request, env: Env, me: Account): Promise<Response> {
+  const token = randomId(10);
+  const now = Date.now();
+  await env.DB.prepare("INSERT INTO shares (token, name, at, expires_at) VALUES (?, ?, ?, ?)").bind(token, me.name, now, now + 12 * HOUR).run();
+  return json({ token });
+}
+
+async function shareUpdate(req: Request, env: Env): Promise<Response> {
+  const b = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+  const token = String(b.token ?? "");
+  if (!/^[0-9a-f]{20}$/.test(token)) return fail(400, "Jeton invalide");
+  const dest = typeof b.dest === "string" ? b.dest.replace(/[\u0000-\u001f<>]/g, "").slice(0, 120) : null;
+  await env.DB.prepare("UPDATE shares SET lat = ?, lon = ?, speed = ?, dest = ?, eta = ?, at = ? WHERE token = ? AND expires_at > ?")
+    .bind(Number(b.lat) || null, Number(b.lon) || null, Math.round(Number(b.speed) || 0), dest, Number(b.eta) || null, Date.now(), token, Date.now()).run();
+  if (b.stop === true) await env.DB.prepare("UPDATE shares SET expires_at = ? WHERE token = ?").bind(Date.now(), token).run();
+  return json({ ok: true });
+}
+
+function sharePage(token: string): Response {
+  const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pilote · trajet en direct</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>body{margin:0;font-family:system-ui,sans-serif;background:#0c1016;color:#fff}#m{position:absolute;inset:0 0 96px 0}
+#i{position:absolute;left:0;right:0;bottom:0;height:96px;padding:12px 16px;box-sizing:border-box;background:#141b24}
+h1{font-size:18px;margin:0 0 4px}p{margin:0;color:#b8c4d0;font-size:15px}</style></head><body>
+<div id="m"></div><div id="i"><h1 id="t">Chargement…</h1><p id="d"></p></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script>
+const map=L.map('m').setView([46.6,2.4],6);L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
+let mk=null,first=true;async function up(){try{const r=await fetch('/v1/share/${token}');const s=await r.json();
+if(s.error){document.getElementById('t').textContent='Partage terminé';document.getElementById('d').textContent='';return}
+document.getElementById('t').textContent=s.name+(s.speed?' · '+s.speed+' km/h':'');
+const ago=Math.round((Date.now()-s.at)/1000);
+document.getElementById('d').textContent=(s.dest?'Vers '+s.dest+' · ':'')+(s.eta?'arrivée vers '+new Date(s.eta).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+' · ':'')+'mis à jour il y a '+ago+' s';
+if(s.lat&&s.lon){if(!mk)mk=L.circleMarker([s.lat,s.lon],{radius:10,color:'#00b8ff',fillOpacity:.9}).addTo(map);mk.setLatLng([s.lat,s.lon]);
+if(first){map.setView([s.lat,s.lon],14);first=false}}}catch(e){}setTimeout(up,10000)}up();
+</script></body></html>`;
+  return new Response(html, { headers: { "content-type": "text/html; charset=utf-8" } });
 }
 
 export default {
@@ -433,7 +506,18 @@ export default {
         if (!data) return fail(404, "Morceau introuvable");
         return new Response(data, { headers: { "content-type": "application/octet-stream", "cache-control": "max-age=86400", ...CORS } });
       }
+      const sp = /^\/(?:s|share)\/([0-9a-f]{20})$/.exec(path);
+      if (req.method === "GET" && sp) return sharePage(sp[1]);
+      const sj = /^\/v1\/share\/([0-9a-f]{20})$/.exec(path);
+      if (req.method === "GET" && sj) {
+        const r = await env.DB.prepare("SELECT name, lat, lon, speed, dest, eta, at FROM shares WHERE token = ? AND expires_at > ?").bind(sj[1], Date.now()).first();
+        return r ? json(r) : fail(404, "Partage terminé");
+      }
+      if (req.method === "POST" && path === "/v1/share/update") return shareUpdate(req, env);
       if (!me) return fail(401, "Compte requis");
+      if (req.method === "POST" && path === "/v1/convoy") return convoyUpdate(req, env, me);
+      if (req.method === "POST" && path === "/v1/convoy/leave") return convoyLeave(req, env, me);
+      if (req.method === "POST" && path === "/v1/share/start") return shareStart(req, env, me);
       if (req.method === "GET" && path === "/v1/account") return json({ id: me.id, name: me.name, points: me.points });
       if ((req.method === "PATCH" || req.method === "POST") && path === "/v1/account/name") {
         const name = cleanName(((await req.json().catch(() => ({}))) as { name?: unknown }).name);

@@ -210,6 +210,19 @@ fun AccountCard(onAdmin: () -> Unit) {
                 BigButton(if (replies > 0) "✉ Écrire à l'administrateur ($replies)" else "✉ Écrire à l'administrateur",
                     if (replies > 0) Color(0xFFD63031) else DriveColors.Accent) { showContact = true }
             }
+            BigButton("☁ Sauvegarder mes réglages", DriveColors.Track) {
+                scope.launch {
+                    message = runCatching { account.saveSettings(fr.roadguard.core.DriveSettings(context).exportAll()) }
+                        .fold({ "Réglages sauvegardés dans ton compte ✓" }, { "Sauvegarde impossible : ${it.message}" })
+                }
+            }
+            BigButton("☁ Restaurer", DriveColors.Track) {
+                scope.launch {
+                    message = runCatching { account.loadSettings() }.fold({ o ->
+                        if (o == null) "Aucune sauvegarde" else { fr.roadguard.core.DriveSettings(context).importAll(o); "Réglages restaurés : redémarre l'appli pour les appliquer" }
+                    }, { "Restauration impossible : ${it.message}" })
+                }
+            }
             BigButton("Mot de passe", DriveColors.Track) { changing = !changing; message = null }
             BigButton("Se déconnecter", Color(0xFF7F1D1D)) { scope.launch { account.logout() } }
         }
