@@ -134,6 +134,13 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                     }
                 }
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    listOf(false to "👨 Je suis un conducteur", true to "👩 Je suis une conductrice").forEach { (f, label) ->
+                        BigButton(label, if (settings.driverFemale == f) DriveColors.Accent else DriveColors.Panel) {
+                            settings.changeDriverFemale(f); voice.pack.feminine = f; voice.limitChanged(80)
+                        }
+                    }
+                }
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     listOf(0 to "Ton : classique", 1 to "Ton : charme 💋", 2 to "Ton : séduction 🔥", 3 to "Ton : osé 😈", 4 to "Ton : extrême 🔥😈").forEach { (c, label) ->
                         BigButton(label, if (settings.voiceTone == c) DriveColors.Accent else DriveColors.Panel) {
                             settings.changeVoiceTone(c)

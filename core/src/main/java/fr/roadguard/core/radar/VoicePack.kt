@@ -12,7 +12,23 @@ import java.io.File
  * Les textes viennent de assets/voices/script.json (aussi utilisés pour la voix du téléphone en repli).
  */
 class VoicePack(context: Context) {
-    companion object { const val MY_VOICE = 9 }
+    companion object {
+        const val MY_VOICE = 9
+
+        private val femaleWords = listOf(
+            "mon gentil garçon" to "ma gentille fille", "gentil garçon" to "gentille fille", "vilain garçon" to "vilaine fille",
+            "mon beau" to "ma belle", "beau pilote" to "belle pilote", "beau gosse" to "belle gosse",
+            "mon chéri" to "ma chérie", "chéri" to "chérie", "mon fauve" to "ma tigresse", "maître de toi" to "maîtresse de toi",
+            "tout à moi" to "toute à moi", "Vilain" to "Vilaine", "vilain" to "vilaine", "séduisant" to "séduisante",
+            "fatigué" to "fatiguée", "épuisé" to "épuisée", "excité" to "excitée", "têtu" to "têtue", "obéissant" to "obéissante",
+            "pressé" to "pressée", "mignon" to "mignonne", "entier" to "entière", "déchaîné" to "déchaînée",
+            "bouillant" to "bouillante", "fougueux" to "fougueuse", "impatient" to "impatiente", "puni" to "punie",
+            "prêt" to "prête", "seul" to "seule",
+        ).map { (m, f) -> Regex("(?<![\\p{L}])" + Regex.escape(m) + "(?![\\p{L}])") to f }
+
+        /** Met une phrase au féminin (mots entiers seulement : « pressés » au pluriel reste tel quel). */
+        fun feminize(text: String): String = femaleWords.fold(text) { acc, (r, f) -> r.replace(acc, f) }
+    }
     private val app = context.applicationContext
     val script: JSONObject = runCatching {
         JSONObject(app.assets.open("voices/script.json").bufferedReader().use { it.readText() })
@@ -30,12 +46,15 @@ class VoicePack(context: Context) {
     private fun list(obj: JSONObject?, name: String): List<String> =
         obj?.optJSONArray(name)?.let { a -> (0 until a.length()).map { a.getString(it) } } ?: emptyList()
     private fun tone(t: Int) = script.optJSONObject("tones")?.optJSONObject(t.coerceIn(0, 4).toString())
+    /** Phrases au féminin (conductrice) : « ma belle », « ma chérie », « fatiguée »… */
+    var feminine = false
+
     /** Phrases du ton : chaque ton reprend aussi celles des tons plus doux (osé = osé + séduction + charme). */
     fun phrases(t: Int, group: String): List<String> = when {
         t == MY_VOICE -> list(script.optJSONObject("myvoice"), group)
         t <= 0 -> list(tone(0), group)
         else -> (t downTo 1).flatMap { list(tone(it), group) }
-    }
+    }.let { l -> if (feminine) l.map(::feminize) else l }
     fun number(v: Int): String? = script.optJSONObject("numbers")?.optString(v.toString())?.takeIf { it.isNotBlank() }
     fun numbers(): List<Int> = script.optJSONObject("numbers")?.keys()?.asSequence()?.mapNotNull { it.toIntOrNull() }?.sorted()?.toList() ?: emptyList()
     fun kinds(): Map<String, String> = script.optJSONObject("kinds")?.let { o -> o.keys().asSequence().associateWith { o.getString(it) } } ?: emptyMap()

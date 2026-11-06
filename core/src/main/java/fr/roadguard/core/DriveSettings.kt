@@ -119,6 +119,9 @@ class DriveSettings(context: Context) {
     var autoDrive by mutableStateOf(prefs.getBoolean("auto_drive", false)); private set
     fun changeAutoDrive(v: Boolean) { autoDrive = v; prefs.edit().putBoolean("auto_drive", v).apply() }
 
+    // Conducteur ou conductrice : phrases de la voix au masculin ou au féminin.
+    var driverFemale by mutableStateOf(prefs.getBoolean("driver_female", false)); private set
+    fun changeDriverFemale(v: Boolean) { driverFemale = v; prefs.edit().putBoolean("driver_female", v).apply() }
     // Ton de la voix : 0 classique, 1 charme (complice), 2 séduction (aguicheuse).
     var voiceTone by mutableStateOf(prefs.getInt("voice_tone", if (prefs.getBoolean("charm_voice", false)) 1 else 0)); private set
     fun changeVoiceTone(v: Int) { voiceTone = v; prefs.edit().putInt("voice_tone", v).apply() }
