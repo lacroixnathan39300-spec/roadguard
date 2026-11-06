@@ -93,7 +93,25 @@ class PhoneHomeActivity : ComponentActivity() {
         fr.roadguard.core.account.CrashReporter.install(this)
         fr.roadguard.core.map.OfflineRegions.enlargeAmbientCache(this)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        hideNavigationBar()
         setContent { fr.roadguard.core.ui.CarFontScale { fr.roadguard.core.ui.AccountGate { PhoneHome() } } }
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) hideNavigationBar()
+    }
+
+    /**
+     * Barre du bas d'Android (accueil, retour, applis récentes, ou la ligne des gestes) masquée pour gagner
+     * de la place ; un glissement depuis le bas la fait réapparaître un instant. La barre du haut reste.
+     */
+    private fun hideNavigationBar() {
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
+        androidx.core.view.WindowInsetsControllerCompat(window, window.decorView).apply {
+            hide(androidx.core.view.WindowInsetsCompat.Type.navigationBars())
+            systemBarsBehavior = androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
     }
 
     override fun onStart() { super.onStart(); visible = true }
