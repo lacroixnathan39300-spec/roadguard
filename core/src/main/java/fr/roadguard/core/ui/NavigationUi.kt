@@ -306,6 +306,30 @@ fun MapButton(label: String, onClick: () -> Unit, modifier: Modifier = Modifier)
     ) { if (!DriveIcon(label, 28.dp * DriveColors.Scale)) Text(label, color = Color.White, fontSize = 24.sp * DriveColors.Scale) }
 }
 
+/**
+ * Interrupteur rond de l'accueil (radars, annonces de limitation) : anneau vert quand c'est actif,
+ * rouge et barré quand c'est coupé, avec une petite légende dessous.
+ */
+@Composable
+fun QuickToggle(emoji: String, caption: String, on: Boolean, onToggle: () -> Unit, modifier: Modifier = Modifier) {
+    val ring = if (on) Color(0xFF2ED573) else Color(0xFFFF4757)
+    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(
+            Modifier.size(60.dp * DriveColors.Scale).clip(androidx.compose.foundation.shape.CircleShape)
+                .background(if (on) DriveStyle.glass else Color(0xCC3A0D12))
+                .border(3.dp, ring, androidx.compose.foundation.shape.CircleShape).clickable(onClick = onToggle),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(emoji, fontSize = 24.sp * DriveColors.Scale, color = Color.White.copy(alpha = if (on) 1f else 0.55f))
+            if (!on) androidx.compose.foundation.Canvas(Modifier.size(40.dp * DriveColors.Scale)) {
+                drawLine(ring, androidx.compose.ui.geometry.Offset(size.width, 0f), androidx.compose.ui.geometry.Offset(0f, size.height), strokeWidth = 4.dp.toPx())
+            }
+        }
+        Text(if (on) caption else "$caption off", color = if (on) Color.White else Color(0xFFFF8A94), fontSize = 12.sp, fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(top = 2.dp).clip(RoundedCornerShape(6.dp)).background(Color(0x99000000)).padding(horizontal = 5.dp))
+    }
+}
+
 /** Arrivée estimée (heure) et durée restante. */
 private fun eta(seconds: Int): String {
     val arrival = java.util.Calendar.getInstance().apply { add(java.util.Calendar.SECOND, seconds) }

@@ -100,6 +100,12 @@ class DriveSettings(context: Context) {
     fun changeOverTolerance(v: Int) { overTolerance = v; prefs.edit().putInt("over_tolerance", v).apply() }
 
     /** Annonce vocale quand la limitation change (« Limitation 50 »). */
+    // Interrupteurs rapides de l'accueil : alertes radars, et annonces de limitation / dépassement.
+    var radarsOn by mutableStateOf(prefs.getBoolean("radars_on", true)); private set
+    fun changeRadarsOn(v: Boolean) { radarsOn = v; prefs.edit().putBoolean("radars_on", v).apply() }
+    val limitVoiceOn get() = announceLimit || speedLimitWarning
+    fun changeLimitVoice(v: Boolean) { changeAnnounceLimit(v); changeSpeedLimitWarning(v) }
+
     var announceLimit by mutableStateOf(prefs.getBoolean("announce_limit", true)); private set
     fun changeAnnounceLimit(v: Boolean) { announceLimit = v; prefs.edit().putBoolean("announce_limit", v).apply() }
 

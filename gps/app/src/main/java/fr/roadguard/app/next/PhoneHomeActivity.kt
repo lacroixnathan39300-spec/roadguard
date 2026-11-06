@@ -230,7 +230,17 @@ private fun PhoneHome() {
                 Action("Menu", Modifier.weight(0.9f), icon = Icons.Filled.Menu) { showMenu = true }
             }
         }
-        Column(Modifier.align(Alignment.CenterEnd).padding(end = 12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.align(Alignment.CenterEnd).padding(end = 12.dp), verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            // Interrupteurs rapides : un appui coupe ou rétablit les alertes radars / les annonces de limitation.
+            fr.roadguard.core.ui.QuickToggle("📷", "Radars", settings.radarsOn, onToggle = {
+                settings.changeRadarsOn(!settings.radarsOn)
+                android.widget.Toast.makeText(context, if (settings.radarsOn) "Alertes radars activées" else "Alertes radars coupées", android.widget.Toast.LENGTH_SHORT).show()
+            })
+            fr.roadguard.core.ui.QuickToggle("🚦", "Limites", settings.limitVoiceOn, onToggle = {
+                settings.changeLimitVoice(!settings.limitVoiceOn)
+                android.widget.Toast.makeText(context, if (settings.limitVoiceOn) "Annonces de limitation activées" else "Annonces de limitation coupées", android.widget.Toast.LENGTH_SHORT).show()
+            })
             MapButton("⚠", onClick = { showReport = true })
             MapButton("◎", onClick = { s.recenter++ })
         }

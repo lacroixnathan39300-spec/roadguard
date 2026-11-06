@@ -186,11 +186,11 @@ class DrivingSession(
         fix = location.toSpeedFix().let { sf -> if (!location.hasSpeed() && f.speedKmh > 0) sf.copy(kmh = f.speedKmh.toInt()) else sf }
         here = f
 
-        val newAlert = alerts?.update(f)?.takeIf { it.radar.kind in settings.alertKinds }
+        val newAlert = alerts?.update(f)?.takeIf { settings.radarsOn && it.radar.kind in settings.alertKinds }
         if (newAlert?.isNew == true) voice.announce(newAlert)
         // Une position isolée sans cap fiable ne doit pas faire clignoter le bandeau : on garde
         // l'alerte précédente 4 s au plus, tant que le radar est encore devant (distance qui baisse).
-        val held = alert?.takeIf { newAlert == null && !it.passed && f.timeMs - alertAt < 4_000 }?.let { a ->
+        val held = alert?.takeIf { settings.radarsOn && newAlert == null && !it.passed && f.timeMs - alertAt < 4_000 }?.let { a ->
             val raw = fr.roadguard.core.radar.Geo.distanceMeters(f.lat, f.lon, a.radar.lat, a.radar.lon)
             val d = (raw - fr.roadguard.core.radar.AlertEngine.lagMeters(f.speedKmh)).toInt()
             // Jamais après le radar : dès qu'il est atteint (ou derrière), l'alerte s'arrête.
