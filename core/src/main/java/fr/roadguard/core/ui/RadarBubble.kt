@@ -30,6 +30,10 @@ class RadarBubble(context: Context) {
     private lateinit var alert: TextView
     private lateinit var info: TextView
     private lateinit var bg: GradientDrawable
+    private lateinit var picker: LinearLayout
+    private var session: fr.roadguard.core.DrivingSession? = null
+    private val handler = android.os.Handler(android.os.Looper.getMainLooper())
+    private val hidePicker = Runnable { if (::picker.isInitialized) picker.visibility = android.view.View.GONE }
     private val density = app.resources.displayMetrics.density
 
     val allowed: Boolean get() = Settings.canDrawOverlays(app)
@@ -70,8 +74,35 @@ class RadarBubble(context: Context) {
             setTextColor(Color.WHITE); textSize = 13f; maxWidth = dp(220); maxLines = 2
             background = pill(Color.rgb(21, 101, 192), 10); setPadding(dp(8), dp(3), dp(8), dp(3))
         }
-        box.addView(row); box.addView(alert); box.addView(info)
+        // Signaler sans quitter Waze : « ⚠ Signaler » ouvre une rangée de choix, un appui envoie.
+        val reportBtn = TextView(app).apply {
+            text = "⚠ Signaler"; setTextColor(Color.WHITE); textSize = 14f; paint.isFakeBoldText = true; gravity = Gravity.CENTER
+            background = pill(Color.rgb(230, 126, 34), 12); setPadding(dp(12), dp(5), dp(12), dp(5))
+            setOnClickListener {
+                picker.visibility = if (picker.visibility == android.view.View.VISIBLE) android.view.View.GONE else android.view.View.VISIBLE
+                handler.removeCallbacks(hidePicker); handler.postDelayed(hidePicker, 8_000)
+            }
+        }
+        picker = LinearLayout(app).apply { orientation = LinearLayout.HORIZONTAL; visibility = android.view.View.GONE }
+        listOf(fr.roadguard.core.community.ReportType.POLICE, fr.roadguard.core.community.ReportType.MOBILE,
+            fr.roadguard.core.community.ReportType.ACCIDENT, fr.roadguard.core.community.ReportType.JAM,
+            fr.roadguard.core.community.ReportType.WORKS, fr.roadguard.core.community.ReportType.DANGER).forEach { t ->
+            picker.addView(TextView(app).apply {
+                text = t.emoji; textSize = 24f; gravity = Gravity.CENTER
+                background = pill(Color.argb(255, 40, 48, 60), 12); setPadding(dp(6), dp(4), dp(6), dp(4))
+                contentDescription = t.label
+                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { setMargins(dp(2), 0, dp(2), 0) }
+                setOnClickListener {
+                    session?.community?.report(t)
+                    picker.visibility = android.view.View.GONE
+                    android.widget.Toast.makeText(app, "${t.emoji} ${t.label} : signalement envoyé", android.widget.Toast.LENGTH_SHORT).show()
+                }
+            })
+        }
+        box.addView(row); box.addView(alert); box.addView(info); box.addView(reportBtn); box.addView(picker)
         (info.layoutParams as LinearLayout.LayoutParams).topMargin = dp(4)
+        (reportBtn.layoutParams as LinearLayout.LayoutParams).topMargin = dp(6)
+        (picker.layoutParams as LinearLayout.LayoutParams).topMargin = dp(6)
 
         val lp = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT,
@@ -108,6 +139,7 @@ class RadarBubble(context: Context) {
 
     /** Affiche ou met à jour la bulle avec l'état de conduite. */
     fun show(s: DrivingSession) {
+        session = s
         if (!allowed) return
         val r = root ?: runCatching { create() }.getOrNull()?.also { root = it } ?: return
         val kmh = s.fix?.kmh
