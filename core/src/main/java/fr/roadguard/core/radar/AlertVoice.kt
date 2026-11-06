@@ -14,9 +14,10 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     private val tts = TextToSpeech(context.applicationContext, this)
     /** Phrases pré-enregistrées (voix réaliste « Jessica » ou « Ma voix »). */
     val pack = VoicePack(context)
-    private val clips by lazy {
+    private val clipsLazy = lazy {
         ClipPlayer(context, onStart = { speaking++; duck() }, onEnd = { speaking = (speaking - 1).coerceAtLeast(0); scheduleRelease() })
     }
+    private val clips by clipsLazy
     /** Voix réaliste au lieu de la voix du téléphone pour les annonces radars et limitations. */
     var realistic = false
 
@@ -169,12 +170,20 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
 
     override fun onInit(status: Int) {
         if (status != TextToSpeech.SUCCESS) return
-        val result = tts.setLanguage(Locale.FRANCE)
+        // Langue des annonces choisie avant que la synthèse soit prête : appliquée ici (sinon voix française).
+        var result = tts.setLanguage(localeOf(pack.lang))
+        if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) result = tts.setLanguage(Locale.FRANCE)
         ttsReady = result != TextToSpeech.LANG_MISSING_DATA && result != TextToSpeech.LANG_NOT_SUPPORTED
+        appliedVoice = null // voix choisie réappliquée au prochain réglage
         tts.setAudioAttributes(guidance)
         tts.setOnUtteranceProgressListener(object : android.speech.tts.UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) {}
-            override fun onDone(utteranceId: String?) { beeper.post { speaking = (speaking - 1).coerceAtLeast(0); scheduleRelease() } }
+            override fun onDone(utteranceId: String?) {
+                beeper.post {
+                    speaking = (speaking - 1).coerceAtLeast(0); scheduleRelease()
+                    utteranceId?.let { afterSpeech.remove(it) }?.invoke()
+                }
+            }
             @Deprecated("API") override fun onError(utteranceId: String?) { onDone(utteranceId) }
         })
     }
@@ -256,8 +265,23 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
         say(text, "rg-nav-${text.hashCode()}")
     }
 
+    /** Suites à lancer quand une phrase est finie (écoute de la réponse « oui / non »). */
+    private val afterSpeech = HashMap<String, () -> Unit>()
+
+    /**
+     * Pose une question puis appelle [then] seulement une fois la phrase entièrement dite :
+     * le micro ne doit pas entendre la voix de l'appli (« … oui ou non ») et la prendre pour une réponse.
+     * Rien n'est appelé si la voix est coupée (pas de question posée, donc pas d'écoute).
+     */
+    fun speakThen(text: String, then: () -> Unit) {
+        if (!(ttsReady && voiceEnabled) || text.isBlank()) return
+        val id = "rg-ask-${System.nanoTime()}"
+        afterSpeech[id] = then
+        say(text, id)
+    }
+
     fun release() {
-        runCatching { clips.release() }
+        if (clipsLazy.isInitialized()) runCatching { clips.release() } // sans créer le lecteur juste pour le fermer
         proximityM = null
         if (focused) runCatching { audio?.abandonAudioFocusRequest(focusRequest) }
         beeper.removeCallbacksAndMessages(null)

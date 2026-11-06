@@ -253,7 +253,10 @@ async function vote(env: Env, me: Account, reportId: string, still: boolean, now
   if (voterLevel === "suspect") return json({ id: r.id, ignored: true });
   if (r.author_id === me.id) {
     // L'auteur peut retirer son propre signalement (« plus là »), sans perte de points.
-    if (!still) await env.DB.prepare("DELETE FROM reports WHERE id = ?").bind(r.id).run();
+    if (!still) await env.DB.batch([
+      env.DB.prepare("DELETE FROM votes WHERE report_id = ?").bind(r.id),
+      env.DB.prepare("DELETE FROM reports WHERE id = ?").bind(r.id),
+    ]);
     return json({ id: r.id, removed: !still, merged });
   }
   const previous = await env.DB.prepare("SELECT still FROM votes WHERE report_id = ? AND account_id = ?")
@@ -579,6 +582,10 @@ async function convoyUpdate(req: Request, env: Env, me: Account): Promise<Respon
   const lat = typeof b.lat === "number" ? b.lat : null, lon = typeof b.lon === "number" ? b.lon : null;
   const speed = typeof b.speed === "number" ? Math.round(b.speed) : null;
   const msg = typeof b.message === "string" ? b.message.replace(/[\u0000-\u001f<>]/g, "").trim().slice(0, 140) : null;
+  // Anti-devinette : au plus 3 convois différents par compte et par heure (on ne peut pas essayer des codes à la chaîne
+  // pour tomber sur le convoi de quelqu'un et voir sa position).
+  const mine = await env.DB.prepare("SELECT DISTINCT code FROM convoy WHERE account_id = ? AND at > ?").bind(me.id, now - HOUR).all<{ code: string }>();
+  if (!mine.results.some((r) => r.code === code) && mine.results.length >= 3) return fail(429, "Trop de convois essayés : réessaie dans une heure");
   await env.DB.prepare(`INSERT INTO convoy (code, account_id, name, lat, lon, speed, message, message_at, at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(code, account_id) DO UPDATE SET name = excluded.name, lat = COALESCE(excluded.lat, lat), lon = COALESCE(excluded.lon, lon),
     speed = COALESCE(excluded.speed, speed), message = COALESCE(excluded.message, message), message_at = COALESCE(excluded.message_at, message_at), at = excluded.at`)
@@ -598,18 +605,28 @@ async function convoyLeave(req: Request, env: Env, me: Account): Promise<Respons
 async function shareStart(req: Request, env: Env, me: Account): Promise<Response> {
   const token = randomId(10);
   const now = Date.now();
-  await env.DB.prepare("INSERT INTO shares (token, name, at, expires_at) VALUES (?, ?, ?, ?)").bind(token, me.name, now, now + 12 * HOUR).run();
+  await env.DB.prepare("INSERT INTO shares (token, name, at, expires_at, owner) VALUES (?, ?, ?, ?, ?)").bind(token, me.name, now, now + 12 * HOUR, me.id).run();
   return json({ token });
 }
 
-async function shareUpdate(req: Request, env: Env): Promise<Response> {
+/** Mise à jour du partage : réservée au compte qui l'a lancé (le lien public sert seulement à regarder). */
+async function shareUpdate(req: Request, env: Env, me: Account | null): Promise<Response> {
   const b = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   const token = String(b.token ?? "");
   if (!/^[0-9a-f]{20}$/.test(token)) return fail(400, "Jeton invalide");
+  if (!me) return fail(401, "Compte requis");
+  const s = await env.DB.prepare("SELECT owner FROM shares WHERE token = ?").bind(token).first<{ owner: string | null }>();
+  if (!s) return fail(404, "Partage terminé");
+  if (s.owner !== me.id) return fail(403, "Ce partage ne t'appartient pas");
+  const now = Date.now();
+  if (b.stop === true) {
+    await env.DB.prepare("UPDATE shares SET expires_at = ? WHERE token = ?").bind(now, token).run();
+    return json({ ok: true, stopped: true });
+  }
+  const lat = num(b.lat, -90, 90), lon = num(b.lon, -180, 180);
   const dest = typeof b.dest === "string" ? b.dest.replace(/[\u0000-\u001f<>]/g, "").slice(0, 120) : null;
   await env.DB.prepare("UPDATE shares SET lat = ?, lon = ?, speed = ?, dest = ?, eta = ?, at = ? WHERE token = ? AND expires_at > ?")
-    .bind(Number(b.lat) || null, Number(b.lon) || null, Math.round(Number(b.speed) || 0), dest, Number(b.eta) || null, Date.now(), token, Date.now()).run();
-  if (b.stop === true) await env.DB.prepare("UPDATE shares SET expires_at = ? WHERE token = ?").bind(Date.now(), token).run();
+    .bind(lat, lon, Math.round(num(b.speed, 0, 400) ?? 0), dest, num(b.eta, 0, 9e15), now, token, now).run();
   return json({ ok: true });
 }
 
@@ -682,7 +699,7 @@ export default {
         const r = await env.DB.prepare("SELECT name, lat, lon, speed, dest, eta, at FROM shares WHERE token = ? AND expires_at > ?").bind(sj[1], Date.now()).first();
         return r ? json(r) : fail(404, "Partage terminé");
       }
-      if (req.method === "POST" && path === "/v1/share/update") return shareUpdate(req, env);
+      if (req.method === "POST" && path === "/v1/share/update") return shareUpdate(req, env, me);
       if (!me) return fail(401, "Compte requis");
       if (req.method === "POST" && path === "/v1/account/link") return linkAccount(req, env, me);
       const mod = await modRoutes(req, env, me, path);

@@ -100,6 +100,14 @@ class Guidance(val route: Route) {
         )
     }
 
+    /** Point du tracé situé [m] mètres devant la dernière position suivie, ou null au-delà de l'arrivée. */
+    fun pointAhead(m: Double): LatLon? {
+        if (route.points.isEmpty()) return null
+        val target = cumulative[lastIndex] + m
+        val i = cumulative.indexOfFirst { it >= target }
+        return if (i < 0) null else route.points[i]
+    }
+
     /** Distance du point au segment [a,b] (mètres) et position relative t ∈ [0,1] sur le segment. */
     private fun projection(lat: Double, lon: Double, a: LatLon, b: LatLon): Pair<Double, Double> {
         val k = cos(Math.toRadians(lat)) // projection locale plane, suffisante sur quelques km

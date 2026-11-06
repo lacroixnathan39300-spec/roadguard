@@ -50,3 +50,16 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
 - Anti-somnolence invisible (caméra avant, MediaPipe Face Landmarker, `DrowsinessGuard.kt`, modèle téléchargé en CI).
 - Messagerie utilisateur ↔ administrateur (migration 0007, `/v1/auth/message(s)`, `/v1/admin/messages`, `InboxNotifier`).
 - Tutoriel v2.
+
+## Audit du 06/11/2026 (soir)
+- Sécurité (commit 3af4770) : plus de réinitialisation de mot de passe par l'admin, plus d'admin automatique au premier compte,
+  `allowBackup=false` (Pilote et Drive), `diag.yml` sans messages privés ni suppression de comptes.
+- Partage de trajet : mise à jour réservée au compte qui l'a lancé (migration 0010 `shares.owner`) ; le lien public ne sert qu'à regarder.
+- Convoi : au plus 3 codes différents par compte et par heure (anti-devinette).
+- Conduite : fin de trajet après 3 min d'arrêt (et non 1 min : bouchons), météo vérifiée 20 km DEVANT sur le tracé (`Guidance.pointAhead`),
+  calcul d'itinéraire périmé ignoré (`routeRequest`), guidage arrêté à l'arrivée (plus de recalcul pour revenir), étape validée à 150 m.
+- Voix : langue des annonces appliquée même si choisie avant que la synthèse soit prête ; « oui / non » à la voix écouté seulement
+  après la question (`AlertVoice.speakThen`), phrase avec « oui » et « non » ignorée (le micro entendait la question).
+- Communauté : police / radar mobile coupés avec les radars (interrupteur, Suisse) ; messages 💬 lus avec leur texte.
+- Drive : tableau de bord avec cadres colorés, titre et icône par bloc, textes vides explicites.
+- Reste à faire : vérification des en-têtes d'identité du site (plateforme ChatGPT Sites), « mot de passe oublié », essais en voiture.

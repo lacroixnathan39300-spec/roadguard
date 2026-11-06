@@ -26,7 +26,8 @@ class PiloteWidget : AppWidgetProvider() {
             val limit = s?.speedLimit
             val info = when {
                 s == null -> "Pilote · touche pour démarrer"
-                s.alert != null -> "📷 Radar à ${s.alert!!.distanceM} m"
+                // Distance arrondie à 50 m : le widget n'est redessiné qu'à chaque palier, pas à chaque mètre.
+                s.alert != null -> "📷 Radar à ${fr.roadguard.core.radar.AlertText.roundedDistance(s.alert!!.distanceM)} m"
                 s.navigating -> s.guidanceState?.next?.instruction ?: "Guidage en cours"
                 else -> s.localInfo.address ?: "Bonne route"
             }

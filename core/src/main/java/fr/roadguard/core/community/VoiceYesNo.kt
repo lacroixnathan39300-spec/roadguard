@@ -18,11 +18,20 @@ object VoiceYesNo {
     private val main = Handler(Looper.getMainLooper())
     private var current: SpeechRecognizer? = null
 
+    /**
+     * « oui » → true, « non » → false, sinon null. Mots entiers seulement, et une phrase qui contient
+     * les deux (« oui ou non », la question elle-même entendue par le micro) ne compte pas.
+     */
     fun parse(text: String): Boolean? {
-        val t = java.text.Normalizer.normalize(text.lowercase(), java.text.Normalizer.Form.NFD).replace(Regex("\\p{M}+"), "")
+        val t = " " + java.text.Normalizer.normalize(text.lowercase().replace('’', '\''), java.text.Normalizer.Form.NFD)
+            .replace(Regex("\\p{M}+"), "").replace(Regex("[^a-z' ]+"), " ").replace(Regex(" +"), " ").trim() + " "
+        fun has(w: String) = " $w " in t
+        val no = listOf("non", "nan", "nope", "plus la", "parti", "partie", "partis", "rien", "aucun", "aucune").any(::has)
+        val yes = listOf("oui", "ouais", "toujours", "encore", "yes", "ok", "affirmatif", "il est la", "c'est la", "elle est la", "ils sont la").any(::has)
         return when {
-            listOf("non", "plus la", "parti", "rien", "aucun", "nan", "nope").any { it in t } -> false
-            listOf("oui", "ouais", "toujours", "encore", "yes", "ok", "affirmatif", "il est la", "c'est la").any { it in t } -> true
+            no && yes -> null
+            no -> false
+            yes -> true
             else -> null
         }
     }

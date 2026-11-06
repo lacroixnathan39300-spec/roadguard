@@ -157,10 +157,12 @@ class DrivingSession(
     private var lastHazardAt = 0L
     private var lastAheadHazard: String? = null
     private var lastRain = false
+    private var lastAheadCheck = 0L
     private fun contextAnnouncements(f: Fix, now: Long) {
-        // Étape atteinte (à moins de 80 m) : retirée de la liste, pour ne pas y retourner en cas de recalcul.
+        // Étape atteinte (à moins de 150 m, comme le recalcul qui l'ignore alors) : retirée de la liste,
+        // pour ne pas y retourner en cas de recalcul (adresse parfois un peu à l'écart de la route).
         if (navigating && stops.isNotEmpty()) {
-            stops.firstOrNull { fr.roadguard.core.radar.Geo.distanceMeters(f.lat, f.lon, it.point.lat, it.point.lon) < 80 }?.let { reached ->
+            stops.firstOrNull { fr.roadguard.core.radar.Geo.distanceMeters(f.lat, f.lon, it.point.lat, it.point.lon) < 150 }?.let { reached ->
                 stops = stops - reached
                 voice.speak("Étape ${reached.name} atteinte." + if (stops.isEmpty()) " Direction l'arrivée." else " Encore ${stops.size} étape${if (stops.size > 1) "s" else ""}.")
             }
@@ -192,9 +194,13 @@ class DrivingSession(
                     else -> "Attention : $h. Adapte ta vitesse."
                 })
             } else if (h == null) lastHazard = null
-            route?.points?.let { pts ->
-                val ahead = pts.firstOrNull { fr.roadguard.core.radar.Geo.distanceMeters(f.lat, f.lon, it.lat, it.lon) > 20_000 }
-                if (ahead != null) localInfo.checkAhead(ahead.lat, ahead.lon, now)
+            // Point situé 20 km DEVANT sur le tracé (et non le premier point à plus de 20 km, qui peut être derrière).
+            val g = guidance
+            if (g != null && route != null) {
+                if (now - lastAheadCheck > 60_000) {
+                    lastAheadCheck = now
+                    g.pointAhead(20_000.0)?.let { localInfo.checkAhead(it.lat, it.lon, now) }
+                }
                 val ha = localInfo.hazardAhead
                 if (ha != null && ha != lastAheadHazard && ha != h) { lastAheadHazard = ha; voice.speak("Sur ta route, dans une vingtaine de kilomètres : $ha.") }
             }
@@ -202,18 +208,19 @@ class DrivingSession(
         if (settings.hazardAlerts && !batterySaving) hazards.onFix(f, now)?.let { voice.speak(it) }
     }
 
-    // Fin de trajet : arrêt d'au moins une minute après au moins 5 min de route (ou Bluetooth de la voiture coupé).
+    // Fin de trajet : arrêt d'au moins 3 min après au moins 5 min de route (ou Bluetooth de la voiture coupé).
+    // Une minute ne suffit pas : un bouchon, un feu long ou un passage à niveau terminaient le trajet en pleine route.
     private var slowSince = 0L
     private fun tripStep(f: Fix, now: Long) {
         meter.onFix(f.lat, f.lon, f.speedKmh, overSpeed, f.timeMs, localInfo.address)
         if (f.speedKmh >= 5) { slowSince = 0; return }
         if (slowSince == 0L) slowSince = now
-        if (meter.active && now - slowSince > 60_000 && now - meter.start > 5 * 60_000) endTrip(f.lat, f.lon)
+        if (meter.active && now - slowSince > 3 * 60_000 && now - meter.start > 5 * 60_000) endTrip(f.lat, f.lon, end = slowSince)
     }
 
-    /** Termine le trajet en cours : bilan, voiture garée, rappels. */
-    fun endTrip(lat: Double? = here?.lat, lon: Double? = here?.lon) {
-        val rec = meter.finish(System.currentTimeMillis(), localInfo.address, settings.defaultTripPro) ?: return
+    /** Termine le trajet en cours : bilan, voiture garée, rappels. [end] : heure d'arrêt (l'attente n'est pas comptée). */
+    fun endTrip(lat: Double? = here?.lat, lon: Double? = here?.lon, end: Long = System.currentTimeMillis()) {
+        val rec = meter.finish(end.coerceAtLeast(meter.start), localInfo.address, settings.defaultTripPro) ?: return
         tripLog.addTrip(rec)
         lastTrip = rec
         if (lat != null && lon != null) tripLog.parking = fr.roadguard.core.safety.Parking(lat, lon, System.currentTimeMillis(), localInfo.address, 0)
@@ -297,6 +304,7 @@ class DrivingSession(
 
     init {
         scope.launch { while (true) { kotlinx.coroutines.delay(1_000); runCatching { deadReckon(System.currentTimeMillis()) } } }
+        community.askAloud = { text, then -> voice.speakThen(text, then) }
         community.startConvoyLoop()
         // Échéances de la voiture (contrôle technique, assurance…) : notification un mois avant.
         scope.launch { kotlinx.coroutines.delay(20_000); runCatching { fr.roadguard.core.safety.Reminders.check(context) } }
@@ -418,6 +426,7 @@ class DrivingSession(
         voice.realistic = false // même voix (celle du téléphone) pour le guidage et les radars
         voice.pack.feminine = settings.driverFemale
         community.voiceAnswers = settings.voiceConfirm && settings.voice
+        community.radarAlertsAllowed = settings.radarsOn && !radarsBlockedHere
         val f = completeFix(location.toAlertFix())
         // Vitesse calculée par ROADGUARD si le GPS ne la donne pas (certains postes).
         fix = location.toSpeedFix().let { sf -> if (!location.hasSpeed() && f.speedKmh > 0) sf.copy(kmh = f.speedKmh.toInt()) else sf }
@@ -467,8 +476,14 @@ class DrivingSession(
             if (alternatives.isNotEmpty() && g.route.lengthM - state.remainingM > 1000) alternatives = emptyList()
             guidanceState = state
             state.speak?.let(voice::guide) // consigne au ton choisi (« …, mon chéri »)
+            // Arrivé : le guidage s'arrête de lui-même (1 min après, ou dès qu'on s'éloigne pour se garer),
+            // au lieu de recalculer un trajet pour revenir à la destination.
+            if (state.arrived && stops.isEmpty()) {
+                if (arrivedAt == 0L) arrivedAt = f.timeMs
+                if (state.offRoute || f.timeMs - arrivedAt > 60_000) { stopNavigation(); return }
+            }
             // Sortie du trajet : nouveau calcul, au plus toutes les 15 s.
-            if (state.offRoute && !rerouting && f.timeMs - lastRerouteAt > 15_000) {
+            if (state.offRoute && !state.arrived && !rerouting && f.timeMs - lastRerouteAt > 15_000) {
                 lastRerouteAt = f.timeMs
                 computeRoute(g.route.destination, announce = false)
             }
@@ -486,6 +501,7 @@ class DrivingSession(
 
     fun startNavigation(place: Place) {
         recents = recentStore.add(place)
+        arrivedAt = 0L
         navigating = true; route = null; guidance = null; guidanceState = null
         pendingDestination = place.point
         navStatus = "Calcul du trajet vers ${place.name}…"
@@ -493,6 +509,9 @@ class DrivingSession(
     }
 
     fun stopNavigation() {
+        routeRequest++ // un calcul encore en cours ne relancera pas le guidage
+        rerouting = false
+        arrivedAt = 0L
         stops = emptyList()
         navigating = false; route = null; guidance = null; guidanceState = null; navStatus = null
         alternatives = emptyList()
@@ -512,10 +531,15 @@ class DrivingSession(
         if (slot == "home") home = place else work = place
     }
 
+    /** Numéro du dernier calcul demandé : un calcul plus ancien qui finit après ne remplace pas le trajet. */
+    private var routeRequest = 0
+    private var arrivedAt = 0L
+
     private fun computeRoute(destination: LatLon, announce: Boolean) {
         val from = here
         if (from == null) { navStatus = "En attente du GPS…"; return }
         rerouting = true
+        val req = ++routeRequest
         scope.launch {
             val start = LatLon(from.lat, from.lon)
             val heading = from.bearing.takeUnless { it.isNaN() }
@@ -536,15 +560,15 @@ class DrivingSession(
                     listOf(offline)
                 }
             }.onSuccess { all ->
-                if (!navigating) return@onSuccess
+                if (!navigating || req != routeRequest) return@onSuccess
                 val r = all.first()
                 alternatives = if (announce && all.size > 1) all else emptyList()
                 route = r; guidance = Guidance(r); guidanceState = null; navStatus = null
                 if (!announce) voice.speak("Nouvel itinéraire")
             }.onFailure {
-                if (navigating) navStatus = "Trajet impossible : ${it.message ?: "pas de réseau"}"
+                if (navigating && req == routeRequest) navStatus = "Trajet impossible : ${it.message ?: "pas de réseau"}"
             }
-            rerouting = false
+            if (req == routeRequest) rerouting = false
         }
     }
 }

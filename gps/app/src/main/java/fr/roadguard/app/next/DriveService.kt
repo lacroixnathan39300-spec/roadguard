@@ -149,7 +149,7 @@ class DriveService : Service() {
         val limit = a.radar.speedKmh?.let { " · limité à $it" } ?: ""
         nm.notify(WATCH_ID, Notification.Builder(this, WATCH_CHANNEL).setSmallIcon(android.R.drawable.ic_dialog_alert)
             .setContentTitle("📷 ${fr.roadguard.core.radar.AlertText.kindLabel(a.radar.kind)}")
-            .setContentText("À ${a.distanceM} m$limit").setTimeoutAfter(25_000).setAutoCancel(true)
+            .setContentText("À ${fr.roadguard.core.radar.AlertText.roundedDistance(a.distanceM)} m$limit").setTimeoutAfter(25_000).setAutoCancel(true)
             .setOnlyAlertOnce(false).build())
     }
 

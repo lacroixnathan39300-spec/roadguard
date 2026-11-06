@@ -77,6 +77,10 @@ class Community(context: Context, private val scope: CoroutineScope, private val
     var knownRadarNear: ((Double, Double) -> Boolean)? = null
     /** Question « toujours là ? » posée à la voix, avec réponse « oui / non » à la voix. */
     var voiceAnswers = true
+    /** Pose une question à la voix puis lance la suite une fois la phrase finie (fourni par la session). */
+    var askAloud: ((String, () -> Unit) -> Unit)? = null
+    /** Annonces police / radar mobile permises (radars activés, et pas en Suisse où c'est interdit). */
+    var radarAlertsAllowed = true
     var shareLocation by mutableStateOf(prefs.getBoolean("share", false)); private set
 
     val baseUrl: String get() = prefs.getString("url", null)?.takeIf { it.isNotBlank() } ?: DEFAULT_URL
@@ -144,15 +148,25 @@ class Community(context: Context, private val scope: CoroutineScope, private val
             // Devant et sur l'axe suivi (couloir étroit, pas un cône) : pas les signalements des routes voisines.
             val off = if (f.bearing.isNaN()) 180.0 else Geo.headingDelta(f.bearing, Geo.bearing(f.lat, f.lon, r.lat, r.lon))
             val ahead = off < 60 && d * kotlin.math.sin(Math.toRadians(off)) < 60 + 0.06 * d
+            // Police et radar mobile : coupés avec les alertes radars (interrupteur, ou Suisse où c'est interdit).
+            val radarLike = r.type == ReportType.POLICE || r.type == ReportType.MOBILE
+            if (radarLike && !radarAlertsAllowed) continue
             if (d < 1000 && ahead && announced.add(r.id) && r.type != ReportType.FIXED) {
-                speak("${r.type.label} signalé ${if (d > 150) "à ${((d + 25) / 50).toInt() * 50} mètres" else "tout près"}")
+                val where = if (d > 150) "à ${((d + 25) / 50).toInt() * 50} mètres" else "tout près"
+                val msg = r.text
+                speak(if (r.type == ReportType.MESSAGE && !msg.isNullOrBlank()) "Message d'un conducteur, $where : $msg"
+                    else "${r.type.label} signalé $where")
             }
             if (d < 120 && !r.mine && !r.voted && prompt == null && asked.add(r.id)) {
                 prompt = VotePrompt(r, f.timeMs)
                 // Question à la voix, réponse « oui » / « non » à la voix : on confirme sans lâcher le volant.
                 if (voiceAnswers && r.type != ReportType.MESSAGE) {
-                    speak("${r.type.label} toujours là ? Réponds oui ou non.")
-                    VoiceYesNo.ask(appContext, delayMs = 2_600) { yes -> if (prompt?.report?.id == r.id) answer(yes) }
+                    val question = "${r.type.label} toujours là ? Réponds oui ou non."
+                    val listen: () -> Unit = { VoiceYesNo.ask(appContext, delayMs = 250) { yes -> if (prompt?.report?.id == r.id) answer(yes) } }
+                    val ask = askAloud
+                    // L'écoute commence une fois la question dite (sinon le micro entend « oui ou non »).
+                    if (ask != null) ask(question, listen)
+                    else { speak(question); VoiceYesNo.ask(appContext, delayMs = 3_500) { yes -> if (prompt?.report?.id == r.id) answer(yes) } }
                 }
             }
         }
@@ -356,7 +370,7 @@ class Community(context: Context, private val scope: CoroutineScope, private val
                     val body = JSONObject().put("token", t)
                     if (f != null) body.put("lat", f.lat).put("lon", f.lon).put("speed", f.speedKmh.toInt())
                     dest?.let { body.put("dest", it) }; eta?.let { body.put("eta", it) }
-                    withContext(Dispatchers.IO) { request("POST", "/v1/share/update", body, auth = false) }
+                    withContext(Dispatchers.IO) { request("POST", "/v1/share/update", body, auth = true) }
                 }
                 delay(15_000)
             }
@@ -366,7 +380,7 @@ class Community(context: Context, private val scope: CoroutineScope, private val
     fun stopShare() {
         val t = shareToken ?: return
         shareToken = null; shareLink = null; shareJob?.cancel()
-        scope.launch(Dispatchers.IO) { runCatching { request("POST", "/v1/share/update", JSONObject().put("token", t).put("stop", true), auth = false) } }
+        scope.launch(Dispatchers.IO) { runCatching { request("POST", "/v1/share/update", JSONObject().put("token", t).put("stop", true), auth = true) } }
     }
 
     private fun request(method: String, path: String, body: JSONObject?, auth: Boolean): JSONObject {

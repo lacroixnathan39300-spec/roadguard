@@ -2,6 +2,7 @@ package fr.roadguard.drive
 
 import android.content.Context
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -88,6 +91,25 @@ fun packRows(items: List<DashItem>): List<List<DashItem>> {
     return rows
 }
 
+/** Apparence d'un bloc : icône, titre et couleur du cadre (chaque bloc bien séparé et reconnaissable). */
+private data class TileLook(val icon: String, val title: String, val color: Color)
+
+private fun look(w: DashWidget, s: DrivingSession): TileLook = when (w) {
+    DashWidget.SPEED -> TileLook("🚗", "VITESSE", if (s.overSpeed) Color(0xFFFF5252) else DriveColors.Accent)
+    DashWidget.CLOCK -> TileLook("🕒", "HEURE", Color(0xFFB39DDB))
+    DashWidget.TRIP -> TileLook("🧭", "TRAJET EN COURS", Color(0xFF4FC3F7))
+    DashWidget.TODAY -> TileLook("📅", "AUJOURD'HUI", Color(0xFF81C784))
+    DashWidget.WEATHER -> TileLook("🌦", "MÉTÉO", Color(0xFFFFD54F))
+    DashWidget.MUSIC -> TileLook("🎵", "MUSIQUE", Color(0xFFF06292))
+    DashWidget.RADAR -> when {
+        s.alert != null -> TileLook("📷", "RADAR DEVANT", Color(0xFFFF5252))
+        !s.settings.radarsOn || s.radarsBlockedHere -> TileLook("📷", "RADARS", DriveColors.TextSecondary)
+        else -> TileLook("📷", "RADARS", Color(0xFF66BB6A))
+    }
+    DashWidget.GUIDANCE -> TileLook("➡️", "PROCHAINE DIRECTION", Color(0xFF4DD0E1))
+    DashWidget.ALTITUDE -> TileLook("⛰", "ALTITUDE", Color(0xFFBCAAA4))
+}
+
 /** Page « Tableau de bord » : grands blocs lisibles, au choix et dans l'ordre voulu. */
 @Composable
 fun DashboardPage(
@@ -104,17 +126,28 @@ fun DashboardPage(
     Column(Modifier.fillMaxSize().background(DriveColors.Background).padding(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             BigButton("◂ Carte", DriveColors.Accent, onMap)
-            Spacer(Modifier.weight(1f))
+            Text("Tableau de bord", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold,
+                fontFamily = fr.roadguard.core.ui.DriveStyle.Titles, textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                maxLines = 1, modifier = Modifier.weight(1f))
             BigButton("✎ Modifier", DriveColors.Panel) { editing = true }
         }
         val rows = packRows(items)
         rows.forEach { row ->
             Row(Modifier.fillMaxWidth().weight(1f), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 row.forEach { item ->
-                    Box(Modifier.weight(if (item.wide) 2f else 1f).fillMaxHeight().clip(RoundedCornerShape(22.dp)).background(fr.roadguard.core.ui.DriveStyle.panelBrush)
+                    val lk = look(item.widget, session)
+                    val shape = RoundedCornerShape(22.dp)
+                    // Cloison : cadre coloré et fond légèrement teinté, pour que chaque bloc se détache du fond noir.
+                    Column(Modifier.weight(if (item.wide) 2f else 1f).fillMaxHeight().clip(shape)
+                        .background(fr.roadguard.core.ui.DriveStyle.panelBrush)
+                        .background(Brush.verticalGradient(listOf(lk.color.copy(alpha = 0.14f), Color.Transparent)))
+                        .border(2.dp, lk.color.copy(alpha = 0.75f), shape)
                         .clickable(enabled = item.widget == DashWidget.TRIP || item.widget == DashWidget.TODAY, onClick = onTrip)
-                        .padding(14.dp)) {
-                        Widget(item.widget, session, music, onPlayPause, onNext, onPrevious)
+                        .padding(horizontal = 16.dp, vertical = 10.dp)) {
+                        TileHeader(lk)
+                        Box(Modifier.fillMaxWidth().weight(1f)) {
+                            Widget(item.widget, session, music, onPlayPause, onNext, onPrevious)
+                        }
                     }
                 }
                 // Ligne incomplète : place vide pour garder la grille.
@@ -123,6 +156,17 @@ fun DashboardPage(
             }
         }
     }
+}
+
+/** Titre du bloc (icône + nom en couleur) et trait de séparation. */
+@Composable
+private fun TileHeader(lk: TileLook) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(lk.icon, fontSize = 15.sp)
+        Text(lk.title, color = lk.color, fontSize = 14.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp,
+            maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+    Box(Modifier.padding(top = 5.dp, bottom = 4.dp).fillMaxWidth().height(1.dp).background(lk.color.copy(alpha = 0.35f)))
 }
 
 @Composable
@@ -159,47 +203,72 @@ private fun Widget(w: DashWidget, s: DrivingSession, music: NowPlaying?, onPlayP
                 SimpleDateFormat("EEEE d MMMM", Locale.FRANCE).format(now).replaceFirstChar { it.uppercase() })
         }
         DashWidget.TRIP -> Big(TripComputer.km(s.trip.trip.distanceM),
-            "Trajet · ${TripComputer.duration(s.trip.trip.movingS)}" + if (s.trip.trip.avgKmh > 0) " · moy. ${s.trip.trip.avgKmh.toInt()} km/h" else "")
-        DashWidget.TODAY -> Big(TripComputer.km(s.trip.day.distanceM), "Aujourd'hui · ${TripComputer.duration(s.trip.day.movingS)} de conduite")
+            TripComputer.duration(s.trip.trip.movingS) + if (s.trip.trip.avgKmh > 0) " · moyenne ${s.trip.trip.avgKmh.toInt()} km/h" else "")
+        DashWidget.TODAY -> Big(TripComputer.km(s.trip.day.distanceM), "${TripComputer.duration(s.trip.day.movingS)} de conduite")
         DashWidget.WEATHER -> {
             val wx = s.localInfo.weather
-            Big(wx?.let { "${it.emoji} ${it.tempC}°" } ?: "—", listOfNotNull(wx?.label, s.localInfo.address).joinToString(" · ").ifBlank { "Météo" })
+            Big(wx?.let { "${it.emoji} ${it.tempC}°" } ?: "—",
+                listOfNotNull(wx?.label?.takeIf { it.isNotBlank() }, s.localInfo.address).joinToString(" · ").ifBlank { "En attente de la météo" })
         }
-        DashWidget.ALTITUDE -> Big(s.trip.altitudeM?.let { "$it m" } ?: "—", "Altitude")
+        DashWidget.ALTITUDE -> {
+            val alt = s.trip.altitudeM
+            Big(alt?.let { "$it m" } ?: "—", if (alt != null) "au-dessus du niveau de la mer" else "En attente du GPS")
+        }
         DashWidget.RADAR -> {
             val a = s.alert
-            if (a != null) Big("${AlertText.roundedDistance(a.distanceM)} m", AlertText.kindLabel(a.radar.kind) + (a.radar.speedKmh?.let { " · $it km/h" } ?: ""), Color(0xFFFF8A80))
-            else Big("✓", "Aucun radar devant")
+            when {
+                a != null -> Big("${AlertText.roundedDistance(a.distanceM)} m",
+                    AlertText.kindLabel(a.radar.kind) + (a.radar.speedKmh?.let { " · limité à $it km/h" } ?: ""), Color(0xFFFF8A80))
+                s.radarsBlockedHere -> Big("Coupés", "Suisse : alertes radars interdites", DriveColors.TextSecondary)
+                !s.settings.radarsOn -> Big("Coupés", "Alertes radars désactivées", DriveColors.TextSecondary)
+                else -> Big("✓ Aucun", "Pas de radar devant toi", Color(0xFF66BB6A))
+            }
         }
         DashWidget.GUIDANCE -> {
             val g = s.guidanceState
             if (g?.next != null && !g.arrived) Big("${maneuverSymbol(g.next)} ${Guidance.shortDistance(g.toNextM)}", g.next?.instruction.orEmpty())
-            else Big("—", "Pas de guidage en cours")
+            else Big("—", "Choisis une destination sur la carte", DriveColors.TextSecondary)
         }
-        DashWidget.MUSIC -> Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
-            Text(music?.title ?: "Aucune musique", color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Bold,
-                maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(music?.artist.orEmpty(), color = DriveColors.TextSecondary, fontSize = 19.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                BigButton("⏮", DriveColors.Track, onPrevious)
-                BigButton(if (music?.playing == true) "⏸" else "▶", DriveColors.Accent, onPlayPause)
-                BigButton("⏭", DriveColors.Track, onNext)
+        DashWidget.MUSIC -> androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize()) {
+            val title = music?.title ?: "Aucune musique"
+            val sub = music?.artist?.takeIf { it.isNotBlank() } ?: if (music == null) "Lance ta musique depuis une appli" else ""
+            if (maxWidth >= 380.dp) {
+                // Bloc large : titre à gauche, commandes à droite (tout tient sur une ligne).
+                Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Column(Modifier.weight(1f)) {
+                        Text(title, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        if (sub.isNotBlank()) Text(sub, color = DriveColors.TextSecondary, fontSize = 17.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                    BigButton("⏮", DriveColors.Track, onPrevious)
+                    BigButton(if (music?.playing == true) "⏸" else "▶", DriveColors.Accent, onPlayPause)
+                    BigButton("⏭", DriveColors.Track, onNext)
+                }
+            } else Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
+                Text(title, color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                if (sub.isNotBlank()) Text(sub, color = DriveColors.TextSecondary, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                    BigButton("⏮", DriveColors.Track, onPrevious)
+                    BigButton(if (music?.playing == true) "⏸" else "▶", DriveColors.Accent, onPlayPause)
+                    BigButton("⏭", DriveColors.Track, onNext)
+                }
             }
         }
     }
 }
 
+/** Valeur en grand, et en dessous le détail (le titre du bloc est déjà en haut). */
 @Composable
-private fun Big(value: String, caption: String, color: Color = Color.White) {
-    // Tailles calculées sur la hauteur du bloc : légende toujours visible, même sur un écran bas.
+private fun Big(value: String, detail: String, color: Color = Color.White) {
+    // Tailles calculées sur la hauteur disponible : lisible d'un coup d'œil, détail toujours visible.
     androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize()) {
         val density = androidx.compose.ui.platform.LocalDensity.current
-        // Plus grand qu'avant : lisible d'un coup d'œil en roulant.
-        val valueSize = with(density) { (maxHeight * 0.50f).toSp() }.let { if (it.value > 64f) 64.sp else it }
-        val captionSize = with(density) { (maxHeight * 0.21f).toSp() }.let { if (it.value > 22f) 22.sp else it }
+        val hasDetail = detail.isNotBlank()
+        val valueSize = with(density) { (maxHeight * (if (hasDetail) 0.56f else 0.72f)).toSp() }.let { if (it.value > 60f) 60.sp else it }
+        val detailSize = with(density) { (maxHeight * 0.22f).toSp() }.let { if (it.value > 19f) 19.sp else it }
         Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
-            Text(caption, color = DriveColors.TextSecondary, fontSize = captionSize, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(value, color = color, fontSize = valueSize, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, fontFamily = fr.roadguard.core.ui.DriveStyle.Numbers)
+            Text(value, color = color, fontSize = valueSize, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                fontFamily = fr.roadguard.core.ui.DriveStyle.Numbers)
+            if (hasDetail) Text(detail, color = DriveColors.TextSecondary, fontSize = detailSize, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }
 }
