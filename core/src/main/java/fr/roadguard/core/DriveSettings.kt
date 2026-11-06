@@ -78,6 +78,9 @@ class DriveSettings(context: Context) {
     /** Alarme forte quand on dépasse la limite en approchant d'un radar. */
     var radarAlarm by mutableStateOf(prefs.getBoolean("radar_alarm", true)); private set
     fun changeRadarAlarm(v: Boolean) { radarAlarm = v; prefs.edit().putBoolean("radar_alarm", v).apply() }
+    // Alarme forte aussi hors radar, dès qu'on dépasse la limitation de la route.
+    var alarmAnywhere by mutableStateOf(prefs.getBoolean("alarm_anywhere", false)); private set
+    fun changeAlarmAnywhere(v: Boolean) { alarmAnywhere = v; prefs.edit().putBoolean("alarm_anywhere", v).apply() }
 
     /** Rappel de pause après 2 h de conduite. */
     var pauseReminder by mutableStateOf(prefs.getBoolean("pause_reminder", true)); private set

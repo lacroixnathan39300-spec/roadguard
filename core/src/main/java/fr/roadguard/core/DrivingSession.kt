@@ -210,8 +210,13 @@ class DrivingSession(
         // Excès de vitesse en approchant d'un radar : alarme forte qui réveille, jusqu'à repasser sous la limite.
         val cur = alert
         val limit = cur?.radar?.speedKmh
-        voice.overspeedAlarm(settings.radarAlarm && cur != null && limit != null &&
-            fr.roadguard.core.nav.SpeedLimitTracker.isOver(f.speedKmh.toInt(), limit, settings.overTolerance), limit)
+        val radarOver = settings.radarAlarm && cur != null && limit != null &&
+            fr.roadguard.core.nav.SpeedLimitTracker.isOver(f.speedKmh.toInt(), limit, settings.overTolerance)
+        // Option : la même alarme dès qu'on dépasse la limitation de la route, même sans radar devant.
+        val roadLimit = speedLimit
+        val roadOver = settings.alarmAnywhere && roadLimit != null &&
+            fr.roadguard.core.nav.SpeedLimitTracker.isOver(f.speedKmh.toInt(), roadLimit, settings.overTolerance)
+        voice.overspeedAlarm(radarOver || roadOver, if (radarOver) limit else roadLimit)
         voice.proximityBeeps = settings.proximityBeeps
         val a = alert
         // Radar dépassé : bips encore le temps de parcourir les derniers mètres (40 m après le radar).
