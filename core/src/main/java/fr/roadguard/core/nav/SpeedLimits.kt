@@ -47,8 +47,8 @@ object SpeedLimits {
 }
 
 /**
- * Garde une courte trace des dernières positions (points espacés d'au moins 25 m)
- * et décide quand redemander la limite : toutes les 12 s en roulant.
+ * Garde une courte trace des dernières positions (points espacés d'au moins 15 m)
+ * et décide quand redemander la limite : toutes les 3 s en roulant, pour suivre les changements de zone sans retard.
  */
 class SpeedLimitTracker {
     private val trail = ArrayDeque<LatLon>()
@@ -56,11 +56,11 @@ class SpeedLimitTracker {
 
     fun add(lat: Double, lon: Double, timeMs: Long, speedKmh: Double): List<LatLon>? {
         val last = trail.lastOrNull()
-        if (last == null || fr.roadguard.core.radar.Geo.distanceMeters(last.lat, last.lon, lat, lon) >= 25) {
+        if (last == null || fr.roadguard.core.radar.Geo.distanceMeters(last.lat, last.lon, lat, lon) >= 15) {
             trail.addLast(LatLon(lat, lon))
             while (trail.size > 6) trail.removeFirst()
         }
-        if (speedKmh < 8 || trail.size < 3 || timeMs - lastAskAt < 12_000) return null
+        if (speedKmh < 8 || trail.size < 3 || timeMs - lastAskAt < 3_000) return null
         lastAskAt = timeMs
         return trail.toList()
     }

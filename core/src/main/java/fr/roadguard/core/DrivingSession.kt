@@ -99,8 +99,12 @@ class DrivingSession(
         }
     }
     private var limitCandidate: Int? = null
+    @Volatile private var limitBusy = false
 
-    /** Nouvelle limite lue : annoncée seulement si elle se confirme deux fois de suite (évite les erreurs aux carrefours). */
+    /**
+     * Nouvelle limite lue (une lecture toutes les 3 s) : retenue quand deux lectures de suite concordent,
+     * soit quelques secondes après l'entrée dans la zone, et sans fausse annonce au passage d'un carrefour.
+     */
     private fun onLimit(v: Int) {
         val old = speedLimit
         if (old == null) { speedLimit = v; limitCandidate = null; return }
@@ -227,7 +231,10 @@ class DrivingSession(
                 newAlert?.let { "${it.radar.id}@${it.distanceM.toInt()}m" } ?: "-", alerts != null))
         }
         limitTracker.add(f.lat, f.lon, f.timeMs, f.speedKmh)?.let { trail ->
-            scope.launch { SpeedLimits.current(trail)?.let { onLimit(it) } }
+            if (!limitBusy) {
+                limitBusy = true
+                scope.launch { try { SpeedLimits.current(trail)?.let { onLimit(it) } } finally { limitBusy = false } }
+            }
         }
         val kmh = fix?.kmh ?: 0
         if (settings.speedLimitWarning && SpeedLimitTracker.isOver(kmh, speedLimit, settings.overTolerance) && f.timeMs - lastOverWarning > 30_000) {

@@ -30,10 +30,11 @@ class SpeedLimitsTest {
     @Test fun asksOnlyWhileMovingAndNotTooOften() {
         val t = SpeedLimitTracker()
         assertNull(t.add(46.0, 5.0, 0, 50.0))
-        assertNull(t.add(46.0005, 5.0, 2000, 50.0))
-        val first = t.add(46.001, 5.0, 13_000, 50.0)
+        assertNull(t.add(46.0005, 5.0, 1000, 50.0))
+        val first = t.add(46.001, 5.0, 3_500, 50.0)
         assertEquals(3, first!!.size)
-        assertNull(t.add(46.0015, 5.0, 15_000, 50.0))
-        assertNull(t.add(46.002, 5.0, 30_000, 3.0))
+        assertNull(t.add(46.0015, 5.0, 5_000, 50.0))
+        assertEquals(5, t.add(46.002, 5.0, 7_000, 50.0)!!.size)
+        assertNull(t.add(46.0025, 5.0, 30_000, 3.0))
     }
 }

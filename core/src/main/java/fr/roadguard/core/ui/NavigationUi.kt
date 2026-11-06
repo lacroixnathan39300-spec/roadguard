@@ -72,24 +72,40 @@ fun SearchScreen(
     val focus = remember { FocusRequester() }
     LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
 
-    fun runSearch() {
-        if (query.isBlank() || busy) return
+    // Une seule recherche à la fois : la plus récente remplace la précédente.
+    var job by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
+    suspend fun search(q: String, live: Boolean) {
+        if (!live) message = "Recherche…"
         busy = true
-        message = "Recherche…"
-        scope.launch {
-            runCatching { NavApi.search(query, near) }
-                .onSuccess { results = it; message = if (it.isEmpty()) "Aucun résultat" else null }
-                .onFailure {
-                    // Sans Internet : communes embarquées.
-                    val offline = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
-                        fr.roadguard.core.nav.OfflinePlaces.search(context, query)
-                    }
-                    results = offline
-                    message = if (offline.isNotEmpty()) "Sans Internet : villes et villages seulement"
-                        else "Recherche impossible : vérifie la connexion (${it.message})"
+        runCatching { NavApi.search(q, near) }
+            .onSuccess { results = it; message = if (it.isEmpty() && !live) "Aucun résultat" else null }
+            .onFailure {
+                if (it is kotlinx.coroutines.CancellationException) throw it
+                // Sans Internet : communes embarquées.
+                val offline = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
+                    fr.roadguard.core.nav.OfflinePlaces.search(context, q)
                 }
-            busy = false
-        }
+                results = offline
+                message = if (offline.isNotEmpty()) "Sans Internet : villes et villages seulement"
+                    else if (live) null else "Recherche impossible : vérifie la connexion (${it.message})"
+            }
+        busy = false
+    }
+
+    fun runSearch() {
+        val q = query.trim()
+        if (q.isBlank()) return
+        job?.cancel()
+        job = scope.launch { search(q, live = false) }
+    }
+
+    // Suggestions pendant la frappe : dès 3 lettres, après une courte pause (350 ms).
+    LaunchedEffect(query) {
+        val q = query.trim()
+        if (q.length < 3) { if (q.isEmpty()) { results = emptyList(); message = null }; return@LaunchedEffect }
+        kotlinx.coroutines.delay(350)
+        job?.cancel()
+        job = scope.launch { search(q, live = true) }
     }
 
     Column(Modifier.fillMaxSize().background(DriveColors.Background).padding(20.dp)) {
