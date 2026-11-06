@@ -50,6 +50,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -178,24 +179,38 @@ private fun PhoneHome() {
     var showEqualizer by remember { mutableStateOf(false) }
     var showAdmin by remember { mutableStateOf(false) }
     var showCamera by remember { mutableStateOf(false) }
+    // Mode épuré : en roulant, les panneaux se replient tout seuls après 8 s sans toucher l'écran
+    // (reste : vitesse, limite, consigne de guidage) ; un appui sur la vitesse ou la consigne les rouvre.
+    var panelOpen by remember { mutableStateOf(true) }
+    var touchedAt by remember { mutableStateOf(System.currentTimeMillis()) }
+    val moving = (s.fix?.kmh ?: 0) >= 10
+    LaunchedEffect(panelOpen, touchedAt, moving) {
+        if (panelOpen && moving) { kotlinx.coroutines.delay(8_000); panelOpen = false }
+    }
+    val openPanel = { panelOpen = true; touchedAt = System.currentTimeMillis() }
 
     // Carte hors ligne : packs téléchargés dans « Plus → Cartes hors ligne », utilisés sans Internet.
     val packStates by fr.roadguard.core.map.MapPackManager.get(context).states.collectAsState()
     val packs = remember(packStates) { OfflineMaps.packs(java.io.File(context.filesDir, "pmtiles")) }
     val offlinePack = if (Net.hasDirectInternet()) null else OfflineMaps.packFor(packs, s.here?.lat, s.here?.lon)
 
-    Box(Modifier.fillMaxSize().background(DriveColors.Background)) {
+    Box(Modifier.fillMaxSize().background(DriveColors.Background).pointerInput(Unit) {
+        // Tout appui à l'écran repousse le repli automatique (sans gêner la carte ni les boutons).
+        awaitPointerEventScope {
+            while (true) { awaitPointerEvent(androidx.compose.ui.input.pointer.PointerEventPass.Initial); touchedAt = System.currentTimeMillis() }
+        }
+    }) {
         DriveMap(
             reports = s.community.reports, drivers = s.community.drivers, jams = s.community.jams,
             position = s.here, northUp = settings.northUp, adaptiveZoom = settings.adaptiveZoom, speedKmh = s.fix?.kmh ?: 0,
             alternatives = s.alternatives,
             offlinePack = offlinePack,
             hasLocation = hasLocation, route = s.route, recenterRequest = s.recenter,
-            night = s.night, visibleKinds = settings.alertKinds, roadguardStyle = settings.mapStyle == "roadguard", bottomInset = 0.30f, modifier = Modifier.fillMaxSize(),
+            night = s.night, visibleKinds = settings.alertKinds, roadguardStyle = settings.mapStyle == "roadguard", bottomInset = if (panelOpen) 0.30f else 0.14f, modifier = Modifier.fillMaxSize(),
         )
         Column(Modifier.align(Alignment.TopCenter).statusBarsPadding().fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             if (s.navigating) {
-                GuidanceBanner(s.guidanceState, s.navStatus, onStop = { s.stopNavigation() },
+                GuidanceBanner(s.guidanceState, s.navStatus, onStop = { s.stopNavigation() }, compact = !panelOpen, onTap = openPanel,
                     choices = s.alternatives, current = s.route, onChoose = s::chooseRoute, onDismissChoices = s::dismissAlternatives)
             }
             AlertBanners(s.alert, s.average)
@@ -203,6 +218,24 @@ private fun PhoneHome() {
             s.community.toast?.let { fr.roadguard.core.ui.CommunityToast(it, s.community::dismissToast) }
         }
 
+        if (!panelOpen) {
+            // Panneau replié : la vitesse (avec la limite) et un bouton pour tout rouvrir.
+            Row(
+                Modifier.align(Alignment.BottomStart).navigationBarsPadding().padding(10.dp)
+                    .clip(RoundedCornerShape(26.dp)).background(fr.roadguard.core.ui.DriveStyle.panelBrush)
+                    .border(1.dp, fr.roadguard.core.ui.DriveStyle.panelBorder, RoundedCornerShape(26.dp))
+                    .clickable { openPanel() }.padding(6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Speedometer(
+                    kmh = s.fix?.kmh, unit = "km/h",
+                    waiting = if (hasLocation) "GPS…" else "Position ?",
+                    limit = s.speedLimit, over = s.overSpeed,
+                    modifier = Modifier.size(104.dp),
+                )
+                Text("▲", color = Color.White, fontSize = 22.sp, modifier = Modifier.padding(horizontal = 12.dp))
+            }
+        } else
         Column(
             Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(10.dp).fillMaxWidth()
                 .clip(RoundedCornerShape(26.dp)).background(fr.roadguard.core.ui.DriveStyle.panelBrush)

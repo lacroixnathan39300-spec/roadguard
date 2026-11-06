@@ -202,10 +202,14 @@ fun GuidanceBanner(
     state: GuidanceState?, status: String?, onStop: () -> Unit, modifier: Modifier = Modifier,
     choices: List<fr.roadguard.core.nav.Route> = emptyList(), current: fr.roadguard.core.nav.Route? = null,
     onChoose: (fr.roadguard.core.nav.Route) -> Unit = {}, onDismissChoices: () -> Unit = {},
+    /** Mode épuré : la ligne « distance · arrivée · Arrêter » est repliée ; l'heure d'arrivée reste en petit. */
+    compact: Boolean = false, onTap: (() -> Unit)? = null,
 ) {
     Column(modifier.padding(12.dp)) {
         Row(
-            Modifier.clip(RoundedCornerShape(18.dp)).background(Color(0xF00B3D66)).padding(horizontal = 16.dp, vertical = 12.dp),
+            Modifier.clip(RoundedCornerShape(18.dp)).background(Color(0xF00B3D66))
+                .then(if (onTap != null) Modifier.clickable { onTap() } else Modifier)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             val next = state?.next
@@ -225,11 +229,13 @@ fun GuidanceBanner(
                                 modifier = Modifier.padding(top = 4.dp).clip(RoundedCornerShape(8.dp))
                                     .background(Color(0x33FFFFFF)).padding(horizontal = 10.dp, vertical = 2.dp))
                         }
+                        if (compact) Text("${Guidance.shortDistance(state.remainingM)} · ${eta(state.remainingS)}",
+                            color = Color(0xFFB8D8F5), fontSize = 14.sp, modifier = Modifier.padding(top = 2.dp))
                     }
                 }
             }
         }
-        if (state != null && !state.arrived) {
+        if (state != null && !state.arrived && !compact) {
             Spacer(Modifier.height(8.dp))
             Row(
                 Modifier.clip(RoundedCornerShape(14.dp)).background(DriveColors.Panel.copy(alpha = 0.95f))
