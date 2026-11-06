@@ -20,6 +20,7 @@ android { lint { if (project.hasProperty('roadguardApiLint')) checkOnly 'NewApi'
    // Cœur commun ROADGUARD (Kotlin) : carte native, radars, navigation, musique, réglages.
    java.srcDir '../../core/src/main/java'
    res.srcDir '../../core/src/main/res'
+   assets.srcDir '../../core/src/main/assets'
    if (roadguardAndroidAuto) {
      java.srcDir 'src/auto/java'
 

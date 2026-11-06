@@ -91,11 +91,11 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                     }
                 }
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    listOf(0 to "Ton : classique", 1 to "Ton : charme 💋", 2 to "Ton : séduction 🔥", 3 to "Ton : osé 😈").forEach { (c, label) ->
+                    listOf(0 to "Ton : classique", 1 to "Ton : charme 💋", 2 to "Ton : séduction 🔥", 3 to "Ton : osé 😈", 4 to "Ma voix 🎙").forEach { (c, label) ->
                         BigButton(label, if (settings.voiceTone == c) DriveColors.Accent else DriveColors.Panel) {
                             settings.changeVoiceTone(c)
                             // Tons charme / séduction / osé : passe sur une voix de femme si la voix choisie est masculine ou inconnue.
-                            if (c > 0 && fr.roadguard.core.radar.AlertVoice.gender(settings.voiceName.orEmpty()) != 'F') {
+                            if (c in 1..3 && fr.roadguard.core.radar.AlertVoice.gender(settings.voiceName.orEmpty()) != 'F') {
                                 voice.femaleVoice()?.let { settings.changeVoiceName(it) }
                             }
                             voice.configure(settings.voiceName, settings.speechRate, c)
@@ -103,8 +103,14 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                         }
                     }
                 }
-                Text("Astuce : essaie les « Voix 1, 2, 3… » ci-dessus pour trouver une voix de femme qui te plaît.",
+                ToggleRow("Voix réaliste (vraie voix de femme enregistrée) pour les radars et limitations", settings.realVoice) { v ->
+                    settings.changeRealVoice(v); voice.realistic = v; voice.limitChanged(80)
+                }
+                Text("Le guidage (« tournez à droite… ») garde la voix du téléphone : essaie les voix ♀ ci-dessus.",
                     color = DriveColors.TextSecondary, fontSize = 14.sp)
+                val recording = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+                BigButton("🎙 Ma voix : enregistrer mes phrases", DriveColors.Panel) { recording.value = true }
+                if (recording.value) MyVoiceScreen(voice) { recording.value = false }
             }
 
             Section("Par-dessus les autres applis")

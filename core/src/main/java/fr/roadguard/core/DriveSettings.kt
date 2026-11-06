@@ -114,6 +114,10 @@ class DriveSettings(context: Context) {
     var voiceTone by mutableStateOf(prefs.getInt("voice_tone", if (prefs.getBoolean("charm_voice", false)) 1 else 0)); private set
     fun changeVoiceTone(v: Int) { voiceTone = v; prefs.edit().putInt("voice_tone", v).apply() }
 
+    // Voix réaliste (phrases enregistrées « Jessica ») pour les radars et limitations.
+    var realVoice by mutableStateOf(prefs.getBoolean("real_voice", true)); private set
+    fun changeRealVoice(v: Boolean) { realVoice = v; prefs.edit().putBoolean("real_voice", v).apply() }
+
     var announceLimit by mutableStateOf(prefs.getBoolean("announce_limit", true)); private set
     fun changeAnnounceLimit(v: Boolean) { announceLimit = v; prefs.edit().putBoolean("announce_limit", v).apply() }
 
