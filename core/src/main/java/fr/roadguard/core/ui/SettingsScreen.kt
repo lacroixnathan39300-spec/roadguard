@@ -76,10 +76,18 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                 Section("Voix")
                 val voices = androidx.compose.runtime.remember { voice.frenchVoices() }
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    BigButton("Par défaut", if (settings.voiceName == null) DriveColors.Accent else DriveColors.Panel) { settings.changeVoiceName(null) }
+                    // La voix réaliste est une voix parmi les autres : choisir une voix du téléphone la remplace (et inversement).
+                    BigButton("✨ Voix réaliste ♀", if (settings.realVoice) DriveColors.Accent else DriveColors.Panel) {
+                        settings.changeRealVoice(true); voice.realistic = true; voice.limitChanged(80)
+                    }
+                    BigButton("Par défaut", if (!settings.realVoice && settings.voiceName == null) DriveColors.Accent else DriveColors.Panel) {
+                        settings.changeRealVoice(false); voice.realistic = false
+                        settings.changeVoiceName(null); voice.configure(null, settings.speechRate); voice.limitChanged(80)
+                    }
                     voices.forEach { (name, label) ->
-                        BigButton(label, if (settings.voiceName == name) DriveColors.Accent else DriveColors.Panel) {
-                            settings.changeVoiceName(name); voice.configure(name, settings.speechRate); voice.speak("Radar fixe, limité à 80")
+                        BigButton(label, if (!settings.realVoice && settings.voiceName == name) DriveColors.Accent else DriveColors.Panel) {
+                            settings.changeRealVoice(false); voice.realistic = false
+                            settings.changeVoiceName(name); voice.configure(name, settings.speechRate); voice.limitChanged(80)
                         }
                     }
                 }
@@ -103,10 +111,7 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                         }
                     }
                 }
-                ToggleRow("Voix réaliste (vraie voix de femme enregistrée) pour les radars et limitations", settings.realVoice) { v ->
-                    settings.changeRealVoice(v); voice.realistic = v; voice.limitChanged(80)
-                }
-                Text("Le guidage (« tournez à droite… ») garde la voix du téléphone : essaie les voix ♀ ci-dessus.",
+                Text("« Voix réaliste » : radars et limitations. Le guidage (« tournez à droite… ») utilise la voix du téléphone choisie avant.",
                     color = DriveColors.TextSecondary, fontSize = 14.sp)
                 val recording = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
                 BigButton("🎙 Ma voix : enregistrer mes phrases", DriveColors.Panel) { recording.value = true }
