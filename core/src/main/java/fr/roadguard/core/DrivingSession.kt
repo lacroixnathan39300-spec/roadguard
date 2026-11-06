@@ -112,7 +112,7 @@ class DrivingSession(
         if (limitCandidate != v) { limitCandidate = v; return }
         limitCandidate = null
         speedLimit = v
-        if (settings.announceLimit && alert == null) voice.speak("Limitation $v")
+        if (settings.announceLimit && alert == null) voice.limitChanged(v)
     }
 
     /** À appeler une fois (bases radars chargées en arrière-plan). */
@@ -180,7 +180,7 @@ class DrivingSession(
         voice.voiceEnabled = settings.voice
         voice.beepEnabled = settings.beep
         voice.duckMusic = settings.duckMusic
-        voice.configure(settings.voiceName, settings.speechRate)
+        voice.configure(settings.voiceName, settings.speechRate, settings.charmVoice)
         val f = completeFix(location.toAlertFix())
         // Vitesse calculée par ROADGUARD si le GPS ne la donne pas (certains postes).
         fix = location.toSpeedFix().let { sf -> if (!location.hasSpeed() && f.speedKmh > 0) sf.copy(kmh = f.speedKmh.toInt()) else sf }
@@ -239,7 +239,7 @@ class DrivingSession(
         val kmh = fix?.kmh ?: 0
         if (settings.speedLimitWarning && SpeedLimitTracker.isOver(kmh, speedLimit, settings.overTolerance) && f.timeMs - lastOverWarning > 30_000) {
             lastOverWarning = f.timeMs
-            voice.speak("Attention, limité à $speedLimit")
+            voice.overLimit(speedLimit)
         }
         pauseReminder(f.speedKmh, f.timeMs)
 

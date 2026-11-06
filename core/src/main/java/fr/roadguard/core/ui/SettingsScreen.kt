@@ -90,6 +90,16 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                         }
                     }
                 }
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    listOf(false to "Ton : classique", true to "Ton : charme 💋").forEach { (c, label) ->
+                        BigButton(label, if (settings.charmVoice == c) DriveColors.Accent else DriveColors.Panel) {
+                            settings.changeCharmVoice(c); voice.configure(settings.voiceName, settings.speechRate, c)
+                            voice.limitChanged(80)
+                        }
+                    }
+                }
+                Text("Astuce : essaie les « Voix 1, 2, 3… » ci-dessus pour trouver une voix de femme qui te plaît.",
+                    color = DriveColors.TextSecondary, fontSize = 14.sp)
             }
 
             Section("Par-dessus les autres applis")

@@ -110,6 +110,10 @@ class DriveSettings(context: Context) {
     var autoDrive by mutableStateOf(prefs.getBoolean("auto_drive", false)); private set
     fun changeAutoDrive(v: Boolean) { autoDrive = v; prefs.edit().putBoolean("auto_drive", v).apply() }
 
+    // Ton de la voix : « Charme » (plus grave, plus lente, phrases complices).
+    var charmVoice by mutableStateOf(prefs.getBoolean("charm_voice", false)); private set
+    fun changeCharmVoice(v: Boolean) { charmVoice = v; prefs.edit().putBoolean("charm_voice", v).apply() }
+
     var announceLimit by mutableStateOf(prefs.getBoolean("announce_limit", true)); private set
     fun changeAnnounceLimit(v: Boolean) { announceLimit = v; prefs.edit().putBoolean("announce_limit", v).apply() }
 

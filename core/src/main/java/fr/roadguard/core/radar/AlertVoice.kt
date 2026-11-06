@@ -56,10 +56,19 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     private var appliedVoice: String? = null
     private var appliedRate = 1f
 
+    /** Ton « Charme » : voix un peu plus grave et plus lente, phrases complices. */
+    var charm = false
+    private var appliedCharm = false
+
     /** Voix et débit choisis dans les réglages (appliqués seulement s'ils changent). */
-    fun configure(voiceName: String?, rate: Float) {
+    fun configure(voiceName: String?, rate: Float, charmTone: Boolean = charm) {
+        charm = charmTone
         if (!ttsReady) return
-        if (rate != appliedRate) { tts.setSpeechRate(rate); appliedRate = rate }
+        if (rate != appliedRate || charm != appliedCharm) {
+            tts.setSpeechRate(if (charm) rate * 0.9f else rate)
+            tts.setPitch(if (charm) 0.93f else 1f)
+            appliedRate = rate; appliedCharm = charm
+        }
         if (voiceName != appliedVoice) {
             appliedVoice = voiceName
             if (voiceName == null) tts.language = Locale.FRANCE
@@ -137,7 +146,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
             if (!alarmOn) return
             if (!beeping) { duck(900); tone?.startTone(ToneGenerator.TONE_CDMA_HIGH_PBX_SS, 700) }
             val now = android.os.SystemClock.uptimeMillis()
-            if (now - lastAlarmVoice > 7_000) { lastAlarmVoice = now; say("Ralentis ! Limité à ${alarmLimit ?: ""}", "rg-alarm") }
+            if (now - lastAlarmVoice > 7_000) { lastAlarmVoice = now; say(Charm.alarm(charm, alarmLimit), "rg-alarm") }
             beeper.postDelayed(this, 1_100)
         }
     }
@@ -153,13 +162,19 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     fun announce(alert: RadarAlert) {
         if (beepEnabled) { duck(600); tone?.startTone(ToneGenerator.TONE_PROP_BEEP2, 300) }
         val text = if (proximityBeeps) AlertText.spokenShort(alert) else AlertText.spoken(alert)
-        say(text, "rg-${alert.radar.id}")
+        say(if (charm) Charm.radar(text) else text, "rg-${alert.radar.id}")
     }
 
     fun announceAverageResult(status: AverageStatus) {
         if (status.over && beepEnabled) { duck(700); tone?.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 400) }
         say(AlertText.averageSpoken(status), "rg-average")
     }
+
+    /** Nouvelle limitation de vitesse. */
+    fun limitChanged(limit: Int) = speak(Charm.limit(charm, limit))
+
+    /** Dépassement de la limitation (hors radar). */
+    fun overLimit(limit: Int?) = speak(Charm.over(charm, limit))
 
     /** Consigne de guidage ou message libre, à la suite des annonces en cours. */
     fun speak(text: String) {
@@ -173,6 +188,32 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
         tts.shutdown()
         tone?.release()
     }
+}
+
+/** Phrases du ton « Charme » : complices, un brin taquines, tirées au hasard pour ne pas lasser. */
+object Charm {
+    private fun pick(vararg options: String) = options.random()
+
+    fun radar(base: String) = pick(
+        "Hmm… doucement, mon chéri. $base",
+        "Attention à toi… $base",
+        "Lève un peu le pied pour moi… $base",
+        "Sois sage… $base",
+    )
+
+    fun limit(charm: Boolean, v: Int) = if (!charm) "Limitation $v" else pick(
+        "On passe à $v… tout en douceur.",
+        "Limitation $v, mon cœur.",
+        "$v maintenant… prends ton temps.",
+    )
+
+    fun over(charm: Boolean, v: Int?) = if (!charm) "Attention, limité à $v" else pick(
+        "Tu vas un peu trop vite pour moi… c'est limité à $v.",
+        "Doucement, beau pilote… limité à $v.",
+        "Pas si vite… on est à $v ici.",
+    )
+
+    fun alarm(charm: Boolean, v: Int?) = if (!charm) "Ralentis ! Limité à ${v ?: ""}" else "Ralentis, mon chéri ! Limité à ${v ?: ""}"
 }
 
 /** Textes des alertes (purs, testables). */
