@@ -170,7 +170,7 @@ class RadarBubble(context: Context) {
         bg.setColor(if (a != null || s.overSpeed) Color.argb(240, 150, 20, 28) else Color.argb(235, 18, 24, 32))
         val pr = s.community.prompt
         voteRow.visibility = if (pr != null) android.view.View.VISIBLE else android.view.View.GONE
-        if (pr != null) voteLabel.text = "${pr.report.type.emoji} toujours là ?"
+        if (pr != null) voteLabel.text = "${pr.report.type.emoji} " + if (pr.report.type.mapFix) "c'est juste ?" else "toujours là ?"
         val t = s.community.toast
         info.visibility = if (t != null) android.view.View.VISIBLE else android.view.View.GONE
         info.text = t.orEmpty()

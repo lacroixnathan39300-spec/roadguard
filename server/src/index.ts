@@ -30,7 +30,33 @@ export const TYPES: Record<string, { label: string; life: number; canBePermanent
   travaux: { label: "Travaux", life: 5 * DAY, canBePermanent: false },
   radar_fixe: { label: "Radar fixe", life: 14 * DAY, canBePermanent: true },
   message: { label: "Message", life: 24 * HOUR, canBePermanent: false },
+  // Corrections de carte : limitation fausse sur une portion de route, rond-point ou route absents de la carte.
+  limite: { label: "Limitation fausse", life: 30 * DAY, canBePermanent: true },
+  rond_point: { label: "Rond-point manquant", life: 60 * DAY, canBePermanent: false },
+  route: { label: "Route manquante", life: 60 * DAY, canBePermanent: false },
 };
+
+/** Limitations qu'on peut proposer comme correction. */
+export const LIMITS = [20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130];
+
+/** Texte d'une limitation corrigée : « 70|90 » (nouvelle | ancienne d'après la carte), ou null si invalide. */
+export function cleanLimit(v: unknown): string | null {
+  const m = /^(\d{2,3})\|(\d{1,3})$/.exec(String(v ?? ""));
+  if (!m || !LIMITS.includes(Number(m[1]))) return null;
+  return `${Number(m[1])}|${Number(m[2])}`;
+}
+
+/** Note OpenStreetMap d'une correction confirmée (sans aucune donnée personnelle). */
+export function osmNoteText(type: string, text: string | null, yes: number): string {
+  const n = yes + 1;
+  const confirmed = `Confirmé par ${n} conducteur${n > 1 ? "s" : ""} (application Pilote).`;
+  if (type === "limite") {
+    const [v, old] = (text ?? "").split("|");
+    return `Limitation de vitesse sur le terrain : ${v} km/h` + (old && old !== "0" && old !== v ? ` (la carte indique ${old} km/h)` : "") + `. ${confirmed}`;
+  }
+  if (type === "rond_point") return `Rond-point présent sur le terrain mais absent de la carte. ${confirmed}`;
+  return `Route présente sur le terrain mais absente de la carte. ${confirmed}`;
+}
 
 export const RULES = {
   /** Même type à moins de 150 m d'un signalement actif : c'est une confirmation, pas un doublon. */
@@ -180,7 +206,7 @@ async function reportsNear(url: URL, env: Env, me: Account | null): Promise<Resp
   const now = Date.now();
   const b = box(lat, lon, radius);
   const rows = await env.DB.prepare(
-    `SELECT r.id, r.type, r.lat, r.lon, r.heading, r.created_at, r.expires_at, r.yes, r.no, r.permanent, r.text, r.status,
+    `SELECT r.id, r.type, r.lat, r.lon, r.heading, r.created_at, r.expires_at, r.yes, r.no, r.permanent, r.text, r.status, r.way,
             a.name AS author, a.good AS a_good, a.bad AS a_bad, a.trusted AS a_trusted, (r.author_id = ?) AS mine,
             (SELECT still FROM votes v WHERE v.report_id = r.id AND v.account_id = ?) AS my_vote
        FROM reports r JOIN accounts a ON a.id = r.author_id
@@ -199,8 +225,11 @@ async function createReport(req: Request, env: Env, me: Account): Promise<Respon
   const lon = num(body.lon, -180, 180);
   const heading = num(body.heading, 0, 360);
   if (!type || lat == null || lon == null) return fail(400, "Type ou position invalide");
-  const text = type === "message" ? cleanMessage(body.text) : null;
+  const text = type === "message" ? cleanMessage(body.text) : type === "limite" ? cleanLimit(body.text) : null;
   if (type === "message" && !text) return fail(400, "Message de 3 à 100 caractères, sans insulte");
+  if (type === "limite" && !text) return fail(400, "Limitation invalide");
+  // Portion de route (identifiant OpenStreetMap) d'une limitation corrigée.
+  const way = type === "limite" && typeof body.way === "string" && /^\d{1,20}$/.test(body.way) ? body.way : null;
   const now = Date.now();
   if (me.banned) return fail(403, "Signalements désactivés pour ce compte");
   if (now - me.last_report_at < RULES.reportCooldown) return fail(429, "Patiente quelques secondes entre deux signalements");
@@ -208,9 +237,11 @@ async function createReport(req: Request, env: Env, me: Account): Promise<Respon
   // Déjà signalé tout près : on confirme au lieu de créer un doublon.
   const b = box(lat, lon, RULES.mergeRadiusM);
   const near = await env.DB.prepare(
-    "SELECT id, lat, lon FROM reports WHERE type = ? AND lat BETWEEN ? AND ? AND lon BETWEEN ? AND ? AND (permanent = 1 OR expires_at > ?)",
-  ).bind(type, b.minLat, b.maxLat, b.minLon, b.maxLon, now).all<{ id: string; lat: number; lon: number }>();
-  const existing = near.results.find((r) => distanceM(lat, lon, r.lat, r.lon) <= RULES.mergeRadiusM);
+    "SELECT id, lat, lon, text, way FROM reports WHERE type = ? AND lat BETWEEN ? AND ? AND lon BETWEEN ? AND ? AND (permanent = 1 OR expires_at > ?)",
+  ).bind(type, b.minLat, b.maxLat, b.minLon, b.maxLon, now).all<{ id: string; lat: number; lon: number; text: string | null; way: string | null }>();
+  // Limitation : c'est une confirmation seulement si c'est la même valeur sur la même portion de route.
+  const existing = near.results.find((r) => distanceM(lat, lon, r.lat, r.lon) <= RULES.mergeRadiusM &&
+    (type !== "limite" || ((r.text ?? "").split("|")[0] === (text ?? "").split("|")[0] && (!way || !r.way || r.way === way))));
   await env.DB.prepare("UPDATE accounts SET last_report_at = ? WHERE id = ?").bind(now, me.id).run();
   // Les messages ne se fusionnent pas : chacun garde son texte.
   if (existing && type !== "message") return vote(env, me, existing.id, true, now, true);
@@ -234,8 +265,8 @@ async function createReport(req: Request, env: Env, me: Account): Promise<Respon
   const id = randomId(10);
   await env.DB.batch([
     env.DB.prepare(
-      "INSERT INTO reports (id, type, lat, lon, heading, author_id, created_at, expires_at, last_yes_at, text, status, permanent, validated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-    ).bind(id, type, lat, lon, heading == null ? null : Math.round(heading), me.id, now, expires, now, text, p.status, p.permanent ? 1 : 0, p.permanent ? 1 : 0),
+      "INSERT INTO reports (id, type, lat, lon, heading, author_id, created_at, expires_at, last_yes_at, text, status, permanent, validated, way) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    ).bind(id, type, lat, lon, heading == null ? null : Math.round(heading), me.id, now, expires, now, text, p.status, p.permanent ? 1 : 0, p.permanent ? 1 : 0, way),
     env.DB.prepare("UPDATE accounts SET rep_lat = ?, rep_lon = ?" + (body.known === true && type === "radar_fixe" ? ", good = good + 1" : "") + " WHERE id = ?").bind(lat, lon, me.id),
   ]);
   await addPoints(env, me.id, RULES.pointsReport, now);
@@ -442,6 +473,27 @@ async function cleanup(env: Env) {
     env.DB.prepare("DELETE FROM convoy WHERE at < ?").bind(now - 6 * HOUR),
     env.DB.prepare("DELETE FROM shares WHERE expires_at < ?").bind(now - DAY),
   ]);
+}
+
+/**
+ * Corrections de carte confirmées (au moins 2 conducteurs, ou validées d'office) : envoyées à OpenStreetMap sous forme
+ * de note publique, pour que les cartographes corrigent la carte (et donc le guidage et les limitations) pour tous.
+ */
+async function forwardToOsm(env: Env) {
+  const rows = await env.DB.prepare(
+    `SELECT id, type, lat, lon, text, yes FROM reports
+      WHERE type IN ('limite', 'rond_point', 'route') AND status = 'ok' AND osm_note IS NULL AND (permanent = 1 OR yes >= 1)
+      LIMIT 5`,
+  ).all<{ id: string; type: string; lat: number; lon: number; text: string | null; yes: number }>();
+  for (const r of rows.results) {
+    const url = `https://api.openstreetmap.org/api/0.6/notes.json?lat=${r.lat.toFixed(6)}&lon=${r.lon.toFixed(6)}` +
+      `&text=${encodeURIComponent(osmNoteText(r.type, r.text, r.yes))}`;
+    const res = await fetch(url, { method: "POST", headers: { "User-Agent": "Pilote-communaute/1.0 (corrections confirmees par des conducteurs)" } })
+      .catch(() => null);
+    if (!res || !res.ok) continue;
+    const j = (await res.json().catch(() => null)) as { properties?: { id?: number } } | null;
+    await env.DB.prepare("UPDATE reports SET osm_note = ? WHERE id = ?").bind(String(j?.properties?.id ?? "envoyee"), r.id).run();
+  }
 }
 
 
@@ -735,5 +787,6 @@ export default {
   },
   async scheduled(_event: ScheduledController, env: Env): Promise<void> {
     await cleanup(env);
+    await forwardToOsm(env).catch(() => {});
   },
 };

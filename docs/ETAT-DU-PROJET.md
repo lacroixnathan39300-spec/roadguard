@@ -81,3 +81,8 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
   (accès « tous les fichiers ») supprimés après confirmation.
 - Compilée seule par `.github/workflows/menage.yml` (signée avec la clé du téléphone), publiée par `publish_updates.py`
   (contrôle de version appli par appli). Lien direct : `/menage`. Appli indépendante : PAS dans Pilote Suite ni dans les menus de Pilote (demande de Nathan).
+- Corrections de carte (types `limite`, `rond_point`, `route`, `ReportType.mapFix`) : mêmes règles de confiance que les radars
+  (placement, votes « c'est juste ? », attente pour les nouveaux). Limitation liée à la portion OSM (`edge.way_id`,
+  `SpeedLimits.lastWay`), appliquée par `Community.limitFix` (validée, ou la sienne tout de suite). Confirmées (2 conducteurs ou
+  validées d'office) : envoyées en note OpenStreetMap par la tâche planifiée (`forwardToOsm`, colonne `osm_note`, migration 0011).
+- Sirène plus présente : `LoudnessEnhancer` +10 dB, musique en pause (focus transitoire), volume d'alarme au maximum pendant le réveil.

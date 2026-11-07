@@ -74,3 +74,13 @@ test("messages : longueur et filtre", () => {
   assert.equal(cleanMessage("espèce de connard"), null);
   assert.equal(cleanMessage("x".repeat(101)), null);
 });
+
+test("corrections de carte : limitation valide et note OpenStreetMap", async () => {
+  const { cleanLimit, osmNoteText } = await import("../src/index.ts");
+  assert.equal(cleanLimit("70|90"), "70|90");
+  assert.equal(cleanLimit("75|90"), null);
+  assert.equal(cleanLimit("70"), null);
+  assert.equal(cleanLimit("<b>|1"), null);
+  assert.equal(osmNoteText("limite", "70|90", 1), "Limitation de vitesse sur le terrain : 70 km/h (la carte indique 90 km/h). Confirmé par 2 conducteurs (application Pilote).");
+  assert.equal(osmNoteText("rond_point", null, 0), "Rond-point présent sur le terrain mais absent de la carte. Confirmé par 1 conducteur (application Pilote).");
+});

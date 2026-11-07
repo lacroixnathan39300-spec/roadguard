@@ -27,6 +27,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -41,14 +43,16 @@ import fr.roadguard.core.community.VotePrompt
 import fr.roadguard.core.radar.Geo
 import kotlinx.coroutines.launch
 
-/** Choix du type de signalement : 7 grosses tuiles, un seul appui. */
+/** Choix du type de signalement (grosses tuiles, un seul appui), dont les corrections de carte. */
 @Composable
 fun ReportSheet(onPick: (ReportType, String?) -> Unit, onClose: () -> Unit) {
     var writing by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
     var msg by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("") }
+    var limiting by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
     Box(Modifier.fillMaxSize().background(Color(0xCC000000)).clickable(onClick = onClose), contentAlignment = Alignment.Center) {
         Column(
-            Modifier.padding(16.dp).clip(RoundedCornerShape(22.dp)).background(DriveColors.Panel).padding(16.dp).clickable(enabled = false) {},
+            Modifier.padding(16.dp).clip(RoundedCornerShape(22.dp)).background(DriveColors.Panel).padding(16.dp).clickable(enabled = false) {}
+                .verticalScroll(androidx.compose.foundation.rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             val context = androidx.compose.ui.platform.LocalContext.current
@@ -77,7 +81,13 @@ fun ReportSheet(onPick: (ReportType, String?) -> Unit, onClose: () -> Unit) {
                     row.forEach { t ->
                         Column(
                             Modifier.width(104.dp * DriveColors.Scale).clip(RoundedCornerShape(16.dp)).background(Color(t.color))
-                                .clickable { if (t == ReportType.MESSAGE) writing = true else onPick(t, null) }.padding(vertical = 14.dp),
+                                .clickable {
+                                    when (t) {
+                                        ReportType.MESSAGE -> { writing = true; limiting = false }
+                                        ReportType.LIMIT -> { limiting = true; writing = false }
+                                        else -> onPick(t, null)
+                                    }
+                                }.padding(vertical = 14.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(t.emoji, fontSize = 30.sp)
@@ -85,6 +95,15 @@ fun ReportSheet(onPick: (ReportType, String?) -> Unit, onClose: () -> Unit) {
                         }
                     }
                 }
+            }
+            if (limiting) {
+                // Limitation fausse sur cette portion de route : on choisit la vraie.
+                Text("Quelle est la vraie limitation ici ?", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Row(Modifier.horizontalScroll(androidx.compose.foundation.rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf(20, 30, 50, 70, 80, 90, 110, 130).forEach { v -> BigButton("$v", DriveColors.Accent) { onPick(ReportType.LIMIT, "$v") } }
+                }
+                Text("La correction vaut pour toute cette portion de route. Elle s'applique tout de suite pour toi, " +
+                    "et pour les autres une fois confirmée par d'autres conducteurs.", color = DriveColors.TextSecondary, fontSize = 13.sp)
             }
             if (writing) {
                 OutlinedTextField(
@@ -130,7 +149,7 @@ fun VotePromptCard(prompt: VotePrompt, onAnswer: (Boolean) -> Unit, modifier: Mo
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.padding(end = 10.dp)) {
-            Text("${r.type.emoji} ${r.type.label} toujours là ?", color = Color.White, fontSize = 19.sp, fontWeight = FontWeight.Bold)
+            Text("${r.type.emoji} ${fr.roadguard.core.community.voteQuestion(r)}", color = Color.White, fontSize = 19.sp, fontWeight = FontWeight.Bold)
             Text("Signalé par ${r.author}" + trustBadge(r.authorStars, r.authorTrusted) + (if (r.yes > 0) " · confirmé ${r.yes} fois" else "") +
                 (if (r.pending) " · à confirmer" else ""), color = Color.White.copy(alpha = 0.85f), fontSize = 14.sp)
         }

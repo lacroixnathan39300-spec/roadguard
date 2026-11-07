@@ -48,6 +48,7 @@ import org.maplibre.android.style.sources.GeoJsonSource
 import org.maplibre.geojson.Feature
 import org.maplibre.geojson.FeatureCollection
 import org.maplibre.geojson.Point
+import fr.roadguard.core.community.limitValue
 
 /** Style vectoriel libre (OpenFreeMap, données © OpenStreetMap), sans clé. */
 internal const val STYLE_URL = "https://tiles.openfreemap.org/styles/liberty"
@@ -255,7 +256,9 @@ fun DriveMap(
                 Feature.fromGeometry(Point.fromLngLat(r.lon, r.lat)).apply {
                     addStringProperty("color", String.format("#%06X", r.type.color and 0xFFFFFF))
                     addBooleanProperty("permanent", r.permanent)
-                    r.text?.let { addStringProperty("text", it) }
+                    // Limitation corrigée : « 70 km/h » (et non « 70|90 ») ; message : son texte.
+                    val label = if (r.type == fr.roadguard.core.community.ReportType.LIMIT) r.limitValue?.let { "$it km/h" } else r.text
+                    label?.let { addStringProperty("text", it) }
                 }
             }))
             style.getSourceAs<GeoJsonSource>(DRIVERS_SOURCE)?.setGeoJson(FeatureCollection.fromFeatures(drivers.map { d ->

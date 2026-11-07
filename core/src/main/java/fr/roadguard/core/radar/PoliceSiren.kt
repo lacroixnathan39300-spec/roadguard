@@ -25,10 +25,18 @@ object PoliceSiren {
 
     private val cycle: ShortArray by lazy { build() }
     private var track: AudioTrack? = null
+    private var booster: android.media.audiofx.LoudnessEnhancer? = null
     private val main = android.os.Handler(android.os.Looper.getMainLooper())
+    private var audio: android.media.AudioManager? = null
+    private var focus: android.media.AudioFocusRequest? = null
+    /** Volume d'alarme avant le réveil, rendu à l'arrêt. */
+    private var savedAlarmVolume = -1
 
     /** Prépare le son à l'avance (en arrière-plan) pour qu'il parte sans délai la première fois. */
-    fun prepare() { Thread { runCatching { cycle } }.start() }
+    fun prepare(context: android.content.Context) {
+        if (audio == null) audio = context.applicationContext.getSystemService(android.media.AudioManager::class.java)
+        Thread { runCatching { cycle } }.start()
+    }
 
     /**
      * Une note de trompe à air : son cuivré (harmoniques renforcées vers 1 à 3 kHz), attaque un peu basse qui monte,
@@ -52,7 +60,7 @@ object PoliceSiren {
             var s1 = 0.0; var s2 = 0.0
             for (j in weights.indices) { val k = j + 1; s1 += weights[j] * sin(k * p1); s2 += weights[j] * sin(k * p2) }
             val env = minOf(1.0, i / attack, (n - 1 - i) / release) * (1.0 + 0.08 * exp(-i / (0.05 * RATE)))
-            out[i] = tanh((s1 + 0.8 * s2) / norm * env * 1.9)
+            out[i] = tanh((s1 + 0.8 * s2) / norm * env * 2.8) // plus « tassé » : plus fort à même volume
         }
         return out
     }
@@ -78,10 +86,28 @@ object PoliceSiren {
     fun stop() {
         track?.let { runCatching { it.stop() }; runCatching { it.release() } }
         track = null
+        booster?.let { runCatching { it.release() } }
+        booster = null
+        val a = audio
+        focus?.let { f -> runCatching { a?.abandonAudioFocusRequest(f) } }
+        focus = null
+        if (savedAlarmVolume >= 0) {
+            runCatching { a?.setStreamVolume(android.media.AudioManager.STREAM_ALARM, savedAlarmVolume, 0) }
+            savedAlarmVolume = -1
+        }
     }
 
-    /** En boucle jusqu'à [stop] : réveil du conducteur. */
-    fun startAlarm() = play(-1, AudioAttributes.USAGE_ALARM)
+    /** En boucle jusqu'à [stop] : réveil du conducteur (volume d'alarme au maximum le temps du réveil). */
+    fun startAlarm() {
+        play(-1, AudioAttributes.USAGE_ALARM)
+        synchronized(this) {
+            val a = audio ?: return
+            if (track != null && savedAlarmVolume < 0) runCatching {
+                savedAlarmVolume = a.getStreamVolume(android.media.AudioManager.STREAM_ALARM)
+                a.setStreamVolume(android.media.AudioManager.STREAM_ALARM, a.getStreamMaxVolume(android.media.AudioManager.STREAM_ALARM), 0)
+            }
+        }
+    }
 
     /** [cycles] « pin-pon » puis arrêt : dernier moment avant un radar. */
     fun burst(cycles: Int = 3) = play(cycles - 1, AudioAttributes.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE)
@@ -106,6 +132,16 @@ object PoliceSiren {
         }.isSuccess
         if (!ok) { runCatching { t.release() }; return }
         track = t
+        // Plus présente : amplification au-dessus du volume normal (+10 dB) et musique mise en pause le temps de la sirène.
+        booster = runCatching {
+            android.media.audiofx.LoudnessEnhancer(t.audioSessionId).apply { setTargetGain(1_000); setEnabled(true) }
+        }.getOrNull()
+        val attrs = AudioAttributes.Builder().setUsage(usage).setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build()
+        audio?.let { a ->
+            val req = android.media.AudioFocusRequest.Builder(android.media.AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+                .setAudioAttributes(attrs).setOnAudioFocusChangeListener { }.build()
+            if (runCatching { a.requestAudioFocus(req) }.getOrNull() == android.media.AudioManager.AUDIOFOCUS_REQUEST_GRANTED) focus = req
+        }
         if (loops >= 0) {
             // Fin du nombre de « pin-pon » demandé : on libère le lecteur.
             val ms = (NOTE_S * 2 * 1000 * (loops + 1)).toLong() + 300

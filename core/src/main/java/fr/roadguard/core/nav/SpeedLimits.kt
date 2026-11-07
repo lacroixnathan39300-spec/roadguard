@@ -12,10 +12,21 @@ import org.json.JSONObject
 object SpeedLimits {
     private const val URL_TRACE = "https://valhalla1.openstreetmap.de/trace_attributes"
 
+    /** Portion de route (identifiant OpenStreetMap) de la dernière lecture : sert aux limitations corrigées par la communauté. */
+    @Volatile var lastWay: String? = null
+        private set
+
     /** Limite du tronçon où l'on roule ; 0 si ce tronçon n'a pas de limite connue ; null si la requête a échoué. */
     suspend fun current(trail: List<LatLon>): Int? = withContext(Dispatchers.IO) {
         if (trail.size < 2) return@withContext null
-        runCatching { parse(post(request(trail))) }.getOrNull()
+        runCatching { val json = post(request(trail)); lastWay = wayOf(json); parse(json) }.getOrNull()
+    }
+
+    /** Identifiant OpenStreetMap de la portion de route où l'on roule (dernier tronçon), ou null. */
+    fun wayOf(json: String): String? {
+        val edges = JSONObject(json).optJSONArray("edges") ?: return null
+        if (edges.length() == 0) return null
+        return edges.getJSONObject(edges.length() - 1).optLong("way_id", 0L).takeIf { it > 0 }?.toString()
     }
 
     fun request(trail: List<LatLon>): String {
@@ -25,7 +36,7 @@ object SpeedLimits {
             .put("shape", shape)
             .put("costing", "auto")
             .put("shape_match", "map_snap")
-            .put("filters", JSONObject().put("attributes", JSONArray().put("edge.speed_limit").put("edge.road_class")).put("action", "include"))
+            .put("filters", JSONObject().put("attributes", JSONArray().put("edge.speed_limit").put("edge.road_class").put("edge.way_id")).put("action", "include"))
             .toString()
     }
 

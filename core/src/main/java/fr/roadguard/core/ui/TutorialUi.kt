@@ -69,6 +69,8 @@ private fun pages(drive: Boolean): List<Page> = listOfNotNull(
         "🎤 « Dire » : signale à la voix, les mains sur le volant. Ton signalement apparaît tout de suite sur la carte.",
         "Les signalements devant toi sont annoncés à 1 km. En passant, « toujours là ? » : réponds oui ou non à la voix.",
         "⭐ Ta fiabilité monte quand les autres confirment tes signalements : les tiens sont alors validés tout de suite.",
+        "🔢 Limitation fausse, 🔄 rond-point ou 🛣 route absents de la carte : signale-les. Une fois confirmées, les corrections " +
+            "s'appliquent pour tous et partent à OpenStreetMap pour corriger la carte.",
     )),
     if (drive) null else Page("🧭", "Plus de place pour la carte", listOf(
         "Plein écran : glisse depuis le haut ou le bas pour voir les barres d'Android un instant.",

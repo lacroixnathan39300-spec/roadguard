@@ -39,4 +39,10 @@ class SpeedLimitsTest {
         assertEquals(5, t.add(46.002, 5.0, 7_000, 50.0)!!.size)
         assertNull(t.add(46.0025, 5.0, 30_000, 3.0))
     }
+
+    @Test fun readsWayOfCurrentRoad() {
+        assertEquals("123456", SpeedLimits.wayOf("""{"edges":[{"way_id":1},{"way_id":123456,"speed_limit":50}]}"""))
+        assertNull(SpeedLimits.wayOf("""{"edges":[{"speed_limit":50}]}"""))
+        assertNull(SpeedLimits.wayOf("""{"edges":[]}"""))
+    }
 }

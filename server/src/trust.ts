@@ -20,7 +20,7 @@ export const TRUST = {
   launchDrivers: 20,
   launchRadiusM: 50_000,
   /** Nouveau, hors lancement : radar fixe retiré au bout de 7 jours sans confirmation, danger au bout de 2 jours. */
-  pendingLife: { radar_fixe: 7 * 86_400_000, danger: 2 * 86_400_000 } as Record<string, number>,
+  pendingLife: { radar_fixe: 7 * 86_400_000, danger: 2 * 86_400_000, limite: 7 * 86_400_000, rond_point: 14 * 86_400_000, route: 14 * 86_400_000 } as Record<string, number>,
   /** Anti-abus. */
   maxPerHour: 10,
   maxSpeedKmh: 250,

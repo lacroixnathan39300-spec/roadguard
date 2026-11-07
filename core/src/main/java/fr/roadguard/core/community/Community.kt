@@ -20,7 +20,8 @@ import java.io.IOException
 import java.net.URLEncoder
 
 /** Types de signalement (mêmes codes que le serveur). */
-enum class ReportType(val code: String, val label: String, val emoji: String, val color: Long) {
+/** [mapFix] : correction de la carte (pas un événement sur la route) : pas d'annonce, question « c'est juste ? ». */
+enum class ReportType(val code: String, val label: String, val emoji: String, val color: Long, val mapFix: Boolean = false) {
     POLICE("police", "Police", "👮", 0xFF1E88E5),
     MOBILE("radar_mobile", "Radar mobile", "📸", 0xFFFFB300),
     ACCIDENT("accident", "Accident", "💥", 0xFFE53935),
@@ -28,7 +29,10 @@ enum class ReportType(val code: String, val label: String, val emoji: String, va
     DANGER("danger", "Danger", "⚠️", 0xFFFB8C00),
     WORKS("travaux", "Travaux", "🚧", 0xFFF4511E),
     FIXED("radar_fixe", "Radar fixe", "📷", 0xFFD32F2F),
-    MESSAGE("message", "Message (24 h)", "💬", 0xFF00897B);
+    MESSAGE("message", "Message (24 h)", "💬", 0xFF00897B),
+    LIMIT("limite", "Limitation fausse", "🔢", 0xFF546E7A, mapFix = true),
+    ROUNDABOUT("rond_point", "Rond-point manquant", "🔄", 0xFF00838F, mapFix = true),
+    ROAD("route", "Route manquante", "🛣", 0xFF6D4C41, mapFix = true);
 
     companion object { fun of(code: String) = entries.firstOrNull { it.code == code } }
 }
@@ -43,7 +47,20 @@ data class Report(
     val authorTrusted: Boolean = false,
     /** « À confirmer » : auteur nouveau, signalement pas encore vérifié. */
     val pending: Boolean = false,
+    /** Limitation corrigée : portion de route (identifiant OpenStreetMap) où elle s'applique. */
+    val way: String? = null,
 )
+
+/** Limitation corrigée proposée (« 70|90 » → 70), ou null. */
+val Report.limitValue: Int? get() = if (type == ReportType.LIMIT) text?.substringBefore('|')?.toIntOrNull() else null
+
+/** Question posée en passant : « Police toujours là ? », ou pour une correction de carte « Limitation à 70 ici, c'est juste ? ». */
+fun voteQuestion(r: Report): String = when (r.type) {
+    ReportType.LIMIT -> "Limitation à ${r.limitValue ?: "?"} ici, c'est juste ?"
+    ReportType.ROUNDABOUT -> "Rond-point absent de la carte ici, c'est vrai ?"
+    ReportType.ROAD -> "Route absente de la carte ici, c'est vrai ?"
+    else -> "${r.type.label} toujours là ?"
+}
 
 data class Driver(val id: String, val name: String, val lat: Double, val lon: Double, val speed: Int?)
 
@@ -83,6 +100,22 @@ class Community(context: Context, private val scope: CoroutineScope, private val
     var announceAloud: ((Report, Int) -> String?)? = null
     /** Annonces police / radar mobile permises (radars activés, et pas en Suisse où c'est interdit). */
     var radarAlertsAllowed = true
+    /** Portion de route (identifiant OpenStreetMap) et limitation lue sur la carte, fournies par la session. */
+    var currentWay: () -> String? = { null }
+    var currentLimit: () -> Int? = { null }
+
+    /**
+     * Limitation corrigée par la communauté pour la portion de route où l'on roule : validée (pas « à confirmer »)
+     * ou la sienne (appliquée tout de suite pour son auteur). null s'il n'y en a pas.
+     */
+    fun limitFix(way: String?, lat: Double, lon: Double): Int? {
+        val fixes = reports.filter { it.type == ReportType.LIMIT && (it.mine || !it.pending) }
+        if (fixes.isEmpty()) return null
+        val r = (if (way != null) fixes.filter { it.way == way }.maxByOrNull { it.yes + if (it.mine) 1_000 else 0 } else null)
+            ?: fixes.firstOrNull { it.way == null && Geo.distanceMeters(lat, lon, it.lat, it.lon) < 40 }
+            ?: return null
+        return r.limitValue?.takeIf { it in 5..150 }
+    }
     var shareLocation by mutableStateOf(prefs.getBoolean("share", false)); private set
 
     val baseUrl: String get() = prefs.getString("url", null)?.takeIf { it.isNotBlank() } ?: DEFAULT_URL
@@ -153,7 +186,7 @@ class Community(context: Context, private val scope: CoroutineScope, private val
             // Police et radar mobile : coupés avec les alertes radars (interrupteur, ou Suisse où c'est interdit).
             val radarLike = r.type == ReportType.POLICE || r.type == ReportType.MOBILE
             if (radarLike && !radarAlertsAllowed) continue
-            if (d < 1000 && ahead && announced.add(r.id) && r.type != ReportType.FIXED) {
+            if (d < 1000 && ahead && !r.type.mapFix && announced.add(r.id) && r.type != ReportType.FIXED) {
                 val meters = ((d + 25) / 50).toInt() * 50
                 val where = if (d > 150) "à $meters mètres" else "tout près"
                 val msg = r.text
@@ -164,7 +197,7 @@ class Community(context: Context, private val scope: CoroutineScope, private val
                 prompt = VotePrompt(r, f.timeMs)
                 // Question à la voix, réponse « oui » / « non » à la voix : on confirme sans lâcher le volant.
                 if (voiceAnswers && r.type != ReportType.MESSAGE) {
-                    val question = "${r.type.label} toujours là ? Réponds oui ou non."
+                    val question = "${voteQuestion(r)} Réponds oui ou non."
                     val listen: () -> Unit = { VoiceYesNo.ask(appContext, delayMs = 250) { yes -> if (prompt?.report?.id == r.id) answer(yes) } }
                     val ask = askAloud
                     // L'écoute commence une fois la question dite (sinon le micro entend « oui ou non »).
@@ -186,8 +219,11 @@ class Community(context: Context, private val scope: CoroutineScope, private val
         }
     }
 
-    fun report(type: ReportType, text: String? = null) {
+    fun report(type: ReportType, text0: String? = null) {
         val f = here ?: return show("Position GPS indisponible : signalement non envoyé")
+        // Limitation corrigée : « nouvelle|ancienne » et la portion de route où l'on roule.
+        val text = if (type == ReportType.LIMIT) "${text0?.toIntOrNull() ?: return show("Choisis la bonne limitation")}|${currentLimit() ?: 0}" else text0
+        val way = if (type == ReportType.LIMIT) currentWay() else null
         scope.launch {
             // Pas encore de pseudo communauté sur cet appareil : on le crée avec l'identifiant Pilote,
             // au lieu de refuser le signalement (c'était la cause des signalements « perdus »).
@@ -199,6 +235,7 @@ class Community(context: Context, private val scope: CoroutineScope, private val
                 post("/v1/reports", JSONObject().put("type", type.code).put("lat", f.lat).put("lon", f.lon)
                     .apply {
                         if (!f.bearing.isNaN()) put("heading", f.bearing.toInt()); if (text != null) put("text", text)
+                        if (way != null) put("way", way)
                         // Radar fixe déjà dans les bases (officielle, MapAtlas, OpenStreetMap) : validé d'office.
                         if (type == ReportType.FIXED && knownRadarNear?.invoke(f.lat, f.lon) == true) put("known", true)
                     })
@@ -207,10 +244,14 @@ class Community(context: Context, private val scope: CoroutineScope, private val
                 val id = r.optString("id")
                 if (r.optBoolean("created") && id.isNotBlank() && reports.none { it.id == id }) {
                     reports = reports + Report(id = id, type = type, lat = f.lat, lon = f.lon, author = name.orEmpty(),
-                        createdAt = System.currentTimeMillis(), yes = 0, permanent = false, mine = true, voted = false, text = text)
+                        createdAt = System.currentTimeMillis(), yes = 0, permanent = false, mine = true, voted = false, text = text, way = way)
                 }
                 show(when {
                     type == ReportType.MESSAGE -> "Message publié pour 24 h, merci ! +5 points"
+                    type.mapFix && r.optString("status") == "pending" -> "Correction envoyée : publiée quand d'autres conducteurs l'auront confirmée (+5 points)"
+                    type.mapFix && r.optBoolean("created") -> "Correction publiée, merci ! " +
+                        (if (type == ReportType.LIMIT) "Elle s'applique déjà pour toi. " else "") + "+5 points"
+                    type.mapFix -> "Déjà signalée : ta confirmation est comptée"
                     r.optString("status") == "pending" -> "${type.label} signalé, à confirmer par d'autres conducteurs (+5 points)"
                     r.optString("status") == "hidden" -> "${type.label} signalé : il sera visible une fois confirmé"
                     r.optBoolean("permanent") -> "${type.label} signalé et validé, merci ! +5 points"
@@ -406,6 +447,7 @@ class Community(context: Context, private val scope: CoroutineScope, private val
             authorStars = if (o.isNull("author_stars") || !o.has("author_stars")) null else o.optDouble("author_stars"),
             authorTrusted = o.optBoolean("author_trusted"),
             pending = o.optString("status") == "pending",
+            way = o.optString("way").takeIf { !o.isNull("way") && it.isNotBlank() },
         )
     }
 

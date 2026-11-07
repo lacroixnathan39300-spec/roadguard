@@ -94,6 +94,8 @@ class DrivingSession(
     private var lastRerouteAt = 0L
     private var pendingDestination: LatLon? = null
     private val limitTracker = SpeedLimitTracker()
+    /** Limitation d'après la carte (avant correction de la communauté) : l'« ancienne » valeur d'une correction. */
+    private var mapLimit: Int? = null
     private var lastOverWarning = 0L
     private var lastSirenRadar: String? = null
     private var overWarned = false
@@ -346,6 +348,8 @@ class DrivingSession(
     init {
         scope.launch { while (true) { kotlinx.coroutines.delay(1_000); runCatching { deadReckon(System.currentTimeMillis()) } } }
         community.askAloud = { text, then -> voice.speakThen(text, then) }
+        community.currentWay = { SpeedLimits.lastWay }
+        community.currentLimit = { mapLimit }
         community.announceAloud = { r, meters -> voice.xxlReport(r.type.code, meters, r.yes) }
         community.startConvoyLoop()
         // Échéances de la voiture (contrôle technique, assurance…) : notification un mois avant.
@@ -517,7 +521,16 @@ class DrivingSession(
         limitTracker.add(f.lat, f.lon, f.timeMs, f.speedKmh, if (batterySaving) 8_000 else 3_000)?.let { trail ->
             if (!limitBusy) {
                 limitBusy = true
-                scope.launch { try { SpeedLimits.current(trail)?.let { onLimit(it) } } finally { limitBusy = false } }
+                scope.launch {
+                    try {
+                        SpeedLimits.current(trail)?.let { read ->
+                            // Limitation corrigée par la communauté sur cette portion de route : elle remplace celle de la carte.
+                            val fixed = community.limitFix(SpeedLimits.lastWay, f.lat, f.lon)
+                            mapLimit = read.takeIf { it > 0 }
+                            onLimit(fixed ?: read)
+                        }
+                    } finally { limitBusy = false }
+                }
             }
         }
         val kmh = fix?.kmh ?: 0
