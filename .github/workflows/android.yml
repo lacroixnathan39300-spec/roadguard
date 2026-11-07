@@ -7,7 +7,7 @@ on:
   push:
     branches: [main]
     # Pas de compilation des applis pour un changement du serveur seul (économise les minutes GitHub).
-    paths-ignore: ["server/**", ".github/workflows/server.yml", ".github/workflows/diag.yml", ".github/workflows/voice-samples.yml", ".github/workflows/voice-pack.yml", "tools/voice/**", "docs/**", "README.md"]
+    paths-ignore: ["menage/**", ".github/workflows/menage.yml", "server/**", ".github/workflows/server.yml", ".github/workflows/diag.yml", ".github/workflows/voice-samples.yml", ".github/workflows/voice-pack.yml", "tools/voice/**", "docs/**", "README.md"]
   pull_request:
   workflow_dispatch:
 

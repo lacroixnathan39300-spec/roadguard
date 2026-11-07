@@ -22,14 +22,16 @@ try:
 except Exception:
     old = {}
 
-# Une compilation plus ancienne qui finit après une plus récente ne doit pas la remplacer.
-if max((old.get(a) or {}).get("build", 0) for a in ("gps", "drive", "suite")) > run:
-    print(f"Build {run} plus ancienne que celle publiée : rien à faire."); sys.exit(0)
+APPS = ("gps", "drive", "suite", "drivesys", "menage")
 manifest = dict(old)
-for app, version in (("gps", 600 + run), ("drive", run), ("suite", run), ("drivesys", run)):
+for app, version in (("gps", 600 + run), ("drive", run), ("suite", run), ("drivesys", run), ("menage", run)):
     path = os.path.join(dist, f"ROADGUARD-{app.upper()}-build{run}.apk")
     if not os.path.isfile(path):
         continue
+    # Une compilation plus ancienne qui finit après une plus récente ne doit pas la remplacer (vérifié appli par appli :
+    # Ménage a sa propre compilation, avec sa propre numérotation).
+    if (old.get(app) or {}).get("build", 0) > run:
+        print(f"{app} : build {run} plus ancienne que celle publiée, ignorée."); continue
     data = open(path, "rb").read()
     parts = [data[i:i + CHUNK] for i in range(0, len(data), CHUNK)]
     for i, p in enumerate(parts):
@@ -38,7 +40,7 @@ for app, version in (("gps", 600 + run), ("drive", run), ("suite", run), ("drive
     print(f"{app} build {run} : {len(parts)} morceaux, {len(data)} octets")
 
 # On garde au plus 2 versions par appli (l'actuelle et la précédente) ; les plus anciennes sont supprimées.
-for app in ("gps", "drive", "suite", "drivesys"):
+for app in APPS:
     cur, prev = manifest.get(app), old.get(app)
     if not cur:
         continue
@@ -56,7 +58,7 @@ for app in ("gps", "drive", "suite", "drivesys"):
 # Ménage complet : tout morceau d'une version qui n'est ni l'actuelle ni la précédente est supprimé.
 try:
     keys = [k["name"] for k in json.loads(call("GET", f"{api}/{ns}/keys?limit=1000"))["result"]]
-    for app in ("gps", "drive", "suite", "drivesys"):
+    for app in APPS:
         cur = manifest.get(app) or {}
         keep = {str(cur.get("build"))} | ({str(cur["previous"]["build"])} if cur.get("previous") else set())
         for k in keys:

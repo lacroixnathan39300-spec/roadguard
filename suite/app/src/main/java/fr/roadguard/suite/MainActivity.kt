@@ -44,6 +44,7 @@ class MainActivity : Activity() {
     private val modules = listOf(
         Module("gps", "fr.roadguard.gps", "Pilote", "GPS, radars, trafic et communauté sur le téléphone.", Color.parseColor("#1E88FF")),
         Module("drive", "fr.roadguard.drive", "Pilote Drive", "L'appli pour l'autoradio : accueil, carte, radars, musique.", Color.parseColor("#E53935")),
+        Module("menage", "fr.roadguard.menage", "Ménage", "Trie les photos et fichiers : doublons, gros fichiers, captures, rafales…", Color.parseColor("#1DB36B")),
     )
 
     /** Autoradio : écran en paysage pas plus haut que 600 px (ex. 1024×600). */
@@ -101,7 +102,7 @@ class MainActivity : Activity() {
             val have = installedVersion(mod.pkg)
             val avail = info?.optLong("version")
             list.addView(card(Color.parseColor("#161C25")).apply {
-                val recommended = (mod.key == "drive") == looksLikeCarUnit
+                val recommended = mod.key != "menage" && (mod.key == "drive") == looksLikeCarUnit
                 addView(text(mod.name + if (recommended) "  ·  recommandé ici" else "", 22f, mod.color, bold = true))
                 addView(text(mod.text, 15f, Color.parseColor("#D5DCE5")))
                 val state = when {

@@ -73,3 +73,11 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
   demi-tour, sortie, insertion, arrivée), radar par type (+ limite toujours dite), limitation, écart chiffré exact, retour sous la limite,
   vitesse moyenne, signalements (police, radar mobile, bouchon, travaux, accident, danger confirmé), dangers OSM, météo, recalcul,
   distances restantes, fin de trajet, GPS perdu / retrouvé, batterie, surprises (25 à 45 min). Sinon : annonce habituelle.
+
+## Ménage (07/11/2026)
+- Petite appli `menage/` (`fr.roadguard.menage`, minSdk 30, sans bibliothèque) : doublons (empreinte SHA-1, original gardé),
+  gros fichiers (> 50 Mo), rafales (< 2 s, même dossier), captures d'écran (cochées après 30 jours), messageries, vieux
+  téléchargements (> 90 jours), APK. Corbeille d'Android (`MediaStore.createTrashRequest`, récupérable 30 jours) ; documents/APK
+  (accès « tous les fichiers ») supprimés après confirmation.
+- Compilée seule par `.github/workflows/menage.yml` (signée avec la clé du téléphone), publiée par `publish_updates.py`
+  (contrôle de version appli par appli). Lien direct : `/menage`. Ajoutée dans Pilote Suite (prochaine compilation de Suite).
