@@ -117,8 +117,8 @@ class DriveSettings(context: Context) {
 
     /** Annonce vocale quand la limitation change (« Limitation 50 »). */
     // Interrupteurs rapides de l'accueil : alertes radars, et annonces de limitation / dépassement.
-    // Alertes radars : coupées par défaut. Elles ne s'allument que si l'utilisateur a coché lui-même la case
-    // d'activation de l'avertissement légal (version en cours) : sans cet accord, impossible de les activer.
+    // Alertes radars : jamais sans l'accord de l'utilisateur pour la version en cours de l'avertissement légal
+    // (acceptation avec la case de responsabilité, ou case + phrase écrite plus tard) : sans cet accord, impossible de les activer.
     var radarsOn by mutableStateOf(prefs.getBoolean("radars_on", false) && fr.roadguard.core.ui.Legal.radarConsented(appContext)); private set
     fun changeRadarsOn(v: Boolean) {
         val on = v && fr.roadguard.core.ui.Legal.radarConsented(appContext)

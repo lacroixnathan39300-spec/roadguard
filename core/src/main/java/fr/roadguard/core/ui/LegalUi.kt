@@ -54,15 +54,15 @@ import org.json.JSONObject
 
 /**
  * Avertissement légal, montré avant tout le reste : au premier lancement, puis chaque fois que le texte change
- * ([VERSION]). Quatre écrans : la loi au volant ; les alertes radars selon les pays, COUPÉES par défaut, que
- * l'utilisateur ne peut activer qu'en cochant lui-même une case qui dit clairement qu'elles sont interdites en
- * France, en Suisse… et qu'il en assume les conséquences ; les autorisations demandées ; l'engagement (code de la
- * route, téléphone, conditions d'utilisation lues dans l'appli, majorité). L'acceptation (date, version, choix pour
+ * ([VERSION]). Quatre écrans : la loi au volant ; les alertes radars selon les pays (activées à l'acceptation, choix
+ * de Nathan, sauf si l'utilisateur les coupe ; dans ce cas une case de responsabilité est exigée : interdites en
+ * France, en Suisse…, conséquences assumées) ; les autorisations demandées ; l'engagement (code de la route,
+ * téléphone, conditions d'utilisation lues dans l'appli, majorité, « J'accepte » écrit). L'acceptation (date, version, choix pour
  * les radars, appareil, compte) est envoyée au serveur comme preuve. Relisible depuis Réglages → « Infos légales ».
  */
 object Legal {
     /** À augmenter quand le texte change : l'avertissement est alors montré de nouveau à tous. */
-    const val VERSION = 3
+    const val VERSION = 4
     const val TERMS_URL = "https://roadguard.roadguard-app.workers.dev/conditions"
     const val PRIVACY_URL = "https://roadguard.roadguard-app.workers.dev/confidentialite"
     var forceShow by mutableStateOf(false)
@@ -88,8 +88,8 @@ object Legal {
     fun typedRadars(c: Context) = if (radarConsented(c)) prefs(c).getString("radar_typed", "") ?: "" else ""
 
     /**
-     * Acceptation de l'avertissement. [acceptTyped] : « J'accepte » écrit par l'utilisateur ; [radars] : case d'activation
-     * cochée ET phrase écrite ([radarTyped]).
+     * Acceptation de l'avertissement. [acceptTyped] : « J'accepte » écrit par l'utilisateur ; [radars] : alertes radars gardées
+     * (activées à l'acceptation, case de responsabilité cochée ; [radarTyped] : ce qui est gardé comme preuve).
      */
     fun accept(c: Context, radars: Boolean, acceptTyped: String, radarTyped: String) {
         val now = System.currentTimeMillis()
@@ -166,6 +166,12 @@ private val Soft = Color(0xFFC2CBD5)
 /** Phrases que l'utilisateur doit écrire lui-même (preuve plus forte qu'une case cochée). */
 private const val ACCEPT_PHRASE = "J'accepte"
 private const val RADAR_PHRASE = "J'active les radars à mes risques"
+
+/** Case obligatoire pour accepter quand les radars restent activés (choix par défaut). */
+private const val RADAR_ACK =
+    "J'ai compris : les alertes radars sont activées. Elles sont interdites en France, en Suisse et dans d'autres pays ; " +
+        "pour y être en règle, je dois les couper. Si je les garde, j'en assume seul toutes les conséquences : amendes, " +
+        "retrait de points, suspension du permis, confiscation de l'appareil."
 private const val SWISS_PHRASE = "Je coupe le mode Suisse à mes risques"
 
 /** Phrase écrite reconnue sans tenir compte des majuscules, accents, apostrophes, espaces ni ponctuation. */
@@ -190,11 +196,10 @@ fun LegalScreen(review: Boolean = false, onDone: () -> Unit) {
     val context = LocalContext.current
     val drive = context.packageName.contains("drive")
     var page by remember { mutableStateOf(0) }
-    // Case d'activation des radars : jamais cochée d'avance (sauf en relecture, où elle reprend le choix en cours),
-    // et phrase à écrire soi-même : les radars ne sont activés que si les deux y sont.
-    var radarsChecked by remember { mutableStateOf(review && DriveSettings(context).radarsOn) }
-    var radarsTyped by remember { mutableStateOf(if (radarsChecked) Legal.typedRadars(context) else "") }
-    val radars = radarsChecked && typedMatches(radarsTyped, RADAR_PHRASE)
+    // Choix de Nathan : radars activés à l'acceptation, sauf si l'utilisateur choisit de les couper (étape 2).
+    // L'acceptation exige alors une case de responsabilité dédiée (étape 4) et « J'accepte » écrit.
+    var radarsOff by remember { mutableStateOf(review && !DriveSettings(context).radarsOn) }
+    val radars = !radarsOff
     val scroll = rememberScrollState()
     LaunchedEffect(page) { scroll.scrollTo(0) }
     BackHandler(enabled = page > 0) { page-- }
@@ -222,9 +227,9 @@ fun LegalScreen(review: Boolean = false, onDone: () -> Unit) {
             }
             when (page) {
                 0 -> LawPage()
-                1 -> RadarsPage(radarsChecked, { radarsChecked = it }, radarsTyped, { radarsTyped = it })
+                1 -> RadarsPage(radarsOff) { radarsOff = it }
                 2 -> PermissionsPage(drive)
-                else -> CommitPage(review, radars, radarsTyped, onBack = { page-- }, onDone = onDone)
+                else -> CommitPage(review, radars, onBack = { page-- }, onDone = onDone)
             }
             if (page < 3) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
                 if (page > 0) BigButton("‹ Retour", DriveColors.Track) { page-- }
@@ -338,25 +343,20 @@ private fun EuropeCard() = LegalCard("🌍", "Ailleurs en Europe") {
 }
 
 @Composable
-private fun RadarsPage(checked: Boolean, onChecked: (Boolean) -> Unit, typed: String, onTyped: (String) -> Unit) {
-    val radars = checked && typedMatches(typed, RADAR_PHRASE)
+private fun RadarsPage(off: Boolean, onOff: (Boolean) -> Unit) {
     Header("📷", "Les alertes radars et la loi",
-        "Pilote sait annoncer les radars, mais ces alertes sont coupées tant que tu ne les actives pas toi-même. Lis bien avant de choisir.")
+        "Les alertes radars s'activent quand tu acceptes. Elles sont interdites dans plusieurs pays, dont la France : lis bien, et coupe-les si tu veux être en règle.")
     FranceCard()
     EuropeCard()
-    LegalCard(null, "Activer les alertes radars (facultatif)") {
-        CheckRow(RADAR_CONSENT, checked, warning = true, onChange = onChecked)
-        if (checked) TypedConsent(RADAR_PHRASE, typed, onTyped)
+    LegalCard(null, "Ton choix") {
+        CheckRow("Je préfère couper les alertes radars : je suis en règle partout. Pilote annonce quand même limitations, dépassements, accidents, travaux, bouchons et dangers.", off, onChange = onOff)
         Text(
-            when {
-                radars -> "Alertes radars : activées par toi, sous ta responsabilité."
-                checked -> "Écris la phrase pour confirmer : sans elle, les alertes radars restent coupées."
-                else -> "Alertes radars : coupées. Tu es en règle partout."
-            },
-            color = if (radars) RedText else GreenText, fontSize = 15.sp, fontWeight = FontWeight.Bold,
+            if (off) "Alertes radars : coupées. Tu es en règle partout."
+            else "Alertes radars : activées dès que tu acceptes. Là où elles sont interdites, c'est toi qui en réponds.",
+            color = if (off) GreenText else RedText, fontSize = 15.sp, fontWeight = FontWeight.Bold,
         )
     }
-    Text("Tu pourras changer d'avis à tout moment : Réglages → « Alertes radars ».",
+    Text("Tu pourras changer d'avis à tout moment : bouton 📷 de la carte, ou Réglages → « Alertes radars ».",
         color = DriveColors.TextSecondary, fontSize = 14.sp, lineHeight = 20.sp)
 }
 
@@ -395,27 +395,29 @@ private fun PermissionsPage(drive: Boolean) {
 }
 
 @Composable
-private fun CommitPage(review: Boolean, radars: Boolean, radarTyped: String, onBack: () -> Unit, onDone: () -> Unit) {
+private fun CommitPage(review: Boolean, radars: Boolean, onBack: () -> Unit, onDone: () -> Unit) {
     val context = LocalContext.current
     Header("✍️", "Ton engagement",
-        "Pilote est une aide à la conduite : il ne remplace ni ton attention, ni le code de la route. Coche les quatre points et écris « J'accepte » pour continuer.")
+        "Pilote est une aide à la conduite : il ne remplace ni ton attention, ni le code de la route. Coche les cases et écris « J'accepte » pour continuer.")
     if (radars) {
         Tinted(RedBg, "!", RedMark, "TON CHOIX : ALERTES RADARS ACTIVÉES", RedText) {
-            BodyText("Tu as coché la case d'activation et écrit « $radarTyped » : en France, en Suisse et dans les autres pays où elles sont interdites, tu n'es pas en règle et tu en assumes seul les conséquences.")
+            BodyText("En France, en Suisse et dans les autres pays où elles sont interdites, tu n'es pas en règle tant qu'elles sont activées, et tu en assumes seul les conséquences. Tu peux revenir à l'étape 2 pour les couper.")
         }
     } else {
         Tinted(GreenBg, "✓", GreenMark, "TON CHOIX : ALERTES RADARS COUPÉES", GreenText) {
-            BodyText("Tu es en règle partout. Tu pourras les activer plus tard, avec la même case et la même phrase à écrire.")
+            BodyText("Tu es en règle partout. Tu pourras les activer plus tard, avec la case et la phrase à écrire.")
         }
     }
     var c1 by remember { mutableStateOf(review) }
     var c2 by remember { mutableStateOf(review) }
     var c3 by remember { mutableStateOf(review) }
     var c4 by remember { mutableStateOf(review) }
+    var c5 by remember { mutableStateOf(review) }
     var showTerms by remember { mutableStateOf(false) }
     var acceptTyped by remember { mutableStateOf(if (review) Legal.typedAccept(context) else "") }
     CheckRow("Je respecte le code de la route et les panneaux, même quand Pilote se trompe.", c1) { c1 = it }
     CheckRow("Je ne touche pas au téléphone en roulant : je parle à Pilote, ou je me gare.", c2) { c2 = it }
+    if (radars) CheckRow(RADAR_ACK, c5, warning = true) { c5 = it }
     CheckRow("J'ai lu et j'accepte les conditions d'utilisation.", c3) { c3 = it }
     LinkText(if (showTerms) "Masquer les conditions d'utilisation" else "Lire les conditions d'utilisation ici") { showTerms = !showTerms }
     if (showTerms) TermsText()
@@ -425,11 +427,11 @@ private fun CommitPage(review: Boolean, radars: Boolean, radarTyped: String, onB
         LinkText("Confidentialité") { openUrl(context, Legal.PRIVACY_URL) }
     }
     TypedConsent(ACCEPT_PHRASE, acceptTyped) { acceptTyped = it }
-    val all = c1 && c2 && c3 && c4 && typedMatches(acceptTyped, ACCEPT_PHRASE)
+    val all = c1 && c2 && c3 && c4 && (!radars || c5) && typedMatches(acceptTyped, ACCEPT_PHRASE)
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
         BigButton("‹ Retour", DriveColors.Track, onBack)
         PrimaryButton(if (review) "J'ai compris" else "J'accepte et je démarre", enabled = all, modifier = Modifier.weight(1f)) {
-            Legal.accept(context, radars, acceptTyped, if (radars) radarTyped else ""); onDone()
+            Legal.accept(context, radars, acceptTyped, if (radars) "activés à l'acceptation, case de responsabilité cochée" else ""); onDone()
         }
     }
     if (!review) {
@@ -439,7 +441,7 @@ private fun CommitPage(review: Boolean, radars: Boolean, radarTyped: String, onB
             contentAlignment = Alignment.Center,
         ) { Text("Je refuse et je quitte", color = Soft, fontSize = 16.sp, fontWeight = FontWeight.Bold) }
     }
-    Text("Ton acceptation (date, version du texte, choix pour les alertes radars, phrases que tu as écrites) est enregistrée comme preuve. " +
+    Text("Ton acceptation (date, version du texte, choix pour les alertes radars, phrase que tu as écrite) est enregistrée comme preuve. " +
         "Ce message revient si les règles changent. À relire quand tu veux dans Réglages → « Infos légales ».",
         color = DriveColors.TextSecondary, fontSize = 14.sp, lineHeight = 20.sp)
 }
@@ -448,12 +450,12 @@ private fun CommitPage(review: Boolean, radars: Boolean, radarTyped: String, onB
 private val TERMS = listOf(
     "1. Une aide, pas un pilote automatique" to "Pilote est une aide à la conduite. Il ne remplace ni ton attention, ni le code de la route. Les limitations, radars, itinéraires et signalements peuvent être faux, incomplets ou pas à jour : la signalisation et les règles de circulation passent toujours avant ce qu'affiche ou annonce l'appli.",
     "2. Au volant" to "Ne tiens pas et ne manipule pas ton téléphone en roulant (en France : 135 € d'amende et 3 points, écouteurs compris). Fixe-le sur un support, règle ton trajet avant de partir et utilise la voix. Aucun écran qui n'aide pas à la conduite (vidéo, autres applis, mode miroir) ne doit être visible du conducteur en roulant (en France : jusqu'à 1 500 € d'amende et 3 points).",
-    "3. Alertes radars" to "La loi dépend du pays. En France, utiliser un appareil ou une application qui indique l'emplacement des radars fixes ou mobiles est interdit (décret du 3 janvier 2012 : jusqu'à 1 500 € d'amende, 6 points, suspension du permis, confiscation) ; seules les « zones de danger » sont admises. C'est aussi interdit, notamment, en Suisse, en Allemagne, en Autriche, au Liechtenstein, en Slovaquie et en Irlande. Les alertes radars de Pilote sont coupées par défaut : elles ne s'activent que si tu coches toi-même la case d'activation et que tu écris « J'active les radars à mes risques ». Pour être en règle dans ces pays, laisse-les coupées. En Suisse, elles sont en plus coupées automatiquement (« mode Suisse »), qui ne se désactive qu'en cochant une case dédiée ; les signalements « police » et « radar » de la communauté n'y sont jamais diffusés. Si tu les actives, tu le fais en connaissance de cause et sous ta seule responsabilité : amendes, retraits de points, suspensions de permis et confiscations restent à ta charge. Ton choix est enregistré avec la date. Ces informations ne sont pas un conseil juridique.",
+    "3. Alertes radars" to "La loi dépend du pays. En France, utiliser un appareil ou une application qui indique l'emplacement des radars fixes ou mobiles est interdit (décret du 3 janvier 2012 : jusqu'à 1 500 € d'amende, 6 points, suspension du permis, confiscation) ; seules les « zones de danger » sont admises. C'est aussi interdit, notamment, en Suisse, en Allemagne, en Autriche, au Liechtenstein, en Slovaquie et en Irlande. Les alertes radars de Pilote s'activent quand tu acceptes ces conditions, en cochant la case qui rappelle cette interdiction et en écrivant « J'accepte » ; tu peux les couper dès l'avertissement, puis à tout moment (bouton 📷, Réglages). Pour être en règle dans ces pays, coupe-les. En Suisse, elles sont en plus coupées automatiquement (« mode Suisse »), qui ne se désactive qu'en cochant une case dédiée ; les signalements « police » et « radar » de la communauté n'y sont jamais diffusés. Si tu les actives, tu le fais en connaissance de cause et sous ta seule responsabilité : amendes, retraits de points, suspensions de permis et confiscations restent à ta charge. Ton choix est enregistré avec la date. Ces informations ne sont pas un conseil juridique.",
     "4. Signalements de contrôles" to "Les signalements « police » de la communauté peuvent être suspendus à tout moment, sans préavis, notamment pour appliquer une interdiction de diffusion décidée par l'autorité administrative.",
     "5. Communauté" to "Signale uniquement ce que tu as vu, honnêtement. Sont interdits : les faux signalements, les messages injurieux, discriminatoires ou illégaux, et toute donnée personnelle sur autrui (nom, plaque, photo). Un compte qui abuse peut être suspendu ou banni.",
     "6. Caméra et dashcam" to "Les images restent sur ton téléphone. Si tu publies une vidéo, floute les visages et les plaques.",
     "7. Compte, âge et accès" to "Tu dois être majeur pour utiliser Pilote. L'accès peut être limité dans le temps (essai), suspendu en cas d'abus ou modifié à tout moment. Pour supprimer ton compte et tes données : Réglages → ton compte → « Écrire à l'administrateur ».",
-    "8. Preuve d'acceptation" to "Quand tu acceptes ces conditions (en écrivant « J'accepte »), que tu actives les alertes radars ou que tu coupes le mode Suisse (en écrivant la phrase demandée), Pilote enregistre la date, la version du texte, tes choix, les phrases que tu as écrites, l'identifiant de l'appareil et ton compte, comme preuve.",
+    "8. Preuve d'acceptation" to "Quand tu acceptes ces conditions (en écrivant « J'accepte »), que tu actives plus tard les alertes radars ou que tu coupes le mode Suisse (en écrivant la phrase demandée), Pilote enregistre la date, la version du texte, tes choix, les phrases que tu as écrites, l'identifiant de l'appareil et ton compte, comme preuve.",
     "9. Responsabilité" to "L'appli est fournie telle quelle, sans garantie d'exactitude ni de disponibilité. Dans les limites permises par la loi, l'éditeur n'est pas responsable des conséquences d'une utilisation contraire à ces conditions ou au code de la route, ni des sanctions liées à l'usage des alertes radars.",
 )
 

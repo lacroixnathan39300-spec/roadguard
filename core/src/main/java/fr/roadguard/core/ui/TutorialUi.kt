@@ -48,11 +48,11 @@ private fun pages(drive: Boolean): List<Page> = listOfNotNull(
         "Ce petit tour prend une minute. Tu peux le revoir dans Réglages → « Revoir le tutoriel ».",
     )),
     Page("📷", "Les radars", listOf(
-        "Coupés au départ : interdits en France, en Suisse et dans d'autres pays. Pour les activer, à tes risques : coche la case d'activation (Réglages → « Infos légales », ou « Alertes radars »).",
+        "Activés quand tu acceptes l'avertissement, sous ta responsabilité : ils sont interdits en France, en Suisse et dans d'autres pays. Pour être en règle, coupe-les (bouton 📷 ou Réglages → « Alertes radars »).",
         "Une fois activés : annonce à 1 km, puis des bips de plus en plus rapides jusqu'au radar, qui s'arrêtent pile au radar.",
         "Seulement le radar qui est sur TA route : avec un itinéraire, ceux du tracé ; sinon, ceux de ton couloir qui se rapprochent vraiment.",
         "Trop vite à l'approche : alarme stridente « Ralentis ! ». Tronçons : ta vitesse moyenne en direct.",
-        if (drive) "Réglages → Annonces : couper les radars, les bips, l'alarme." else "Bouton rond 📷 à droite de la carte : coupe ou remet les radars (et leurs points sur la carte) ; la première fois, la case d'activation s'affiche.",
+        if (drive) "Réglages → Annonces : couper les radars, les bips, l'alarme." else "Bouton rond 📷 à droite de la carte : coupe ou remet les radars (et leurs points sur la carte).",
     )),
     Page("🚦", "Limitations de vitesse", listOf(
         "La limitation de la route s'affiche à côté de ta vitesse, et change en quelques secondes avec la zone.",

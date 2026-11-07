@@ -115,3 +115,8 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
   « J'active les radars à mes risques » pour les radars, « Je coupe le mode Suisse à mes risques » pour la Suisse
   (`typedMatches` : sans tenir compte des majuscules, accents, apostrophes ; test `TypedConsentTest`). Phrases gardées
   dans les préférences `legal` et envoyées au serveur (colonne `typed`, migration 0014).
+- **Version 4 du texte (choix de Nathan : « activés pour tous à J'accepte »)** : radars ACTIVÉS à l'acceptation, sauf si
+  l'utilisateur coche « Je préfère les couper » à l'étape 2 ; s'ils restent activés, l'étape 4 exige une case de
+  responsabilité (`RADAR_ACK`) en plus de « J'accepte » écrit. Réactivation plus tard (s'ils ont été coupés à
+  l'acceptation) : case + « J'active les radars à mes risques ». Correctif : `DriveSettings` écoute aussi les préférences
+  `legal` (l'accord s'applique tout de suite à la séance en cours, même si `radars_on` valait déjà vrai).
