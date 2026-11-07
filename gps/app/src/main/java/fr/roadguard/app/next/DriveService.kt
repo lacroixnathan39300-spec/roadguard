@@ -33,6 +33,14 @@ class DriveService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
+    override fun onCreate() { super.onCreate(); instance = this }
+
+    /** Pilote balayé des applis récentes : même règle que la fermeture par le bouton retour. */
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        appClosed(this)
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_STOP) { stopSelf(); return START_NOT_STICKY }
         startForegroundNow()
@@ -100,7 +108,7 @@ class DriveService : Service() {
         val n = Notification.Builder(this, CHANNEL)
             .setSmallIcon(android.R.drawable.ic_menu_mylocation)
             .setContentTitle("Pilote actif")
-            .setContentText("Alertes radars et guidage vocal, même écran éteint")
+            .setContentText("Annonces et guidage, même écran éteint · ferme Pilote ou touche « Arrêter » pour couper")
             .setContentIntent(open)
             .addAction(Notification.Action.Builder(null, "Arrêter", stop).build())
             .setOngoing(true)
@@ -161,6 +169,7 @@ class DriveService : Service() {
         session = null
         scope.cancel()
         voice?.release()
+        if (instance === this) instance = null
         super.onDestroy()
     }
 
@@ -171,6 +180,23 @@ class DriveService : Service() {
         private const val WATCH_ID = 4742
         const val ACTION_STOP = "fr.roadguard.app.next.DRIVE_STOP"
         const val EXTRA_AUTO = "auto"
+
+        @Volatile private var instance: DriveService? = null
+
+        /**
+         * Pilote fermé (bouton retour, ou balayé des applis récentes) : tout s'arrête (annonces, bulle, bips), sauf un
+         * guidage en cours (jusqu'à l'arrivée) ou le réglage « Continuer quand je ferme Pilote ».
+         */
+        fun appClosed(context: Context) {
+            if (DriveSettings(context).keepRunning || session?.navigating == true) return
+            quit(context)
+        }
+
+        /** « Quitter Pilote » : tout s'arrête, guidage compris ; pas de redémarrage automatique pendant 1 h. */
+        fun quit(context: Context) {
+            AutoStart.pause(context)
+            instance?.stopSelf()
+        }
 
         /** Session en cours (lue par l'accueil), ou null si le service est arrêté. */
         @Volatile var session: DrivingSession? = null; private set

@@ -146,6 +146,9 @@ class DriveSettings(context: Context) {
     fun changeLimitVoice(v: Boolean) { changeAnnounceLimit(v); changeSpeedLimitWarning(v) }
 
     // Pilote (téléphone) : démarrage automatique en roulant, dès 20 km/h, avec la bulle par-dessus Waze.
+    /** Pilote fermé (retour, ou balayé des applis récentes) : continuer les annonces en arrière-plan (sinon tout s'arrête). */
+    var keepRunning by mutableStateOf(prefs.getBoolean("keep_running", false)); private set
+    fun changeKeepRunning(v: Boolean) { keepRunning = v; put("keep_running", v) }
     var autoDrive by mutableStateOf(prefs.getBoolean("auto_drive", false)); private set
     fun changeAutoDrive(v: Boolean) { autoDrive = v; prefs.edit().putBoolean("auto_drive", v).apply() }
 

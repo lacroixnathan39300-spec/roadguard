@@ -128,3 +128,11 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
   un seul téléchargement à la fois.
 - Pilote / Pilote Drive (mise à jour intégrée) : `DownloadProgress` (même présentation) dans le bandeau et dans
   Réglages ; `Net.fetchWithProgress` (progression en direct ; par le relais du téléphone, morceau d'un coup).
+
+## Pilote fermé = tout s'arrête (08/11/2026)
+- Bouton retour (activité finie) ou Pilote balayé des applis récentes (`DriveService.onTaskRemoved`) :
+  `DriveService.appClosed` arrête le service (annonces, bulle, bips), sauf guidage en cours (jusqu'à l'arrivée) ou
+  réglage « Continuer quand je ferme Pilote » (`DriveSettings.keepRunning`, faux par défaut). Bouton d'accueil ou écran
+  éteint : rien ne change (le service continue).
+- Menu → « ⏻ Quitter Pilote » : tout s'arrête, guidage compris. Après une fermeture ou « Quitter », le démarrage
+  automatique en roulant attend 1 h (`AutoStart.pause`), ou reprend dès que Pilote est rouvert (`AutoStart.resume`).

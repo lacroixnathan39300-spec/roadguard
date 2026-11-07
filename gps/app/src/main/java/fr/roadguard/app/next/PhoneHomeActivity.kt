@@ -99,7 +99,14 @@ class PhoneHomeActivity : ComponentActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         hideNavigationBar()
         destinationText(intent)?.let { incomingDestination.value = it }
+        AutoStart.resume(this) // Pilote rouvert : le démarrage automatique reprend
         setContent { fr.roadguard.core.ui.CarFontScale { fr.roadguard.core.ui.AccountGate { PhoneHome() } } }
+    }
+
+    override fun onDestroy() {
+        // Fermée (bouton retour, « Je refuse et je quitte ») : tout s'arrête, sauf guidage en cours ou réglage contraire.
+        if (isFinishing && !isChangingConfigurations) DriveService.appClosed(this)
+        super.onDestroy()
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -472,6 +479,12 @@ private fun PhoneHome() {
                 // L'ancienne appli annonce les radars de son côté : proposée seulement après la case d'activation des radars.
                 if (fr.roadguard.core.ui.Legal.radarConsented(context)) MenuEntry("🧰", "Ancienne version", "Fonctions de l'ancienne appli, en attendant leur reprise") {
                     showMenu = false; context.startActivity(Intent(context, fr.roadguard.app.MainActivity::class.java))
+                }
+                MenuEntry("⏻", "Quitter Pilote", "Tout s'arrête : annonces, bulle, guidage. Pas de redémarrage auto pendant 1 h") {
+                    showMenu = false
+                    DriveService.quit(context)
+                    generateSequence(context) { (it as? android.content.ContextWrapper)?.baseContext }
+                        .filterIsInstance<android.app.Activity>().firstOrNull()?.finishAndRemoveTask()
                 }
             }
         }

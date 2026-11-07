@@ -55,6 +55,15 @@ object AutoStart {
         }
     }
 
+    private fun state(context: Context) = context.applicationContext.getSharedPreferences("autostart", Context.MODE_PRIVATE)
+
+    /** Après une fermeture volontaire : pas de redémarrage automatique pendant 1 h (ou jusqu'à la réouverture de Pilote). */
+    fun pause(context: Context, ms: Long = 3_600_000L) {
+        state(context).edit().putLong("paused_until", System.currentTimeMillis() + ms).apply()
+    }
+    fun resume(context: Context) { state(context).edit().remove("paused_until").apply() }
+    fun paused(context: Context) = System.currentTimeMillis() < state(context).getLong("paused_until", 0)
+
     /** Vitesse estimée en km/h : celle du GPS si fournie, sinon déduite de la position précédente. */
     fun estimateKmh(context: Context, loc: Location): Double? {
         val prefs = context.getSharedPreferences("autostart", Context.MODE_PRIVATE)
@@ -101,7 +110,7 @@ class AutoStartReceiver : BroadcastReceiver() {
             else -> {
                 @Suppress("DEPRECATION")
                 val loc = intent.getParcelableExtra<Location>(LocationManager.KEY_LOCATION_CHANGED) ?: return
-                if (!DriveSettings(context).autoDrive || DriveService.session != null) return
+                if (!DriveSettings(context).autoDrive || DriveService.session != null || AutoStart.paused(context)) return
                 val kmh = AutoStart.estimateKmh(context, loc) ?: return
                 if (kmh >= AutoStart.TRIGGER_KMH) AutoStart.launch(context)
             }

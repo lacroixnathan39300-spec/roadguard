@@ -213,6 +213,7 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                 fun askBackground() {
                     if (android.os.Build.VERSION.SDK_INT >= 29) askBg.launch(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)
                 }
+                ToggleRow("Continuer quand je ferme Pilote (annonces et bulle en arrière-plan)", settings.keepRunning, settings::changeKeepRunning)
                 ToggleRow("Démarrer tout seul en roulant (dès 20 km/h), avec la bulle et les bips", settings.autoDrive) { v ->
                     settings.changeAutoDrive(v)
                     if (v) {
