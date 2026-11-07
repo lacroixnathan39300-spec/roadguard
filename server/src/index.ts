@@ -808,23 +808,31 @@ export default {
         const m = env.APPS ? await env.APPS.get("manifest") : null;
         return new Response(m ?? "{}", { headers: { "content-type": "application/json", "cache-control": "max-age=300", ...CORS } });
       }
-      // Lien direct pour installer Pilote Suite la première fois (à partager, ou en QR code).
-      // (et « Ménage », la petite appli de tri des photos et fichiers : /menage).
-      const direct = /^\/(?:v1\/apps\/)?(suite|menage)(?:\.apk)?$/.exec(path);
+      // Liens directs (à partager, ou en QR code) : /suite (Pilote Suite), /pilote (Pilote, téléphone),
+      // /drive (Pilote Drive, autoradio), /menage (la petite appli de tri des photos et fichiers).
+      const direct = /^\/(?:v1\/apps\/)?(suite|menage|pilote|gps|drive|pilote-drive)(?:\.apk)?$/.exec(path);
       if (req.method === "GET" && direct && env.APPS) {
-        const app = direct[1];
-        const m = JSON.parse((await env.APPS.get("manifest")) ?? "{}") as Record<string, { build: number; chunks: number }>;
+        const app = direct[1] === "pilote" ? "gps" : direct[1] === "pilote-drive" ? "drive" : direct[1];
+        const names: Record<string, string> = { suite: "Pilote-Suite", menage: "Menage", gps: "Pilote", drive: "Pilote-Drive" };
+        const m = JSON.parse((await env.APPS.get("manifest")) ?? "{}") as Record<string, { build: number; chunks: number; size?: number }>;
         const info = m[app];
-        if (!info) return fail(404, app === "suite" ? "Pilote Suite pas encore publiée" : "Ménage pas encore publiée");
-        const parts: ArrayBuffer[] = [];
-        for (let i = 0; i < info.chunks; i++) {
-          const part = await env.APPS.get(`${app}:${info.build}:${i}`, "arrayBuffer");
-          if (!part) return fail(404, "Morceau introuvable");
-          parts.push(part);
-        }
-        return new Response(new Blob(parts), { headers: {
+        if (!info) return fail(404, `${names[app]} pas encore publiée`);
+        // Envoi morceau par morceau (20 Mo) : Pilote fait ~100 Mo, trop pour tout garder en mémoire d'un coup.
+        let i = 0;
+        const body = new ReadableStream<Uint8Array>({
+          async pull(controller) {
+            if (i >= info.chunks) { controller.close(); return; }
+            const part = await env.APPS!.get(`${app}:${info.build}:${i++}`, "arrayBuffer");
+            if (!part) { controller.error(new Error("Morceau introuvable")); return; }
+            controller.enqueue(new Uint8Array(part));
+          },
+        });
+        const headers: Record<string, string> = {
           "content-type": "application/vnd.android.package-archive",
-          "content-disposition": `attachment; filename="${app === "suite" ? "Pilote-Suite" : "Menage"}-${info.build}.apk"`, ...CORS } });
+          "content-disposition": `attachment; filename="${names[app]}-${info.build}.apk"`, ...CORS,
+        };
+        if (info.size) headers["content-length"] = String(info.size);
+        return new Response(body, { headers });
       }
       const chunk = /^\/v1\/apps\/(gps|drive|suite|drivesys|menage)\/(\d+)\/(\d{1,2})$/.exec(path);
       if (req.method === "GET" && chunk && env.APPS) {
