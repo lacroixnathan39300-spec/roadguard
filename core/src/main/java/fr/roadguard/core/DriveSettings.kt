@@ -130,6 +130,18 @@ class DriveSettings(context: Context) {
         if (key == "swiss_mode") swissMode = p.getBoolean("swiss_mode", true) || !fr.roadguard.core.ui.Legal.swissConsented(appContext)
     }
     init { prefs.registerOnSharedPreferenceChangeListener(radarsListener) }
+    /**
+     * Accord donné (case + phrase) : relu tout de suite. Sans ça, une séance déjà lancée gardait les radars coupés
+     * quand « radars_on » valait déjà vrai (Android ne prévient pas si la valeur ne change pas).
+     */
+    private val legalPrefs = appContext.getSharedPreferences("legal", Context.MODE_PRIVATE)
+    private val legalListener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == null || key == "radar_consent_version" || key == "swiss_consent_version") {
+            radarsOn = prefs.getBoolean("radars_on", false) && fr.roadguard.core.ui.Legal.radarConsented(appContext)
+            swissMode = prefs.getBoolean("swiss_mode", true) || !fr.roadguard.core.ui.Legal.swissConsented(appContext)
+        }
+    }
+    init { legalPrefs.registerOnSharedPreferenceChangeListener(legalListener) }
     val limitVoiceOn get() = announceLimit || speedLimitWarning
     fun changeLimitVoice(v: Boolean) { changeAnnounceLimit(v); changeSpeedLimitWarning(v) }
 
