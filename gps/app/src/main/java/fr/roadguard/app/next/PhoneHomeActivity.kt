@@ -390,8 +390,11 @@ private fun PhoneHome() {
             // Interrupteurs rapides (cachés avec le reste en mode épuré) : radars / annonces de limitation.
             if (panelOpen) {
                 fr.roadguard.core.ui.QuickToggle("📷", "Radars", settings.radarsOn, onToggle = {
-                    settings.changeRadarsOn(!settings.radarsOn)
-                    android.widget.Toast.makeText(context, if (settings.radarsOn) "Alertes radars activées" else "Alertes radars coupées", android.widget.Toast.LENGTH_SHORT).show()
+                    val want = !settings.radarsOn
+                    settings.changeRadarsOn(want)
+                    // Pas encore d'accord (case de l'avertissement légal) : la confirmation s'affiche.
+                    if (want && !settings.radarsOn) fr.roadguard.core.ui.Legal.askRadars = true
+                    else android.widget.Toast.makeText(context, if (settings.radarsOn) "Alertes radars activées" else "Alertes radars coupées", android.widget.Toast.LENGTH_SHORT).show()
                 })
                 fr.roadguard.core.ui.QuickToggle("🚦", "Limites", settings.limitVoiceOn, onToggle = {
                     settings.changeLimitVoice(!settings.limitVoiceOn)
@@ -465,7 +468,8 @@ private fun PhoneHome() {
                     showMenu = false; context.startActivity(Intent(context, LinkActivity::class.java))
                 }
                 MenuEntry("⚙", "Réglages", "Voix, alertes, itinéraire, couleurs") { showMenu = false; showSettings = true }
-                MenuEntry("🧰", "Ancienne version", "Fonctions de l'ancienne appli, en attendant leur reprise") {
+                // L'ancienne appli annonce les radars de son côté : proposée seulement après la case d'activation des radars.
+                if (fr.roadguard.core.ui.Legal.radarConsented(context)) MenuEntry("🧰", "Ancienne version", "Fonctions de l'ancienne appli, en attendant leur reprise") {
                     showMenu = false; context.startActivity(Intent(context, fr.roadguard.app.MainActivity::class.java))
                 }
             }

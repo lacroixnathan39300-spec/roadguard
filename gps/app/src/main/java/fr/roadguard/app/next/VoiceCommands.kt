@@ -22,7 +22,16 @@ object VoiceCommands {
         val on = listOf("active", "remet", "rallume", "allume", "reactive").any { it in t }
         val st = s.settings
         return when {
-            "radar" in t && (off || on) && !("signal" in t) -> { st.changeRadarsOn(on && !off); if (st.radarsOn) "Alertes radars activées" else "Alertes radars coupées" }
+            "radar" in t && (off || on) && !("signal" in t) -> {
+                val want = on && !off
+                st.changeRadarsOn(want)
+                when {
+                    st.radarsOn -> "Alertes radars activées"
+                    // Jamais activées à la voix sans l'accord écrit (case de l'avertissement légal).
+                    want -> "Pour activer les alertes radars, coche d'abord la case d'activation, à l'arrêt : Réglages, Infos légales"
+                    else -> "Alertes radars coupées"
+                }
+            }
             ("limit" in t || "vitesse" in t) && (off || on) -> { st.changeLimitVoice(on && !off); if (st.limitVoiceOn) "Annonces de limitation activées" else "Annonces de limitation coupées" }
             ("guidage" in t || "navigation" in t || "itineraire" in t) && off -> { s.stopNavigation(); "Guidage arrêté" }
             "signal" in t || listOf("police", "accident", "bouchon", "travaux", "danger", "flash").any { it in t } -> {

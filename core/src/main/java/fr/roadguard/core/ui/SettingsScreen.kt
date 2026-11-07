@@ -80,7 +80,11 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
             ToggleRow("Baisser la musique pendant les annonces et les bips", settings.duckMusic, settings::changeDuckMusic)
             ToggleRow("Bips de plus en plus rapides en approchant (détecteur)", settings.proximityBeeps, settings::changeProximityBeeps)
             ToggleRow("Lire à voix haute les messages du téléphone", settings.readMessages, settings::changeReadMessages)
-            ToggleRow("Alertes radars", settings.radarsOn, settings::changeRadarsOn)
+            // Activation : seulement après la case de l'avertissement légal (sinon, la confirmation s'affiche).
+            ToggleRow("Alertes radars (interdites en France, en Suisse… : à tes risques)", settings.radarsOn) { v ->
+                settings.changeRadarsOn(v)
+                if (v && !settings.radarsOn) Legal.askRadars = true
+            }
             ToggleRow("Avertir en cas de dépassement de la limite", settings.speedLimitWarning, settings::changeSpeedLimitWarning)
             if (settings.speedLimitWarning) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 listOf(-1 to "Tolérance légale", 0 to "Dès 1 km/h", 3 to "+3 km/h", 10 to "+10 km/h").forEach { (v, l) ->

@@ -87,16 +87,22 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
   validées d'office) : envoyées en note OpenStreetMap par la tâche planifiée (`forwardToOsm`, colonne `osm_note`, migration 0011).
 - Sirène plus présente : `LoudnessEnhancer` +10 dB, musique en pause (focus transitoire), volume d'alarme au maximum pendant le réveil.
 
-## Avertissement légal (07/11/2026)
+## Avertissement légal (07/11/2026, version 2 du texte)
 - `core/ui/LegalUi.kt` : 4 écrans montrés AVANT tout (connexion comprise) dans `AccountGate`, puis à chaque nouvelle version
-  du texte (`Legal.VERSION`, préférences `legal`) : la loi au volant (téléphone, écrans, limitations), les alertes radars selon
-  les pays (France : interdit, 1 500 € / 6 points ; aussi Suisse, Allemagne, Autriche, Liechtenstein, Slovaquie, Irlande),
-  interrupteur « Alertes radars », les autorisations (texte différent pour Drive), l'engagement (3 cases, « Je refuse et je quitte »).
-  Relisible : Réglages → « Infos légales ».
-- **Choix de Nathan : les alertes radars restent actives partout** (rien n'est coupé automatiquement, en dehors de l'ancien
-  réglage « Suisse » qui existait déjà) ; l'utilisateur est prévenu et peut les couper.
-- Risques expliqués à Nathan : utilisateurs en France (contravention 5e classe), relais des signalements « police » si la
-  préfecture notifie une interdiction (L130-11/L130-12 : 2 ans, 30 000 €), Suisse (art. 98a LCR : avertir publiquement des
-  contrôles est puni), Play Store. Proposé : mode France « zones de danger » (pas fait, en attente de sa décision).
-- Serveur : page `/conditions` (conditions d'utilisation), liée depuis l'avertissement avec `/confidentialite`.
-- `DriveSettings` écoute `radars_on` : un changement fait ailleurs (avertissement) s'applique tout de suite à la séance en cours.
+  du texte (`Legal.VERSION`, préférences `legal`) : la loi au volant ; les alertes radars selon les pays ; les autorisations
+  (texte différent pour Drive) ; l'engagement (code de la route, téléphone, conditions lues — texte complet dans l'appli —,
+  majorité ; « Je refuse et je quitte »). Relisible : Réglages → « Infos légales ».
+- **Choix de Nathan : radars gardés, mais en opt-in.** Alertes radars COUPÉES par défaut ; elles ne s'allument que si
+  l'utilisateur coche lui-même la case d'activation (texte : interdites en France, en Suisse…, il en assume les conséquences).
+  `DriveSettings.radarsOn` = préférence ET `Legal.radarConsented` : aucun chemin (réglages, bouton de l'accueil, commande
+  vocale, sauvegarde restaurée) ne peut les allumer sans cette case ; sinon `Legal.askRadars` affiche la confirmation
+  (`RadarConsentScreen`). Couche radars d'Android Auto et menu « Ancienne version » (radars de l'ancienne appli) suivent aussi.
+- Preuve : `Legal.sync` → `POST /v1/legal/accept` (date, version, choix radars, appareil, compte, appli, version) → table
+  `legal_acceptances` (migration 0012), une ligne par appareil/version/choix/compte ; renvoyée après connexion.
+- Serveur : `/conditions` (conditions d'utilisation, mêmes textes que `TERMS` dans LegalUi.kt : les garder identiques),
+  `/confidentialite` complétée ; interrupteur administrateur `/v1/mod/police` (config `police_off_until`) qui masque et
+  refuse les signalements « police » (interdiction préfectorale, art. L130-11 / L130-12 : 2 ans, 30 000 €). Bouton dans l'appli :
+  Communauté (modération) → onglet « ⚖ Préfecture » (2 h, 12 h, 24 h, jusqu'à nouvel ordre, rétablir).
+- Risques expliqués à Nathan : utilisateurs en France (contravention 5e classe), relais « police » si la préfecture notifie
+  une interdiction, Suisse (art. 98a LCR : avertir publiquement des contrôles est puni), Play Store. Proposé (refusé pour
+  l'instant) : mode France « zones de danger ». Refusé : renommer « radar » en « danger » pour contourner la loi.

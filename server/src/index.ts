@@ -631,6 +631,7 @@ Les vidéos de la dashcam ne sont gardées que si tu le demandes ou après un ch
 <li><b>Compte</b> : identifiant et mot de passe (chiffré), date d'inscription, appareils connectés.</li>
 <li><b>Communauté</b> : pseudo, signalements (type, position, heure), votes, points et note de fiabilité ; ta position approximative si tu choisis de te montrer aux autres, ou pendant un convoi.</li>
 <li><b>Partage de trajet</b> : position et heure d'arrivée, seulement pendant un partage que tu lances (lien valable 12 h).</li>
+<li><b>Acceptation de l'avertissement légal</b> : date, version du texte, choix pour les alertes radars, identifiant de l'appareil, compte, appli et version, gardés comme preuve de ton acceptation.</li>
 <li><b>Messages à l'administrateur</b>, rapports de plantage (texte technique), et, si tu le demandes, la sauvegarde de tes réglages.</li>
 </ul>
 <h2>Services tiers</h2>
@@ -645,6 +646,30 @@ Les vidéos de la dashcam ne sont gardées que si tu le demandes ou après un ch
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8" } });
 }
 
+// ---------- preuve d'acceptation de l'avertissement légal ----------
+export function cleanAcceptance(b: Record<string, unknown>, now: number) {
+  const version = typeof b.version === "number" && Number.isInteger(b.version) && b.version > 0 && b.version < 1000 ? b.version : null;
+  const device = typeof b.device === "string" && /^[0-9A-Za-z_-]{8,64}$/.test(b.device) ? b.device : null;
+  if (version == null || device == null) return null;
+  const at = typeof b.at === "number" && Number.isFinite(b.at) && b.at > 0 ? Math.min(Math.round(b.at), now) : now;
+  return {
+    version, device, at, radars: b.radars === true ? 1 : 0, app: b.app === "drive" ? "drive" : "gps",
+    appVersion: String(b.appVersion ?? "?").slice(0, 20),
+  };
+}
+
+async function legalAccept(req: Request, env: Env): Promise<Response> {
+  const now = Date.now();
+  const a = cleanAcceptance((await req.json().catch(() => ({}))) as Record<string, unknown>, now);
+  if (!a) return fail(400, "Acceptation invalide");
+  const user = await currentUser(req, env);
+  // Une ligne par appareil, version, choix et compte (les renvois ne créent pas de doublon).
+  await env.DB.prepare(
+    "INSERT OR IGNORE INTO legal_acceptances (at, received_at, version, device, username, app, app_version, radars) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+  ).bind(a.at, now, a.version, a.device, user?.username ?? "", a.app, a.appVersion, a.radars).run();
+  return json({ ok: true });
+}
+
 // ---------- conditions d'utilisation (lien de l'avertissement légal de l'appli) ----------
 function termsPage(): Response {
   const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -657,18 +682,20 @@ h1{font-size:26px}h2{font-size:19px;margin-top:26px}</style></head><body>
 <h2>2. Au volant</h2>
 <p>Ne tiens pas et ne manipule pas ton téléphone en roulant (en France : 135 € d'amende et 3 points, écouteurs compris). Fixe-le sur un support, règle ton trajet avant de partir et utilise la voix. Aucun écran qui n'aide pas à la conduite (vidéo, autres applis, mode miroir) ne doit être visible du conducteur en roulant (en France : jusqu'à 1 500 € d'amende et 3 points).</p>
 <h2>3. Alertes radars</h2>
-<p>La loi sur les alertes radars dépend du pays. En France, utiliser un appareil ou une application qui indique l'emplacement des radars fixes ou mobiles est interdit depuis le décret du 3 janvier 2012 (jusqu'à 1 500 € d'amende et 6 points) ; seules les « zones de danger » sont admises. C'est aussi interdit, notamment, en Suisse (où l'appareil peut être confisqué et où avertir publiquement des contrôles est puni), en Allemagne, en Autriche, au Liechtenstein, en Slovaquie et en Irlande.</p>
-<p><b>Pour être en règle, tu dois couper les alertes radars avant de circuler en France, en Suisse et dans tout pays qui les interdit</b> (Réglages → « Alertes radars », ou l'interrupteur de l'avertissement).</p>
-<p>Les alertes radars restent actives tant que tu ne les coupes pas. Si tu choisis de les garder dans un pays qui les interdit, tu le fais en connaissance de cause et sous ta seule responsabilité : amendes, retraits de points, suspensions de permis et confiscations restent à ta charge. Les lois changent : renseigne-toi avant de partir à l'étranger. Ces informations ne sont pas un conseil juridique.</p>
+<p>La loi sur les alertes radars dépend du pays. En France, utiliser un appareil ou une application qui indique l'emplacement des radars fixes ou mobiles est interdit depuis le décret du 3 janvier 2012 (jusqu'à 1 500 € d'amende, 6 points, suspension du permis, confiscation de l'appareil) ; seules les « zones de danger » sont admises. C'est aussi interdit, notamment, en Suisse (où l'appareil peut être confisqué et où avertir publiquement des contrôles est puni), en Allemagne, en Autriche, au Liechtenstein, en Slovaquie et en Irlande.</p>
+<p><b>Les alertes radars de Pilote sont coupées par défaut.</b> Elles ne s'activent que si tu coches toi-même la case d'activation, qui rappelle cette interdiction ; sans elle, aucun réglage, bouton ni commande vocale ne peut les allumer. <b>Pour être en règle en France, en Suisse et dans tout pays qui les interdit, laisse-les coupées.</b></p>
+<p>Si tu les actives, tu le fais en connaissance de cause et sous ta seule responsabilité : amendes, retraits de points, suspensions de permis et confiscations restent à ta charge. Ton choix est enregistré avec sa date (voir « Preuve d'acceptation »). Les lois changent : renseigne-toi avant de partir à l'étranger. Ces informations ne sont pas un conseil juridique.</p>
 <h2>3 bis. Signalements de contrôles</h2>
 <p>Les signalements « police » de la communauté peuvent être suspendus à tout moment, sans préavis, notamment pour appliquer une interdiction de diffusion décidée par l'autorité administrative (article L130-11 du code de la route).</p>
 <h2>4. Communauté</h2>
 <p>Signale uniquement ce que tu as vu, honnêtement. Sont interdits : les faux signalements, les messages injurieux, discriminatoires ou illégaux, et toute donnée personnelle sur autrui (nom, plaque, photo). Les signalements sont soumis aux votes des conducteurs et à la modération ; un compte qui abuse peut être suspendu ou banni.</p>
 <h2>5. Caméra et dashcam</h2>
 <p>Les images restent sur ton téléphone. Si tu publies une vidéo, floute les visages et les plaques : le droit à l'image et la protection des données des autres usagers s'appliquent.</p>
-<h2>6. Compte et accès</h2>
-<p>L'accès peut être limité dans le temps (essai), suspendu en cas d'abus ou modifié à tout moment. Pour supprimer ton compte et tes données : Réglages → ton compte → « Écrire à l'administrateur ».</p>
-<h2>7. Données personnelles</h2>
+<h2>6. Compte, âge et accès</h2>
+<p>Tu dois être majeur pour utiliser Pilote. L'accès peut être limité dans le temps (essai), suspendu en cas d'abus ou modifié à tout moment. Pour supprimer ton compte et tes données : Réglages → ton compte → « Écrire à l'administrateur ».</p>
+<h2>7. Preuve d'acceptation</h2>
+<p>Quand tu acceptes ces conditions ou que tu actives les alertes radars, Pilote enregistre la date, la version du texte, ton choix pour les alertes radars, l'identifiant de l'appareil et ton compte, comme preuve.</p>
+<h2>7 bis. Données personnelles</h2>
 <p>Voir la <a href="/confidentialite">politique de confidentialité</a>.</p>
 <h2>8. Responsabilité</h2>
 <p>L'appli est fournie telle quelle, sans garantie d'exactitude ni de disponibilité. Dans les limites permises par la loi, l'éditeur n'est pas responsable des conséquences d'une utilisation contraire à ces conditions ou au code de la route, ni des amendes liées à l'usage des alertes radars.</p>
@@ -805,6 +832,7 @@ export default {
       }
       if (req.method === "GET" && (path === "/confidentialite" || path === "/privacy")) return privacyPage();
       if (req.method === "GET" && (path === "/conditions" || path === "/terms")) return termsPage();
+      if (req.method === "POST" && path === "/v1/legal/accept") return legalAccept(req, env);
       const sp = /^\/(?:s|share)\/([0-9a-f]{20})$/.exec(path);
       if (req.method === "GET" && sp) return sharePage(sp[1]);
       const sj = /^\/v1\/share\/([0-9a-f]{20})$/.exec(path);

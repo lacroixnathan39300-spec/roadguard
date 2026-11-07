@@ -11,6 +11,7 @@ enum class ThemeMode(val label: String) { AUTO("Automatique"), DAY("Jour"), NIGH
 /** Réglages de DRIVE, mémorisés sur le poste et observables par l'interface. */
 class DriveSettings(context: Context) {
     private val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    private val appContext: Context = context.applicationContext ?: context
 
     var voice by mutableStateOf(prefs.getBoolean("voice", true)); private set
     var beep by mutableStateOf(prefs.getBoolean("beep", true)); private set
@@ -116,11 +117,16 @@ class DriveSettings(context: Context) {
 
     /** Annonce vocale quand la limitation change (« Limitation 50 »). */
     // Interrupteurs rapides de l'accueil : alertes radars, et annonces de limitation / dépassement.
-    var radarsOn by mutableStateOf(prefs.getBoolean("radars_on", true)); private set
-    fun changeRadarsOn(v: Boolean) { radarsOn = v; prefs.edit().putBoolean("radars_on", v).apply() }
+    // Alertes radars : coupées par défaut. Elles ne s'allument que si l'utilisateur a coché lui-même la case
+    // d'activation de l'avertissement légal (version en cours) : sans cet accord, impossible de les activer.
+    var radarsOn by mutableStateOf(prefs.getBoolean("radars_on", false) && fr.roadguard.core.ui.Legal.radarConsented(appContext)); private set
+    fun changeRadarsOn(v: Boolean) {
+        val on = v && fr.roadguard.core.ui.Legal.radarConsented(appContext)
+        radarsOn = on; prefs.edit().putBoolean("radars_on", on).apply()
+    }
     /** Alertes radars changées ailleurs (avertissement légal, autre écran) : la séance de conduite suit tout de suite. */
     private val radarsListener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { p, key ->
-        if (key == "radars_on") radarsOn = p.getBoolean("radars_on", true)
+        if (key == "radars_on") radarsOn = p.getBoolean("radars_on", false) && fr.roadguard.core.ui.Legal.radarConsented(appContext)
     }
     init { prefs.registerOnSharedPreferenceChangeListener(radarsListener) }
     val limitVoiceOn get() = announceLimit || speedLimitWarning

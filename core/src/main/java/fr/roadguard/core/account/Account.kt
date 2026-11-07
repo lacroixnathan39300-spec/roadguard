@@ -141,6 +141,8 @@ class AccountManager private constructor(context: Context) {
 
     /** Jeton de session (liaison du compte communauté au compte Pilote). */
     fun sessionToken(): String? = token
+    /** Identifiant de l'appareil (preuve d'acceptation de l'avertissement légal). */
+    fun deviceId(): String = device
 
     // ---------- Sauvegarde des réglages dans le compte ----------
     suspend fun saveSettings(data: JSONObject) = withContext(Dispatchers.IO) { request("POST", "/v1/auth/settings", data) }

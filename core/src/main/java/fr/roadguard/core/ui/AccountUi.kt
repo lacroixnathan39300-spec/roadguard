@@ -61,6 +61,8 @@ fun AccountGate(extra: @Composable () -> Unit = {}, content: @Composable () -> U
     }
     // Avertissement légal avant tout le reste (connexion comprise), puis à chaque nouvelle version du texte.
     var legalOk by remember { mutableStateOf(Legal.accepted(context)) }
+    // Preuve d'acceptation : renvoyée une fois connecté (rattachée au compte), ou si l'envoi avait échoué (pas de réseau).
+    LaunchedEffect(account.loggedIn, legalOk) { if (legalOk) Legal.syncSoon(context) }
     when {
         account.testBuild -> content()
         !legalOk -> LegalScreen(onDone = { legalOk = true })
@@ -70,6 +72,7 @@ fun AccountGate(extra: @Composable () -> Unit = {}, content: @Composable () -> U
             content()
             // Tutoriel au premier lancement (et à la demande depuis les réglages).
             var tutorialDone by remember { mutableStateOf(Tutorial.seen(context)) }
+            if (Legal.askRadars) RadarConsentScreen(onDone = { Legal.askRadars = false })
             if (Legal.forceShow) LegalScreen(review = true, onDone = { Legal.forceShow = false })
             else if (!tutorialDone || Tutorial.forceShow) TutorialScreen(onDone = { tutorialDone = true; Tutorial.forceShow = false })
             else UpdateBanner()

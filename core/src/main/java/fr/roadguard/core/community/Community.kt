@@ -332,6 +332,14 @@ class Community(context: Context, private val scope: CoroutineScope, private val
     suspend fun modAccount(id: String, action: String) = withContext(Dispatchers.IO) {
         request("POST", "/v1/mod/account/$id", JSONObject().put("action", action), auth = true)
     }
+    /** Signalements « police » suspendus jusqu'à (ms), 0 sinon (interdiction préfectorale). */
+    suspend fun modPoliceUntil(): Long = withContext(Dispatchers.IO) {
+        request("GET", "/v1/mod/police", null, auth = true).optLong("until")
+    }
+    /** Suspend les signalements « police » pour [hours] heures (0 : rétablir). */
+    suspend fun modSetPolice(hours: Double): Long = withContext(Dispatchers.IO) {
+        request("POST", "/v1/mod/police", JSONObject().put("hours", hours), auth = true).optLong("until")
+    }
     suspend fun modLink() { prefs.edit().putBoolean("linked", false).apply(); ensureAccount(); linkOnce() }
 
     /** Pseudo communauté créé au besoin avec l'identifiant Pilote (convoi, partage). */

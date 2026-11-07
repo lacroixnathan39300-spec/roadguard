@@ -48,6 +48,8 @@ class CarMapRenderer(private val context: Context, private val scope: CoroutineS
     private var styleNight: Boolean? = null
     private var banner: TextView? = null
     private var lastRoute: Any? = null
+    /** Couche radars affichée (null : à régler après chaque changement de style). */
+    private var lastRadarsVisible: Boolean? = null
     private var zoom = 16.0
     /** Haut de la zone visible (sous les cartes du système) : la position est placée plus bas. */
     private var visibleTop = 0
@@ -100,7 +102,7 @@ class CarMapRenderer(private val context: Context, private val scope: CoroutineS
         val m = map ?: return
         val night = s?.night ?: false
         if (styleNight != night) {
-            styleNight = night; style = null; lastRoute = null
+            styleNight = night; style = null; lastRoute = null; lastRadarsVisible = null
             m.setStyle(Style.Builder().fromUri(if (night) NIGHT_STYLE_URL else STYLE_URL)) { st ->
                 st.addSource(GeoJsonSource(ROUTE))
                 st.addLayer(LineLayer(ROUTE, ROUTE).withProperties(
@@ -120,6 +122,12 @@ class CarMapRenderer(private val context: Context, private val scope: CoroutineS
         }
         val st = style ?: return
         val here = s?.here
+        // Points radars sur la carte : seulement si l'utilisateur a activé lui-même les alertes radars.
+        val radarsVisible = s?.settings?.radarsOn == true
+        if (radarsVisible != lastRadarsVisible) runCatching {
+            st.getLayer(RADARS)?.setProperties(PropertyFactory.visibility(if (radarsVisible) Property.VISIBLE else Property.NONE))
+            lastRadarsVisible = radarsVisible
+        }
         runCatching {
             if (s?.route !== lastRoute) {
                 lastRoute = s?.route

@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,9 +48,17 @@ fun ModerationScreen(community: Community, onClose: () -> Unit) {
     var pending by remember { mutableStateOf<List<JSONObject>>(emptyList()) }
     var accounts by remember { mutableStateOf<List<JSONObject>>(emptyList()) }
     var info by remember { mutableStateOf<String?>("Chargement…") }
+    var policeUntil by remember { mutableStateOf(0L) }
     suspend fun load() {
         runCatching { community.modLink() }
-        runCatching { if (tab == 0) pending = community.modPending() else accounts = community.modAccounts() }
+        runCatching {
+            when (tab) {
+                0 -> pending = community.modPending()
+                1 -> accounts = community.modAccounts()
+                else -> policeUntil = community.modPoliceUntil()
+            }
+            Unit
+        }
             .onSuccess { info = null }
             .onFailure { info = "Impossible de charger : ${it.message}. Ouvre Communauté une fois pour relier ton compte." }
     }
@@ -64,6 +73,7 @@ fun ModerationScreen(community: Community, onClose: () -> Unit) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 BigButton("À valider", if (tab == 0) DriveColors.Accent else DriveColors.Panel) { tab = 0 }
                 BigButton("Comptes", if (tab == 1) DriveColors.Accent else DriveColors.Panel) { tab = 1 }
+                BigButton("⚖ Préfecture", if (tab == 2) DriveColors.Accent else DriveColors.Panel) { tab = 2 }
             }
             info?.let { Text(it, color = DriveColors.TextSecondary, fontSize = 15.sp) }
             if (tab == 0) LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -93,7 +103,7 @@ fun ModerationScreen(community: Community, onClose: () -> Unit) {
                         }
                     }
                 }
-            } else LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            } else if (tab == 1) LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(accounts, key = { it.optString("id") }) { a ->
                     val id = a.optString("id")
                     val stars = if (a.isNull("stars")) null else a.optDouble("stars")
@@ -114,7 +124,40 @@ fun ModerationScreen(community: Community, onClose: () -> Unit) {
                         }
                     }
                 }
+            } else PoliceTab(policeUntil) { h ->
+                scope.launch {
+                    runCatching { policeUntil = community.modSetPolice(h) }
+                        .onSuccess { info = null }
+                        .onFailure { info = "Impossible d'enregistrer : ${it.message}" }
+                }
             }
         }
+    }
+}
+
+/**
+ * Interdiction préfectorale (art. L130-11 du code de la route) : suspendre tout de suite la diffusion des signalements
+ * « police » (ni affichés ni acceptés par le serveur). Ne pas la respecter : 2 ans de prison et 30 000 € (L130-12).
+ */
+@Composable
+private fun PoliceTab(until: Long, onSet: (Double) -> Unit) {
+    val df = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.FRANCE)
+    val suspended = until > System.currentTimeMillis()
+    Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text("Signalements « police »", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text(
+            if (suspended) "SUSPENDUS jusqu'au ${df.format(java.util.Date(until))} : ni affichés, ni acceptés." else "Diffusés normalement.",
+            color = if (suspended) Color(0xFFFCA5A5) else Color(0xFF86EFAC), fontSize = 16.sp, fontWeight = FontWeight.Bold,
+        )
+        Text("Si une préfecture te notifie une interdiction de relayer certains contrôles (article L130-11 du code de la route), " +
+            "suspends-les ici tout de suite et garde la notification reçue. Ne pas la respecter : 2 ans de prison et 30 000 € d'amende.",
+            color = DriveColors.TextSecondary, fontSize = 15.sp)
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BigButton("Suspendre 2 h", Color(0xFF7F1D1D)) { onSet(2.0) }
+            BigButton("12 h", Color(0xFF7F1D1D)) { onSet(12.0) }
+            BigButton("24 h", Color(0xFF7F1D1D)) { onSet(24.0) }
+            BigButton("Jusqu'à nouvel ordre", Color(0xFF7F1D1D)) { onSet(24.0 * 365) }
+        }
+        if (suspended) BigButton("Rétablir maintenant", DriveColors.Track) { onSet(0.0) }
     }
 }

@@ -84,3 +84,16 @@ test("corrections de carte : limitation valide et note OpenStreetMap", async () 
   assert.equal(osmNoteText("limite", "70|90", 1), "Limitation de vitesse sur le terrain : 70 km/h (la carte indique 90 km/h). Confirmé par 2 conducteurs (application Pilote).");
   assert.equal(osmNoteText("rond_point", null, 0), "Rond-point présent sur le terrain mais absent de la carte. Confirmé par 1 conducteur (application Pilote).");
 });
+
+test("preuve d'acceptation de l'avertissement légal", async () => {
+  const { cleanAcceptance } = await import("../src/index.ts");
+  const now = 1_800_000_000_000;
+  const ok = cleanAcceptance({ version: 2, device: "a1b2c3d4e5f60718", radars: true, app: "drive", appVersion: "11.14.230", at: now - 5000 }, now);
+  assert.deepEqual(ok, { version: 2, device: "a1b2c3d4e5f60718", at: now - 5000, radars: 1, app: "drive", appVersion: "11.14.230" });
+  // Case non cochée (ou absente) : radars coupés ; date dans le futur ramenée à maintenant.
+  assert.equal(cleanAcceptance({ version: 2, device: "a1b2c3d4e5f60718", radars: "true", at: now + 99 }, now)?.radars, 0);
+  assert.equal(cleanAcceptance({ version: 2, device: "a1b2c3d4e5f60718", at: now + 99 }, now)?.at, now);
+  assert.equal(cleanAcceptance({ version: 0, device: "a1b2c3d4e5f60718" }, now), null);
+  assert.equal(cleanAcceptance({ version: 2, device: "court" }, now), null);
+  assert.equal(cleanAcceptance({ version: 2, device: "x'; DROP TABLE users;--" }, now), null);
+});
