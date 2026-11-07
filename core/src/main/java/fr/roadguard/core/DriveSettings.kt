@@ -118,6 +118,11 @@ class DriveSettings(context: Context) {
     // Interrupteurs rapides de l'accueil : alertes radars, et annonces de limitation / dépassement.
     var radarsOn by mutableStateOf(prefs.getBoolean("radars_on", true)); private set
     fun changeRadarsOn(v: Boolean) { radarsOn = v; prefs.edit().putBoolean("radars_on", v).apply() }
+    /** Alertes radars changées ailleurs (avertissement légal, autre écran) : la séance de conduite suit tout de suite. */
+    private val radarsListener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { p, key ->
+        if (key == "radars_on") radarsOn = p.getBoolean("radars_on", true)
+    }
+    init { prefs.registerOnSharedPreferenceChangeListener(radarsListener) }
     val limitVoiceOn get() = announceLimit || speedLimitWarning
     fun changeLimitVoice(v: Boolean) { changeAnnounceLimit(v); changeSpeedLimitWarning(v) }
 

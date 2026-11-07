@@ -67,6 +67,7 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                 BigButton("🪞 Tête haute", DriveColors.Panel) { tool.value = 5 }
             }
             BigButton("📖 Revoir le tutoriel", DriveColors.Panel) { Tutorial.forceShow = true; onClose() }
+            BigButton("⚖ Infos légales : la loi, les radars, les autorisations", DriveColors.Panel) { Legal.forceShow = true; onClose() }
             if (onPersonalize != null) BigButton("🖼 Fond d'écran et logo de démarrage", DriveColors.Accent, onPersonalize)
             if (onMusicPlayer != null) BigButton("🎵 Lecteur de musique (Bluetooth du poste…)", DriveColors.Accent, onMusicPlayer)
             if (onCommunity != null) BigButton("👥 Communauté : pseudo, points, classement", DriveColors.Accent, onCommunity)

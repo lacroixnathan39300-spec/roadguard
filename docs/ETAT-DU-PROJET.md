@@ -86,3 +86,17 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
   `SpeedLimits.lastWay`), appliquée par `Community.limitFix` (validée, ou la sienne tout de suite). Confirmées (2 conducteurs ou
   validées d'office) : envoyées en note OpenStreetMap par la tâche planifiée (`forwardToOsm`, colonne `osm_note`, migration 0011).
 - Sirène plus présente : `LoudnessEnhancer` +10 dB, musique en pause (focus transitoire), volume d'alarme au maximum pendant le réveil.
+
+## Avertissement légal (07/11/2026)
+- `core/ui/LegalUi.kt` : 4 écrans montrés AVANT tout (connexion comprise) dans `AccountGate`, puis à chaque nouvelle version
+  du texte (`Legal.VERSION`, préférences `legal`) : la loi au volant (téléphone, écrans, limitations), les alertes radars selon
+  les pays (France : interdit, 1 500 € / 6 points ; aussi Suisse, Allemagne, Autriche, Liechtenstein, Slovaquie, Irlande),
+  interrupteur « Alertes radars », les autorisations (texte différent pour Drive), l'engagement (3 cases, « Je refuse et je quitte »).
+  Relisible : Réglages → « Infos légales ».
+- **Choix de Nathan : les alertes radars restent actives partout** (rien n'est coupé automatiquement, en dehors de l'ancien
+  réglage « Suisse » qui existait déjà) ; l'utilisateur est prévenu et peut les couper.
+- Risques expliqués à Nathan : utilisateurs en France (contravention 5e classe), relais des signalements « police » si la
+  préfecture notifie une interdiction (L130-11/L130-12 : 2 ans, 30 000 €), Suisse (art. 98a LCR : avertir publiquement des
+  contrôles est puni), Play Store. Proposé : mode France « zones de danger » (pas fait, en attente de sa décision).
+- Serveur : page `/conditions` (conditions d'utilisation), liée depuis l'avertissement avec `/confidentialite`.
+- `DriveSettings` écoute `radars_on` : un changement fait ailleurs (avertissement) s'applique tout de suite à la séance en cours.

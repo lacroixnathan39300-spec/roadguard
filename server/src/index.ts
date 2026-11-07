@@ -619,6 +619,34 @@ Les vidéos de la dashcam ne sont gardées que si tu le demandes ou après un ch
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8" } });
 }
 
+// ---------- conditions d'utilisation (lien de l'avertissement légal de l'appli) ----------
+function termsPage(): Response {
+  const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pilote · conditions d'utilisation</title><style>body{font-family:system-ui,sans-serif;max-width:760px;margin:0 auto;padding:20px;line-height:1.55;color:#1b1f24}
+h1{font-size:26px}h2{font-size:19px;margin-top:26px}</style></head><body>
+<h1>Pilote · conditions d'utilisation</h1>
+<p>Dernière mise à jour : novembre 2026. Ces conditions s'appliquent à Pilote, Pilote Drive et Pilote Suite. En acceptant l'avertissement affiché au premier lancement, tu les acceptes.</p>
+<h2>1. Une aide, pas un pilote automatique</h2>
+<p>Pilote est une aide à la conduite. Il ne remplace ni ton attention, ni le code de la route. Les limitations, radars, itinéraires et signalements peuvent être faux, incomplets ou pas à jour : la signalisation et les règles de circulation passent toujours avant ce qu'affiche ou annonce l'appli.</p>
+<h2>2. Au volant</h2>
+<p>Ne tiens pas et ne manipule pas ton téléphone en roulant (en France : 135 € d'amende et 3 points, écouteurs compris). Fixe-le sur un support, règle ton trajet avant de partir et utilise la voix. Aucun écran qui n'aide pas à la conduite (vidéo, autres applis, mode miroir) ne doit être visible du conducteur en roulant (en France : jusqu'à 1 500 € d'amende et 3 points).</p>
+<h2>3. Alertes radars</h2>
+<p>La loi sur les alertes radars dépend du pays. En France, utiliser un appareil ou une application qui indique l'emplacement des radars fixes ou mobiles est interdit depuis le décret du 3 janvier 2012 (jusqu'à 1 500 € d'amende et 6 points) ; seules les « zones de danger » sont admises. C'est aussi interdit, notamment, en Suisse (où l'appareil peut être confisqué et où avertir publiquement des contrôles est puni), en Allemagne, en Autriche, au Liechtenstein, en Slovaquie et en Irlande.</p>
+<p>Les alertes radars de Pilote peuvent être coupées à tout moment (Réglages → « Alertes radars »). Si tu les gardes actives, tu es seul responsable de leur usage au regard de la loi du pays où tu circules. Les lois changent : renseigne-toi avant de partir à l'étranger. Ces informations ne sont pas un conseil juridique.</p>
+<h2>4. Communauté</h2>
+<p>Signale uniquement ce que tu as vu, honnêtement. Sont interdits : les faux signalements, les messages injurieux, discriminatoires ou illégaux, et toute donnée personnelle sur autrui (nom, plaque, photo). Les signalements sont soumis aux votes des conducteurs et à la modération ; un compte qui abuse peut être suspendu ou banni.</p>
+<h2>5. Caméra et dashcam</h2>
+<p>Les images restent sur ton téléphone. Si tu publies une vidéo, floute les visages et les plaques : le droit à l'image et la protection des données des autres usagers s'appliquent.</p>
+<h2>6. Compte et accès</h2>
+<p>L'accès peut être limité dans le temps (essai), suspendu en cas d'abus ou modifié à tout moment. Pour supprimer ton compte et tes données : Réglages → ton compte → « Écrire à l'administrateur ».</p>
+<h2>7. Données personnelles</h2>
+<p>Voir la <a href="/confidentialite">politique de confidentialité</a>.</p>
+<h2>8. Responsabilité</h2>
+<p>L'appli est fournie telle quelle, sans garantie d'exactitude ni de disponibilité. Dans les limites permises par la loi, l'éditeur n'est pas responsable des conséquences d'une utilisation contraire à ces conditions ou au code de la route, ni des amendes liées à l'usage des alertes radars.</p>
+</body></html>`;
+  return new Response(html, { headers: { "content-type": "text/html; charset=utf-8" } });
+}
+
 // ---------- convoi entre amis et partage de trajet ----------
 
 function cleanCode(raw: unknown): string | null {
@@ -747,6 +775,7 @@ export default {
         return new Response(data, { headers: { "content-type": "application/octet-stream", "cache-control": "max-age=86400", ...CORS } });
       }
       if (req.method === "GET" && (path === "/confidentialite" || path === "/privacy")) return privacyPage();
+      if (req.method === "GET" && (path === "/conditions" || path === "/terms")) return termsPage();
       const sp = /^\/(?:s|share)\/([0-9a-f]{20})$/.exec(path);
       if (req.method === "GET" && sp) return sharePage(sp[1]);
       const sj = /^\/v1\/share\/([0-9a-f]{20})$/.exec(path);

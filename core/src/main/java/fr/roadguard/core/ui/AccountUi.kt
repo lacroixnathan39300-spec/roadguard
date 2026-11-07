@@ -59,15 +59,19 @@ fun AccountGate(extra: @Composable () -> Unit = {}, content: @Composable () -> U
         delay(5_000)
         while (account.loggedIn) { InboxNotifier.check(context); delay(120_000) }
     }
+    // Avertissement légal avant tout le reste (connexion comprise), puis à chaque nouvelle version du texte.
+    var legalOk by remember { mutableStateOf(Legal.accepted(context)) }
     when {
         account.testBuild -> content()
+        !legalOk -> LegalScreen(onDone = { legalOk = true })
         !account.loggedIn -> LoginScreen(account, extra)
         !account.allowed -> AccessEndedScreen(account, account.status!!, extra)
         else -> Box(Modifier.fillMaxSize()) {
             content()
             // Tutoriel au premier lancement (et à la demande depuis les réglages).
             var tutorialDone by remember { mutableStateOf(Tutorial.seen(context)) }
-            if (!tutorialDone || Tutorial.forceShow) TutorialScreen(onDone = { tutorialDone = true; Tutorial.forceShow = false })
+            if (Legal.forceShow) LegalScreen(review = true, onDone = { Legal.forceShow = false })
+            else if (!tutorialDone || Tutorial.forceShow) TutorialScreen(onDone = { tutorialDone = true; Tutorial.forceShow = false })
             else UpdateBanner()
             // Fin d'essai proche : rappel discret (une fois par jour), avec le contact de l'administrateur.
             val days = account.status?.trialDaysLeft()
