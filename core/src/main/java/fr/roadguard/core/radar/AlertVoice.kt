@@ -162,6 +162,8 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
             val d = proximityM
             if (d == null) { beeping = false; scheduleRelease(); return }
             val interval = BeepCadence.intervalMs(d, startM)
+            // Sirène de police en cours : les bips se taisent le temps des « pin-pon ».
+            if (android.os.SystemClock.uptimeMillis() < sirenUntil) { beeper.postDelayed(this, interval); return }
             duck(interval + 200)
             // Trop vite devant le radar : les bips deviennent l'alarme aiguë (même rythme, même générateur).
             if (alarmOn) tone?.startTone(ToneGenerator.TONE_CDMA_HIGH_PBX_SS, minOf(interval - 40, 600L).toInt().coerceAtLeast(120))
@@ -198,7 +200,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     private val alarmTick = object : Runnable {
         override fun run() {
             if (!alarmOn) return
-            if (!beeping) { duck(900); tone?.startTone(ToneGenerator.TONE_CDMA_HIGH_PBX_SS, 700) }
+            if (!beeping && android.os.SystemClock.uptimeMillis() >= sirenUntil) { duck(900); tone?.startTone(ToneGenerator.TONE_CDMA_HIGH_PBX_SS, 700) }
             val now = android.os.SystemClock.uptimeMillis()
             if (now - lastAlarmVoice > 7_000) { lastAlarmVoice = now; line("alarm", null, alarmLimit, "rg-alarm") }
             beeper.postDelayed(this, 1_100)
@@ -211,6 +213,15 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
         if (on == alarmOn) return
         alarmOn = on
         if (on) { lastAlarmVoice = 0; beeper.post(alarmTick) } else beeper.removeCallbacks(alarmTick)
+    }
+
+    @Volatile private var sirenUntil = 0L
+
+    /** Sirène de police française au dernier moment avant un radar (3 « pin-pon », musique baissée). */
+    fun radarSiren() {
+        sirenUntil = android.os.SystemClock.uptimeMillis() + 2_800
+        duck(3_200)
+        PoliceSiren.burst(3)
     }
 
     fun announce(alert: RadarAlert) {
@@ -398,6 +409,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
         proximityM = null
         if (focused) runCatching { audio?.abandonAudioFocusRequest(focusRequest) }
         beeper.removeCallbacksAndMessages(null)
+        PoliceSiren.stop()
         tts.shutdown()
         tone?.release()
     }

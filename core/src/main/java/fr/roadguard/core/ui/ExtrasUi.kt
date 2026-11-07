@@ -556,6 +556,10 @@ fun SafetySettings(settings: fr.roadguard.core.DriveSettings) {
                 (context as? android.app.Activity)?.requestPermissions(arrayOf(android.Manifest.permission.SEND_SMS), 77)
             }
         }
+        ToggleLine("🚨 Sirène de police française si je m'endors (anti-somnolence)", settings.sirenWake) { v ->
+            settings.changeSirenWake(v)
+            if (v) fr.roadguard.core.radar.PoliceSiren.burst(2) // pour l'entendre
+        }
         Text("Confort", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 8.dp))
         ToggleLine("Lire mes messages à voix haute (SMS, WhatsApp…), avec réponse dictée", settings.speakNotifications) { v ->
             settings.changeSpeakNotifications(v)

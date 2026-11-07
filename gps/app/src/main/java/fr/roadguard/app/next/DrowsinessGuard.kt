@@ -170,11 +170,18 @@ fun rememberDrowsyGuard(session: DrivingSession?, enabled: Boolean): Alertness? 
     LaunchedEffect(state) {
         when (state) {
             Alertness.ASLEEP -> {
-                var n = 0
-                while (true) {
-                    tones?.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 900)
-                    if (n++ % 4 == 0) session?.voice?.wakeUp()
-                    kotlinx.coroutines.delay(1_000)
+                // Sirène de police française en boucle (réglage), arrêtée dès que les yeux se rouvrent.
+                val siren = session?.settings?.sirenWake != false
+                if (siren) fr.roadguard.core.radar.PoliceSiren.startAlarm()
+                try {
+                    var n = 0
+                    while (true) {
+                        if (!siren) tones?.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 900)
+                        if (n++ % 4 == 0) session?.voice?.wakeUp()
+                        kotlinx.coroutines.delay(1_000)
+                    }
+                } finally {
+                    if (siren) fr.roadguard.core.radar.PoliceSiren.stop()
                 }
             }
             Alertness.TIRED -> {

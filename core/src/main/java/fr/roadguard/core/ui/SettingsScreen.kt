@@ -88,6 +88,15 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
             }
             ToggleRow("Annoncer les changements de limitation", settings.announceLimit, settings::changeAnnounceLimit)
             ToggleRow("Alarme forte si je suis trop vite en approchant d'un radar", settings.radarAlarm, settings::changeRadarAlarm)
+            Text("🚨 Sirène de police au dernier moment avant un radar", color = Color.White, fontSize = 18.sp)
+            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                listOf(2 to "À chaque radar", 1 to "Seulement si trop vite", 0 to "Jamais").forEach { (v, l) ->
+                    BigButton(l, if (settings.sirenRadar == v) DriveColors.Accent else DriveColors.Panel) {
+                        settings.changeSirenRadar(v)
+                        if (v > 0) fr.roadguard.core.radar.PoliceSiren.burst(2) // pour l'entendre
+                    }
+                }
+            }
             ToggleRow("Alarme forte aussi sans radar, dès que je dépasse la limitation", settings.alarmAnywhere, settings::changeAlarmAnywhere)
             ToggleRow("Me réprimander si je roule trop vite trop longtemps ou trop souvent", settings.scold, settings::changeScold)
             SafetySettings(settings)

@@ -95,6 +95,7 @@ class DrivingSession(
     private var pendingDestination: LatLon? = null
     private val limitTracker = SpeedLimitTracker()
     private var lastOverWarning = 0L
+    private var lastSirenRadar: String? = null
     private var overWarned = false
     private var avgOverSaid = false
     private var nextSurpriseAt = 0L
@@ -451,6 +452,16 @@ class DrivingSession(
         }
         voice.proximityBeeps = settings.proximityBeeps
         val a = alert
+        // Sirène de police au dernier moment : moins de 4 s avant le radar (au moins 120 m), une fois par radar.
+        // Réglage : à chaque radar, seulement si trop vite (au-dessus de la limite du radar), ou jamais.
+        if (a != null && !a.passed && settings.sirenRadar > 0 && a.radar.id != lastSirenRadar) {
+            val lastMoment = maxOf(120.0, f.speedKmh / 3.6 * 4).toInt()
+            val tooFast = limit != null && f.speedKmh > limit
+            if (a.distanceM <= lastMoment && (settings.sirenRadar == 2 || tooFast)) {
+                lastSirenRadar = a.radar.id
+                voice.radarSiren()
+            }
+        }
         // Radar dépassé : bips encore le temps de parcourir les derniers mètres (40 m après le radar).
         voice.proximity(a?.distanceM, if (a?.passed == true) (a.remainingM / (f.speedKmh / 3.6).coerceAtLeast(2.0) * 1000).toLong().coerceAtLeast(1) else 0)
     }
