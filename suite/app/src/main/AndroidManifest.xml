@@ -5,7 +5,6 @@
     <queries>
         <package android:name="fr.roadguard.gps" />
         <package android:name="fr.roadguard.drive" />
-        <package android:name="fr.roadguard.menage" />
     </queries>
     <application android:label="Pilote Suite" android:icon="@mipmap/ic_launcher" android:theme="@android:style/Theme.Material.NoActionBar"
         android:allowBackup="false" android:supportsRtl="true">

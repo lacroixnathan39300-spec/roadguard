@@ -80,4 +80,4 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
   téléchargements (> 90 jours), APK. Corbeille d'Android (`MediaStore.createTrashRequest`, récupérable 30 jours) ; documents/APK
   (accès « tous les fichiers ») supprimés après confirmation.
 - Compilée seule par `.github/workflows/menage.yml` (signée avec la clé du téléphone), publiée par `publish_updates.py`
-  (contrôle de version appli par appli). Lien direct : `/menage`. Ajoutée dans Pilote Suite (prochaine compilation de Suite).
+  (contrôle de version appli par appli). Lien direct : `/menage`. Appli indépendante : PAS dans Pilote Suite ni dans les menus de Pilote (demande de Nathan).
