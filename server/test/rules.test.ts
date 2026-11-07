@@ -89,7 +89,8 @@ test("preuve d'acceptation de l'avertissement légal", async () => {
   const { cleanAcceptance } = await import("../src/index.ts");
   const now = 1_800_000_000_000;
   const ok = cleanAcceptance({ version: 2, device: "a1b2c3d4e5f60718", radars: true, app: "drive", appVersion: "11.14.230", at: now - 5000 }, now);
-  assert.deepEqual(ok, { version: 2, device: "a1b2c3d4e5f60718", at: now - 5000, radars: 1, swiss: 0, app: "drive", appVersion: "11.14.230" });
+  assert.deepEqual(ok, { version: 2, device: "a1b2c3d4e5f60718", at: now - 5000, radars: 1, swiss: 0, app: "drive", appVersion: "11.14.230", typed: "" });
+  assert.equal(cleanAcceptance({ version: 3, device: "a1b2c3d4e5f60718", typed: "acceptation : « J'accepte »" }, now)?.typed, "acceptation : « J'accepte »");
   assert.equal(cleanAcceptance({ version: 2, device: "a1b2c3d4e5f60718", radars: true, swiss: true }, now)?.swiss, 1);
   // Case non cochée (ou absente) : radars coupés ; date dans le futur ramenée à maintenant.
   assert.equal(cleanAcceptance({ version: 2, device: "a1b2c3d4e5f60718", radars: "true", at: now + 99 }, now)?.radars, 0);

@@ -111,3 +111,7 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
   Les signalements police / radars de la communauté ne sont JAMAIS relayés en Suisse (art. 98a LCR vise celui qui avertit
   publiquement) : `radarAlertsAllowed` faux en Suisse, `Community.shownReports` (carte sans radars/contrôles quand non
   permis), signalement radar/police refusé et masqué dans la feuille. Annonce vocale à l'entrée en Suisse si gardés.
+- **Version 3 du texte : phrases écrites par l'utilisateur** (preuve plus forte qu'une case) : « J'accepte » pour valider,
+  « J'active les radars à mes risques » pour les radars, « Je coupe le mode Suisse à mes risques » pour la Suisse
+  (`typedMatches` : sans tenir compte des majuscules, accents, apostrophes ; test `TypedConsentTest`). Phrases gardées
+  dans les préférences `legal` et envoyées au serveur (colonne `typed`, migration 0014).
