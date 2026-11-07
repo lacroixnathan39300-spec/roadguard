@@ -86,6 +86,8 @@ fun BoxScope.UpdateBanner() {
     var release by remember { mutableStateOf<AppRelease?>(null) }
     var dismissed by remember { mutableStateOf(0) }
     var progress by remember { mutableStateOf<String?>(null) }
+    // Téléchargement en cours : (reçus, total) pour la grande barre ; null sinon.
+    var bytes by remember { mutableStateOf<Pair<Long, Long>?>(null) }
     LaunchedEffect(Unit) {
         delay(8_000) // laisser l'appli démarrer
         while (true) { release = UpdateNotifier.checkAndNotify(context); delay(3 * 3_600_000L) }
@@ -99,15 +101,19 @@ fun BoxScope.UpdateBanner() {
     ) {
         Column(Modifier.weight(1f)) {
             Text("🆕 Nouvelle version de ${UpdateNotifier.appName(context)}", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold)
-            Text(progress ?: "Version ${r.build} disponible (${r.size / 1_048_576} Mo).", color = Color(0xFFCFE3FF), fontSize = 14.sp)
+            val b = bytes
+            if (b != null) DownloadProgress(if (b.second > 0) b.first.toFloat() / b.second else 0f, b.first, b.second)
+            else Text(progress ?: "Version ${r.build} disponible (${r.size / 1_048_576} Mo).", color = Color(0xFFCFE3FF), fontSize = 14.sp)
         }
         if (progress == null) {
             BigButton("Installer", DriveColors.Accent) {
-                progress = "Téléchargement…"
+                progress = "En cours de téléchargement…"
+                bytes = 0L to r.size
                 scope.launch {
                     runCatching {
-                        AppUpdater.downloadAndInstall(context, r) { done, total -> progress = "Téléchargement ${if (total > 0) done * 100 / total else 0} %" }
-                    }.onFailure { progress = "Échec : ${it.message}" }
+                        AppUpdater.downloadAndInstall(context, r) { done, total -> bytes = done to total }
+                    }.onSuccess { bytes = null; progress = "Confirme l'installation dans la fenêtre d'Android." }
+                        .onFailure { bytes = null; progress = "Échec : ${it.message}" }
                 }
             }
             BigButton("Plus tard", Color(0x33FFFFFF)) { dismissed = r.build }

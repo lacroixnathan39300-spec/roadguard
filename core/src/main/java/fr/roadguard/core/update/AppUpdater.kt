@@ -48,16 +48,26 @@ object AppUpdater {
         val out = file(context)
         val digest = MessageDigest.getInstance("SHA-256")
         var done = 0L
+        // Progression au fil des octets (et plus seulement par morceau de 20 Mo), au plus une fois par pour mille.
+        var lastShown = -1L
+        fun report(bytes: Long) {
+            val step = if (rel.size > 0) bytes * 1000 / rel.size else 0
+            if (step != lastShown) { lastShown = step; onProgress(bytes, rel.size) }
+        }
         out.outputStream().use { o ->
             for (i in 0 until rel.chunks) {
                 var bytes: ByteArray? = null
                 for (attempt in 1..3) {
-                    val r = runCatching { Net.fetch("${Community.DEFAULT_URL}/v1/apps/${rel.app}/${rel.build}/$i") }.getOrNull()
+                    var got = 0L
+                    val r = runCatching {
+                        Net.fetchWithProgress("${Community.DEFAULT_URL}/v1/apps/${rel.app}/${rel.build}/$i") { n -> got += n; report(done + got) }
+                    }.getOrNull()
                     if (r != null && r.code in 200..299) { bytes = r.body; break }
+                    report(done) // essai raté : la barre revient au début du morceau
                 }
                 val b = bytes ?: throw IOException("Téléchargement interrompu (morceau ${i + 1}/${rel.chunks})")
                 o.write(b); digest.update(b); done += b.size
-                onProgress(done, rel.size)
+                report(done)
             }
         }
         val sha = digest.digest().joinToString("") { "%02x".format(it) }

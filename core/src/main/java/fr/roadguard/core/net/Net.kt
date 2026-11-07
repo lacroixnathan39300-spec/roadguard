@@ -54,6 +54,41 @@ object Net {
         return direct(url, method, body, contentType, followRedirects)
     }
 
+    /**
+     * Téléchargement avec progression : [onBytes] reçoit les octets au fur et à mesure (barre de progression).
+     * Par le relais du téléphone (autoradio sans Internet), le morceau arrive d'un coup.
+     */
+    fun fetchWithProgress(url: String, onBytes: (Int) -> Unit): NetResponse {
+        val link = relay
+        if (!hasDirectInternet() && link != null && link.isConnected()) {
+            val r = fetch(url)
+            if (r.code in 200..299) onBytes(r.body.size)
+            return r
+        }
+        val c = URL(url).openConnection() as HttpURLConnection
+        c.connectTimeout = 10_000
+        c.readTimeout = 30_000
+        c.setRequestProperty("User-Agent", USER_AGENT)
+        try {
+            val code = c.responseCode
+            if (code !in 200..299) return NetResponse(code, c.errorStream?.use { it.readBytes() } ?: ByteArray(0), c.contentType)
+            val out = java.io.ByteArrayOutputStream(maxOf(c.contentLength, 0))
+            val buf = ByteArray(64 * 1024)
+            c.inputStream.use { input ->
+                while (true) {
+                    val n = input.read(buf)
+                    if (n < 0) break
+                    out.write(buf, 0, n); onBytes(n)
+                }
+            }
+            return NetResponse(code, out.toByteArray(), c.contentType)
+        } catch (e: IOException) {
+            throw IOException(if (relay?.isConnected() == true) e.message else "Pas d'accès Internet", e)
+        } finally {
+            c.disconnect()
+        }
+    }
+
     private fun direct(url: String, method: String, body: ByteArray?, contentType: String?, follow: Boolean): NetResponse {
         val c = URL(url).openConnection() as HttpURLConnection
         c.connectTimeout = 10_000

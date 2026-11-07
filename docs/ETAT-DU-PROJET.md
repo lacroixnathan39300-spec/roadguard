@@ -120,3 +120,11 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
   responsabilité (`RADAR_ACK`) en plus de « J'accepte » écrit. Réactivation plus tard (s'ils ont été coupés à
   l'acceptation) : case + « J'active les radars à mes risques ». Correctif : `DriveSettings` écoute aussi les préférences
   `legal` (l'accord s'applique tout de suite à la séance en cours, même si `radars_on` valait déjà vrai).
+
+## Téléchargements plus visibles (07/11/2026)
+- Pilote Suite : bloc « ⬇ En cours de téléchargement… » dans la carte de l'appli (grosse barre de 18 dp à la couleur de
+  l'appli, pourcentage, Mo reçus sur le total), puis « Vérification du fichier » et « Installation en cours » ;
+  progression au fil des octets (et non plus par morceau de 20 Mo), 3 essais par morceau, écran maintenu allumé,
+  un seul téléchargement à la fois.
+- Pilote / Pilote Drive (mise à jour intégrée) : `DownloadProgress` (même présentation) dans le bandeau et dans
+  Réglages ; `Net.fetchWithProgress` (progression en direct ; par le relais du téléphone, morceau d'un coup).

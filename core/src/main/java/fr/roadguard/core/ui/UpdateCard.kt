@@ -26,6 +26,34 @@ import fr.roadguard.core.update.AppRelease
 import fr.roadguard.core.update.AppUpdater
 import kotlinx.coroutines.launch
 
+/**
+ * Téléchargement en cours, bien visible : « En cours de téléchargement… », pourcentage, grosse barre, Mo reçus.
+ * L'écran reste allumé pendant le téléchargement.
+ */
+@Composable
+fun DownloadProgress(fraction: Float, done: Long, total: Long, modifier: Modifier = Modifier) {
+    val view = androidx.compose.ui.platform.LocalView.current
+    androidx.compose.runtime.DisposableEffect(view) {
+        view.keepScreenOn = true
+        onDispose { view.keepScreenOn = false }
+    }
+    val f = fraction.coerceIn(0f, 1f)
+    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        androidx.compose.foundation.layout.Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            Text(if (f >= 0.999f) "🔎 Vérification, puis installation…" else "⬇ En cours de téléchargement…",
+                color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            Text("${(f * 100).toInt()} %", color = DriveColors.Accent, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        }
+        LinearProgressIndicator(progress = { f }, modifier = Modifier.fillMaxWidth().height(16.dp).clip(RoundedCornerShape(8.dp)),
+            color = DriveColors.Accent, trackColor = DriveColors.Track)
+        Text(
+            if (f >= 0.999f) "Confirme ensuite dans la fenêtre d'Android (« Installer » ou « Mettre à jour »)."
+            else String.format(java.util.Locale.FRANCE, "%.1f Mo sur %.0f Mo · ne ferme pas l'appli", done / 1_048_576.0, total / 1_048_576.0),
+            color = Color(0xFFC7D2DE), fontSize = 14.sp,
+        )
+    }
+}
+
 /** « Mise à jour » dans les réglages : vérifier, télécharger, installer. */
 @Composable
 fun UpdateCard(app: String) {
@@ -39,11 +67,7 @@ fun UpdateCard(app: String) {
         Text("Mise à jour de l'appli", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
         val r = release
         when {
-            progress != null -> {
-                Text("Téléchargement… ${((progress ?: 0f) * 100).toInt()} %", color = Color.White, fontSize = 15.sp)
-                LinearProgressIndicator(progress = { progress ?: 0f }, modifier = Modifier.fillMaxWidth().height(6.dp),
-                    color = DriveColors.Accent, trackColor = DriveColors.Track)
-            }
+            progress != null -> DownloadProgress(progress ?: 0f, ((progress ?: 0f) * (r?.size ?: 0L)).toLong(), r?.size ?: 0L)
             r != null -> BigButton("Installer la version ${r.build} (${r.size / 1_000_000} Mo)", DriveColors.Accent) {
                 progress = 0f
                 scope.launch {
