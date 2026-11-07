@@ -48,10 +48,11 @@ private fun pages(drive: Boolean): List<Page> = listOfNotNull(
         "Ce petit tour prend une minute. Tu peux le revoir dans Réglages → « Revoir le tutoriel ».",
     )),
     Page("📷", "Les radars", listOf(
-        "Annonce à 1 km, puis des bips de plus en plus rapides jusqu'au radar, qui s'arrêtent pile au radar.",
+        "Coupés au départ : interdits en France, en Suisse et dans d'autres pays. Pour les activer, à tes risques : coche la case d'activation (Réglages → « Infos légales », ou « Alertes radars »).",
+        "Une fois activés : annonce à 1 km, puis des bips de plus en plus rapides jusqu'au radar, qui s'arrêtent pile au radar.",
         "Seulement le radar qui est sur TA route : avec un itinéraire, ceux du tracé ; sinon, ceux de ton couloir qui se rapprochent vraiment.",
         "Trop vite à l'approche : alarme stridente « Ralentis ! ». Tronçons : ta vitesse moyenne en direct.",
-        if (drive) "Réglages → Annonces : couper les radars, les bips, l'alarme." else "Bouton rond 📷 à droite de la carte : coupe ou remet les radars (et leurs points sur la carte).",
+        if (drive) "Réglages → Annonces : couper les radars, les bips, l'alarme." else "Bouton rond 📷 à droite de la carte : coupe ou remet les radars (et leurs points sur la carte) ; la première fois, la case d'activation s'affiche.",
     )),
     Page("🚦", "Limitations de vitesse", listOf(
         "La limitation de la route s'affiche à côté de ta vitesse, et change en quelques secondes avec la zone.",
@@ -104,7 +105,7 @@ private fun pages(drive: Boolean): List<Page> = listOfNotNull(
         "L'autoradio reçoit ta position, ta musique, tes messages, et Internet par le téléphone.",
     )),
     Page("🛡", "Sécurité automatique", listOf(
-        "Suisse : alertes radars coupées toutes seules (interdites là-bas), rétablies en France.",
+        "Suisse : alertes radars coupées toutes seules (mode Suisse) ; les garder demande une case dédiée. Les signalements police et radars de la communauté n'y sont jamais diffusés.",
         "Pluie : limitations abaissées (130→110, 110→100, 90→80). Jeune conducteur et vitesse max perso dans Réglages.",
         "Météo dangereuse, passages à niveau, virages, écoles annoncés. Radars suivis même dans les tunnels.",
         if (drive) "Fin de trajet : voiture garée mémorisée, et rappel « rien oublié ? » si tu l'actives." else "Détection d'accident : choc + arrêt → « Tout va bien ? », puis SMS à ton contact d'urgence.",
