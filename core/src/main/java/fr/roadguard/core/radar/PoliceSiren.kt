@@ -4,7 +4,11 @@ import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioTrack
 import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.exp
+import kotlin.math.pow
 import kotlin.math.sin
+import kotlin.math.tanh
 
 /**
  * Sirène « deux-tons » de la police française (« pin-pon » : la 435 Hz puis ré 580 Hz), fabriquée par l'appli
@@ -14,27 +18,56 @@ import kotlin.math.sin
  */
 object PoliceSiren {
     private const val RATE = 44_100
-    /** Durée d'une note : un « pin » puis un « pon » font un cycle d'environ 0,85 s. */
-    private const val NOTE_S = 0.42
+    /** Durée d'une note : un « pin » puis un « pon » font un cycle d'environ 0,9 s. */
+    private const val NOTE_S = 0.46
+    /** La trompe « monte » vers sa note au départ (l'air arrive). */
+    private const val GLIDE_S = 0.07
 
     private val cycle: ShortArray by lazy { build() }
     private var track: AudioTrack? = null
     private val main = android.os.Handler(android.os.Looper.getMainLooper())
 
-    private fun build(): ShortArray {
-        val n = (RATE * NOTE_S).toInt()
-        val fade = RATE / 125 // 8 ms d'attaque et de fin : pas de claquement entre les notes
-        val out = ShortArray(n * 2)
-        for ((k, f) in listOf(435.0, 580.0).withIndex()) {
-            for (i in 0 until n) {
-                val w = 2 * PI * f * i / RATE
-                // Fondamentale et harmoniques : timbre de trompe, plus proche d'une vraie sirène qu'un son pur.
-                val v = 0.62 * sin(w) + 0.25 * sin(2 * w) + 0.13 * sin(3 * w)
-                val env = minOf(1.0, i.toDouble() / fade, (n - 1 - i).toDouble() / fade)
-                out[k * n + i] = (v * env * 0.9 * Short.MAX_VALUE).toInt().toShort()
-            }
+    /** Prépare le son à l'avance (en arrière-plan) pour qu'il parte sans délai la première fois. */
+    fun prepare() { Thread { runCatching { cycle } }.start() }
+
+    /**
+     * Une note de trompe à air : son cuivré (harmoniques renforcées vers 1 à 3 kHz), attaque un peu basse qui monte,
+     * léger vibrato, deux trompes légèrement désaccordées, saturation douce.
+     */
+    private fun hornNote(f0: Double, n: Int): DoubleArray {
+        val weights = DoubleArray((6_500 / f0).toInt()) { j ->
+            val k = j + 1
+            val x = (k * f0 - 1_700) / 1_100
+            (1.0 / k.toDouble().pow(0.85)) * (1.0 + 1.8 * exp(-x * x))
+        }
+        val norm = weights.sum()
+        val attack = 0.022 * RATE; val release = 0.018 * RATE
+        val out = DoubleArray(n)
+        var p1 = 0.0; var p2 = 0.0
+        for (i in 0 until n) {
+            val t = i.toDouble() / RATE
+            val f = f0 * (1.0 - 0.045 * exp(-t / (GLIDE_S / 3))) * (1.0 + 0.0025 * sin(2 * PI * 5.3 * t))
+            p1 += 2 * PI * f / RATE
+            p2 += 2 * PI * f * 1.007 / RATE
+            var s1 = 0.0; var s2 = 0.0
+            for (j in weights.indices) { val k = j + 1; s1 += weights[j] * sin(k * p1); s2 += weights[j] * sin(k * p2) }
+            val env = minOf(1.0, i / attack, (n - 1 - i) / release) * (1.0 + 0.08 * exp(-i / (0.05 * RATE)))
+            out[i] = tanh((s1 + 0.8 * s2) / norm * env * 1.9)
         }
         return out
+    }
+
+    private fun build(): ShortArray {
+        val n = (RATE * NOTE_S).toInt()
+        val dry = hornNote(435.0, n) + hornNote(580.0, n)
+        // Écho de la rue (réflexions sur les façades), en boucle : la sirène tourne sans coupure.
+        val wet = dry.copyOf()
+        for ((d, g) in listOf(0.031 to 0.22, 0.057 to 0.15, 0.089 to 0.10, 0.131 to 0.06)) {
+            val k = (d * RATE).toInt()
+            for (i in dry.indices) wet[(i + k) % dry.size] += g * dry[i]
+        }
+        val peak = wet.maxOf { abs(it) }.coerceAtLeast(1e-9)
+        return ShortArray(wet.size) { (wet[it] / peak * 0.92 * Short.MAX_VALUE).toInt().toShort() }
     }
 
     /** Sirène en cours (alarme ou dernier moment avant un radar). */

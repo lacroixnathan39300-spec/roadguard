@@ -216,11 +216,12 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     }
 
     @Volatile private var sirenUntil = 0L
+    init { PoliceSiren.prepare() } // son de sirène prêt à l'avance
 
     /** Sirène de police française au dernier moment avant un radar (3 « pin-pon », musique baissée). */
     fun radarSiren() {
-        sirenUntil = android.os.SystemClock.uptimeMillis() + 2_800
-        duck(3_200)
+        sirenUntil = android.os.SystemClock.uptimeMillis() + 3_000
+        duck(3_400)
         PoliceSiren.burst(3)
     }
 
