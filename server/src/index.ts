@@ -198,6 +198,15 @@ async function createAccount(req: Request, env: Env): Promise<Response> {
   return json({ id, secret, name, points: 0 });
 }
 
+/**
+ * Signalements « police » suspendus jusqu'à cette date (ms), 0 sinon. Sert à appliquer sans délai une interdiction de
+ * diffusion notifiée par l'autorité administrative (art. L130-11 du code de la route ; 2 ans et 30 000 € sinon, L130-12).
+ */
+async function policeOffUntil(env: Env): Promise<number> {
+  const v = await env.DB.prepare("SELECT value FROM config WHERE key = 'police_off_until'").first<{ value: string }>();
+  return Number(v?.value ?? 0) || 0;
+}
+
 async function reportsNear(url: URL, env: Env, me: Account | null): Promise<Response> {
   const lat = num(url.searchParams.get("lat"), -90, 90);
   const lon = num(url.searchParams.get("lon"), -180, 180);
@@ -214,8 +223,10 @@ async function reportsNear(url: URL, env: Env, me: Account | null): Promise<Resp
         AND (r.status != 'hidden' OR r.author_id = ? OR r.yes > 0) AND a.banned = 0
       LIMIT 2000`,
   ).bind(me?.id ?? "", me?.id ?? "", b.minLat, b.maxLat, b.minLon, b.maxLon, now, me?.id ?? "").all<Record<string, unknown>>();
-  const reports = rows.results.map((r) => ({ ...r, author_stars: stars(Number(r.a_good), Number(r.a_bad)), author_trusted: r.a_trusted === 1 }));
-  return json({ now, reports });
+  const policeOff = (await policeOffUntil(env)) > now;
+  const reports = rows.results.filter((r) => !(policeOff && r.type === "police"))
+    .map((r) => ({ ...r, author_stars: stars(Number(r.a_good), Number(r.a_bad)), author_trusted: r.a_trusted === 1 }));
+  return json({ now, reports, police_off: policeOff });
 }
 
 async function createReport(req: Request, env: Env, me: Account): Promise<Response> {
@@ -225,6 +236,8 @@ async function createReport(req: Request, env: Env, me: Account): Promise<Respon
   const lon = num(body.lon, -180, 180);
   const heading = num(body.heading, 0, 360);
   if (!type || lat == null || lon == null) return fail(400, "Type ou position invalide");
+  if (type === "police" && (await policeOffUntil(env)) > Date.now())
+    return fail(403, "Signalements « police » suspendus pour le moment, sur décision de l'autorité");
   const text = type === "message" ? cleanMessage(body.text) : type === "limite" ? cleanLimit(body.text) : null;
   if (type === "message" && !text) return fail(400, "Message de 3 à 100 caractères, sans insulte");
   if (type === "limite" && !text) return fail(400, "Limitation invalide");
@@ -586,6 +599,19 @@ async function modRoutes(req: Request, env: Env, me: Account, path: string): Pro
     if (b.action === "ban") await env.DB.prepare("UPDATE reports SET status = 'hidden' WHERE author_id = ? AND permanent = 0").bind(am[1]).run();
     return json({ ok: true });
   }
+  // Interdiction préfectorale : suspendre la diffusion des signalements « police » (hours = 0 : rétablir).
+  if (path === "/v1/mod/police") {
+    if (req.method === "GET") return json({ until: await policeOffUntil(env), now });
+    if (req.method === "POST") {
+      const b = (await req.json().catch(() => ({}))) as { hours?: unknown };
+      const h = typeof b.hours === "number" && Number.isFinite(b.hours) && b.hours >= 0 && b.hours <= 24 * 366 ? b.hours : null;
+      if (h == null) return fail(400, "Durée invalide");
+      const until = h === 0 ? 0 : now + Math.round(h * HOUR);
+      await env.DB.prepare("INSERT INTO config (key, value) VALUES ('police_off_until', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value")
+        .bind(String(until)).run();
+      return json({ ok: true, until, now });
+    }
+  }
   return fail(404, "Inconnu");
 }
 
@@ -632,7 +658,10 @@ h1{font-size:26px}h2{font-size:19px;margin-top:26px}</style></head><body>
 <p>Ne tiens pas et ne manipule pas ton téléphone en roulant (en France : 135 € d'amende et 3 points, écouteurs compris). Fixe-le sur un support, règle ton trajet avant de partir et utilise la voix. Aucun écran qui n'aide pas à la conduite (vidéo, autres applis, mode miroir) ne doit être visible du conducteur en roulant (en France : jusqu'à 1 500 € d'amende et 3 points).</p>
 <h2>3. Alertes radars</h2>
 <p>La loi sur les alertes radars dépend du pays. En France, utiliser un appareil ou une application qui indique l'emplacement des radars fixes ou mobiles est interdit depuis le décret du 3 janvier 2012 (jusqu'à 1 500 € d'amende et 6 points) ; seules les « zones de danger » sont admises. C'est aussi interdit, notamment, en Suisse (où l'appareil peut être confisqué et où avertir publiquement des contrôles est puni), en Allemagne, en Autriche, au Liechtenstein, en Slovaquie et en Irlande.</p>
-<p>Les alertes radars de Pilote peuvent être coupées à tout moment (Réglages → « Alertes radars »). Si tu les gardes actives, tu es seul responsable de leur usage au regard de la loi du pays où tu circules. Les lois changent : renseigne-toi avant de partir à l'étranger. Ces informations ne sont pas un conseil juridique.</p>
+<p><b>Pour être en règle, tu dois couper les alertes radars avant de circuler en France, en Suisse et dans tout pays qui les interdit</b> (Réglages → « Alertes radars », ou l'interrupteur de l'avertissement).</p>
+<p>Les alertes radars restent actives tant que tu ne les coupes pas. Si tu choisis de les garder dans un pays qui les interdit, tu le fais en connaissance de cause et sous ta seule responsabilité : amendes, retraits de points, suspensions de permis et confiscations restent à ta charge. Les lois changent : renseigne-toi avant de partir à l'étranger. Ces informations ne sont pas un conseil juridique.</p>
+<h2>3 bis. Signalements de contrôles</h2>
+<p>Les signalements « police » de la communauté peuvent être suspendus à tout moment, sans préavis, notamment pour appliquer une interdiction de diffusion décidée par l'autorité administrative (article L130-11 du code de la route).</p>
 <h2>4. Communauté</h2>
 <p>Signale uniquement ce que tu as vu, honnêtement. Sont interdits : les faux signalements, les messages injurieux, discriminatoires ou illégaux, et toute donnée personnelle sur autrui (nom, plaque, photo). Les signalements sont soumis aux votes des conducteurs et à la modération ; un compte qui abuse peut être suspendu ou banni.</p>
 <h2>5. Caméra et dashcam</h2>
