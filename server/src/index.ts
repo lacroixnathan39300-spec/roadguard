@@ -671,21 +671,24 @@ export default {
         return new Response(m ?? "{}", { headers: { "content-type": "application/json", "cache-control": "max-age=300", ...CORS } });
       }
       // Lien direct pour installer Pilote Suite la première fois (à partager, ou en QR code).
-      if (req.method === "GET" && (path === "/suite" || path === "/v1/apps/suite.apk") && env.APPS) {
+      // (et « Ménage », la petite appli de tri des photos et fichiers : /menage).
+      const direct = /^\/(?:v1\/apps\/)?(suite|menage)(?:\.apk)?$/.exec(path);
+      if (req.method === "GET" && direct && env.APPS) {
+        const app = direct[1];
         const m = JSON.parse((await env.APPS.get("manifest")) ?? "{}") as Record<string, { build: number; chunks: number }>;
-        const info = m.suite;
-        if (!info) return fail(404, "Pilote Suite pas encore publiée");
+        const info = m[app];
+        if (!info) return fail(404, app === "suite" ? "Pilote Suite pas encore publiée" : "Ménage pas encore publiée");
         const parts: ArrayBuffer[] = [];
         for (let i = 0; i < info.chunks; i++) {
-          const part = await env.APPS.get(`suite:${info.build}:${i}`, "arrayBuffer");
+          const part = await env.APPS.get(`${app}:${info.build}:${i}`, "arrayBuffer");
           if (!part) return fail(404, "Morceau introuvable");
           parts.push(part);
         }
         return new Response(new Blob(parts), { headers: {
           "content-type": "application/vnd.android.package-archive",
-          "content-disposition": `attachment; filename="Pilote-Suite-${info.build}.apk"`, ...CORS } });
+          "content-disposition": `attachment; filename="${app === "suite" ? "Pilote-Suite" : "Menage"}-${info.build}.apk"`, ...CORS } });
       }
-      const chunk = /^\/v1\/apps\/(gps|drive|suite|drivesys)\/(\d+)\/(\d{1,2})$/.exec(path);
+      const chunk = /^\/v1\/apps\/(gps|drive|suite|drivesys|menage)\/(\d+)\/(\d{1,2})$/.exec(path);
       if (req.method === "GET" && chunk && env.APPS) {
         const data = await env.APPS.get(`${chunk[1]}:${chunk[2]}:${chunk[3]}`, "arrayBuffer");
         if (!data) return fail(404, "Morceau introuvable");
