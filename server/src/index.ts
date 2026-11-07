@@ -631,7 +631,7 @@ Les vidéos de la dashcam ne sont gardées que si tu le demandes ou après un ch
 <li><b>Compte</b> : identifiant et mot de passe (chiffré), date d'inscription, appareils connectés.</li>
 <li><b>Communauté</b> : pseudo, signalements (type, position, heure), votes, points et note de fiabilité ; ta position approximative si tu choisis de te montrer aux autres, ou pendant un convoi.</li>
 <li><b>Partage de trajet</b> : position et heure d'arrivée, seulement pendant un partage que tu lances (lien valable 12 h).</li>
-<li><b>Acceptation de l'avertissement légal</b> : date, version du texte, choix pour les alertes radars, identifiant de l'appareil, compte, appli et version, gardés comme preuve de ton acceptation.</li>
+<li><b>Acceptation de l'avertissement légal</b> : date, version du texte, choix pour les alertes radars et le mode Suisse, identifiant de l'appareil, compte, appli et version, gardés comme preuve de ton acceptation.</li>
 <li><b>Messages à l'administrateur</b>, rapports de plantage (texte technique), et, si tu le demandes, la sauvegarde de tes réglages.</li>
 </ul>
 <h2>Services tiers</h2>
@@ -653,7 +653,7 @@ export function cleanAcceptance(b: Record<string, unknown>, now: number) {
   if (version == null || device == null) return null;
   const at = typeof b.at === "number" && Number.isFinite(b.at) && b.at > 0 ? Math.min(Math.round(b.at), now) : now;
   return {
-    version, device, at, radars: b.radars === true ? 1 : 0, app: b.app === "drive" ? "drive" : "gps",
+    version, device, at, radars: b.radars === true ? 1 : 0, swiss: b.swiss === true ? 1 : 0, app: b.app === "drive" ? "drive" : "gps",
     appVersion: String(b.appVersion ?? "?").slice(0, 20),
   };
 }
@@ -665,8 +665,8 @@ async function legalAccept(req: Request, env: Env): Promise<Response> {
   const user = await currentUser(req, env);
   // Une ligne par appareil, version, choix et compte (les renvois ne créent pas de doublon).
   await env.DB.prepare(
-    "INSERT OR IGNORE INTO legal_acceptances (at, received_at, version, device, username, app, app_version, radars) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-  ).bind(a.at, now, a.version, a.device, user?.username ?? "", a.app, a.appVersion, a.radars).run();
+    "INSERT OR IGNORE INTO legal_acceptances (at, received_at, version, device, username, app, app_version, radars, swiss) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+  ).bind(a.at, now, a.version, a.device, user?.username ?? "", a.app, a.appVersion, a.radars, a.swiss).run();
   return json({ ok: true });
 }
 
@@ -684,6 +684,7 @@ h1{font-size:26px}h2{font-size:19px;margin-top:26px}</style></head><body>
 <h2>3. Alertes radars</h2>
 <p>La loi sur les alertes radars dépend du pays. En France, utiliser un appareil ou une application qui indique l'emplacement des radars fixes ou mobiles est interdit depuis le décret du 3 janvier 2012 (jusqu'à 1 500 € d'amende, 6 points, suspension du permis, confiscation de l'appareil) ; seules les « zones de danger » sont admises. C'est aussi interdit, notamment, en Suisse (où l'appareil peut être confisqué et où avertir publiquement des contrôles est puni), en Allemagne, en Autriche, au Liechtenstein, en Slovaquie et en Irlande.</p>
 <p><b>Les alertes radars de Pilote sont coupées par défaut.</b> Elles ne s'activent que si tu coches toi-même la case d'activation, qui rappelle cette interdiction ; sans elle, aucun réglage, bouton ni commande vocale ne peut les allumer. <b>Pour être en règle en France, en Suisse et dans tout pays qui les interdit, laisse-les coupées.</b></p>
+<p>En Suisse, les alertes radars sont en plus coupées automatiquement (« mode Suisse »), qui ne se désactive qu'en cochant une case dédiée rappelant l'interdiction ; les signalements « police » et « radar » de la communauté n'y sont jamais diffusés.</p>
 <p>Si tu les actives, tu le fais en connaissance de cause et sous ta seule responsabilité : amendes, retraits de points, suspensions de permis et confiscations restent à ta charge. Ton choix est enregistré avec sa date (voir « Preuve d'acceptation »). Les lois changent : renseigne-toi avant de partir à l'étranger. Ces informations ne sont pas un conseil juridique.</p>
 <h2>3 bis. Signalements de contrôles</h2>
 <p>Les signalements « police » de la communauté peuvent être suspendus à tout moment, sans préavis, notamment pour appliquer une interdiction de diffusion décidée par l'autorité administrative (article L130-11 du code de la route).</p>
@@ -694,7 +695,7 @@ h1{font-size:26px}h2{font-size:19px;margin-top:26px}</style></head><body>
 <h2>6. Compte, âge et accès</h2>
 <p>Tu dois être majeur pour utiliser Pilote. L'accès peut être limité dans le temps (essai), suspendu en cas d'abus ou modifié à tout moment. Pour supprimer ton compte et tes données : Réglages → ton compte → « Écrire à l'administrateur ».</p>
 <h2>7. Preuve d'acceptation</h2>
-<p>Quand tu acceptes ces conditions ou que tu actives les alertes radars, Pilote enregistre la date, la version du texte, ton choix pour les alertes radars, l'identifiant de l'appareil et ton compte, comme preuve.</p>
+<p>Quand tu acceptes ces conditions, que tu actives les alertes radars ou que tu coupes le mode Suisse, Pilote enregistre la date, la version du texte, tes choix, l'identifiant de l'appareil et ton compte, comme preuve.</p>
 <h2>7 bis. Données personnelles</h2>
 <p>Voir la <a href="/confidentialite">politique de confidentialité</a>.</p>
 <h2>8. Responsabilité</h2>

@@ -34,6 +34,9 @@ enum class ReportType(val code: String, val label: String, val emoji: String, va
     ROUNDABOUT("rond_point", "Rond-point manquant", "🔄", 0xFF00838F, mapFix = true),
     ROAD("route", "Route manquante", "🛣", 0xFF6D4C41, mapFix = true);
 
+    /** Radar ou contrôle : affiché, annoncé et signalable seulement avec les alertes radars activées (et jamais en Suisse). */
+    val radarLike: Boolean get() = this == POLICE || this == MOBILE || this == FIXED
+
     companion object { fun of(code: String) = entries.firstOrNull { it.code == code } }
 }
 
@@ -98,8 +101,10 @@ class Community(context: Context, private val scope: CoroutineScope, private val
     var askAloud: ((String, () -> Unit) -> Unit)? = null
     /** Annonce d'un signalement au ton choisi (« Coquin XXL ») : (signalement, mètres) → phrase, ou null pour l'annonce habituelle. */
     var announceAloud: ((Report, Int) -> String?)? = null
-    /** Annonces police / radar mobile permises (radars activés, et pas en Suisse où c'est interdit). */
-    var radarAlertsAllowed = true
+    /** Police / radars de la communauté permis : alertes radars activées par l'utilisateur, et jamais en Suisse. */
+    var radarAlertsAllowed by mutableStateOf(false)
+    /** Signalements à montrer sur la carte : sans radars ni contrôles quand ils ne sont pas permis. */
+    val shownReports: List<Report> get() = if (radarAlertsAllowed) reports else reports.filter { !it.type.radarLike }
     /** Portion de route (identifiant OpenStreetMap) et limitation lue sur la carte, fournies par la session. */
     var currentWay: () -> String? = { null }
     var currentLimit: () -> Int? = { null }
@@ -220,6 +225,10 @@ class Community(context: Context, private val scope: CoroutineScope, private val
     }
 
     fun report(type: ReportType, text0: String? = null) {
+        if (type.radarLike && !radarAlertsAllowed) {
+            show("Radars et contrôles : signalement impossible (alertes radars coupées, ou en Suisse où c'est interdit)")
+            return
+        }
         val f = here ?: return show("Position GPS indisponible : signalement non envoyé")
         // Limitation corrigée : « nouvelle|ancienne » et la portion de route où l'on roule.
         val text = if (type == ReportType.LIMIT) "${text0?.toIntOrNull() ?: return show("Choisis la bonne limitation")}|${currentLimit() ?: 0}" else text0

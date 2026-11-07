@@ -532,7 +532,11 @@ fun SafetySettings(settings: fr.roadguard.core.DriveSettings) {
     val context = LocalContext.current
     val phone = !context.packageName.contains("drive")
     Text("Sécurité et code de la route", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 8.dp))
-    ToggleLine("Suisse : couper les radars automatiquement (interdits dans le pays)", settings.swissMode, settings::changeSwissMode)
+    ToggleLine("Suisse : couper les radars automatiquement (interdits dans le pays)", settings.swissMode) { v ->
+        settings.changeSwissMode(v)
+        // Désactivation seulement après la case dédiée (sinon, la confirmation s'affiche).
+        if (!v && settings.swissMode) Legal.askSwiss = true
+    }
     ToggleLine("Pluie : abaisser les limitations (130→110, 110→100, 90→80)", settings.rainLimits, settings::changeRainLimits)
     ToggleLine("Jeune conducteur (permis probatoire : 110 / 100 / 80)", settings.driverProfile == 1) { settings.changeDriverProfile(if (it) 1 else 0) }
     Text("Vitesse maximale personnelle (remorque, caravane…)", color = Color.White, fontSize = 16.sp)

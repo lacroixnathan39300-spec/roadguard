@@ -301,7 +301,7 @@ private fun DriveHome() {
         WallpaperBackground(wallpaperVersion)
         // Contenu des modules, partagé entre l'accueil en pages (façon Car Launcher) et la disposition classique.
         val mapContent: @Composable BoxScope.() -> Unit = {
-                DriveMap(reports = session.community.reports, drivers = session.community.drivers + session.community.convoy, jams = session.community.jams, position = session.here, northUp = settings.northUp, adaptiveZoom = settings.adaptiveZoom, speedKmh = session.fix?.kmh ?: 0, alternatives = session.alternatives, offlinePack = offlinePack, hasLocation = hasLocation, route = session.route, recenterRequest = session.recenter, night = session.night, visibleKinds = if (settings.radarsOn && !session.radarsBlockedHere) settings.alertKinds else emptySet(), roadguardStyle = settings.mapStyle == "roadguard",
+                DriveMap(reports = session.community.shownReports, drivers = session.community.drivers + session.community.convoy, jams = session.community.jams, position = session.here, northUp = settings.northUp, adaptiveZoom = settings.adaptiveZoom, speedKmh = session.fix?.kmh ?: 0, alternatives = session.alternatives, offlinePack = offlinePack, hasLocation = hasLocation, route = session.route, recenterRequest = session.recenter, night = session.night, visibleKinds = if (settings.radarsOn && !session.radarsBlockedHere) settings.alertKinds else emptySet(), roadguardStyle = settings.mapStyle == "roadguard",
                     modifier = Modifier.fillMaxSize())
                 if (session.navigating) {
                     GuidanceBanner(session.guidanceState, session.navStatus, onStop = { session.stopNavigation() }, modifier = Modifier.align(Alignment.TopStart),
@@ -444,7 +444,8 @@ private fun DriveHome() {
         }
         if (showReport) {
             BackHandler { showReport = false }
-            fr.roadguard.core.ui.ReportSheet(onPick = { t, text -> showReport = false; session.community.report(t, text) }, onClose = { showReport = false })
+            fr.roadguard.core.ui.ReportSheet(onPick = { t, text -> showReport = false; session.community.report(t, text) }, onClose = { showReport = false },
+                radarLike = session.community.radarAlertsAllowed)
         }
         if (showAdmin) {
             BackHandler { showAdmin = false }

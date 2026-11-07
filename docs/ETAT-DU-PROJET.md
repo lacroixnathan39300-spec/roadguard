@@ -106,3 +106,8 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
 - Risques expliqués à Nathan : utilisateurs en France (contravention 5e classe), relais « police » si la préfecture notifie
   une interdiction, Suisse (art. 98a LCR : avertir publiquement des contrôles est puni), Play Store. Proposé (refusé pour
   l'instant) : mode France « zones de danger ». Refusé : renommer « radar » en « danger » pour contourner la loi.
+- **Suisse (choix de Nathan : activables mais protégé)** : « mode Suisse » activé par défaut (radars coupés en Suisse) ;
+  le couper exige une case dédiée (`SwissConsentScreen`, `Legal.swissConsented`, preuve avec `swiss`, migration 0013).
+  Les signalements police / radars de la communauté ne sont JAMAIS relayés en Suisse (art. 98a LCR vise celui qui avertit
+  publiquement) : `radarAlertsAllowed` faux en Suisse, `Community.shownReports` (carte sans radars/contrôles quand non
+  permis), signalement radar/police refusé et masqué dans la feuille. Annonce vocale à l'entrée en Suisse si gardés.

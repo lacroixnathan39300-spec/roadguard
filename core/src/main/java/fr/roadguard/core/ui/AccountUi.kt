@@ -73,6 +73,7 @@ fun AccountGate(extra: @Composable () -> Unit = {}, content: @Composable () -> U
             // Tutoriel au premier lancement (et à la demande depuis les réglages).
             var tutorialDone by remember { mutableStateOf(Tutorial.seen(context)) }
             if (Legal.askRadars) RadarConsentScreen(onDone = { Legal.askRadars = false })
+            if (Legal.askSwiss) SwissConsentScreen(onDone = { Legal.askSwiss = false })
             if (Legal.forceShow) LegalScreen(review = true, onDone = { Legal.forceShow = false })
             else if (!tutorialDone || Tutorial.forceShow) TutorialScreen(onDone = { tutorialDone = true; Tutorial.forceShow = false })
             else UpdateBanner()

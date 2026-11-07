@@ -304,7 +304,7 @@ private fun PhoneHome() {
         }
     }) {
         DriveMap(
-            reports = s.community.reports, drivers = s.community.drivers + s.community.convoy, jams = s.community.jams,
+            reports = s.community.shownReports, drivers = s.community.drivers + s.community.convoy, jams = s.community.jams,
             position = s.here, northUp = settings.northUp, adaptiveZoom = settings.adaptiveZoom, speedKmh = s.fix?.kmh ?: 0,
             alternatives = s.alternatives,
             offlinePack = offlinePack,
@@ -412,7 +412,8 @@ private fun PhoneHome() {
         }
         if (showReport) {
             BackHandler { showReport = false }
-            fr.roadguard.core.ui.ReportSheet(onPick = { t, text -> showReport = false; s.community.report(t, text) }, onClose = { showReport = false })
+            fr.roadguard.core.ui.ReportSheet(onPick = { t, text -> showReport = false; s.community.report(t, text) }, onClose = { showReport = false },
+                radarLike = s.community.radarAlertsAllowed)
         }
         if (showTrip) {
             BackHandler { showTrip = false }

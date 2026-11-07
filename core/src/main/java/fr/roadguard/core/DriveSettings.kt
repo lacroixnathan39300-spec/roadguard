@@ -127,6 +127,7 @@ class DriveSettings(context: Context) {
     /** Alertes radars changées ailleurs (avertissement légal, autre écran) : la séance de conduite suit tout de suite. */
     private val radarsListener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { p, key ->
         if (key == "radars_on") radarsOn = p.getBoolean("radars_on", false) && fr.roadguard.core.ui.Legal.radarConsented(appContext)
+        if (key == "swiss_mode") swissMode = p.getBoolean("swiss_mode", true) || !fr.roadguard.core.ui.Legal.swissConsented(appContext)
     }
     init { prefs.registerOnSharedPreferenceChangeListener(radarsListener) }
     val limitVoiceOn get() = announceLimit || speedLimitWarning
@@ -177,8 +178,12 @@ class DriveSettings(context: Context) {
     }.apply()
 
     /** Suisse : annonces de radars interdites, coupées automatiquement dans le pays. */
-    var swissMode by mutableStateOf(prefs.getBoolean("swiss_mode", true)); private set
-    fun changeSwissMode(v: Boolean) { swissMode = v; put("swiss_mode", v) }
+    // Suisse : radars coupés automatiquement ; ne peut être désactivé qu'en cochant la case dédiée (accord enregistré).
+    var swissMode by mutableStateOf(prefs.getBoolean("swiss_mode", true) || !fr.roadguard.core.ui.Legal.swissConsented(appContext)); private set
+    fun changeSwissMode(v: Boolean) {
+        val on = v || !fr.roadguard.core.ui.Legal.swissConsented(appContext)
+        swissMode = on; put("swiss_mode", on)
+    }
     /** France : limitations abaissées par temps de pluie (130→110, 110→100, 90→80). */
     var rainLimits by mutableStateOf(prefs.getBoolean("rain_limits", true)); private set
     fun changeRainLimits(v: Boolean) { rainLimits = v; put("rain_limits", v) }

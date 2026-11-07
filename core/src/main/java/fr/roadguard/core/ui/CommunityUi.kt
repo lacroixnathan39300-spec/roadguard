@@ -45,7 +45,7 @@ import kotlinx.coroutines.launch
 
 /** Choix du type de signalement (grosses tuiles, un seul appui), dont les corrections de carte. */
 @Composable
-fun ReportSheet(onPick: (ReportType, String?) -> Unit, onClose: () -> Unit) {
+fun ReportSheet(onPick: (ReportType, String?) -> Unit, onClose: () -> Unit, radarLike: Boolean = true) {
     var writing by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
     var msg by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("") }
     var limiting by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
@@ -76,7 +76,8 @@ fun ReportSheet(onPick: (ReportType, String?) -> Unit, onClose: () -> Unit) {
                 if (canSpeak) BigButton("🎤 Dire", DriveColors.Accent) { heard = null; runCatching { speech.launch(speechIntent) } }
             }
             heard?.let { Text(it, color = DriveColors.TextSecondary, fontSize = 14.sp) }
-            ReportType.entries.chunked(3).forEach { row ->
+            // Radars et contrôles : seulement avec les alertes radars activées (et jamais en Suisse).
+            ReportType.entries.filter { radarLike || !it.radarLike }.chunked(3).forEach { row ->
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     row.forEach { t ->
                         Column(

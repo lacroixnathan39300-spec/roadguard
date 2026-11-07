@@ -211,6 +211,8 @@ class DrivingSession(
             if (lastCountry != null && settings.swissMode) {
                 if (c == "CH") voice.speak("Tu entres en Suisse : les alertes radars sont coupées, comme l'exige la loi suisse.")
                 else if (lastCountry == "CH") voice.speak("Tu quittes la Suisse : alertes radars rétablies.")
+            } else if (lastCountry != null && c == "CH" && settings.radarsOn) {
+                voice.speak("Tu entres en Suisse : les alertes radars y sont interdites. Tu as choisi de les garder, sous ta responsabilité.")
             }
             lastCountry = c
         }
@@ -483,7 +485,8 @@ class DrivingSession(
         voice.realistic = false // même voix (celle du téléphone) pour le guidage et les radars
         voice.pack.feminine = settings.driverFemale
         community.voiceAnswers = settings.voiceConfirm && settings.voice
-        community.radarAlertsAllowed = settings.radarsOn && !radarsBlockedHere
+        // Communauté (police, radars signalés) : jamais en Suisse, où avertir publiquement des contrôles est puni (art. 98a LCR).
+        community.radarAlertsAllowed = settings.radarsOn && !radarsBlockedHere && localInfo.country != "CH"
         val f = completeFix(location.toAlertFix())
         // Vitesse calculée par ROADGUARD si le GPS ne la donne pas (certains postes).
         fix = location.toSpeedFix().let { sf -> if (!location.hasSpeed() && f.speedKmh > 0) sf.copy(kmh = f.speedKmh.toInt()) else sf }
