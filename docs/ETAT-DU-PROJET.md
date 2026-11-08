@@ -134,5 +134,7 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
   `DriveService.appClosed` arrête le service (annonces, bulle, bips), sauf guidage en cours (jusqu'à l'arrivée) ou
   réglage « Continuer quand je ferme Pilote » (`DriveSettings.keepRunning`, faux par défaut). Bouton d'accueil ou écran
   éteint : rien ne change (le service continue).
-- Menu → « ⏻ Quitter Pilote » : tout s'arrête, guidage compris. Après une fermeture ou « Quitter », le démarrage
-  automatique en roulant attend 1 h (`AutoStart.pause`), ou reprend dès que Pilote est rouvert (`AutoStart.resume`).
+- Menu → « ⏻ Quitter Pilote » : tout s'arrête, guidage compris. Après une fermeture ou « Quitter », PLUS RIEN ne relance
+  Pilote tant qu'il n'est pas rouvert (`AutoStart.pause` / `resume`) : ni la vitesse, ni le Bluetooth de la voiture
+  (`AutoStart.launch`), ni la relance du service par Android (START_STICKY, intent nul : reprise seulement si un guidage
+  ou un démarrage automatique était en cours, `AutoStart.remember`). Retour de Nathan : « il parle toujours même fermée ».

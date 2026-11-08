@@ -480,7 +480,7 @@ private fun PhoneHome() {
                 if (fr.roadguard.core.ui.Legal.radarConsented(context)) MenuEntry("🧰", "Ancienne version", "Fonctions de l'ancienne appli, en attendant leur reprise") {
                     showMenu = false; context.startActivity(Intent(context, fr.roadguard.app.MainActivity::class.java))
                 }
-                MenuEntry("⏻", "Quitter Pilote", "Tout s'arrête : annonces, bulle, guidage. Pas de redémarrage auto pendant 1 h") {
+                MenuEntry("⏻", "Quitter Pilote", "Tout s'arrête : annonces, bulle, guidage, jusqu'à ce que tu rouvres Pilote") {
                     showMenu = false
                     DriveService.quit(context)
                     generateSequence(context) { (it as? android.content.ContextWrapper)?.baseContext }

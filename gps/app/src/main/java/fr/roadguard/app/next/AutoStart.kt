@@ -57,12 +57,20 @@ object AutoStart {
 
     private fun state(context: Context) = context.applicationContext.getSharedPreferences("autostart", Context.MODE_PRIVATE)
 
-    /** Après une fermeture volontaire : pas de redémarrage automatique pendant 1 h (ou jusqu'à la réouverture de Pilote). */
-    fun pause(context: Context, ms: Long = 3_600_000L) {
-        state(context).edit().putLong("paused_until", System.currentTimeMillis() + ms).apply()
+    /**
+     * Pilote fermé volontairement : plus rien ne le relance tout seul (vitesse, Bluetooth de la voiture, redémarrage
+     * du service par Android) tant qu'il n'est pas rouvert.
+     */
+    fun pause(context: Context) { state(context).edit().putBoolean("closed", true).commit() }
+    fun resume(context: Context) { state(context).edit().putBoolean("closed", false).apply() }
+    fun paused(context: Context) = state(context).getBoolean("closed", false)
+
+    /** Dernier état du service, pour savoir quoi faire s'il est relancé par Android après un arrêt brutal. */
+    fun remember(context: Context, auto: Boolean, navigating: Boolean) {
+        state(context).edit().putBoolean("was_auto", auto).putBoolean("was_navigating", navigating).apply()
     }
-    fun resume(context: Context) { state(context).edit().remove("paused_until").apply() }
-    fun paused(context: Context) = System.currentTimeMillis() < state(context).getLong("paused_until", 0)
+    fun wasAuto(context: Context) = state(context).getBoolean("was_auto", false)
+    fun wasNavigating(context: Context) = state(context).getBoolean("was_navigating", false)
 
     /** Vitesse estimée en km/h : celle du GPS si fournie, sinon déduite de la position précédente. */
     fun estimateKmh(context: Context, loc: Location): Double? {
@@ -86,6 +94,7 @@ object AutoStart {
     fun launch(context: Context) {
         val app = context.applicationContext
         if (DriveService.session != null) return
+        if (paused(app)) return // fermé volontairement : pas de relance tant que Pilote n'est pas rouvert
         if (!fr.roadguard.core.account.AccountManager.get(app).allowed) return
         var anchor: View? = null
         val wm = app.getSystemService(WindowManager::class.java)

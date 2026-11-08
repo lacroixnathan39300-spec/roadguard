@@ -44,9 +44,17 @@ class DriveService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_STOP) { stopSelf(); return START_NOT_STICKY }
         startForegroundNow()
+        // Relancé par Android après un arrêt brutal (appli balayée sur certains téléphones, manque de mémoire) :
+        // on ne reprend que si Pilote n'a pas été fermé et qu'un guidage ou un démarrage automatique était en cours.
+        if (intent == null && session == null &&
+            (AutoStart.paused(this) || !(AutoStart.wasNavigating(this) || AutoStart.wasAuto(this)))) {
+            stopSelf(); return START_NOT_STICKY
+        }
+        if (intent?.getBooleanExtra(EXTRA_AUTO, false) == true && AutoStart.paused(this)) { stopSelf(); return START_NOT_STICKY }
         // Compte ROADGUARD sans accès (essai fini, bloqué ou déconnecté) : pas d'alertes en arrière-plan.
         if (!fr.roadguard.core.account.AccountManager.get(this).allowed) { stopSelf(); return START_NOT_STICKY }
         if (intent?.getBooleanExtra(EXTRA_AUTO, false) == true && session == null) autoStarted = true
+        if (intent == null && AutoStart.wasAuto(this)) autoStarted = true
         if (session == null) start()
         return START_STICKY
     }
@@ -95,6 +103,8 @@ class DriveService : Service() {
                 // Démarré tout seul en roulant : arrêt tout seul après 10 min à l'arrêt, appli fermée.
                 if (kmh >= 5 || PhoneHomeActivity.visible) stillSince = now
                 if (autoStarted && !s.navigating && now - stillSince > 10 * 60_000L) { bubble.hide(); stopSelf(); break }
+                // Mémorisé pour une éventuelle relance par Android (voir onStartCommand).
+                if (s.navigating != lastNav) { lastNav = s.navigating; AutoStart.remember(this@DriveService, autoStarted, s.navigating) }
                 kotlinx.coroutines.delay(1000)
             }
         }
@@ -119,6 +129,7 @@ class DriveService : Service() {
 
     private var bubbleView: fr.roadguard.core.ui.RadarBubble? = null
     private var autoStarted = false
+    private var lastNav: Boolean? = null
     private var lastWatchRadar: String? = null
     private var sensorListener: android.hardware.SensorEventListener? = null
 
@@ -192,7 +203,7 @@ class DriveService : Service() {
             quit(context)
         }
 
-        /** « Quitter Pilote » : tout s'arrête, guidage compris ; pas de redémarrage automatique pendant 1 h. */
+        /** « Quitter Pilote » : tout s'arrête, guidage compris ; plus de démarrage automatique tant que Pilote n'est pas rouvert. */
         fun quit(context: Context) {
             AutoStart.pause(context)
             instance?.stopSelf()
