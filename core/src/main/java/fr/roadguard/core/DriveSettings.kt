@@ -85,7 +85,7 @@ class DriveSettings(context: Context) {
     /** Sirène de police française (deux-tons) quand le conducteur s'endort (sinon : sonnerie d'alarme). */
     var sirenWake by mutableStateOf(prefs.getBoolean("siren_wake", true)); private set
     fun changeSirenWake(v: Boolean) { sirenWake = v; prefs.edit().putBoolean("siren_wake", v).apply() }
-    /** Sirène de police au dernier moment avant un radar : 0 jamais, 1 seulement si trop vite, 2 à chaque radar. */
+    /** (Plus utilisé : la sirène avant les radars a été retirée.) */
     var sirenRadar by mutableStateOf(prefs.getInt("siren_radar", 2)); private set
     fun changeSirenRadar(v: Int) { sirenRadar = v; prefs.edit().putInt("siren_radar", v).apply() }
     // Réprimandes si l'excès de vitesse dure ou se répète.

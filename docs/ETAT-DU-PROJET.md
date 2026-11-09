@@ -154,3 +154,5 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
   en passant au-dessus, rappelé au plus toutes les 60 s.
 - **Suisse** : activer les radars (acceptation ou confirmation) vaut aussi pour la Suisse (`swiss_consent_version` posé,
   mode Suisse coupé) ; textes « y compris en Suisse ». Les signalements communauté restent jamais diffusés en Suisse.
+- **Sirène avant les radars retirée** (Nathan : « horrible au final ») : plus de déclenchement dans `DrivingSession` ni
+  de réglage ; la sirène reste pour l'anti-somnolence (`sirenWake`, `DrowsinessGuard`).

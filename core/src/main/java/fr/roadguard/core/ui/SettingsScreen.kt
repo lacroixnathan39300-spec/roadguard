@@ -38,7 +38,7 @@ import fr.roadguard.core.radar.RadarKind
 private enum class Cat(val emoji: String, val title: String, val hint: String) {
     VOICE("🗣", "Voix", "Ton prénom, voix, débit, langue, bips"),
     TONE("🎭", "Ton et imitations", "Classique, charme, séduction, osé, extrême, Coquin XXL"),
-    RADARS("📷", "Alertes radars", "Activer ou couper, types, sirène, bips, Suisse"),
+    RADARS("📷", "Alertes radars", "Activer ou couper, types, bips, alarme, Suisse"),
     SPEED("🚦", "Vitesse et limitations", "Dépassement, petit bip, tolérance, pluie, jeune conducteur"),
     ROUTE("🧭", "Trajet et itinéraire", "Péages, autoroutes, étapes, pause"),
     SAFETY("🛡", "Sécurité", "Météo, dangers, accident, somnolence, dashcam"),
@@ -58,7 +58,7 @@ private val INDEX: List<Pair<Cat, String>> = listOf(
     Cat.TONE to "Ton extrême", Cat.TONE to "Coquin XXL (imitation, phrases coquines)",
     Cat.RADARS to "Alertes radars : activer ou couper", Cat.RADARS to "Types : radars fixes, feux rouges, vitesse moyenne, mobiles",
     Cat.RADARS to "Bips de plus en plus rapides en approchant (détecteur)", Cat.RADARS to "Alarme forte si trop vite près d'un radar",
-    Cat.RADARS to "Sirène de police avant un radar", Cat.RADARS to "Mode Suisse", Cat.RADARS to "Infos légales (radars et loi)",
+    Cat.RADARS to "Mode Suisse", Cat.RADARS to "Infos légales (radars et loi)",
     Cat.SPEED to "Annoncer les changements de limitation", Cat.SPEED to "Me prévenir à la voix si je dépasse (sinon un petit bip)",
     Cat.SPEED to "Tolérance de dépassement", Cat.SPEED to "Alarme forte dès que je dépasse la limitation",
     Cat.SPEED to "Me réprimander si je roule trop vite", Cat.SPEED to "Pluie : limitations abaissées",
@@ -126,7 +126,7 @@ fun SettingsScreen(settings: DriveSettings, radarCount: Int, onClose: () -> Unit
                 null -> {
                     OutlinedTextField(
                         value = query, onValueChange = { query = it.take(40) }, singleLine = true,
-                        label = { Text("🔍 Chercher un réglage (péage, sirène, prénom…)") },
+                        label = { Text("🔍 Chercher un réglage (péage, prénom, bip…)") },
                         textStyle = androidx.compose.ui.text.TextStyle(color = Color.White, fontSize = 19.sp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = DriveColors.Accent, unfocusedBorderColor = DriveColors.Track,
@@ -338,15 +338,6 @@ private fun RadarsCategory(settings: DriveSettings) {
     Section("Sons à l'approche")
     ToggleRow("Bips de plus en plus rapides en approchant (détecteur)", settings.proximityBeeps, settings::changeProximityBeeps)
     ToggleRow("Alarme forte si je suis trop vite en approchant d'un radar", settings.radarAlarm, settings::changeRadarAlarm)
-    Text("🚨 Sirène de police au dernier moment avant un radar", color = Color.White, fontSize = 18.sp)
-    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-        listOf(2 to "À chaque radar", 1 to "Seulement si trop vite", 0 to "Jamais").forEach { (v, l) ->
-            BigButton(l, if (settings.sirenRadar == v) DriveColors.Accent else DriveColors.Panel) {
-                settings.changeSirenRadar(v)
-                if (v > 0) fr.roadguard.core.radar.PoliceSiren.burst(2) // pour l'entendre
-            }
-        }
-    }
     Section("Suisse et loi")
     SwissModeToggle(settings)
     BigButton("⚖ Infos légales : la loi, les radars", DriveColors.Panel) { Legal.forceShow = true }
