@@ -483,6 +483,8 @@ class DrivingSession(
         community.voiceAnswers = settings.voiceConfirm && settings.voice
         // Communauté (police, radars signalés) : jamais en Suisse, où avertir publiquement des contrôles est puni (art. 98a LCR).
         community.radarAlertsAllowed = settings.radarsOn && !radarsBlockedHere && localInfo.country != "CH"
+        // En Suisse, radars rallumés (bouton « Suisse ») : seulement ses propres radars, gardés privés.
+        community.ownRadarsOnly = settings.radarsOn && !radarsBlockedHere && localInfo.country == "CH"
         val f = completeFix(location.toAlertFix())
         // Vitesse calculée par ROADGUARD si le GPS ne la donne pas (certains postes).
         fix = location.toSpeedFix().let { sf -> if (!location.hasSpeed() && f.speedKmh > 0) sf.copy(kmh = f.speedKmh.toInt()) else sf }

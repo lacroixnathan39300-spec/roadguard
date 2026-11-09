@@ -23,6 +23,11 @@ test("niveaux", () => {
 
 test("placement selon le niveau et le lancement", () => {
   assert.equal(placement("trusted", "radar_fixe", true, false, false).permanent, true);
+  // Personne de confiance : radars mobiles et contrôles restent aussi ; bouchons et accidents passent.
+  assert.equal(placement("trusted", "radar_mobile", false, false, false).permanent, true);
+  assert.equal(placement("trusted", "police", false, false, false).permanent, true);
+  assert.equal(placement("trusted", "bouchon", false, false, false).permanent, false);
+  assert.equal(placement("reliable", "radar_mobile", false, false, false).permanent, false);
   assert.equal(placement("new", "radar_fixe", true, false, false).status, "pending");
   assert.equal(placement("new", "radar_fixe", true, true, false).status, "ok"); // région en lancement
   assert.equal(placement("new", "radar_fixe", true, false, true).permanent, true); // radar déjà connu

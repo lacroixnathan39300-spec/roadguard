@@ -103,8 +103,15 @@ class Community(context: Context, private val scope: CoroutineScope, private val
     var announceAloud: ((Report, Int) -> String?)? = null
     /** Police / radars de la communauté permis : alertes radars activées par l'utilisateur, et jamais en Suisse. */
     var radarAlertsAllowed by mutableStateOf(false)
+    /**
+     * En Suisse, radars activés : seulement SES PROPRES radars et contrôles (signalements privés, jamais diffusés aux
+     * autres : avertir publiquement des contrôles y est puni).
+     */
+    var ownRadarsOnly by mutableStateOf(false)
+    /** Radar ou contrôle de la communauté montrable / annonçable ici. */
+    private fun radarVisible(r: Report) = radarAlertsAllowed || (ownRadarsOnly && r.mine)
     /** Signalements à montrer sur la carte : sans radars ni contrôles quand ils ne sont pas permis. */
-    val shownReports: List<Report> get() = if (radarAlertsAllowed) reports else reports.filter { !it.type.radarLike }
+    val shownReports: List<Report> get() = if (radarAlertsAllowed) reports else reports.filter { !it.type.radarLike || radarVisible(it) }
     /** Portion de route (identifiant OpenStreetMap) et limitation lue sur la carte, fournies par la session. */
     var currentWay: () -> String? = { null }
     var currentLimit: () -> Int? = { null }
@@ -190,7 +197,7 @@ class Community(context: Context, private val scope: CoroutineScope, private val
             val ahead = off < 60 && d * kotlin.math.sin(Math.toRadians(off)) < 60 + 0.06 * d
             // Police et radar mobile : coupés avec les alertes radars (interrupteur, ou Suisse où c'est interdit).
             val radarLike = r.type == ReportType.POLICE || r.type == ReportType.MOBILE
-            if (radarLike && !radarAlertsAllowed) continue
+            if (radarLike && !radarVisible(r)) continue
             if (d < 1000 && ahead && !r.type.mapFix && announced.add(r.id) && r.type != ReportType.FIXED) {
                 val meters = ((d + 25) / 50).toInt() * 50
                 val where = if (d > 150) "à $meters mètres" else "tout près"
@@ -225,8 +232,10 @@ class Community(context: Context, private val scope: CoroutineScope, private val
     }
 
     fun report(type: ReportType, text0: String? = null) {
-        if (type.radarLike && !radarAlertsAllowed) {
-            show("Radars et contrôles : signalement impossible (alertes radars coupées, ou en Suisse où c'est interdit)")
+        // En Suisse (radars activés) : signalement privé, gardé pour soi seul.
+        val priv = type.radarLike && !radarAlertsAllowed && ownRadarsOnly
+        if (type.radarLike && !radarAlertsAllowed && !priv) {
+            show("Radars et contrôles : signalement impossible (alertes radars coupées, ou mode Suisse actif)")
             return
         }
         val f = here ?: return show("Position GPS indisponible : signalement non envoyé")
@@ -245,6 +254,7 @@ class Community(context: Context, private val scope: CoroutineScope, private val
                     .apply {
                         if (!f.bearing.isNaN()) put("heading", f.bearing.toInt()); if (text != null) put("text", text)
                         if (way != null) put("way", way)
+                        if (priv) put("private", true)
                         // Radar fixe déjà dans les bases (officielle, MapAtlas, OpenStreetMap) : validé d'office.
                         if (type == ReportType.FIXED && knownRadarNear?.invoke(f.lat, f.lon) == true) put("known", true)
                     })
@@ -253,9 +263,10 @@ class Community(context: Context, private val scope: CoroutineScope, private val
                 val id = r.optString("id")
                 if (r.optBoolean("created") && id.isNotBlank() && reports.none { it.id == id }) {
                     reports = reports + Report(id = id, type = type, lat = f.lat, lon = f.lon, author = name.orEmpty(),
-                        createdAt = System.currentTimeMillis(), yes = 0, permanent = false, mine = true, voted = false, text = text, way = way)
+                        createdAt = System.currentTimeMillis(), yes = 0, permanent = r.optBoolean("permanent"), mine = true, voted = false, text = text, way = way)
                 }
                 show(when {
+                    r.optBoolean("private") -> "${type.label} gardé pour toi seul (en Suisse, il n'est montré à personne d'autre)"
                     type == ReportType.MESSAGE -> "Message publié pour 24 h, merci ! +5 points"
                     type.mapFix && r.optString("status") == "pending" -> "Correction envoyée : publiée quand d'autres conducteurs l'auront confirmée (+5 points)"
                     type.mapFix && r.optBoolean("created") -> "Correction publiée, merci ! " +
@@ -263,7 +274,7 @@ class Community(context: Context, private val scope: CoroutineScope, private val
                     type.mapFix -> "Déjà signalée : ta confirmation est comptée"
                     r.optString("status") == "pending" -> "${type.label} signalé, à confirmer par d'autres conducteurs (+5 points)"
                     r.optString("status") == "hidden" -> "${type.label} signalé : il sera visible une fois confirmé"
-                    r.optBoolean("permanent") -> "${type.label} signalé et validé, merci ! +5 points"
+                    r.optBoolean("permanent") -> "${type.label} signalé, il reste affiché, merci ! +5 points"
                     r.optBoolean("created") -> "${type.label} signalé, merci ! +5 points"
                     else -> "Déjà signalé : ta confirmation est comptée"
                 })

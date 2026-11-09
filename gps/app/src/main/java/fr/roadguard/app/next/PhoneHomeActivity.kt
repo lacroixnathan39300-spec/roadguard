@@ -426,7 +426,7 @@ private fun PhoneHome() {
         if (showReport) {
             BackHandler { showReport = false }
             fr.roadguard.core.ui.ReportSheet(onPick = { t, text -> showReport = false; s.community.report(t, text) }, onClose = { showReport = false },
-                radarLike = s.community.radarAlertsAllowed)
+                radarLike = s.community.radarAlertsAllowed || s.community.ownRadarsOnly)
         }
         if (showTrip) {
             BackHandler { showTrip = false }

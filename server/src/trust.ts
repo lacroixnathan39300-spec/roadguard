@@ -54,9 +54,15 @@ export interface Placement { status: "ok" | "pending" | "hidden"; lifeFactor: nu
  * Comment un nouveau signalement est publié selon le niveau de l'auteur.
  * [known] : radar fixe à moins de 100 m d'un radar déjà connu des bases (validé d'office).
  */
+/**
+ * Personne de confiance : ses signalements restent jusqu'à ce qu'elle les retire ou que les votes « plus là » les enlèvent
+ * (choix de Nathan), sauf ce qui passe forcément vite (bouchon, accident, message).
+ */
+export const TRUSTED_FOREVER = new Set(["radar_fixe", "radar_mobile", "police", "danger", "travaux", "limite", "rond_point", "route"]);
+
 export function placement(lv: Level, type: string, canBePermanent: boolean, launch: boolean, known: boolean): Placement {
   if (lv === "suspect" || lv === "low") return { status: "hidden", lifeFactor: 1, permanent: false, pendingLife: null };
-  if (lv === "trusted") return { status: "ok", lifeFactor: 2, permanent: canBePermanent, pendingLife: null };
+  if (lv === "trusted") return { status: "ok", lifeFactor: 2, permanent: canBePermanent || TRUSTED_FOREVER.has(type), pendingLife: null };
   if (known && type === "radar_fixe") return { status: "ok", lifeFactor: 1, permanent: true, pendingLife: null };
   if (lv === "reliable") return { status: "ok", lifeFactor: 2, permanent: false, pendingLife: null };
   if (lv === "new" && !launch && TRUST.pendingLife[type]) return { status: "pending", lifeFactor: 1, permanent: false, pendingLife: TRUST.pendingLife[type] };

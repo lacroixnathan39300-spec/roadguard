@@ -445,7 +445,7 @@ private fun DriveHome() {
         if (showReport) {
             BackHandler { showReport = false }
             fr.roadguard.core.ui.ReportSheet(onPick = { t, text -> showReport = false; session.community.report(t, text) }, onClose = { showReport = false },
-                radarLike = session.community.radarAlertsAllowed)
+                radarLike = session.community.radarAlertsAllowed || session.community.ownRadarsOnly)
         }
         if (showAdmin) {
             BackHandler { showAdmin = false }

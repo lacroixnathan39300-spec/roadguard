@@ -159,3 +159,12 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
   `RadarConsentScreen(swiss = true)`). Écran de confirmation Suisse séparé supprimé. Communauté jamais diffusée en Suisse.
 - **Sirène avant les radars retirée** (Nathan : « horrible au final ») : plus de déclenchement dans `DrivingSession` ni
   de réglage ; la sirène reste pour l'anti-somnolence (`sirenWake`, `DrowsinessGuard`).
+
+## Signalements qui restent, radars privés en Suisse (09/11/2026)
+- Personne de confiance (admin, ou « confiance » donnée en modération) : radars fixes et mobiles, police, dangers,
+  travaux et corrections de carte restent (`TRUSTED_FOREVER`, `placement`) jusqu'à suppression par l'auteur ou votes
+  « plus là » ; bouchons, accidents et messages restent temporaires. Migration 0016 : signalements encore en cours des
+  personnes de confiance rendus permanents (ceux déjà effacés par le nettoyage toutes les 15 min ne reviennent pas).
+- Suisse, radars rallumés (bouton « Suisse ») : `Community.ownRadarsOnly` ; on peut signaler radar / police, envoyé
+  `private: true` → colonne `reports.private`, rendu par le serveur à son auteur seul (`reportsNear`), jamais fusionné
+  avec un signalement public. Les signalements publics de la communauté restent jamais montrés en Suisse.

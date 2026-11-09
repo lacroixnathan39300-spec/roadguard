@@ -221,8 +221,9 @@ async function reportsNear(url: URL, env: Env, me: Account | null): Promise<Resp
        FROM reports r JOIN accounts a ON a.id = r.author_id
       WHERE r.lat BETWEEN ? AND ? AND r.lon BETWEEN ? AND ? AND (r.permanent = 1 OR r.expires_at > ?)
         AND (r.status != 'hidden' OR r.author_id = ? OR r.yes > 0) AND a.banned = 0
+        AND (r.private = 0 OR r.author_id = ?)
       LIMIT 2000`,
-  ).bind(me?.id ?? "", me?.id ?? "", b.minLat, b.maxLat, b.minLon, b.maxLon, now, me?.id ?? "").all<Record<string, unknown>>();
+  ).bind(me?.id ?? "", me?.id ?? "", b.minLat, b.maxLat, b.minLon, b.maxLon, now, me?.id ?? "", me?.id ?? "").all<Record<string, unknown>>();
   const policeOff = (await policeOffUntil(env)) > now;
   const reports = rows.results.filter((r) => !(policeOff && r.type === "police"))
     .map((r) => ({ ...r, author_stars: stars(Number(r.a_good), Number(r.a_bad)), author_trusted: r.a_trusted === 1 }));
@@ -244,14 +245,17 @@ async function createReport(req: Request, env: Env, me: Account): Promise<Respon
   // Portion de route (identifiant OpenStreetMap) d'une limitation corrigée.
   const way = type === "limite" && typeof body.way === "string" && /^\d{1,20}$/.test(body.way) ? body.way : null;
   const now = Date.now();
+  // Signalement privé (radar ou contrôle fait en Suisse) : visible par son auteur seul, jamais diffusé aux autres.
+  const priv = body.private === true && (type === "radar_fixe" || type === "radar_mobile" || type === "police") ? 1 : 0;
   if (me.banned) return fail(403, "Signalements désactivés pour ce compte");
   if (now - me.last_report_at < RULES.reportCooldown) return fail(429, "Patiente quelques secondes entre deux signalements");
 
   // Déjà signalé tout près : on confirme au lieu de créer un doublon.
   const b = box(lat, lon, RULES.mergeRadiusM);
   const near = await env.DB.prepare(
-    "SELECT id, lat, lon, text, way FROM reports WHERE type = ? AND lat BETWEEN ? AND ? AND lon BETWEEN ? AND ? AND (permanent = 1 OR expires_at > ?)",
-  ).bind(type, b.minLat, b.maxLat, b.minLon, b.maxLon, now).all<{ id: string; lat: number; lon: number; text: string | null; way: string | null }>();
+    "SELECT id, lat, lon, text, way FROM reports WHERE type = ? AND lat BETWEEN ? AND ? AND lon BETWEEN ? AND ? AND (permanent = 1 OR expires_at > ?)" +
+      " AND private = ? AND (private = 0 OR author_id = ?)",
+  ).bind(type, b.minLat, b.maxLat, b.minLon, b.maxLon, now, priv, me.id).all<{ id: string; lat: number; lon: number; text: string | null; way: string | null }>();
   // Limitation : c'est une confirmation seulement si c'est la même valeur sur la même portion de route.
   const existing = near.results.find((r) => distanceM(lat, lon, r.lat, r.lon) <= RULES.mergeRadiusM &&
     (type !== "limite" || ((r.text ?? "").split("|")[0] === (text ?? "").split("|")[0] && (!way || !r.way || r.way === way))));
@@ -278,12 +282,12 @@ async function createReport(req: Request, env: Env, me: Account): Promise<Respon
   const id = randomId(10);
   await env.DB.batch([
     env.DB.prepare(
-      "INSERT INTO reports (id, type, lat, lon, heading, author_id, created_at, expires_at, last_yes_at, text, status, permanent, validated, way) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-    ).bind(id, type, lat, lon, heading == null ? null : Math.round(heading), me.id, now, expires, now, text, p.status, p.permanent ? 1 : 0, p.permanent ? 1 : 0, way),
+      "INSERT INTO reports (id, type, lat, lon, heading, author_id, created_at, expires_at, last_yes_at, text, status, permanent, validated, way, private) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    ).bind(id, type, lat, lon, heading == null ? null : Math.round(heading), me.id, now, expires, now, text, p.status, p.permanent ? 1 : 0, p.permanent ? 1 : 0, way, priv),
     env.DB.prepare("UPDATE accounts SET rep_lat = ?, rep_lon = ?" + (body.known === true && type === "radar_fixe" ? ", good = good + 1" : "") + " WHERE id = ?").bind(lat, lon, me.id),
   ]);
   await addPoints(env, me.id, RULES.pointsReport, now);
-  return json({ id, created: true, points: me.points + RULES.pointsReport, status: p.status, level: lv, permanent: p.permanent });
+  return json({ id, created: true, points: me.points + RULES.pointsReport, status: p.status, level: lv, permanent: p.permanent, private: priv === 1 });
 }
 
 async function vote(env: Env, me: Account, reportId: string, still: boolean, now = Date.now(), merged = false): Promise<Response> {
@@ -547,7 +551,7 @@ async function modRoutes(req: Request, env: Env, me: Account, path: string): Pro
       `SELECT r.id, r.type, r.lat, r.lon, r.created_at, r.expires_at, r.yes, r.no, r.status, r.text, r.author_id,
               a.name AS author, a.good, a.bad, a.trusted, a.banned, a.suspect_until
          FROM reports r JOIN accounts a ON a.id = r.author_id
-        WHERE (r.permanent = 1 OR r.expires_at > ?) AND r.validated = 0
+        WHERE (r.permanent = 1 OR r.expires_at > ?) AND r.validated = 0 AND r.private = 0
           AND (r.status != 'ok' OR (r.yes = 0 AND r.type IN ('radar_fixe', 'danger')))
         ORDER BY r.created_at DESC LIMIT 100`).bind(now).all<{ good: number; bad: number; trusted: number; banned: number; suspect_until: number; [k: string]: unknown }>();
     return json({ reports: rows.results.map((r) => ({ ...r, author_stars: stars(r.good, r.bad), author_level: level(r, now) })) });
@@ -640,7 +644,7 @@ Les vidéos de la dashcam ne sont gardées que si tu le demandes ou après un ch
 <h2>SMS d'urgence</h2>
 <p>Si tu actives la détection d'accident, un SMS avec ta position est envoyé au seul contact que tu as choisi, uniquement après un choc et sans réponse de ta part pendant 30 secondes.</p>
 <h2>Durées de conservation</h2>
-<p>Signalements : quelques heures à quelques semaines selon le type (permanents pour les radars confirmés). Positions de présence : 30 minutes. Convois : 6 heures. Partages : 12 heures. Compte : jusqu'à sa suppression.</p>
+<p>Signalements : quelques heures à quelques semaines selon le type (permanents pour les radars confirmés et pour ceux des personnes de confiance ; en Suisse, un radar signalé reste privé, visible par son seul auteur). Positions de présence : 30 minutes. Convois : 6 heures. Partages : 12 heures. Compte : jusqu'à sa suppression.</p>
 <h2>Tes droits</h2>
 <p>Pour consulter, corriger ou supprimer tes données : Réglages → ton compte → « Écrire à l'administrateur ». Aucune donnée n'est vendue ni utilisée pour la publicité.</p>
 </body></html>`;
