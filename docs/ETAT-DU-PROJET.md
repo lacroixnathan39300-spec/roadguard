@@ -152,7 +152,10 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
 - **« Me prévenir à la voix si je dépasse » coupé** : plus aucune voix pour ralentir (ni alarme « Ralentis »,
   `overspeedAlarm(talk = false)`, ni réprimande, ni alarme hors radar) ; un tout petit bip (`AlertVoice.softBeep`, 70 ms)
   en passant au-dessus, rappelé au plus toutes les 60 s.
-- **Suisse** : activer les radars (acceptation ou confirmation) vaut aussi pour la Suisse (`swiss_consent_version` posé,
-  mode Suisse coupé) ; textes « y compris en Suisse ». Les signalements communauté restent jamais diffusés en Suisse.
+- **Suisse (précision de Nathan)** : le mode Suisse ne se coupe JAMAIS tout seul. Les consignes légales de la Suisse sont
+  données en même temps que l'activation des radars (`RADAR_ACK`, `RADAR_CONSENT`), et l'accord vaut pour la Suisse
+  (`swiss_consent_version`). Bouton « 🇨🇭 Suisse » à côté du bouton radars (téléphone : `QuickToggle` ; Drive : module
+  radars du tableau de bord, `RadarChip`) et dans Réglages → Alertes radars : `Legal.toggleSwiss` (rallumer sans accord →
+  `RadarConsentScreen(swiss = true)`). Écran de confirmation Suisse séparé supprimé. Communauté jamais diffusée en Suisse.
 - **Sirène avant les radars retirée** (Nathan : « horrible au final ») : plus de déclenchement dans `DrivingSession` ni
   de réglage ; la sirène reste pour l'anti-somnolence (`sirenWake`, `DrowsinessGuard`).

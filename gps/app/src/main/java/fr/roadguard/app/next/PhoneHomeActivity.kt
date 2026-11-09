@@ -403,6 +403,12 @@ private fun PhoneHome() {
                     if (want && !settings.radarsOn) fr.roadguard.core.ui.Legal.askRadars = true
                     else android.widget.Toast.makeText(context, if (settings.radarsOn) "Alertes radars activées" else "Alertes radars coupées", android.widget.Toast.LENGTH_SHORT).show()
                 })
+                // Radars en Suisse (interdits là-bas) : coupés par défaut, rallumés d'un appui, à ses risques.
+                fr.roadguard.core.ui.QuickToggle("🇨🇭", "Suisse", settings.radarsOn && !settings.swissMode, onToggle = {
+                    fr.roadguard.core.ui.Legal.toggleSwiss(context, settings)?.let {
+                        android.widget.Toast.makeText(context, it, android.widget.Toast.LENGTH_SHORT).show()
+                    }
+                })
                 fr.roadguard.core.ui.QuickToggle("🚦", "Limites", settings.limitVoiceOn, onToggle = {
                     settings.changeLimitVoice(!settings.limitVoiceOn)
                     android.widget.Toast.makeText(context, if (settings.limitVoiceOn) "Annonces de limitation activées" else "Annonces de limitation coupées", android.widget.Toast.LENGTH_SHORT).show()

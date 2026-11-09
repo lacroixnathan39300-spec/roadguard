@@ -75,7 +75,7 @@ fun AccountGate(extra: @Composable () -> Unit = {}, content: @Composable () -> U
             // Prénom : demandé une fois aux comptes qui n'en ont pas encore (le GPS s'en sert pour parler au conducteur).
             var nameAsked by remember { mutableStateOf(FirstName.asked(context)) }
             if (Legal.askRadars) RadarConsentScreen(onDone = { Legal.askRadars = false })
-            if (Legal.askSwiss) SwissConsentScreen(onDone = { Legal.askSwiss = false })
+            if (Legal.askSwiss) RadarConsentScreen(swiss = true, onDone = { Legal.askSwiss = false })
             if (Legal.forceShow) LegalScreen(review = true, onDone = { Legal.forceShow = false })
             else if (!tutorialDone || Tutorial.forceShow) TutorialScreen(onDone = { tutorialDone = true; Tutorial.forceShow = false })
             else if (account.status?.firstName.isNullOrBlank() && !nameAsked) FirstNameScreen(onDone = { nameAsked = true })

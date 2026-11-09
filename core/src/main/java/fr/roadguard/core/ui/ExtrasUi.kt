@@ -538,10 +538,10 @@ fun SafetySettings(settings: fr.roadguard.core.DriveSettings) {
 /** Mode Suisse : radars coupés en Suisse ; le désactiver passe par la case dédiée. */
 @Composable
 fun SwissModeToggle(settings: fr.roadguard.core.DriveSettings) {
-    ToggleLine("Suisse : couper les radars automatiquement (interdits dans le pays)", settings.swissMode) { v ->
-        settings.changeSwissMode(v)
-        // Désactivation seulement avec l'accord (activation des radars, ou case dédiée) : sinon, la confirmation s'affiche.
-        if (!v && settings.swissMode) Legal.askSwiss = true
+    val context = LocalContext.current
+    ToggleLine("Suisse : couper les radars automatiquement (interdits dans le pays)", settings.swissMode) {
+        // Même règle que le bouton « Suisse » de l'accueil : les y rallumer demande l'accord des radars (Suisse comprise).
+        Legal.toggleSwiss(context, settings)?.let { android.widget.Toast.makeText(context, it, android.widget.Toast.LENGTH_SHORT).show() }
     }
 }
 

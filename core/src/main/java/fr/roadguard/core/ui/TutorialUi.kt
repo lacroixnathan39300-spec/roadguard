@@ -105,7 +105,7 @@ private fun pages(drive: Boolean): List<Page> = listOfNotNull(
         "L'autoradio reçoit ta position, ta musique, tes messages, et Internet par le téléphone.",
     )),
     Page("🛡", "Sécurité automatique", listOf(
-        "Suisse : les alertes radars activées valent aussi là-bas (à tes risques, c'est interdit) ; coupées, Pilote les y coupe. Les signalements police et radars de la communauté n'y sont jamais diffusés.",
+        "Suisse : radars coupés automatiquement (interdits là-bas). Bouton 🇨🇭 « Suisse » à côté du bouton radars pour les y rallumer ou les recouper, à tes risques. Les signalements police et radars de la communauté n'y sont jamais diffusés.",
         "Pluie : limitations abaissées (130→110, 110→100, 90→80). Jeune conducteur et vitesse max perso dans Réglages.",
         "Météo dangereuse, passages à niveau, virages, écoles annoncés. Radars suivis même dans les tunnels.",
         if (drive) "Fin de trajet : voiture garée mémorisée, et rappel « rien oublié ? » si tu l'actives." else "Détection d'accident : choc + arrêt → « Tout va bien ? », puis SMS à ton contact d'urgence.",

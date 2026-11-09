@@ -214,14 +214,31 @@ private fun Widget(w: DashWidget, s: DrivingSession, music: NowPlaying?, onPlayP
             val alt = s.trip.altitudeM
             Big(alt?.let { "$it m" } ?: "—", if (alt != null) "au-dessus du niveau de la mer" else "En attente du GPS")
         }
-        DashWidget.RADAR -> {
-            val a = s.alert
-            when {
-                a != null -> Big("${AlertText.roundedDistance(a.distanceM)} m",
-                    AlertText.kindLabel(a.radar.kind) + (a.radar.speedKmh?.let { " · limité à $it km/h" } ?: ""), Color(0xFFFF8A80))
-                s.radarsBlockedHere -> Big("Coupés", "Suisse : alertes radars interdites", DriveColors.TextSecondary)
-                !s.settings.radarsOn -> Big("Coupés", "Alertes radars désactivées", DriveColors.TextSecondary)
-                else -> Big("✓ Aucun", "Pas de radar devant toi", Color(0xFF66BB6A))
+        DashWidget.RADAR -> Column(Modifier.fillMaxSize()) {
+            val context = androidx.compose.ui.platform.LocalContext.current
+            Box(Modifier.fillMaxWidth().weight(1f)) {
+                val a = s.alert
+                when {
+                    a != null -> Big("${AlertText.roundedDistance(a.distanceM)} m",
+                        AlertText.kindLabel(a.radar.kind) + (a.radar.speedKmh?.let { " · limité à $it km/h" } ?: ""), Color(0xFFFF8A80))
+                    s.radarsBlockedHere -> Big("Coupés", "Suisse : alertes radars interdites", DriveColors.TextSecondary)
+                    !s.settings.radarsOn -> Big("Coupés", "Alertes radars désactivées", DriveColors.TextSecondary)
+                    else -> Big("✓ Aucun", "Pas de radar devant toi", Color(0xFF66BB6A))
+                }
+            }
+            // Interrupteurs du module : radars, et radars en Suisse (interdits là-bas : coupés par défaut, à ses risques).
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                RadarChip("📷 Radars", s.settings.radarsOn) {
+                    val want = !s.settings.radarsOn
+                    s.settings.changeRadarsOn(want)
+                    // Pas encore d'accord : la confirmation (consignes légales, Suisse comprise) s'affiche.
+                    if (want && !s.settings.radarsOn) fr.roadguard.core.ui.Legal.askRadars = true
+                }
+                RadarChip("🇨🇭 Suisse", s.settings.radarsOn && !s.settings.swissMode) {
+                    fr.roadguard.core.ui.Legal.toggleSwiss(context, s.settings)?.let {
+                        android.widget.Toast.makeText(context, it, android.widget.Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
         }
         DashWidget.GUIDANCE -> {
@@ -254,6 +271,15 @@ private fun Widget(w: DashWidget, s: DrivingSession, music: NowPlaying?, onPlayP
             }
         }
     }
+}
+
+/** Petit interrupteur du module radars (vert : actif, rouge : coupé). */
+@Composable
+private fun RadarChip(label: String, on: Boolean, onClick: () -> Unit) {
+    val c = if (on) Color(0xFF2ED573) else Color(0xFFFF4757)
+    Text(if (on) "$label ✓" else "$label ✕", color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1,
+        modifier = Modifier.clip(RoundedCornerShape(10.dp)).background(c.copy(alpha = 0.18f)).border(1.5.dp, c, RoundedCornerShape(10.dp))
+            .clickable(onClick = onClick).padding(horizontal = 10.dp, vertical = 6.dp))
 }
 
 /** Valeur en grand, et en dessous le détail (le titre du bloc est déjà en haut). */
