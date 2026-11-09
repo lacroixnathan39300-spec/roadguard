@@ -72,10 +72,13 @@ fun AccountGate(extra: @Composable () -> Unit = {}, content: @Composable () -> U
             content()
             // Tutoriel au premier lancement (et à la demande depuis les réglages).
             var tutorialDone by remember { mutableStateOf(Tutorial.seen(context)) }
+            // Prénom : demandé une fois aux comptes qui n'en ont pas encore (le GPS s'en sert pour parler au conducteur).
+            var nameAsked by remember { mutableStateOf(FirstName.asked(context)) }
             if (Legal.askRadars) RadarConsentScreen(onDone = { Legal.askRadars = false })
             if (Legal.askSwiss) SwissConsentScreen(onDone = { Legal.askSwiss = false })
             if (Legal.forceShow) LegalScreen(review = true, onDone = { Legal.forceShow = false })
             else if (!tutorialDone || Tutorial.forceShow) TutorialScreen(onDone = { tutorialDone = true; Tutorial.forceShow = false })
+            else if (account.status?.firstName.isNullOrBlank() && !nameAsked) FirstNameScreen(onDone = { nameAsked = true })
             else UpdateBanner()
             // Fin d'essai proche : rappel discret (une fois par jour), avec le contact de l'administrateur.
             val days = account.status?.trialDaysLeft()
@@ -136,6 +139,7 @@ private fun LoginScreen(account: AccountManager, extra: @Composable () -> Unit) 
     var user by remember { mutableStateOf("") }
     var pass by remember { mutableStateOf("") }
     var pass2 by remember { mutableStateOf("") }
+    var first by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     CenteredCard {
@@ -145,7 +149,17 @@ private fun LoginScreen(account: AccountManager, extra: @Composable () -> Unit) 
             if (creating) "Essai gratuit d'un mois. Un seul essai par appareil." else "Le même compte sert sur le téléphone et sur l'autoradio.",
             color = DriveColors.TextSecondary, fontSize = 15.sp,
         )
-        Field(user, { user = it.take(24) }, "Identifiant")
+        if (creating) OutlinedTextField(
+            value = first, onValueChange = { first = it.take(30) }, singleLine = true, label = { Text("Prénom (Pilote t'appellera comme ça)") },
+            textStyle = androidx.compose.ui.text.TextStyle(color = Color.White, fontSize = 20.sp),
+            keyboardOptions = KeyboardOptions(capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Words),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = DriveColors.Accent, unfocusedBorderColor = DriveColors.Track,
+                focusedLabelColor = DriveColors.Accent, unfocusedLabelColor = DriveColors.TextSecondary,
+            ),
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Field(user, { user = it.take(24) }, if (creating) "Pseudo (identifiant de connexion)" else "Identifiant")
         Field(pass, { pass = it.take(100) }, "Mot de passe", password = true)
         if (creating) Field(pass2, { pass2 = it.take(100) }, "Mot de passe (encore)", password = true)
         error?.let { Text(it, color = Color(0xFFFF6B6B), fontSize = 15.sp) }
@@ -154,7 +168,7 @@ private fun LoginScreen(account: AccountManager, extra: @Composable () -> Unit) 
             if (creating && pass != pass2) { error = "Les deux mots de passe sont différents"; return@BigButton }
             busy = true; error = null
             scope.launch {
-                runCatching { if (creating) account.register(user, pass) else account.login(user, pass) }
+                runCatching { if (creating) account.register(user, pass, first) else account.login(user, pass) }
                     .onFailure { error = it.message ?: "Connexion impossible" }
                 busy = false
             }
@@ -207,7 +221,7 @@ fun AccountCard(onAdmin: () -> Unit) {
     if (showContact) ContactAdminScreen { showContact = false }
     if (showInbox) AdminMessagesScreen { showInbox = false }
     Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(DriveColors.Panel).padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("👤 ${s.username}", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("👤 ${s.username}" + (s.firstName.takeIf { it.isNotBlank() }?.let { " · $it" } ?: ""), color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Text(s.label, color = DriveColors.TextSecondary, fontSize = 15.sp)
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             if (s.admin) BigButton("🛡 Gérer les comptes", DriveColors.Accent, onAdmin)

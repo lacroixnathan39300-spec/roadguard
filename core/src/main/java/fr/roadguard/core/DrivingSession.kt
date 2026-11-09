@@ -97,6 +97,9 @@ class DrivingSession(
     /** Limitation d'après la carte (avant correction de la communauté) : l'« ancienne » valeur d'une correction. */
     private var mapLimit: Int? = null
     private var lastOverWarning = 0L
+    /** Petit bip discret de dépassement (avertissements coupés) : déjà bipé pour cet excès, et quand. */
+    private var softOver = false
+    private var lastSoftBeep = 0L
     private var lastSirenRadar: String? = null
     private var overWarned = false
     private var avgOverSaid = false
@@ -147,8 +150,8 @@ class DrivingSession(
         if (drivingSince == 0L) { drivingSince = now; nextPauseAt = now + if (night) 90 * 60_000L else 2 * 3_600_000L }
         if (now >= nextPauseAt) {
             val h = (now - drivingSince) / 3_600_000.0
-            if (night) voice.speak("Il est tard et tu roules depuis un moment : la vigilance baisse. Fais une pause.")
-            else voice.speak(if (h < 2.2) "Deux heures de route. Pense à faire une pause." else "Cela fait %.0f heures de route. Une pause s'impose.".format(java.util.Locale.FRANCE, h))
+            if (night) voice.speakNamed("Il est tard et tu roules depuis un moment : la vigilance baisse. Fais une pause.")
+            else voice.speakNamed(if (h < 2.2) "Deux heures de route. Pense à faire une pause." else "Cela fait %.0f heures de route. Une pause s'impose.".format(java.util.Locale.FRANCE, h))
             nextPauseAt = now + if (night) 20 * 60_000L else 30 * 60_000L
         }
     }
@@ -263,7 +266,7 @@ class DrivingSession(
         lastTrip = rec
         if (lat != null && lon != null) tripLog.parking = fr.roadguard.core.safety.Parking(lat, lon, System.currentTimeMillis(), localInfo.address, 0)
         voice.xxl("trip_end")?.let(voice::speak)
-        if (settings.forgetReminder) voice.speak("Fin du trajet. Pense à vérifier : rien oublié à l'arrière ? Enfant, animal, sac ?")
+        if (settings.forgetReminder) voice.speakNamed("Fin du trajet. Pense à vérifier : rien oublié à l'arrière ? Enfant, animal, sac ?")
         val due = settings.serviceAtKm
         if (due > 0 && tripLog.odometerKm >= due) voice.speak("Rappel : l'entretien de la voiture est à prévoir.")
     }
@@ -282,7 +285,7 @@ class DrivingSession(
         val now = System.currentTimeMillis()
         if (now - lastFastAt < 6_000) impactAt = now
     }
-    fun cancelCrash() { crashAt = 0L; impactAt = 0L; voice.speak("D'accord. Bonne route, et prends soin de toi.") }
+    fun cancelCrash() { crashAt = 0L; impactAt = 0L; voice.speakNamed("D'accord. Bonne route, et prends soin de toi.") }
     private fun crashStep(kmh: Double, now: Long) {
         if (kmh >= 25) lastFastAt = now
         // Choc puis arrêt dans les 15 s : on demande si tout va bien.
@@ -291,7 +294,7 @@ class DrivingSession(
                 crashAt = now; impactAt = 0L
                 val who = settings.emergencyName.ifBlank { "ton contact d'urgence" }
                 voice.wakeUp()
-                voice.speak("Choc détecté. Tout va bien ? Touche « Je vais bien ». Sinon, je préviens $who dans trente secondes.")
+                voice.speakNamed("Choc détecté. Tout va bien ? Touche « Je vais bien ». Sinon, je préviens $who dans trente secondes.")
             } else if (now - impactAt > 15_000) impactAt = 0L
         }
     }
@@ -445,15 +448,18 @@ class DrivingSession(
         val radarOver = settings.radarAlarm && cur != null && limit != null &&
             fr.roadguard.core.nav.SpeedLimitTracker.isOver(f.speedKmh.toInt(), limit, settings.overTolerance)
         // Option : la même alarme dès qu'on dépasse la limitation de la route, même sans radar devant.
+        // Avertissements de dépassement coupés (« Me prévenir si je dépasse ») : plus aucune voix pour ralentir
+        // (ni « Ralentis » de l'alarme, ni réprimande), seulement un petit bip discret (plus bas).
+        val talkOver = settings.speedLimitWarning
         val roadLimit = speedLimit
-        val roadOver = settings.alarmAnywhere && roadLimit != null &&
+        val roadOver = talkOver && settings.alarmAnywhere && roadLimit != null &&
             fr.roadguard.core.nav.SpeedLimitTracker.isOver(f.speedKmh.toInt(), roadLimit, settings.overTolerance)
-        voice.overspeedAlarm(radarOver || roadOver, if (radarOver) limit else roadLimit)
+        voice.overspeedAlarm(radarOver || roadOver, if (radarOver) limit else roadLimit, talk = talkOver)
         // Réprimande : excès qui dure (plus de 15 s) ou qui se répète (3 fois en 10 min), au plus toutes les 45 s.
         val overNow = radarOver || (roadLimit != null && fr.roadguard.core.nav.SpeedLimitTracker.isOver(f.speedKmh.toInt(), roadLimit, settings.overTolerance))
         if (overNow) { if (overSince == 0L) { overSince = f.timeMs; overEpisodes.addLast(f.timeMs) } } else overSince = 0L
         while (overEpisodes.isNotEmpty() && f.timeMs - overEpisodes.first() > 600_000) overEpisodes.removeFirst()
-        if (settings.scold && overNow && (f.timeMs - overSince > 15_000 || overEpisodes.size >= 3) && f.timeMs - lastScold > 45_000) {
+        if (talkOver && settings.scold && overNow && (f.timeMs - overSince > 15_000 || overEpisodes.size >= 3) && f.timeMs - lastScold > 45_000) {
             lastScold = f.timeMs; voice.scold()
         }
         voice.proximityBeeps = settings.proximityBeeps
@@ -543,6 +549,11 @@ class DrivingSession(
             overWarned = true
             voice.overLimit(speedLimit, kmh)
         }
+        // Avertissements coupés : un tout petit bip en passant au-dessus de la limite, rappelé au plus toutes les 60 s.
+        if (!settings.speedLimitWarning) {
+            if (overNowLimit && (!softOver || f.timeMs - lastSoftBeep > 60_000)) { softOver = true; lastSoftBeep = f.timeMs; voice.softBeep() }
+            if (!overNowLimit) softOver = false
+        } else softOver = false
         // « Coquin XXL » : retour sous la limite après un avertissement.
         val lim = speedLimit
         if (overWarned && lim != null && kmh <= lim) { overWarned = false; voice.xxl("back_under")?.let(voice::speak) }

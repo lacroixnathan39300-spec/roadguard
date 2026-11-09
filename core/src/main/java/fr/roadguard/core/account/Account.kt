@@ -27,6 +27,8 @@ data class AccountStatus(
     val blocked: Boolean,
     /** Contact de l'administrateur affiché sur l'écran « accès terminé ». */
     val contact: String = "",
+    /** Prénom du conducteur (le GPS l'appelle par son prénom), "" si non donné. */
+    val firstName: String = "",
 ) {
     /** Jours d'essai restants (null si ce n'est pas un essai en cours). */
     fun trialDaysLeft(now: Long = System.currentTimeMillis()): Int? =
@@ -45,12 +47,13 @@ data class AccountStatus(
 
     fun toJson(): JSONObject = JSONObject().put("username", username).put("admin", admin).put("plan", plan)
         .put("accessUntil", accessUntil).put("active", active).put("blocked", blocked).put("contact", contact)
+        .put("firstName", firstName)
 
     companion object {
         fun date(ms: Long): String = java.text.SimpleDateFormat("d MMMM yyyy", java.util.Locale.FRANCE).format(java.util.Date(ms))
         fun from(o: JSONObject) = AccountStatus(
             o.optString("username"), o.optBoolean("admin"), o.optString("plan"), o.optLong("accessUntil"),
-            o.optBoolean("active"), o.optBoolean("blocked"), o.optString("contact"),
+            o.optBoolean("active"), o.optBoolean("blocked"), o.optString("contact"), o.optString("firstName"),
         )
     }
 }
@@ -86,11 +89,18 @@ class AccountManager private constructor(context: Context) {
     /** Appli des essais automatiques (émulateur) : pas de compte demandé. Jamais vrai dans les applis publiées. */
     val testBuild: Boolean = app.resources.getIdentifier("rg_emulator_test", "bool", app.packageName).let { it != 0 && app.resources.getBoolean(it) }
 
-    suspend fun register(username: String, password: String) = auth("/v1/auth/register", username, password)
+    suspend fun register(username: String, password: String, firstName: String = "") = auth("/v1/auth/register", username, password, firstName)
     suspend fun login(username: String, password: String) = auth("/v1/auth/login", username, password)
 
-    private suspend fun auth(path: String, username: String, password: String) = withContext(Dispatchers.IO) {
-        val o = request("POST", path, JSONObject().put("username", username.trim()).put("password", password).put("device", device).put("app", appName), withToken = false)
+    /** Prénom du conducteur (vide : effacé). */
+    suspend fun setFirstName(name: String) = withContext(Dispatchers.IO) {
+        save(AccountStatus.from(request("POST", "/v1/auth/profile", JSONObject().put("firstName", name.trim()))))
+    }
+
+    private suspend fun auth(path: String, username: String, password: String, firstName: String = "") = withContext(Dispatchers.IO) {
+        val body = JSONObject().put("username", username.trim()).put("password", password).put("device", device).put("app", appName)
+        if (firstName.isNotBlank()) body.put("firstName", firstName.trim())
+        val o = request("POST", path, body, withToken = false)
         val t = o.getString("token")
         prefs.edit().putString("token", t).apply()
         save(AccountStatus.from(o))

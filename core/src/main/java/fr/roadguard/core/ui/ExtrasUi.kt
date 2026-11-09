@@ -525,18 +525,29 @@ fun CrashOverlay(session: DrivingSession) {
     }
 }
 
-// ======================= Réglages : sécurité et pratique =======================
+// ======================= Réglages : sécurité et pratique (rangés par catégorie dans SettingsScreen) =======================
 
 @Composable
 fun SafetySettings(settings: fr.roadguard.core.DriveSettings) {
-    val context = LocalContext.current
-    val phone = !context.packageName.contains("drive")
-    Text("Sécurité et code de la route", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 8.dp))
+    SwissModeToggle(settings)
+    SpeedRulesSettings(settings)
+    RoadSafetySettings(settings)
+    PhoneComfortSettings(settings)
+}
+
+/** Mode Suisse : radars coupés en Suisse ; le désactiver passe par la case dédiée. */
+@Composable
+fun SwissModeToggle(settings: fr.roadguard.core.DriveSettings) {
     ToggleLine("Suisse : couper les radars automatiquement (interdits dans le pays)", settings.swissMode) { v ->
         settings.changeSwissMode(v)
-        // Désactivation seulement après la case dédiée (sinon, la confirmation s'affiche).
+        // Désactivation seulement avec l'accord (activation des radars, ou case dédiée) : sinon, la confirmation s'affiche.
         if (!v && settings.swissMode) Legal.askSwiss = true
     }
+}
+
+/** Limitations adaptées : pluie, jeune conducteur, vitesse maximale personnelle. */
+@Composable
+fun SpeedRulesSettings(settings: fr.roadguard.core.DriveSettings) {
     ToggleLine("Pluie : abaisser les limitations (130→110, 110→100, 90→80)", settings.rainLimits, settings::changeRainLimits)
     ToggleLine("Jeune conducteur (permis probatoire : 110 / 100 / 80)", settings.driverProfile == 1) { settings.changeDriverProfile(if (it) 1 else 0) }
     Text("Vitesse maximale personnelle (remorque, caravane…)", color = Color.White, fontSize = 16.sp)
@@ -545,6 +556,13 @@ fun SafetySettings(settings: fr.roadguard.core.DriveSettings) {
             BigButton(l, if (settings.personalMax == v) DriveColors.Accent else DriveColors.Panel) { settings.changePersonalMax(v) }
         }
     }
+}
+
+/** Dangers de la route, accident, somnolence, dashcam. */
+@Composable
+fun RoadSafetySettings(settings: fr.roadguard.core.DriveSettings) {
+    val context = LocalContext.current
+    val phone = !context.packageName.contains("drive")
     ToggleLine("Météo dangereuse : verglas, brouillard, fortes pluies (ici et sur l'itinéraire)", settings.weatherAlerts, settings::changeWeatherAlerts)
     ToggleLine("Passages à niveau, virages dangereux, écoles", settings.hazardAlerts, settings::changeHazardAlerts)
     ToggleLine("Fin de trajet : « rien oublié à l'arrière ? »", settings.forgetReminder, settings::changeForgetReminder)
@@ -553,55 +571,60 @@ fun SafetySettings(settings: fr.roadguard.core.DriveSettings) {
         if (v && context.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
             (context as? android.app.Activity)?.requestPermissions(arrayOf(android.Manifest.permission.RECORD_AUDIO), 81)
     }
-    if (phone) {
-        ToggleLine("Détection d'accident (choc + arrêt → SMS au contact d'urgence après 30 s)", settings.crashDetect) { v ->
-            settings.changeCrashDetect(v)
-            if (v && android.os.Build.VERSION.SDK_INT >= 23 && context.checkSelfPermission(android.Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
-                (context as? android.app.Activity)?.requestPermissions(arrayOf(android.Manifest.permission.SEND_SMS), 77)
-            }
+    if (!phone) return
+    ToggleLine("Détection d'accident (choc + arrêt → SMS au contact d'urgence après 30 s)", settings.crashDetect) { v ->
+        settings.changeCrashDetect(v)
+        if (v && android.os.Build.VERSION.SDK_INT >= 23 && context.checkSelfPermission(android.Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            (context as? android.app.Activity)?.requestPermissions(arrayOf(android.Manifest.permission.SEND_SMS), 77)
         }
-        ToggleLine("🚨 Sirène de police française si je m'endors (anti-somnolence)", settings.sirenWake) { v ->
-            settings.changeSirenWake(v)
-            if (v) fr.roadguard.core.radar.PoliceSiren.burst(2) // pour l'entendre
+    }
+    if (settings.crashDetect) {
+        var name by remember { mutableStateOf(settings.emergencyName) }
+        var num by remember { mutableStateOf(settings.emergencyPhone) }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            ExField(name, { name = it.take(40) }, "Contact (nom)", Modifier.weight(1f))
+            ExField(num, { num = it.filter { c -> c.isDigit() || c == '+' || c == ' ' }.take(20) }, "Téléphone", Modifier.weight(1f), number = true)
+            BigButton("Enregistrer", DriveColors.Accent) { settings.changeEmergency(name.trim(), num.trim()) }
         }
-        Text("Confort", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 8.dp))
-        ToggleLine("Lire mes messages à voix haute (SMS, WhatsApp…), avec réponse dictée", settings.speakNotifications) { v ->
-            settings.changeSpeakNotifications(v)
-            val enabled = android.provider.Settings.Secure.getString(context.contentResolver, "enabled_notification_listeners")?.contains(context.packageName) == true
-            if (v && !enabled) runCatching { context.startActivity(Intent(android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
+    }
+    ToggleLine("🚨 Sirène de police française si je m'endors (anti-somnolence)", settings.sirenWake) { v ->
+        settings.changeSirenWake(v)
+        if (v) fr.roadguard.core.radar.PoliceSiren.burst(2) // pour l'entendre
+    }
+    ToggleLine("Dashcam : filmer la route en boucle (caméra arrière), vidéo gardée en cas de choc", settings.dashcam) { v ->
+        settings.changeDashcam(v)
+        if (v && settings.drowsyGuard) settings.changeDrowsyGuard(false)
+        if (v && context.checkSelfPermission(android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+            (context as? android.app.Activity)?.requestPermissions(arrayOf(android.Manifest.permission.CAMERA), 78)
+    }
+    if (settings.dashcam) Text("La dashcam et l'anti-somnolence utilisent chacune une caméra : une seule à la fois.", color = DriveColors.TextSecondary, fontSize = 13.sp)
+}
+
+/** Téléphone : messages lus, montre, moto, Bluetooth de la voiture, batterie, agenda. */
+@Composable
+fun PhoneComfortSettings(settings: fr.roadguard.core.DriveSettings) {
+    val context = LocalContext.current
+    if (context.packageName.contains("drive")) return
+    ToggleLine("Lire mes messages à voix haute (SMS, WhatsApp…), avec réponse dictée", settings.speakNotifications) { v ->
+        settings.changeSpeakNotifications(v)
+        val enabled = android.provider.Settings.Secure.getString(context.contentResolver, "enabled_notification_listeners")?.contains(context.packageName) == true
+        if (v && !enabled) runCatching { context.startActivity(Intent(android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
+    }
+    ToggleLine("Vibrer à chaque radar (relayé sur ma montre connectée)", settings.watchAlerts, settings::changeWatchAlerts)
+    ToggleLine("Mode moto : gros boutons, tout à la voix (casque)", settings.motoMode) { v ->
+        settings.changeMotoMode(v); settings.changeScale(if (v) 1.35f else 1f)
+    }
+    CarBluetoothPicker(settings)
+    Text("🔋 Économie de batterie", color = Color.White, fontSize = 16.sp)
+    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        listOf(0 to "Auto (batterie ≤ 20 %)", 1 to "Toujours", 2 to "Jamais").forEach { (v, l) ->
+            BigButton(l, if (settings.batterySaver == v) DriveColors.Accent else DriveColors.Panel) { settings.changeBatterySaver(v) }
         }
-        ToggleLine("Vibrer à chaque radar (relayé sur ma montre connectée)", settings.watchAlerts, settings::changeWatchAlerts)
-        ToggleLine("Mode moto : gros boutons, tout à la voix (casque)", settings.motoMode) { v ->
-            settings.changeMotoMode(v); settings.changeScale(if (v) 1.35f else 1f)
-        }
-        ToggleLine("Dashcam : filmer la route en boucle (caméra arrière), vidéo gardée en cas de choc", settings.dashcam) { v ->
-            settings.changeDashcam(v)
-            if (v && settings.drowsyGuard) settings.changeDrowsyGuard(false)
-            if (v && context.checkSelfPermission(android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
-                (context as? android.app.Activity)?.requestPermissions(arrayOf(android.Manifest.permission.CAMERA), 78)
-        }
-        if (settings.dashcam) Text("La dashcam et l'anti-somnolence utilisent chacune une caméra : une seule à la fois.", color = DriveColors.TextSecondary, fontSize = 13.sp)
-        CarBluetoothPicker(settings)
-        Text("🔋 Économie de batterie", color = Color.White, fontSize = 16.sp)
-        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf(0 to "Auto (batterie ≤ 20 %)", 1 to "Toujours", 2 to "Jamais").forEach { (v, l) ->
-                BigButton(l, if (settings.batterySaver == v) DriveColors.Accent else DriveColors.Panel) { settings.changeBatterySaver(v) }
-            }
-        }
-        ToggleLine("Agenda : proposer l'itinéraire vers mes prochains rendez-vous", settings.calendarHints) { v ->
-            settings.changeCalendarHints(v)
-            if (v && context.checkSelfPermission(android.Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED)
-                (context as? android.app.Activity)?.requestPermissions(arrayOf(android.Manifest.permission.READ_CALENDAR), 79)
-        }
-        if (settings.crashDetect) {
-            var name by remember { mutableStateOf(settings.emergencyName) }
-            var num by remember { mutableStateOf(settings.emergencyPhone) }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                ExField(name, { name = it.take(40) }, "Contact (nom)", Modifier.weight(1f))
-                ExField(num, { num = it.filter { c -> c.isDigit() || c == '+' || c == ' ' }.take(20) }, "Téléphone", Modifier.weight(1f), number = true)
-                BigButton("Enregistrer", DriveColors.Accent) { settings.changeEmergency(name.trim(), num.trim()) }
-            }
-        }
+    }
+    ToggleLine("Agenda : proposer l'itinéraire vers mes prochains rendez-vous", settings.calendarHints) { v ->
+        settings.changeCalendarHints(v)
+        if (v && context.checkSelfPermission(android.Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED)
+            (context as? android.app.Activity)?.requestPermissions(arrayOf(android.Manifest.permission.READ_CALENDAR), 79)
     }
 }
 

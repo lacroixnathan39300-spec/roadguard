@@ -138,3 +138,19 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
   Pilote tant qu'il n'est pas rouvert (`AutoStart.pause` / `resume`) : ni la vitesse, ni le Bluetooth de la voiture
   (`AutoStart.launch`), ni la relance du service par Android (START_STICKY, intent nul : reprise seulement si un guidage
   ou un démarrage automatique était en cours, `AutoStart.remember`). Retour de Nathan : « il parle toujours même fermée ».
+
+## Prénom, réglages par catégories, petit bip, Suisse avec les radars (09/11/2026)
+- **Prénom** : `users.first_name` (migration 0015, `cleanFirstName`), demandé à la création du compte (en plus du pseudo),
+  une fois aux comptes existants (`FirstNameScreen`, `FirstName.asked`), modifiable dans Réglages → Voix
+  (`FirstNameEditor`, `POST /v1/auth/profile`). `AlertVoice.withName` : toujours pour réveil, réprimande, pause, arrivée,
+  départ, choc (`speakNamed`, id « rg-named ») ; parfois pour dépassement (60 %), alarme (50 %), radars (35 %),
+  moyenne (30 %), limitation (25 %) ; jamais au milieu des consignes de guidage.
+- **Réglages par catégories** (`SettingsScreen`) : Voix, Ton et imitations, Alertes radars, Vitesse et limitations, Trajet,
+  Sécurité, Messages et téléphone, Arrière-plan et démarrage, Carte et affichage, Compte et aide ; recherche (`INDEX`,
+  sans accents). `SafetySettings` découpé (`SwissModeToggle`, `SpeedRulesSettings`, `RoadSafetySettings`,
+  `PhoneComfortSettings`).
+- **« Me prévenir à la voix si je dépasse » coupé** : plus aucune voix pour ralentir (ni alarme « Ralentis »,
+  `overspeedAlarm(talk = false)`, ni réprimande, ni alarme hors radar) ; un tout petit bip (`AlertVoice.softBeep`, 70 ms)
+  en passant au-dessus, rappelé au plus toutes les 60 s.
+- **Suisse** : activer les radars (acceptation ou confirmation) vaut aussi pour la Suisse (`swiss_consent_version` posé,
+  mode Suisse coupé) ; textes « y compris en Suisse ». Les signalements communauté restent jamais diffusés en Suisse.

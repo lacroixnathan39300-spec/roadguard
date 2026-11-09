@@ -95,10 +95,13 @@ object Legal {
         val now = System.currentTimeMillis()
         val e = prefs(c).edit().putInt("accepted_version", VERSION).putLong("accepted_at", now).putBoolean("radars", radars)
             .putString("accept_typed", acceptTyped.trim().take(80))
+        // Radars acceptés : valable aussi en Suisse (choix de Nathan), le mode Suisse est coupé en même temps.
         if (radars) e.putInt("radar_consent_version", VERSION).putLong("radar_consent_at", now).putString("radar_typed", radarTyped.trim().take(80))
+            .putInt("swiss_consent_version", VERSION).putLong("swiss_consent_at", now).putBoolean("swiss", true)
+            .putString("swiss_typed", "avec l'activation des radars")
         else e.remove("radar_consent_version").remove("radar_typed")
         e.commit() // tout de suite : les réglages relisent cet accord juste après
-        DriveSettings(c).changeRadarsOn(radars)
+        DriveSettings(c).let { it.changeRadarsOn(radars); if (radars) it.changeSwissMode(false) }
         syncSoon(c)
     }
 
@@ -106,8 +109,10 @@ object Legal {
     fun consentRadars(c: Context, typed: String) {
         val now = System.currentTimeMillis()
         prefs(c).edit().putInt("radar_consent_version", VERSION).putLong("radar_consent_at", now).putBoolean("radars", true)
-            .putString("radar_typed", typed.trim().take(80)).commit()
-        DriveSettings(c).changeRadarsOn(true)
+            .putString("radar_typed", typed.trim().take(80))
+            .putInt("swiss_consent_version", VERSION).putLong("swiss_consent_at", now).putBoolean("swiss", true)
+            .putString("swiss_typed", "avec l'activation des radars").commit()
+        DriveSettings(c).let { it.changeRadarsOn(true); it.changeSwissMode(false) }
         syncSoon(c)
     }
 
@@ -169,9 +174,9 @@ private const val RADAR_PHRASE = "J'active les radars à mes risques"
 
 /** Case obligatoire pour accepter quand les radars restent activés (choix par défaut). */
 private const val RADAR_ACK =
-    "J'ai compris : les alertes radars sont activées. Elles sont interdites en France, en Suisse et dans d'autres pays ; " +
-        "pour y être en règle, je dois les couper. Si je les garde, j'en assume seul toutes les conséquences : amendes, " +
-        "retrait de points, suspension du permis, confiscation de l'appareil."
+    "J'ai compris : les alertes radars sont activées, y compris en Suisse. Elles sont interdites en France, en Suisse " +
+        "(même seulement transportées) et dans d'autres pays ; pour y être en règle, je dois les couper. Si je les garde, " +
+        "j'en assume seul toutes les conséquences : amendes, retrait de points, suspension du permis, confiscation de l'appareil."
 private const val SWISS_PHRASE = "Je coupe le mode Suisse à mes risques"
 
 /** Phrase écrite reconnue sans tenir compte des majuscules, accents, apostrophes, espaces ni ponctuation. */
@@ -186,7 +191,7 @@ private const val SWISS_CONSENT =
         "(amende, confiscation de l'appareil, même s'il est seulement transporté) et j'en assume seul toutes les conséquences."
 
 private const val RADAR_CONSENT =
-    "J'active les alertes radars. Je sais qu'elles sont interdites en France, en Suisse et dans d'autres pays, et que pour y " +
+    "J'active les alertes radars, y compris en Suisse. Je sais qu'elles sont interdites en France, en Suisse et dans d'autres pays, et que pour y " +
         "être en règle je dois les laisser coupées. En les activant, j'en assume seul toutes les conséquences : amendes, " +
         "retrait de points, suspension du permis, confiscation de l'appareil."
 
@@ -335,8 +340,8 @@ private fun FranceCard() = LegalCard("🇫🇷", "En France") {
 
 @Composable
 private fun EuropeCard() = LegalCard("🌍", "Ailleurs en Europe") {
-    InfoRow("🇨🇭", "Suisse : coupées automatiquement",
-        "Interdit, même seulement transporté (amende, appareil confisqué). Pilote les coupe en Suisse (« mode Suisse ») ; pour les garder, une case dédiée t'est demandée. Les signalements de la communauté y restent toujours coupés.", RedBg)
+    InfoRow("🇨🇭", "Suisse : interdit, même seulement transporté",
+        "Amende, et l'appareil peut être confisqué. Si tu actives les alertes radars, elles marchent aussi en Suisse ; sinon Pilote les y coupe (« mode Suisse »). Les signalements police et radars de la communauté n'y sont jamais diffusés.", RedBg)
     InfoRow("⛔", "Interdit aussi : à laisser coupées", "Allemagne, Autriche, Liechtenstein, Slovaquie, Irlande.", RedBg)
     InfoRow("✅", "Autorisé", "Belgique, Luxembourg, Italie, Espagne, Pays-Bas, Royaume-Uni.", GreenBg)
     Text("Les lois changent : c'est celle du pays où tu roules qui compte.", color = DriveColors.TextSecondary, fontSize = 14.sp, lineHeight = 20.sp)
@@ -450,7 +455,7 @@ private fun CommitPage(review: Boolean, radars: Boolean, onBack: () -> Unit, onD
 private val TERMS = listOf(
     "1. Une aide, pas un pilote automatique" to "Pilote est une aide à la conduite. Il ne remplace ni ton attention, ni le code de la route. Les limitations, radars, itinéraires et signalements peuvent être faux, incomplets ou pas à jour : la signalisation et les règles de circulation passent toujours avant ce qu'affiche ou annonce l'appli.",
     "2. Au volant" to "Ne tiens pas et ne manipule pas ton téléphone en roulant (en France : 135 € d'amende et 3 points, écouteurs compris). Fixe-le sur un support, règle ton trajet avant de partir et utilise la voix. Aucun écran qui n'aide pas à la conduite (vidéo, autres applis, mode miroir) ne doit être visible du conducteur en roulant (en France : jusqu'à 1 500 € d'amende et 3 points).",
-    "3. Alertes radars" to "La loi dépend du pays. En France, utiliser un appareil ou une application qui indique l'emplacement des radars fixes ou mobiles est interdit (décret du 3 janvier 2012 : jusqu'à 1 500 € d'amende, 6 points, suspension du permis, confiscation) ; seules les « zones de danger » sont admises. C'est aussi interdit, notamment, en Suisse, en Allemagne, en Autriche, au Liechtenstein, en Slovaquie et en Irlande. Les alertes radars de Pilote s'activent quand tu acceptes ces conditions, en cochant la case qui rappelle cette interdiction et en écrivant « J'accepte » ; tu peux les couper dès l'avertissement, puis à tout moment (bouton 📷, Réglages). Pour être en règle dans ces pays, coupe-les. En Suisse, elles sont en plus coupées automatiquement (« mode Suisse »), qui ne se désactive qu'en cochant une case dédiée ; les signalements « police » et « radar » de la communauté n'y sont jamais diffusés. Si tu les actives, tu le fais en connaissance de cause et sous ta seule responsabilité : amendes, retraits de points, suspensions de permis et confiscations restent à ta charge. Ton choix est enregistré avec la date. Ces informations ne sont pas un conseil juridique.",
+    "3. Alertes radars" to "La loi dépend du pays. En France, utiliser un appareil ou une application qui indique l'emplacement des radars fixes ou mobiles est interdit (décret du 3 janvier 2012 : jusqu'à 1 500 € d'amende, 6 points, suspension du permis, confiscation) ; seules les « zones de danger » sont admises. C'est aussi interdit, notamment, en Suisse, en Allemagne, en Autriche, au Liechtenstein, en Slovaquie et en Irlande. Les alertes radars de Pilote s'activent quand tu acceptes ces conditions, en cochant la case qui rappelle cette interdiction et en écrivant « J'accepte » ; tu peux les couper dès l'avertissement, puis à tout moment (bouton 📷, Réglages). Pour être en règle dans ces pays, coupe-les. L'activation des alertes radars vaut aussi pour la Suisse (le « mode Suisse », qui les y coupe, est alors désactivé ; tu peux le réactiver dans les réglages) ; les signalements « police » et « radar » de la communauté n'y sont jamais diffusés. Si tu les actives, tu le fais en connaissance de cause et sous ta seule responsabilité : amendes, retraits de points, suspensions de permis et confiscations restent à ta charge. Ton choix est enregistré avec la date. Ces informations ne sont pas un conseil juridique.",
     "4. Signalements de contrôles" to "Les signalements « police » de la communauté peuvent être suspendus à tout moment, sans préavis, notamment pour appliquer une interdiction de diffusion décidée par l'autorité administrative.",
     "5. Communauté" to "Signale uniquement ce que tu as vu, honnêtement. Sont interdits : les faux signalements, les messages injurieux, discriminatoires ou illégaux, et toute donnée personnelle sur autrui (nom, plaque, photo). Un compte qui abuse peut être suspendu ou banni.",
     "6. Caméra et dashcam" to "Les images restent sur ton téléphone. Si tu publies une vidéo, floute les visages et les plaques.",

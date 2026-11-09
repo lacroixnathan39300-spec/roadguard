@@ -13,6 +13,18 @@ export interface LicEnv { DB: D1Database }
 export interface User {
   username: string; pass_hash: string; salt: string; created_at: number;
   access_until: number; plan: string; blocked: number; admin: number; last_seen: number;
+  first_name?: string;
+}
+
+/**
+ * Prénom (facultatif) : lettres, espaces, tiret et apostrophe, 30 caractères au plus, majuscule au début de chaque
+ * partie (« jean-marc » → « Jean-Marc »). "" si vide ou invalide.
+ */
+export function cleanFirstName(raw: unknown): string {
+  if (typeof raw !== "string") return "";
+  const t = raw.normalize("NFC").replace(/[’`]/g, "'").replace(/\s+/g, " ").trim().slice(0, 30);
+  if (!t || !/^[\p{L}][\p{L}' -]*$/u.test(t)) return "";
+  return t.toLowerCase().replace(/(^|[ '-])(\p{L})/gu, (_m, sep: string, c: string) => sep + c.toUpperCase());
 }
 
 export function cleanUsername(raw: unknown): string | null {
@@ -78,6 +90,7 @@ export function status(u: User, now: number) {
   return {
     username: u.username, admin: !!u.admin, plan: u.admin ? "admin" : u.blocked ? "blocked" : u.plan,
     accessUntil: u.access_until, active: isActive(u, now), blocked: !!u.blocked, serverTime: now,
+    firstName: u.first_name ?? "",
   };
 }
 
@@ -144,10 +157,10 @@ export async function licenseRoutes(req: Request, env: LicEnv, path: string): Pr
       const user: User = {
         username, pass_hash: await hashPassword(password, salt), salt, created_at: now,
         access_until: usedTrial ? now - 1 : now + TRIAL_MS, plan: usedTrial ? "expired" : "trial",
-        blocked: 0, admin: 0, last_seen: now,
+        blocked: 0, admin: 0, last_seen: now, first_name: cleanFirstName(b.firstName),
       };
-      const stmts = [env.DB.prepare("INSERT INTO users (username, pass_hash, salt, created_at, access_until, plan, blocked, admin, last_seen) VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?)")
-        .bind(user.username, user.pass_hash, user.salt, now, user.access_until, user.plan, user.admin, now)];
+      const stmts = [env.DB.prepare("INSERT INTO users (username, pass_hash, salt, created_at, access_until, plan, blocked, admin, last_seen, first_name) VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, ?)")
+        .bind(user.username, user.pass_hash, user.salt, now, user.access_until, user.plan, user.admin, now, user.first_name)];
       if (!usedTrial) stmts.push(env.DB.prepare("INSERT INTO trials (device, username, at) VALUES (?, ?, ?)").bind(device, username, now));
       await env.DB.batch(stmts);
       return openSession(env, user, device, app, now);
@@ -172,6 +185,14 @@ export async function licenseRoutes(req: Request, env: LicEnv, path: string): Pr
   }
   if (!me) return fail(401, "Connexion requise");
   if (req.method === "GET" && path === "/v1/auth/status") return json({ ...status(me, now), contact: await contact(env) });
+  // Prénom (le GPS s'adresse au conducteur par son prénom) : modifiable à tout moment, vide pour l'effacer.
+  if (req.method === "POST" && path === "/v1/auth/profile") {
+    const b = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+    const firstName = cleanFirstName(b.firstName);
+    if (typeof b.firstName === "string" && b.firstName.trim() && !firstName) return fail(400, "Prénom : lettres seulement (tiret et apostrophe permis)");
+    await env.DB.prepare("UPDATE users SET first_name = ? WHERE username = ?").bind(firstName, me.username).run();
+    return json({ ...status({ ...me, first_name: firstName }, now), contact: await contact(env) });
+  }
   if (req.method === "POST" && path === "/v1/auth/logout") {
     const t = req.headers.get("x-rg-session") ?? new URL(req.url).searchParams.get("session") ?? "";
     await env.DB.prepare("DELETE FROM sessions WHERE token_hash = ?").bind(await sha256(t)).run();

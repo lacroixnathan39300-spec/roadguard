@@ -99,3 +99,16 @@ test("preuve d'acceptation de l'avertissement légal", async () => {
   assert.equal(cleanAcceptance({ version: 2, device: "court" }, now), null);
   assert.equal(cleanAcceptance({ version: 2, device: "x'; DROP TABLE users;--" }, now), null);
 });
+
+test("prénom du conducteur", async () => {
+  const { cleanFirstName } = await import("../src/license.ts");
+  assert.equal(cleanFirstName("  nathan "), "Nathan");
+  assert.equal(cleanFirstName("jean-marc"), "Jean-Marc");
+  assert.equal(cleanFirstName("MARIE  CLAIRE"), "Marie Claire");
+  assert.equal(cleanFirstName("éloïse"), "Éloïse");
+  assert.equal(cleanFirstName("d’artagnan"), "D'Artagnan");
+  assert.equal(cleanFirstName("<script>"), "");
+  assert.equal(cleanFirstName("R2D2"), "");
+  assert.equal(cleanFirstName(42), "");
+  assert.equal(cleanFirstName(""), "");
+});

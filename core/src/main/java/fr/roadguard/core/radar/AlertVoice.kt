@@ -11,6 +11,7 @@ import java.util.Locale
  * seul le bip est joué.
  */
 class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
+    private val appContext: Context = context.applicationContext ?: context
     private val tts = TextToSpeech(context.applicationContext, this)
     /** Phrases pré-enregistrées (voix réaliste « Jessica » ou « Ma voix »). */
     val pack = VoicePack(context)
@@ -126,7 +127,48 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
         if (!(ttsReady && voiceEnabled) || text.isBlank()) return
         speaking++
         duck()
-        tts.speak(text, TextToSpeech.QUEUE_ADD, null, id)
+        tts.speak(withName(text, nameChance(id)), TextToSpeech.QUEUE_ADD, null, id)
+    }
+
+    // ---------- Prénom du conducteur dans les phrases ----------
+
+    /** Prénom du conducteur (compte), "" si non donné. */
+    private val driverName: String
+        get() = runCatching { fr.roadguard.core.account.AccountManager.get(appContext).status?.firstName.orEmpty() }.getOrDefault("").trim()
+
+    /**
+     * Part des phrases dites avec le prénom, selon leur rôle : toujours pour réveiller, réprimander ou conseiller une
+     * pause ; parfois pour un radar ou une limitation (sinon ça devient lassant) ; jamais au milieu des consignes de
+     * guidage (courtes et précises), sauf demande explicite ([speakNamed]).
+     */
+    private fun nameChance(id: String): Double = when {
+        id == "rg-wake" || id == "rg-tired" || id == "rg-scold" || id == "rg-named" -> 1.0
+        id == "rg-over" -> 0.6
+        id == "rg-alarm" -> 0.5
+        id.startsWith("rg-ask-") -> 0.5
+        id == "rg-average" -> 0.3
+        id == "rg-limit" -> 0.25
+        id.startsWith("rg-nav-") -> 0.0
+        id.startsWith("rg-") -> 0.35 // radars (identifiant du radar)
+        else -> 0.0
+    }
+
+    /** Ajoute le prénom à la phrase (« Nathan, radar fixe… » ou « …, Nathan. »), avec la probabilité [chance]. */
+    private fun withName(text: String, chance: Double): String {
+        val name = driverName
+        if (name.isEmpty() || chance <= 0.0 || Math.random() >= chance) return text
+        if (text.contains(name, ignoreCase = true)) return text
+        val t = text.trim()
+        // Fin de phrase (« Fais une pause, Nathan. ») pour les conseils ; début (« Nathan, … ») pour le reste.
+        val atEnd = Math.random() < 0.4 && t.length < 90 && !t.dropLast(1).contains('.')
+        if (atEnd) {
+            val end = t.lastOrNull()?.takeIf { it == '.' || it == '!' || it == '?' }
+            val body = if (end != null) t.dropLast(1).trimEnd() else t
+            return "$body, $name${end ?: "."}"
+        }
+        // Première lettre en minuscule après le prénom, sauf sigle ou nom propre probable (deux majuscules, chiffre).
+        val keepCase = t.length > 1 && (t[1].isUpperCase() || t[0].isDigit())
+        return "$name, " + if (keepCase) t else t.replaceFirstChar { it.lowercase() }
     }
     private var ttsReady = false
     /** Réglages : voix et bip (modifiables à tout moment). */
@@ -195,6 +237,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     // Alarme d'excès de vitesse devant un radar : son aigu répété, plus « Ralentis » à la voix.
     // Pendant les bips de proximité, ce sont les bips eux-mêmes qui passent en alarme (voir beepTick).
     private var alarmOn = false
+    private var alarmTalk = true
     private var alarmLimit: Int? = null
     private var lastAlarmVoice = 0L
     private val alarmTick = object : Runnable {
@@ -202,17 +245,24 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
             if (!alarmOn) return
             if (!beeping && android.os.SystemClock.uptimeMillis() >= sirenUntil) { duck(900); tone?.startTone(ToneGenerator.TONE_CDMA_HIGH_PBX_SS, 700) }
             val now = android.os.SystemClock.uptimeMillis()
-            if (now - lastAlarmVoice > 7_000) { lastAlarmVoice = now; line("alarm", null, alarmLimit, "rg-alarm") }
+            if (alarmTalk && now - lastAlarmVoice > 7_000) { lastAlarmVoice = now; line("alarm", null, alarmLimit, "rg-alarm") }
             beeper.postDelayed(this, 1_100)
         }
     }
 
-    /** Active ou coupe l'alarme (appelé à chaque position). */
-    fun overspeedAlarm(on: Boolean, limitKmh: Int?) {
+    /** Active ou coupe l'alarme (appelé à chaque position). [talk] faux : sons seulement, sans « Ralentis » à la voix. */
+    fun overspeedAlarm(on: Boolean, limitKmh: Int?, talk: Boolean = true) {
         alarmLimit = limitKmh
+        alarmTalk = talk
         if (on == alarmOn) return
         alarmOn = on
         if (on) { lastAlarmVoice = 0; beeper.post(alarmTick) } else beeper.removeCallbacks(alarmTick)
+    }
+
+    /** Tout petit bip, court et sans baisser la musique : dépassement quand les avertissements à la voix sont coupés. */
+    fun softBeep() {
+        if (!beepEnabled || beeping || alarmOn) return
+        tone?.startTone(ToneGenerator.TONE_PROP_BEEP, 70)
     }
 
     @Volatile private var sirenUntil = 0L
@@ -263,10 +313,10 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
 
     /** Somnolence : réveil d'urgence, ou conseil de pause. */
     fun wakeUp() {
-        // Toujours dit, même quand les annonces sont coupées.
+        // Toujours dit, même quand les annonces sont coupées (avec le prénom : on réagit plus vite à son nom).
         if (!ttsReady) return
         speaking++; duck()
-        tts.speak(pack.text(style, "wake", null, null), TextToSpeech.QUEUE_ADD, null, "rg-wake")
+        tts.speak(withName(pack.text(style, "wake", null, null), 1.0), TextToSpeech.QUEUE_ADD, null, "rg-wake")
     }
     fun tired() = line("tired", null, null, "rg-tired")
 
@@ -316,6 +366,9 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
      */
     fun guideStep(instruction: String, m: fr.roadguard.core.nav.Maneuver?, toNextM: Int, kind: Int, hasThen: Boolean) {
         val x = if (xxlOn && !hasThen) xxlManeuver(instruction, m, toNextM, kind) else null
+        // Départ et arrivée : dits avec le prénom (« Nathan, c'est parti… », « Tu es arrivé, Nathan. »).
+        val arrival = m != null && m.type in 4..6 && kind != fr.roadguard.core.nav.GuidanceState.EARLY
+        if (arrival || kind == fr.roadguard.core.nav.GuidanceState.START) { speakNamed(x ?: instruction); return }
         if (x != null) speak(x) else guide(instruction)
     }
 
@@ -388,6 +441,11 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     /** Consigne de guidage ou message libre, à la suite des annonces en cours. */
     fun speak(text: String) {
         say(text, "rg-nav-${text.hashCode()}")
+    }
+
+    /** Message dit en s'adressant au conducteur par son prénom (pause, fin de trajet, arrivée, choc…). */
+    fun speakNamed(text: String) {
+        say(text, "rg-named")
     }
 
     /** Suites à lancer quand une phrase est finie (écoute de la réponse « oui / non »). */
