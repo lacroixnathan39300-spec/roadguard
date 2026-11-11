@@ -7,6 +7,12 @@ on:
       list:
         description: "Lister seulement les comptes (oui/non)"
         default: "non"
+      reset_user:
+        description: "Nouveau mot de passe provisoire pour ce compte (vide = rien)"
+        default: ""
+      reset_pass:
+        description: "Mot de passe provisoire (jamais écrit dans le dépôt)"
+        default: ""
 
 jobs:
   diag:
@@ -24,9 +30,33 @@ jobs:
           while IFS='=' read -r k v; do [ -n "$k" ] && echo "::add-mask::$v" && echo "$k=$v" >> "$GITHUB_ENV"; done < "$RUNNER_TEMP/cf.env"
           rm -f "$RUNNER_TEMP/cf.env"
       - name: Essai
+        env:
+          RESET_USER: ${{ inputs.reset_user }}
+          RESET_PASS: ${{ inputs.reset_pass }}
         run: |
+          [ -n "$RESET_PASS" ] && echo "::add-mask::$RESET_PASS"
           npm install --no-audit --no-fund >/dev/null 2>&1
           sed -i "s/REMPLACE_PAR_LA_CI/$(npx wrangler d1 list --json | python3 -c "import json,sys; print(next(d['uuid'] for d in json.load(sys.stdin) if d['name']=='roadguard-eu'))")/" wrangler.toml
+          url=https://roadguard.roadguard-app.workers.dev
+          if [ -n "$RESET_USER" ] && [ -n "$RESET_PASS" ]; then
+            # Même calcul que le serveur (PBKDF2-SHA256, 4 000 itérations, sel aléatoire) : le mot de passe n'est jamais stocké.
+            read -r salt hash < <(node -e '
+              const s=[...crypto.getRandomValues(new Uint8Array(16))].map(b=>b.toString(16).padStart(2,"0")).join("");
+              (async()=>{const k=await crypto.subtle.importKey("raw",new TextEncoder().encode(process.env.RESET_PASS),"PBKDF2",false,["deriveBits"]);
+              const b=await crypto.subtle.deriveBits({name:"PBKDF2",hash:"SHA-256",salt:new TextEncoder().encode(s),iterations:4000},k,256);
+              console.log(s,[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""));})()')
+            echo "::add-mask::$hash"
+            u=$(echo "$RESET_USER" | tr 'A-Z' 'a-z' | tr -cd 'a-z0-9._-')
+            echo "== nouveau mot de passe pour $u"
+            npx wrangler d1 execute roadguard-eu --remote --json --command "UPDATE users SET pass_hash = '$hash', salt = '$salt' WHERE username = '$u'" 2>/dev/null \
+              | python3 -c "import json,sys; print('comptes modifiés :', json.load(sys.stdin)[0]['meta']['changes'])"
+            echo "== essai de connexion"
+            d=ci$(date +%s)reset
+            r=$(curl -sS -X POST "$url/v1/auth/login" -H "content-type: application/json" -d "{\"username\":\"$u\",\"password\":\"$RESET_PASS\",\"device\":\"$d\",\"app\":\"gps\"}")
+            echo "$r" | python3 -c "import json,sys; j=json.load(sys.stdin); print('connexion OK :', j.get('username'), j.get('plan')) if j.get('token') else print('ÉCHEC :', j)"
+            npx wrangler d1 execute roadguard-eu --remote --command "DELETE FROM sessions WHERE device = '$d'" >/dev/null 2>&1 || true
+            exit 0
+          fi
           url=https://roadguard.roadguard-app.workers.dev
           if [ "${{ inputs.list }}" = "oui" ]; then
             for q in "SELECT username, plan, admin, blocked, created_at, last_seen FROM users" "SELECT username, substr(device,1,6) AS dev, app, created_at, last_seen FROM sessions" "SELECT substr(device,1,6) AS dev, username, at FROM trials" "SELECT id, name, points, last_report_at FROM accounts ORDER BY last_report_at DESC LIMIT 10" "SELECT type, round(lat,3) AS lat, round(lon,3) AS lon, yes, no, status, created_at, expires_at, author_id FROM reports ORDER BY created_at DESC LIMIT 15" "SELECT at, app, version, substr(text,1,700) AS text FROM crashes ORDER BY at DESC LIMIT 6"; do
