@@ -340,7 +340,8 @@ fun MapButton(label: String, onClick: () -> Unit, modifier: Modifier = Modifier)
  * rouge et barré quand c'est coupé, avec une petite légende dessous.
  */
 @Composable
-fun QuickToggle(emoji: String, caption: String, on: Boolean, onToggle: () -> Unit, modifier: Modifier = Modifier) {
+fun QuickToggle(emoji: String, caption: String, on: Boolean, onToggle: () -> Unit, modifier: Modifier = Modifier,
+                offCaption: String? = null, slash: Boolean = true) {
     val ring = if (on) Color(0xFF2ED573) else Color(0xFFFF4757)
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
@@ -350,11 +351,11 @@ fun QuickToggle(emoji: String, caption: String, on: Boolean, onToggle: () -> Uni
             contentAlignment = Alignment.Center,
         ) {
             Text(emoji, fontSize = 24.sp * DriveColors.Scale, color = Color.White.copy(alpha = if (on) 1f else 0.55f))
-            if (!on) androidx.compose.foundation.Canvas(Modifier.size(40.dp * DriveColors.Scale)) {
+            if (!on && slash) androidx.compose.foundation.Canvas(Modifier.size(40.dp * DriveColors.Scale)) {
                 drawLine(ring, androidx.compose.ui.geometry.Offset(size.width, 0f), androidx.compose.ui.geometry.Offset(0f, size.height), strokeWidth = 4.dp.toPx())
             }
         }
-        Text(if (on) caption else "$caption off", color = if (on) Color.White else Color(0xFFFF8A94), fontSize = 12.sp, fontWeight = FontWeight.Bold,
+        Text(if (on) caption else offCaption ?: "$caption off", color = if (on) Color.White else Color(0xFFFF8A94), fontSize = 12.sp, fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(top = 2.dp).clip(RoundedCornerShape(6.dp)).background(Color(0x99000000)).padding(horizontal = 5.dp))
     }
 }

@@ -270,7 +270,7 @@ private fun PhoneHome() {
     }
     val listen = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()) { r ->
         val text = r.data?.getStringArrayListExtra(android.speech.RecognizerIntent.EXTRA_RESULTS)?.firstOrNull() ?: return@rememberLauncherForActivityResult
-        s.voice.speak(VoiceCommands.handle(text, s, voiceActions))
+        s.voice.speakAlways(VoiceCommands.handle(text, s, voiceActions))
     }
     fun startListening() = runCatching {
         listen.launch(android.content.Intent(android.speech.RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
@@ -283,7 +283,7 @@ private fun PhoneHome() {
     val replyTo = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()) { r ->
         val text = r.data?.getStringArrayListExtra(android.speech.RecognizerIntent.EXTRA_RESULTS)?.firstOrNull() ?: return@rememberLauncherForActivityResult
         val m = MessageReader.last.value ?: return@rememberLauncherForActivityResult
-        s.voice.speak(if (MessageReader.reply(context, m, text)) "Réponse envoyée à ${m.from}" else "Impossible de répondre depuis Pilote à ce message")
+        s.voice.speakAlways(if (MessageReader.reply(context, m, text)) "Réponse envoyée à ${m.from}" else "Impossible de répondre depuis Pilote à ce message")
         MessageReader.last.value = null
     }
     // Anti-somnolence : analyse invisible par la caméra avant pendant que la carte reste affichée.
@@ -394,24 +394,15 @@ private fun PhoneHome() {
         }
         Column(Modifier.align(Alignment.CenterEnd).padding(end = 12.dp), verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
-            // Interrupteurs rapides (cachés avec le reste en mode épuré) : radars / annonces de limitation.
+            // Interrupteurs rapides (cachés avec le reste en mode épuré) : bouton son (niveaux et radars) et Suisse.
             if (panelOpen) {
-                fr.roadguard.core.ui.QuickToggle("📷", "Radars", settings.radarsOn, onToggle = {
-                    val want = !settings.radarsOn
-                    settings.changeRadarsOn(want)
-                    // Pas encore d'accord (case de l'avertissement légal) : la confirmation s'affiche.
-                    if (want && !settings.radarsOn) fr.roadguard.core.ui.Legal.askRadars = true
-                    else android.widget.Toast.makeText(context, if (settings.radarsOn) "Alertes radars activées" else "Alertes radars coupées", android.widget.Toast.LENGTH_SHORT).show()
-                })
+                // Haut-parleur : tout, alertes seulement, radars seuls ou tout couper ; activation des radars dedans.
+                fr.roadguard.core.ui.SoundButton(settings, s.voice)
                 // Radars en Suisse (interdits là-bas) : coupés par défaut, rallumés d'un appui, à ses risques.
                 fr.roadguard.core.ui.QuickToggle("🇨🇭", "Suisse", settings.radarsOn && !settings.swissMode, onToggle = {
                     fr.roadguard.core.ui.Legal.toggleSwiss(context, settings)?.let {
                         android.widget.Toast.makeText(context, it, android.widget.Toast.LENGTH_SHORT).show()
                     }
-                })
-                fr.roadguard.core.ui.QuickToggle("🚦", "Limites", settings.limitVoiceOn, onToggle = {
-                    settings.changeLimitVoice(!settings.limitVoiceOn)
-                    android.widget.Toast.makeText(context, if (settings.limitVoiceOn) "Annonces de limitation activées" else "Annonces de limitation coupées", android.widget.Toast.LENGTH_SHORT).show()
                 })
             }
             if (drowsy != null) {

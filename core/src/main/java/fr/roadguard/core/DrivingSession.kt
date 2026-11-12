@@ -149,8 +149,8 @@ class DrivingSession(
         if (drivingSince == 0L) { drivingSince = now; nextPauseAt = now + if (night) 90 * 60_000L else 2 * 3_600_000L }
         if (now >= nextPauseAt) {
             val h = (now - drivingSince) / 3_600_000.0
-            if (night) voice.speakNamed("Il est tard et tu roules depuis un moment : la vigilance baisse. Fais une pause.")
-            else voice.speakNamed(if (h < 2.2) "Deux heures de route. Pense à faire une pause." else "Cela fait %.0f heures de route. Une pause s'impose.".format(java.util.Locale.FRANCE, h))
+            if (night) voice.speakNamed("Il est tard et tu roules depuis un moment : la vigilance baisse. Fais une pause.", fr.roadguard.core.radar.SoundLevel.ALERTS)
+            else voice.speakNamed(if (h < 2.2) "Deux heures de route. Pense à faire une pause." else "Cela fait %.0f heures de route. Une pause s'impose.".format(java.util.Locale.FRANCE, h), fr.roadguard.core.radar.SoundLevel.ALERTS)
             nextPauseAt = now + if (night) 20 * 60_000L else 30 * 60_000L
         }
     }
@@ -204,17 +204,17 @@ class DrivingSession(
         val adj = adjusted(rawLimit)
         if (rawLimit != null && adj != speedLimit) {
             speedLimit = adj
-            if (settings.announceLimit && adj != null) voice.speak(if (localInfo.raining && settings.rainLimits) "Il pleut : limitation abaissée à $adj" else "Limitation $adj")
+            if (settings.announceLimit && adj != null) voice.speakAlert(if (localInfo.raining && settings.rainLimits) "Il pleut : limitation abaissée à $adj" else "Limitation $adj")
         }
         if (localInfo.raining != lastRain) { lastRain = localInfo.raining }
         // Suisse : annonces de radars interdites.
         val c = localInfo.country
         if (c != null && c != lastCountry) {
             if (lastCountry != null && settings.swissMode) {
-                if (c == "CH") voice.speak("Tu entres en Suisse : les alertes radars sont coupées, comme l'exige la loi suisse.")
-                else if (lastCountry == "CH") voice.speak("Tu quittes la Suisse : alertes radars rétablies.")
+                if (c == "CH") voice.speakRadar("Tu entres en Suisse : les alertes radars sont coupées, comme l'exige la loi suisse.")
+                else if (lastCountry == "CH") voice.speakRadar("Tu quittes la Suisse : alertes radars rétablies.")
             } else if (lastCountry != null && c == "CH" && settings.radarsOn) {
-                voice.speak("Tu entres en Suisse : les alertes radars y sont interdites. Tu as choisi de les garder, sous ta responsabilité.")
+                voice.speakRadar("Tu entres en Suisse : les alertes radars y sont interdites. Tu as choisi de les garder, sous ta responsabilité.")
             }
             lastCountry = c
         }
@@ -228,7 +228,7 @@ class DrivingSession(
                     "Brouillard" -> "Brouillard : allume tes feux et garde tes distances."
                     else -> "Attention : $h. Adapte ta vitesse."
                 }
-                voice.speak(when (h) {
+                voice.speakAlert(when (h) {
                     "Brouillard" -> voice.xxl("fog")
                     "Risque de verglas", "Pluie verglaçante" -> voice.xxl("ice")?.let { "Attention : $h. $it" }
                     else -> null
@@ -242,10 +242,10 @@ class DrivingSession(
                     g.pointAhead(20_000.0)?.let { localInfo.checkAhead(it.lat, it.lon, now) }
                 }
                 val ha = localInfo.hazardAhead
-                if (ha != null && ha != lastAheadHazard && ha != h) { lastAheadHazard = ha; voice.speak("Sur ta route, dans une vingtaine de kilomètres : $ha.") }
+                if (ha != null && ha != lastAheadHazard && ha != h) { lastAheadHazard = ha; voice.speakAlert("Sur ta route, dans une vingtaine de kilomètres : $ha.") }
             }
         }
-        if (settings.hazardAlerts && !batterySaving) hazards.onFix(f, now)?.let { voice.speak(voice.xxlHazard(it) ?: it) }
+        if (settings.hazardAlerts && !batterySaving) hazards.onFix(f, now)?.let { voice.speakAlert(voice.xxlHazard(it) ?: it) }
     }
 
     // Fin de trajet : arrêt d'au moins 3 min après au moins 5 min de route (ou Bluetooth de la voiture coupé).
@@ -265,7 +265,7 @@ class DrivingSession(
         lastTrip = rec
         if (lat != null && lon != null) tripLog.parking = fr.roadguard.core.safety.Parking(lat, lon, System.currentTimeMillis(), localInfo.address, 0)
         voice.xxl("trip_end")?.let(voice::speak)
-        if (settings.forgetReminder) voice.speakNamed("Fin du trajet. Pense à vérifier : rien oublié à l'arrière ? Enfant, animal, sac ?")
+        if (settings.forgetReminder) voice.speakNamed("Fin du trajet. Pense à vérifier : rien oublié à l'arrière ? Enfant, animal, sac ?", fr.roadguard.core.radar.SoundLevel.MUTE)
         val due = settings.serviceAtKm
         if (due > 0 && tripLog.odometerKm >= due) voice.speak("Rappel : l'entretien de la voiture est à prévoir.")
     }
@@ -284,7 +284,7 @@ class DrivingSession(
         val now = System.currentTimeMillis()
         if (now - lastFastAt < 6_000) impactAt = now
     }
-    fun cancelCrash() { crashAt = 0L; impactAt = 0L; voice.speakNamed("D'accord. Bonne route, et prends soin de toi.") }
+    fun cancelCrash() { crashAt = 0L; impactAt = 0L; voice.speakNamed("D'accord. Bonne route, et prends soin de toi.", fr.roadguard.core.radar.SoundLevel.MUTE) }
     private fun crashStep(kmh: Double, now: Long) {
         if (kmh >= 25) lastFastAt = now
         // Choc puis arrêt dans les 15 s : on demande si tout va bien.
@@ -293,7 +293,7 @@ class DrivingSession(
                 crashAt = now; impactAt = 0L
                 val who = settings.emergencyName.ifBlank { "ton contact d'urgence" }
                 voice.wakeUp()
-                voice.speakNamed("Choc détecté. Tout va bien ? Touche « Je vais bien ». Sinon, je préviens $who dans trente secondes.")
+                voice.speakNamed(min = fr.roadguard.core.radar.SoundLevel.MUTE, text = "Choc détecté. Tout va bien ? Touche « Je vais bien ». Sinon, je préviens $who dans trente secondes.")
             } else if (now - impactAt > 15_000) impactAt = 0L
         }
     }
@@ -302,12 +302,12 @@ class DrivingSession(
         crashAt = 0L
         val p = here
         val phone = settings.emergencyPhone
-        if (phone.isBlank()) { voice.speak("Aucun contact d'urgence enregistré. Appelle le 112 si tu as besoin d'aide."); return }
+        if (phone.isBlank()) { voice.speakAlways("Aucun contact d'urgence enregistré. Appelle le 112 si tu as besoin d'aide."); return }
         val pos = p?.let { "https://maps.google.com/?q=%.5f,%.5f".format(java.util.Locale.US, it.lat, it.lon) } ?: "position inconnue"
         val text = "Pilote : un choc a été détecté et le conducteur ne répond pas. Position : $pos. " +
             "Appelle-le, et le 112 si besoin."
         val ok = sendEmergency?.invoke(phone, text) == true
-        voice.speak(if (ok) "Message envoyé à ${settings.emergencyName.ifBlank { "ton contact" }}." else "Impossible d'envoyer le message. Appelle le 112 si tu as besoin d'aide.")
+        voice.speakAlways(if (ok) "Message envoyé à ${settings.emergencyName.ifBlank { "ton contact" }}." else "Impossible d'envoyer le message. Appelle le 112 si tu as besoin d'aide.")
     }
 
     // ---------- Tunnels : position estimée quand le GPS ne répond plus ----------
@@ -355,6 +355,8 @@ class DrivingSession(
         community.currentWay = { SpeedLimits.lastWay }
         community.currentLimit = { mapLimit }
         community.announceAloud = { r, meters -> voice.xxlReport(r.type.code, meters, r.yes) }
+        // Bouton son : contrôles signalés avec les radars, le reste (accident, bouchon, danger…) avec les alertes.
+        community.sayReport = { type, text -> if (type.radarLike) voice.speakRadar(text) else voice.speakAlert(text) }
         community.startConvoyLoop()
         // Échéances de la voiture (contrôle technique, assurance…) : notification un mois avant.
         scope.launch { kotlinx.coroutines.delay(20_000); runCatching { fr.roadguard.core.safety.Reminders.check(context) } }
@@ -461,7 +463,7 @@ class DrivingSession(
         val roadLimit = speedLimit
         val roadOver = talkOver && settings.alarmAnywhere && roadLimit != null &&
             fr.roadguard.core.nav.SpeedLimitTracker.isOver(f.speedKmh.toInt(), roadLimit, settings.overTolerance)
-        voice.overspeedAlarm(radarOver || roadOver, if (radarOver) limit else roadLimit, talk = talkOver)
+        voice.overspeedAlarm(radarOver || roadOver, if (radarOver) limit else roadLimit, talk = talkOver, radar = radarOver)
         // Réprimande : excès qui dure (plus de 15 s) ou qui se répète (3 fois en 10 min), au plus toutes les 45 s.
         val overNow = radarOver || (roadLimit != null && fr.roadguard.core.nav.SpeedLimitTracker.isOver(f.speedKmh.toInt(), roadLimit, settings.overTolerance))
         if (overNow) { if (overSince == 0L) { overSince = f.timeMs; overEpisodes.addLast(f.timeMs) } } else overSince = 0L
@@ -484,6 +486,7 @@ class DrivingSession(
         }
         voice.voiceEnabled = settings.voice
         voice.beepEnabled = settings.beep
+        voice.level = settings.soundLevel
         voice.duckMusic = settings.duckMusic
         voice.configure(settings.voiceName, settings.speechRate, settings.voiceTone, settings.voiceLang)
         voice.realistic = false // même voix (celle du téléphone) pour le guidage et les radars
@@ -514,7 +517,7 @@ class DrivingSession(
         // « Coquin XXL » : moyenne au-dessus de la limite pendant le tronçon (une fois par tronçon).
         if (newAverage != null && !newAverage.finished && newAverage.over && newAverage.meters > 500 && !avgOverSaid) {
             avgOverSaid = true
-            voice.xxl("avg_over")?.let { voice.speak("$it Moyenne ${newAverage.averageKmh}, limite ${newAverage.limitKmh}.") }
+            voice.xxl("avg_over")?.let { voice.speakRadar("$it Moyenne ${newAverage.averageKmh}, limite ${newAverage.limitKmh}.") }
         }
         if (newAverage == null || newAverage.finished) avgOverSaid = false
         average = newAverage

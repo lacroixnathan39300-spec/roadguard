@@ -48,15 +48,15 @@ private fun pages(drive: Boolean): List<Page> = listOfNotNull(
         "Ce petit tour prend une minute. Tu peux le revoir dans Réglages → « Revoir le tutoriel ».",
     )),
     Page("📷", "Les radars", listOf(
-        "Activés quand tu acceptes l'avertissement, sous ta responsabilité : ils sont interdits en France, en Suisse et dans d'autres pays. Pour être en règle, coupe-les (bouton 📷 ou Réglages → « Alertes radars »).",
+        "Activés quand tu acceptes l'avertissement, sous ta responsabilité : ils sont interdits en France, en Suisse et dans d'autres pays. Pour être en règle, coupe-les (bouton son 🔊 → « Alertes radars », ou Réglages → « Alertes radars »).",
         "Une fois activés : annonce à 1 km, puis des bips de plus en plus rapides jusqu'au radar, qui s'arrêtent pile au radar.",
         "Seulement le radar qui est sur TA route : avec un itinéraire, ceux du tracé ; sinon, ceux de ton couloir qui se rapprochent vraiment.",
         "Trop vite à l'approche : alarme stridente « Ralentis ! ». Tronçons : ta vitesse moyenne en direct.",
-        if (drive) "Réglages → Annonces : couper les radars, les bips, l'alarme." else "Bouton rond 📷 à droite de la carte : coupe ou remet les radars (et leurs points sur la carte).",
+        if (drive) "Réglages → Annonces : couper les radars, les bips, l'alarme." else "Bouton son 🔊 à droite de la carte : « Radars seuls » pour n'entendre qu'eux, et « Alertes radars » pour les couper ou les remettre (avec leurs points sur la carte).",
     )),
     Page("🚦", "Limitations de vitesse", listOf(
         "La limitation de la route s'affiche à côté de ta vitesse, et change en quelques secondes avec la zone.",
-        if (drive) "Réglages → Annonces : annonces « Limitation 50 » et avertissement de dépassement." else "Bouton 🚦 : coupe ou remet les annonces « Limitation 50 » et de dépassement.",
+        if (drive) "Réglages → Annonces : annonces « Limitation 50 » et avertissement de dépassement." else "Bouton son 🔊 : Tout, Alertes seulement (sans le guidage), Radars seuls, ou Tout couper (🔇).",
         "Option : alarme forte dès que tu dépasses, même sans radar. Et si tu insistes, elle te réprimande !",
     )),
     Page("💋", "La voix et ses tons", listOf(
@@ -105,7 +105,7 @@ private fun pages(drive: Boolean): List<Page> = listOfNotNull(
         "L'autoradio reçoit ta position, ta musique, tes messages, et Internet par le téléphone.",
     )),
     Page("🛡", "Sécurité automatique", listOf(
-        "Suisse : radars coupés automatiquement (interdits là-bas). Bouton 🇨🇭 « Suisse » à côté du bouton radars pour les y rallumer ou les recouper, à tes risques. Les signalements police et radars de la communauté n'y sont jamais diffusés.",
+        "Suisse : radars coupés automatiquement (interdits là-bas). Bouton 🇨🇭 « Suisse » à côté du bouton son pour les y rallumer ou les recouper, à tes risques. Les signalements police et radars de la communauté n'y sont jamais diffusés.",
         "Pluie : limitations abaissées (130→110, 110→100, 90→80). Jeune conducteur et vitesse max perso dans Réglages.",
         "Météo dangereuse, passages à niveau, virages, écoles annoncés. Radars suivis même dans les tunnels.",
         if (drive) "Fin de trajet : voiture garée mémorisée, et rappel « rien oublié ? » si tu l'actives." else "Détection d'accident : choc + arrêt → « Tout va bien ? », puis SMS à ton contact d'urgence.",

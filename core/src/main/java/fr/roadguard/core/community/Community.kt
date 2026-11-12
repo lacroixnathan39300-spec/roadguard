@@ -95,6 +95,8 @@ class Community(context: Context, private val scope: CoroutineScope, private val
     var myJudged by mutableStateOf(0); private set
     /** Radar déjà connu des bases à cette position (fourni par la session) : radar fixe validé d'office. */
     var knownRadarNear: ((Double, Double) -> Boolean)? = null
+    /** Annonce d'un signalement devant soi, selon son type (bouton son : contrôles avec les radars, le reste avec les alertes). */
+    var sayReport: ((ReportType, String) -> Unit)? = null
     /** Question « toujours là ? » posée à la voix, avec réponse « oui / non » à la voix. */
     var voiceAnswers = true
     /** Pose une question à la voix puis lance la suite une fois la phrase finie (fourni par la session). */
@@ -208,8 +210,9 @@ class Community(context: Context, private val scope: CoroutineScope, private val
                 val meters = ((d + 25) / 50).toInt() * 50
                 val where = if (d > 150) "à $meters mètres" else "tout près"
                 val msg = r.text
-                speak(if (r.type == ReportType.MESSAGE && !msg.isNullOrBlank()) "Message d'un conducteur, $where : $msg"
-                    else announceAloud?.invoke(r, meters.coerceAtLeast(50)) ?: "${r.type.label} signalé $where")
+                val text = if (r.type == ReportType.MESSAGE && !msg.isNullOrBlank()) "Message d'un conducteur, $where : $msg"
+                    else announceAloud?.invoke(r, meters.coerceAtLeast(50)) ?: "${r.type.label} signalé $where"
+                sayReport?.invoke(r.type, text) ?: speak(text)
             }
             if (d < 120 && !r.mine && !r.voted && prompt == null && asked.add(r.id)) {
                 prompt = VotePrompt(r, f.timeMs)

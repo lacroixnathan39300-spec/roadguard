@@ -176,7 +176,7 @@ fun CameraAssistScreen(session: DrivingSession?, onClose: () -> Unit) {
         when (level) {
             AssistLevel.DANGER -> while (true) {
                 tones?.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 250)
-                if (now - lastSound > 4000) { lastSound = now; session?.voice?.speak("Freine !") }
+                if (now - lastSound > 4000) { lastSound = now; session?.voice?.speakAlways("Freine !") }
                 kotlinx.coroutines.delay(350)
             }
             AssistLevel.CLOSE -> { if (now - lastSound > 5000) { lastSound = now; tones?.startTone(ToneGenerator.TONE_PROP_BEEP2, 300) } }

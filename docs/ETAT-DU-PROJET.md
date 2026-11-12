@@ -177,3 +177,14 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
 - Radars signalés (mobiles et fixes) : `Community.alertRadars` → `AlertEngine.extra` ; ils passent par le même moteur
   que les radars des bases (annonce, bandeau, bips d'approche, compteur de radars franchis). La communauté ne les annonce
   plus elle-même (pas de double annonce). Radar fixe signalé déjà connu des bases (< 100 m) : annoncé une seule fois.
+
+## Bouton son à niveaux (12/11/2026)
+- Le feu 🚦 « Limites » et l'interrupteur 📷 « Radars » de l'accueil sont remplacés par un haut-parleur
+  (`SoundButton` / `SoundPanel`, `core/ui/SoundUi.kt`) ; Pilote Drive : même panneau depuis le module radars.
+- Niveaux (`radar/SoundLevel.kt`, réglage `sound_level`) : 🔊 Tout ; 🔉 Alertes seulement (radars, limitations,
+  signalements, dangers, sans le guidage ni les petites phrases) ; 🔈 Radars seuls (radars, contrôles, tronçons)
+  — proposé une fois les radars activés ; 🔇 Tout couper. Toujours dits : choc, somnolence, oubli à l'arrière,
+  réponses aux commandes vocales, « Freine ! » de l'assistance caméra, essais de voix des réglages (`preview`).
+- Filtre dans `AlertVoice` (`level`, `speak` = tout, `speakAlert`, `speakRadar`, `speakAlways`, `speakNamed(min)`) ;
+  signalements de la communauté via `Community.sayReport` (contrôles avec les radars, le reste avec les alertes).
+- Activation / arrêt des radars dans le même panneau (consignes légales à accepter si pas encore fait).

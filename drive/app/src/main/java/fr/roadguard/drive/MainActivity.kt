@@ -199,6 +199,7 @@ private fun DriveHome() {
     val settings = remember { DriveSettings(context) }
     voice.voiceEnabled = settings.voice
     voice.beepEnabled = settings.beep
+    voice.level = settings.soundLevel
     val scope = rememberCoroutineScope()
     // Cœur de conduite commun avec l'appli GPS du téléphone.
     val session = remember { DrivingSession(context, scope, voice, settings) }

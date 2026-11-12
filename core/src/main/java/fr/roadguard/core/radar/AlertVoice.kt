@@ -171,6 +171,16 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
         return "$name, " + if (keepCase) t else t.replaceFirstChar { it.lowercase() }
     }
     private var ttsReady = false
+
+    // ---------- Bouton son : niveaux (tout, alertes, radars seuls, muet) ----------
+    /** Niveau choisi avec le bouton haut-parleur de l'accueil ([SoundLevel]). */
+    @Volatile var level = SoundLevel.ALL
+    /** Essai depuis les réglages : toujours entendu, quel que soit le niveau. */
+    private var forced = false
+    private fun allowed(min: Int) = forced || level >= min
+    /** Joue [block] même si le son est coupé par le bouton (essai d'une voix dans les réglages). */
+    fun preview(block: AlertVoice.() -> Unit) { val was = forced; forced = true; try { block() } finally { forced = was } }
+
     /** Réglages : voix et bip (modifiables à tout moment). */
     var voiceEnabled = true
     var beepEnabled = true
@@ -192,7 +202,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     /** [stopAfterMs] > 0 : radar dépassé, bips rapides encore ce temps-là puis arrêt (sans attendre la position suivante). */
     fun proximity(distanceM: Int?, stopAfterMs: Long = 0) {
         stopAt = if (stopAfterMs > 0 && distanceM != null) android.os.SystemClock.uptimeMillis() + stopAfterMs else 0L
-        proximityM = if (beepEnabled && proximityBeeps) distanceM else null
+        proximityM = if (beepEnabled && proximityBeeps && allowed(SoundLevel.RADARS)) distanceM else null
         // Distance de départ de l'alerte : l'accélération s'étale de ce point jusqu'au radar.
         if (distanceM == null) startM = 0 else if (distanceM > startM || startM == 0) startM = distanceM
         if (proximityM != null && !beeping) { beeping = true; beeper.post(beepTick) }
@@ -251,7 +261,9 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     }
 
     /** Active ou coupe l'alarme (appelé à chaque position). [talk] faux : sons seulement, sans « Ralentis » à la voix. */
-    fun overspeedAlarm(on: Boolean, limitKmh: Int?, talk: Boolean = true) {
+    fun overspeedAlarm(on0: Boolean, limitKmh: Int?, talk: Boolean = true, radar: Boolean = false) {
+        // Devant un radar : avec les radars ; ailleurs (limitation de la route) : avec les alertes.
+        val on = on0 && allowed(if (radar) SoundLevel.RADARS else SoundLevel.ALERTS)
         alarmLimit = limitKmh
         alarmTalk = talk
         if (on == alarmOn) return
@@ -261,7 +273,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
 
     /** Tout petit bip, court et sans baisser la musique : dépassement quand les avertissements à la voix sont coupés. */
     fun softBeep() {
-        if (!beepEnabled || beeping || alarmOn) return
+        if (!beepEnabled || beeping || alarmOn || !allowed(SoundLevel.ALERTS)) return
         tone?.startTone(ToneGenerator.TONE_PROP_BEEP, 70)
     }
 
@@ -276,6 +288,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     }
 
     fun announce(alert: RadarAlert) {
+        if (!allowed(SoundLevel.RADARS)) return
         if (beepEnabled) { duck(600); tone?.startTone(ToneGenerator.TONE_PROP_BEEP2, 300) }
         xxlRadar(alert)?.let { say(it, "rg-${alert.radar.id}"); return }
         if (proximityBeeps || pack.lang != "fr") line("radar", alert.radar.kind, alert.radar.speedKmh, "rg-${alert.radar.id}")
@@ -283,6 +296,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     }
 
     fun announceAverageResult(status: AverageStatus) {
+        if (!allowed(SoundLevel.RADARS)) return
         if (status.over && beepEnabled) { duck(700); tone?.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 400) }
         // « Coquin XXL » : seulement si la moyenne est bonne, et la moyenne mesurée est toujours dite.
         val x = if (!status.over && status.limitKmh != null) xxl("avg_ok")?.let { "$it Moyenne ${status.averageKmh}." } else null
@@ -291,6 +305,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
 
     /** Nouvelle limitation de vitesse. */
     fun limitChanged(limit: Int) {
+        if (!allowed(SoundLevel.ALERTS)) return
         xxl("limit", mapOf("vitesse" to "$limit"))?.let { say(it, "rg-limit"); return }
         line("limit", null, limit, "rg-limit")
     }
@@ -300,6 +315,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
      * (« Mmmh… dans 300 mètres, tournez à droite, mon chéri. »). Ton classique : consigne seule.
      */
     fun guide(instruction: String) {
+        if (!allowed(SoundLevel.ALL)) return
         if (style <= 0 || style == VoicePack.MY_VOICE || pack.lang != "fr") return speak(instruction)
         val base = instruction.trim().trimEnd('.', ' ')
         val pre = pack.phrases(style, "guide_pre").takeIf { Math.random() < 0.45 }?.randomOrNull()
@@ -309,7 +325,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
     }
 
     /** Réprimande (excès de vitesse qui dure ou se répète). */
-    fun scold() = line("scold", null, null, "rg-scold")
+    fun scold() { if (allowed(SoundLevel.ALERTS)) line("scold", null, null, "rg-scold") }
 
     /** Somnolence : réveil d'urgence, ou conseil de pause. */
     fun wakeUp() {
@@ -325,6 +341,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
      * chiffré (« dix km/h de trop ») n'est dite que si l'écart réel est bien celui-là ; la limite est toujours rappelée.
      */
     fun overLimit(limit: Int?, kmh: Int = 0) {
+        if (!allowed(SoundLevel.ALERTS)) return
         if (xxlOn && limit != null && kmh > limit) {
             val over = kmh - limit
             val p = when (over) { in 5..7 -> xxl("over_5"); in 9..12 -> xxl("over_10"); in 18..23 -> xxl("over_20"); in 28..33 -> xxl("over_30"); else -> null }
@@ -365,6 +382,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
      * (même direction, même distance, même sortie de rond-point) ; sinon la consigne au ton choisi ([guide]).
      */
     fun guideStep(instruction: String, m: fr.roadguard.core.nav.Maneuver?, toNextM: Int, kind: Int, hasThen: Boolean) {
+        if (!allowed(SoundLevel.ALL)) return
         val x = if (xxlOn && !hasThen) xxlManeuver(instruction, m, toNextM, kind) else null
         // Départ et arrivée : dits avec le prénom (« Nathan, c'est parti… », « Tu es arrivé, Nathan. »).
         val arrival = m != null && m.type in 4..6 && kind != fr.roadguard.core.nav.GuidanceState.EARLY
@@ -438,14 +456,32 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
         if (parts != null) clips.play(parts) else say(pack.text(style, group, kind, limit), id)
     }
 
-    /** Consigne de guidage ou message libre, à la suite des annonces en cours. */
+    /** Consigne de guidage ou message libre, à la suite des annonces en cours (bouton son sur « Tout »). */
     fun speak(text: String) {
+        if (allowed(SoundLevel.ALL)) say(text, "rg-nav-${text.hashCode()}")
+    }
+
+    /** Alerte de la route (danger, météo, signalement, limitation) : entendue aussi sur « Alertes seulement ». */
+    fun speakAlert(text: String) {
+        if (allowed(SoundLevel.ALERTS)) say(text, "rg-nav-${text.hashCode()}")
+    }
+
+    /** Radar ou contrôle : entendu aussi sur « Radars seuls ». */
+    fun speakRadar(text: String) {
+        if (allowed(SoundLevel.RADARS)) say(text, "rg-nav-${text.hashCode()}")
+    }
+
+    /** Réponse à une demande (commande vocale) ou sécurité (choc) : toujours dite, même son coupé par le bouton. */
+    fun speakAlways(text: String) {
         say(text, "rg-nav-${text.hashCode()}")
     }
 
-    /** Message dit en s'adressant au conducteur par son prénom (pause, fin de trajet, arrivée, choc…). */
-    fun speakNamed(text: String) {
-        say(text, "rg-named")
+    /**
+     * Message dit en s'adressant au conducteur par son prénom (pause, fin de trajet, arrivée, choc…) ;
+     * [min] : niveau du bouton son à partir duquel il est dit ([SoundLevel.MUTE] : toujours).
+     */
+    fun speakNamed(text: String, min: Int = SoundLevel.ALL) {
+        if (allowed(min)) say(text, "rg-named")
     }
 
     /** Suites à lancer quand une phrase est finie (écoute de la réponse « oui / non »). */
@@ -457,7 +493,7 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
      * Rien n'est appelé si la voix est coupée (pas de question posée, donc pas d'écoute).
      */
     fun speakThen(text: String, then: () -> Unit) {
-        if (!(ttsReady && voiceEnabled) || text.isBlank()) return
+        if (!(ttsReady && voiceEnabled) || text.isBlank() || !allowed(SoundLevel.ALERTS)) return
         val id = "rg-ask-${System.nanoTime()}"
         afterSpeech[id] = then
         say(text, id)

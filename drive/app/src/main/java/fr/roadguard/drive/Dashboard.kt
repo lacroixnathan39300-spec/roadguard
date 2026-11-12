@@ -226,14 +226,14 @@ private fun Widget(w: DashWidget, s: DrivingSession, music: NowPlaying?, onPlayP
                     else -> Big("✓ Aucun", "Pas de radar devant toi", Color(0xFF66BB6A))
                 }
             }
-            // Interrupteurs du module : radars, et radars en Suisse (interdits là-bas : coupés par défaut, à ses risques).
+            // Interrupteurs du module : bouton son (niveaux, et activation des radars avec les consignes légales),
+            // et radars en Suisse (interdits là-bas : coupés par défaut, à ses risques).
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                RadarChip("📷 Radars", s.settings.radarsOn) {
-                    val want = !s.settings.radarsOn
-                    s.settings.changeRadarsOn(want)
-                    // Pas encore d'accord : la confirmation (consignes légales, Suisse comprise) s'affiche.
-                    if (want && !s.settings.radarsOn) fr.roadguard.core.ui.Legal.askRadars = true
-                }
+                var soundOpen by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+                val lvl = s.settings.soundLevel
+                RadarChip("${fr.roadguard.core.radar.SoundLevel.emoji(lvl)} ${fr.roadguard.core.radar.SoundLevel.caption(lvl)}" +
+                    if (s.settings.radarsOn) "" else " · radars off", lvl != fr.roadguard.core.radar.SoundLevel.MUTE) { soundOpen = true }
+                if (soundOpen) fr.roadguard.core.ui.SoundPanel(s.settings, s.voice, onClose = { soundOpen = false })
                 RadarChip("🇨🇭 Suisse", s.settings.radarsOn && !s.settings.swissMode) {
                     fr.roadguard.core.ui.Legal.toggleSwiss(context, s.settings)?.let {
                         android.widget.Toast.makeText(context, it, android.widget.Toast.LENGTH_SHORT).show()

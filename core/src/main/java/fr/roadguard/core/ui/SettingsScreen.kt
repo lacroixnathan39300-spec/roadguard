@@ -252,11 +252,11 @@ private fun VoiceCategory(settings: DriveSettings, voice: fr.roadguard.core.rada
     val voices = remember { voice.frenchVoices() }
     Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         BigButton("Par défaut", if (settings.voiceName == null) DriveColors.Accent else DriveColors.Panel) {
-            settings.changeVoiceName(null); voice.configure(null, settings.speechRate); voice.limitChanged(80)
+            settings.changeVoiceName(null); voice.configure(null, settings.speechRate); voice.preview { limitChanged(80) }
         }
         voices.forEach { (name, label) ->
             BigButton(label, if (settings.voiceName == name) DriveColors.Accent else DriveColors.Panel) {
-                settings.changeVoiceName(name); voice.configure(name, settings.speechRate); voice.limitChanged(80)
+                settings.changeVoiceName(name); voice.configure(name, settings.speechRate); voice.preview { limitChanged(80) }
             }
         }
     }
@@ -274,7 +274,7 @@ private fun VoiceCategory(settings: DriveSettings, voice: fr.roadguard.core.rada
         }
         others.forEach { (name, label) ->
             BigButton(label, if (settings.voiceName == name) DriveColors.Accent else DriveColors.Panel) {
-                settings.changeVoiceName(name); voice.configure(name, settings.speechRate); voice.limitChanged(80)
+                settings.changeVoiceName(name); voice.configure(name, settings.speechRate); voice.preview { limitChanged(80) }
             }
         }
     }
@@ -282,14 +282,14 @@ private fun VoiceCategory(settings: DriveSettings, voice: fr.roadguard.core.rada
     Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         listOf(0.85f to "Lente", 1f to "Normale", 1.2f to "Rapide").forEach { (r, label) ->
             BigButton("Débit : $label", if (settings.speechRate == r) DriveColors.Accent else DriveColors.Panel) {
-                settings.changeSpeechRate(r); voice.configure(settings.voiceName, r); voice.speak("Dans 300 mètres, tournez à droite")
+                settings.changeSpeechRate(r); voice.configure(settings.voiceName, r); voice.preview { speak("Dans 300 mètres, tournez à droite") }
             }
         }
     }
     Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         listOf("fr" to "🇫🇷 Français", "en" to "🇬🇧 English", "de" to "🇩🇪 Deutsch", "it" to "🇮🇹 Italiano").forEach { (l, label) ->
             BigButton(label, if (settings.voiceLang == l) DriveColors.Accent else DriveColors.Panel) {
-                settings.changeVoiceLang(l); voice.configure(settings.voiceName, settings.speechRate, settings.voiceTone, l); voice.limitChanged(80)
+                settings.changeVoiceLang(l); voice.configure(settings.voiceName, settings.speechRate, settings.voiceTone, l); voice.preview { limitChanged(80) }
             }
         }
     }
@@ -299,7 +299,7 @@ private fun VoiceCategory(settings: DriveSettings, voice: fr.roadguard.core.rada
     Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         listOf(false to "👨 Je suis un conducteur", true to "👩 Je suis une conductrice").forEach { (f, label) ->
             BigButton(label, if (settings.driverFemale == f) DriveColors.Accent else DriveColors.Panel) {
-                settings.changeDriverFemale(f); voice.pack.feminine = f; voice.limitChanged(80)
+                settings.changeDriverFemale(f); voice.pack.feminine = f; voice.preview { limitChanged(80) }
             }
         }
     }

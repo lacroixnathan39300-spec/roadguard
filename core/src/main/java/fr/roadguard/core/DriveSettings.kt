@@ -142,6 +142,9 @@ class DriveSettings(context: Context) {
         }
     }
     init { legalPrefs.registerOnSharedPreferenceChangeListener(legalListener) }
+    /** Bouton son (haut-parleur de l'accueil) : tout, alertes seulement, radars seuls ou muet ([SoundLevel]). */
+    var soundLevel by mutableStateOf(prefs.getInt("sound_level", fr.roadguard.core.radar.SoundLevel.ALL)); private set
+    fun changeSoundLevel(v: Int) { soundLevel = v.coerceIn(fr.roadguard.core.radar.SoundLevel.MUTE, fr.roadguard.core.radar.SoundLevel.ALL); put("sound_level", soundLevel) }
     val limitVoiceOn get() = announceLimit || speedLimitWarning
     fun changeLimitVoice(v: Boolean) { changeAnnounceLimit(v); changeSpeedLimitWarning(v) }
 
