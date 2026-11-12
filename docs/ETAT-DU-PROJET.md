@@ -224,3 +224,9 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
   `Shizuku.newProcess` (PlayMark.shizukuExec / setInstallerViaShizuku : `pm set-installer <pkg> com.android.vending`,
   sinon `cmd package set-installer`), sans service utilisateur — supporté sur HyperOS. withShell (service utilisateur)
   gardé pour l'ouverture de l'installateur. fixMark et verifyAuto réécrits sur ce chemin.
+- Suite (12/11, remise en ordre) : l'installation/mise à jour normale de Pilote repasse par le chemin simple
+  (`install()`). La marque Play Store (chemin Shizuku) n'est plus tentée que si on touche explicitement
+  « Installer Pilote pour Android Auto » (`download(..., markAuto = true)`). Android Auto reste donc une option à part,
+  sans gêner l'usage courant. Conclusion de la session : sur Xiaomi/HyperOS la marque est impossible sans root
+  (SecurityException « same cert as com.android.vending ») ; voie réelle = Play Store (compte perso avec pièce d'identité,
+  ou compte organisation via SIRET), ou autoradio/boîtier Android pour Pilote Drive.

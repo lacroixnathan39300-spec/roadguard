@@ -208,12 +208,12 @@ class MainActivity : Activity() {
             13f, Color.parseColor("#7F8EA0")).also { it.setPadding(0, dp(14), 0, 0) })
     }
 
-    private fun download(mod: Module, info: JSONObject) {
+    private fun download(mod: Module, info: JSONObject, markAuto: Boolean = false) {
         if (!packageManager.canRequestPackageInstalls()) { render(); return }
         if (active != null) return
         val build = info.optInt("build"); val chunks = info.optInt("chunks"); val sha = info.optString("sha256")
-        // Pilote sur un téléphone : passe par l'installateur d'Android avec la marque Play Store (pour Android Auto).
-        val auto = mod.key == "gps" && !looksLikeCarUnit
+        // Installation normale, sauf si on a explicitement demandé la marque Play Store (bouton « pour Android Auto »).
+        val auto = markAuto && mod.key == "gps" && !looksLikeCarUnit
         active = mod.key; phase = 0; doneBytes = 0; totalBytes = info.optLong("size")
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) // pas de mise en veille pendant le téléchargement
         status.text = "${mod.name} : en cours de téléchargement…"
@@ -546,7 +546,7 @@ class MainActivity : Activity() {
         step(6, if (installed) "Réinstalle Pilote (tes réglages sont gardés)." else "Installe Pilote.", false)
         if (active == null) spaced(button(if (installed) "Réinstaller Pilote pour Android Auto" else "Installer Pilote pour Android Auto",
             if (ready) mod.color else Color.parseColor("#3A4654")) {
-            if (PlayMark.shizukuReady()) { prefs.edit().remove(KEY_NO_MARK).apply(); download(mod, info) }
+            if (PlayMark.shizukuReady()) { prefs.edit().remove(KEY_NO_MARK).apply(); download(mod, info, markAuto = true) }
             else status.text = "Termine d'abord les étapes 1 à 5 (Shizuku démarré et Pilote Suite autorisée)."
         })
         addView(text("Après un redémarrage du téléphone, rallume le débogage sans fil et relance Shizuku avant de mettre Pilote à jour. " +
