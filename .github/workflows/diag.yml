@@ -13,9 +13,31 @@ on:
       reset_pass:
         description: "Mot de passe provisoire (jamais écrit dans le dépôt)"
         default: ""
+      apk_run:
+        description: "Contrôle de l'APK Pilote d'une compilation (numéro du run Android) : Android Auto déclaré ?"
+        default: ""
 
 jobs:
+  apk:
+    if: ${{ inputs.apk_run != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { pattern: "gps-apk-*", run-id: "${{ inputs.apk_run }}", github-token: "${{ github.token }}", path: apk }
+      - name: Manifeste de l'APK
+        run: |
+          aapt2=$(ls $ANDROID_HOME/build-tools/*/aapt2 | tail -1)
+          find apk -name '*.apk' | while read -r f; do
+            echo "== $f"
+            $aapt2 dump badging "$f" | grep -E "^package|sdkVersion|targetSdk" | head -4
+            $aapt2 dump xmltree --file AndroidManifest.xml "$f" > m.txt
+            grep -n -i -E "car|automotive" m.txt || echo "AUCUNE déclaration Android Auto"
+            grep -n -B3 -A14 "RoadguardCarService" m.txt | head -60 || true
+            unzip -l "$f" | grep -i -E "automotive_app_desc|res/xml" | head -20
+            $aapt2 dump xmltree --file res/xml/automotive_app_desc.xml "$f" || true
+          done
   diag:
+    if: ${{ inputs.apk_run == '' }}
     runs-on: ubuntu-latest
     defaults:
       run:
