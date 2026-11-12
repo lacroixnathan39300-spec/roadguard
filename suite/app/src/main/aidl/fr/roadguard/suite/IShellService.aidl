@@ -13,4 +13,7 @@ interface IShellService {
     // Ouvre une activité en tant que shell, avec l'activité de Pilote Suite comme destinataire du résultat ;
     // rend « ok », ou la raison de l'échec.
     String startForResult(in Intent intent, IBinder resultTo, int requestCode) = 2;
+    // Réécrit l'installateur noté de [pkg] (l'identité shell a le droit système INSTALL_PACKAGES) :
+    // c'est le champ qu'Android Auto veut à « com.android.vending ». Rend « ok », ou la raison de l'échec.
+    String setInstaller(in String pkg, in String installer) = 3;
 }

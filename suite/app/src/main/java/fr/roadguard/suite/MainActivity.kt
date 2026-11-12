@@ -376,19 +376,29 @@ class MainActivity : Activity() {
             endAuto("Pilote installé ✔ · prêt pour Android Auto. Force l'arrêt d'Android Auto, puis rebranche le téléphone.")
             return
         }
-        // Installé sans la marque : certains téléphones ne la gardent que par l'autre chemin, essayé une fois
-        // (plus du tout si les deux chemins ont déjà échoué sur ce téléphone).
-        val other = !autoViaShell
-        if (autoRetried) prefs.edit().putBoolean(KEY_NO_MARK, true).apply()
-        if (!autoRetried && PlayMark.shizukuReady() && !prefs.getBoolean(KEY_NO_MARK, false)) {
+        // Installé, mais l'installateur noté n'est pas le Play Store (cas courant : la fenêtre d'Android ignore
+        // l'étiquette demandée). L'initiateur, lui, est bon. On réécrit juste l'installateur via Shizuku (shell).
+        if (!autoRetried && PlayMark.shizukuReady()) {
             autoRetried = true
-            autoBefore = now
-            status.text = "Encore une étape pour Android Auto : confirme la mise à jour une deuxième fois."
-            launchAuto(shell = other)
+            status.text = "Dernière étape pour Android Auto : correction de l'étiquette Play Store…"
+            render()
+            PlayMark.withShell(this, { it.setInstaller(GPS, PlayMark.VENDING) }) { out ->
+                if (!autoPending) return@withShell
+                if (PlayMark.marked(this, GPS)) {
+                    prefs.edit().putBoolean(KEY_SHELL_KEEPS, autoViaShell).remove(KEY_NO_MARK).apply()
+                    endAuto("Pilote installé ✔ · prêt pour Android Auto. Force l'arrêt d'Android Auto, puis rebranche le téléphone.")
+                } else {
+                    prefs.edit().putBoolean(KEY_NO_MARK, true).apply()
+                    endAuto("Pilote installé ✔, mais ce téléphone refuse l'étiquette Play Store" +
+                        (if (out != null && out != "ok") " ($out)" else "") +
+                        ". Sans elle, Android Auto ne l'affiche pas — seul le Play Store peut la poser ici.")
+                }
+            }
             return
         }
+        prefs.edit().putBoolean(KEY_NO_MARK, true).apply()
         endAuto(if (PlayMark.shizukuReady()) "Pilote installé ✔ · ce téléphone n'a pas gardé la marque pour Android Auto."
-            else "Pilote installé ✔")
+            else "Pilote installé ✔ · démarre Shizuku pour l'activer dans Android Auto.")
     }
 
     private fun endAuto(message: String, installed: Boolean = true) {
@@ -426,6 +436,21 @@ class MainActivity : Activity() {
         """.trimIndent()
         PlayMark.withShell(this, { it.run(arrayOf("/system/bin/sh", "-c", script)) }) { out ->
             diag = head + (out?.trim()?.ifEmpty { null } ?: "Shizuku n'a pas répondu : relance-le.")
+            render()
+        }
+    }
+
+    /** Corrige l'étiquette d'un Pilote déjà installé : réécrit l'installateur en Play Store, sans réinstaller. */
+    private fun fixMark() {
+        if (!PlayMark.shizukuReady()) { status.text = "Démarre Shizuku et autorise Pilote Suite d'abord."; return }
+        status.text = "Correction de l'étiquette Play Store…"
+        PlayMark.withShell(this, { it.setInstaller(GPS, PlayMark.VENDING) }) { out ->
+            if (PlayMark.marked(this, GPS)) {
+                prefs.edit().remove(KEY_NO_MARK).apply()
+                status.text = "Étiquette posée ✔ · force l'arrêt d'Android Auto, puis rebranche le téléphone."
+            } else {
+                status.text = "Ce téléphone a refusé l'étiquette" + (if (out != null && out != "ok") " ($out)" else "") + "."
+            }
             render()
         }
     }
@@ -475,6 +500,18 @@ class MainActivity : Activity() {
             return@apply
         }
         addView(text(if (installed) "🚗 Android Auto : Pilote n'y apparaît pas encore." else "🚗 Android Auto : pour que Pilote s'y affiche, prépare-le avant d'installer.", 14f, grey))
+        // Pilote déjà installé avec le bon initiateur : il suffit de corriger l'installateur, sans réinstaller.
+        if (installed) {
+            val (initiating, _) = PlayMark.source(context, mod.pkg)
+            if (initiating == PlayMark.VENDING || initiating == PlayMark.GOOGLE_INSTALLER) {
+                addView(text("Il ne manque que l'étiquette « Play Store » sur l'installateur. Shizuku peut la poser sans réinstaller Pilote.",
+                    14f, Color.parseColor("#D5DCE5")).also { it.setPadding(0, dp(8), 0, 0) })
+                spaced(button(if (PlayMark.shizukuReady()) "Corriger l'étiquette Play Store" else "Démarrer Shizuku puis corriger",
+                    if (PlayMark.shizukuReady()) mod.color else Color.parseColor("#3A4654")) {
+                    if (PlayMark.shizukuReady()) fixMark() else openShizuku()
+                })
+            }
+        }
         details()
         diagnostic()
         if (!showAutoGuide) {

@@ -39,6 +39,33 @@ public final class ShellService extends IShellService.Stub {
         System.exit(0);
     }
 
+    /**
+     * Réécrit l'installateur noté de [pkg] vers [installer] (ex. com.android.vending). L'installation, elle, garde
+     * son initiateur : Android Auto veut initiateur = installateur du système ET installateur = Play Store, et c'est
+     * ce second champ qui manque après une installation normale. L'identité shell (uid 2000) a INSTALL_PACKAGES,
+     * donc le gestionnaire de paquets l'autorise. Essaie d'abord la commande pm, puis l'API cachée.
+     */
+    @Override
+    public String setInstaller(String pkg, String installer) {
+        String viaCmd = run(new String[]{"/system/bin/pm", "set-installer", pkg, installer});
+        if (viaCmd != null && viaCmd.toLowerCase().contains("success")) {
+            return "ok";
+        }
+        try {
+            Object sm = Class.forName("android.os.ServiceManager").getMethod("getService", String.class).invoke(null, "package");
+            Object pm = Class.forName("android.content.pm.IPackageManager$Stub")
+                    .getMethod("asInterface", IBinder.class).invoke(null, sm);
+            Method set = pm.getClass().getMethod("setInstallerPackageName", String.class, String.class);
+            set.invoke(pm, pkg, installer);
+            return "ok";
+        } catch (InvocationTargetException e) {
+            String cmd = viaCmd == null ? "" : " / pm: " + viaCmd.trim();
+            return String.valueOf(e.getCause()) + cmd;
+        } catch (Throwable t) {
+            return String.valueOf(t);
+        }
+    }
+
     @Override
     public String run(String[] cmd) {
         try {

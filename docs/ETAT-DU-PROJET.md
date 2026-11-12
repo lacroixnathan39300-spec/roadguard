@@ -211,3 +211,11 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
   de Google avec installateur noté = Play Store) ; Android Auto doit être arrêté de force après l'installation pour
   relire ses applis (bouton vers sa fiche) ; l'origine notée par Android, le téléphone et la version sont affichés sous
   la carte de Pilote. Pilote Suite se met maintenant à jour elle-même (module `suite` du manifeste).
+- Suite (12/11, diagnostic de Nathan sur Xiaomi 15T Pro, Android 16 : installateur ET initiateur =
+  com.google.android.packageinstaller) : la fenêtre d'installation ignore l'étiquette Play Store pour un appelant non
+  privilégié (cas H2, aa-torque #126 / sierra-auto #36). Mais l'initiateur obtenu est déjà celui qu'Android Auto
+  accepte ; il ne manque que l'installateur = com.android.vending, champ réécrivable après coup par l'identité shell
+  (INSTALL_PACKAGES). Ajout : `IShellService.setInstaller` (pm set-installer, sinon IPackageManager.setInstallerPackageName
+  en réflexion) appelé après l'installation, et bouton « Corriger l'étiquette Play Store » (fixMark) pour un Pilote déjà
+  installé, sans réinstaller. Non root, mais toujours via Shizuku (pas viable pour les utilisateurs : distribution =
+  test interne Play Store). Non testé sur l'appareil au moment de l'écriture.
