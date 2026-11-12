@@ -66,6 +66,8 @@ class MainActivity : Activity() {
     private var autoBefore = 0L
     private var autoAttempt = 0
     private var showAutoGuide = false
+    /** Résultat du bouton « Diagnostic Android Auto » (origine notée par Android et verdict d'Android Auto). */
+    private var diag: String? = null
     private val binderReceived = Shizuku.OnBinderReceivedListener { main.post { render() } }
     private val binderDead = Shizuku.OnBinderDeadListener { main.post { render() } }
     private val permissionResult = Shizuku.OnRequestPermissionResultListener { _, _ -> main.post { render() } }
@@ -399,6 +401,37 @@ class MainActivity : Activity() {
         render()
     }
 
+    /**
+     * Pourquoi Android Auto n'affiche pas Pilote : l'origine de l'installation notée par Android et, si Shizuku tourne,
+     * les lignes du validateur d'Android Auto dans le journal du téléphone (« Package DENIED; raison [paquet] »).
+     * Pour un verdict frais : forcer l'arrêt d'Android Auto, ouvrir « Personnaliser le lanceur », puis lancer ceci.
+     */
+    private fun runDiagnostic() {
+        val (initiating, installer) = PlayMark.source(this, GPS)
+        val head = "Pilote ${installedVersion(GPS)} · installateur=$installer · initiateur=$initiating
+" +
+            "Android ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT}) · ${Build.MANUFACTURER} ${Build.MODEL}
+"
+        if (!PlayMark.shizukuReady()) {
+            diag = head + "Shizuku n'est pas démarré : démarre-le pour lire aussi le verdict d'Android Auto."
+            render(); return
+        }
+        diag = head + "Lecture en cours…"
+        render()
+        val script = """
+            dumpsys package fr.roadguard.gps | grep -E 'installerPackageName|initiatingPackageName|originatingPackageName|updateOwnerPackageName|packageSource' | head -n 8
+            echo '--- Android Auto'
+            dumpsys package com.google.android.projection.gearhead | grep -m 1 versionName
+            echo '--- verdict (journal)'
+            logcat -d -v brief | grep -E 'CAR\.VALIDATOR|Validator' | grep -i -E 'roadguard|DENIED|not connected' | tail -n 25
+            true
+        """.trimIndent()
+        PlayMark.withShell(this, { it.run(arrayOf("/system/bin/sh", "-c", script)) }) { out ->
+            diag = head + (out?.trim()?.ifEmpty { null } ?: "Shizuku n'a pas répondu : relance-le.")
+            render()
+        }
+    }
+
     private fun openShizuku() {
         val launch = packageManager.getLaunchIntentForPackage(PlayMark.SHIZUKU)
         if (launch != null) { startActivity(launch); return }
@@ -415,6 +448,22 @@ class MainActivity : Activity() {
         fun details() { if (installed) PlayMark.source(context, mod.pkg).let { (initiating, installer) ->
             addView(text("Origine notée par Android : installateur ${installer ?: "aucun"}, initiateur ${initiating ?: "aucun"} · Android ${Build.VERSION.RELEASE}, ${Build.MANUFACTURER} ${Build.MODEL}",
                 12f, Color.parseColor("#7F8EA0")).also { it.setPadding(0, dp(8), 0, 0) }) } }
+        // Diagnostic : ce qu'Android a noté et, avec Shizuku, le verdict écrit par Android Auto dans le journal du téléphone.
+        fun diagnostic() {
+            if (!installed) return
+            spaced(button("Diagnostic Android Auto", Color.parseColor("#2A3442")) { runDiagnostic() })
+            diag?.let { d ->
+                addView(TextView(context).apply {
+                    text = d; textSize = 11f; setTextColor(Color.parseColor("#C7D2DE")); typeface = Typeface.MONOSPACE
+                    setTextIsSelectable(true); setPadding(0, dp(8), 0, 0)
+                })
+                spaced(button("Copier", Color.parseColor("#2A3442")) {
+                    (getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager)
+                        .setPrimaryClip(android.content.ClipData.newPlainText("Diagnostic Android Auto", d))
+                    status.text = "Diagnostic copié."
+                })
+            }
+        }
         if (marked) {
             addView(text("🚗 Android Auto : prêt ✔  Pilote porte la marque « Play Store ».", 14f, green))
             addView(text("Pilote n'apparaît pas dans la voiture ? Android Auto ne relit ses applis qu'après un arrêt : touche le bouton, puis « Forcer l'arrêt », et rebranche le téléphone. Vérifie aussi « Personnaliser le lanceur d'applications » dans ses réglages.",
@@ -424,10 +473,12 @@ class MainActivity : Activity() {
                     .onFailure { status.text = "Android Auto n'est pas installé sur cet appareil." }
             })
             details()
+            diagnostic()
             return@apply
         }
         addView(text(if (installed) "🚗 Android Auto : Pilote n'y apparaît pas encore." else "🚗 Android Auto : pour que Pilote s'y affiche, prépare-le avant d'installer.", 14f, grey))
         details()
+        diagnostic()
         if (!showAutoGuide) {
             spaced(button("Afficher Pilote dans Android Auto", Color.parseColor("#2A3442")) { showAutoGuide = true; render() })
             return@apply
