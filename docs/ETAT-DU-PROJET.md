@@ -206,3 +206,8 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
 - Limites : Shizuku à installer et associer une fois, à relancer après chaque redémarrage du téléphone ; une
   confirmation dans la fenêtre d'Android reste nécessaire ; Google peut fermer ce contournement. Non testé sur un vrai
   téléphone au moment de l'écriture. Pilote Suite ne se met pas à jour seule : réinstaller par le lien `/suite`.
+- Suite (12/11, après essai de Nathan : Suite disait « prêt ✔ » mais Pilote absent d'Android Auto) : contrôle de la
+  marque aligné sur le validateur d'Android Auto 17.7 (analyse Fermata #846 : initiateur = Play Store, ou installateur
+  de Google avec installateur noté = Play Store) ; Android Auto doit être arrêté de force après l'installation pour
+  relire ses applis (bouton vers sa fiche) ; l'origine notée par Android, le téléphone et la version sont affichés sous
+  la carte de Pilote. Pilote Suite se met maintenant à jour elle-même (module `suite` du manifeste).

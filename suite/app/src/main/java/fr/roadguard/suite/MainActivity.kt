@@ -76,6 +76,9 @@ class MainActivity : Activity() {
         Module("drive", "fr.roadguard.drive", "Pilote Drive", "L'appli pour l'autoradio : accueil, carte, radars, musique.", Color.parseColor("#E53935")),
     )
 
+    /** Pilote Suite elle-même : elle se met à jour comme les autres (plus besoin de la réinstaller par son lien). */
+    private val self = Module("suite", "fr.roadguard.suite", "Pilote Suite", "Cette appli : elle installe et met à jour les autres.", Color.parseColor("#8E9BAE"))
+
     /** Autoradio : écran en paysage pas plus haut que 600 px (ex. 1024×600). */
     private val looksLikeCarUnit: Boolean
         get() = resources.displayMetrics.let { it.widthPixels > it.heightPixels && it.heightPixels <= 720 }
@@ -152,14 +155,17 @@ class MainActivity : Activity() {
             })
         }
         val m = manifest
-        modules.forEach { mod ->
+        // Pilote Suite à mettre à jour : sa carte passe en premier (les nouveautés d'installation sont dedans).
+        val selfUpdate = (m?.optJSONObject(self.key)?.optLong("version") ?: 0L) > (installedVersion(self.pkg) ?: Long.MAX_VALUE)
+        (if (selfUpdate) listOf(self) + modules else modules + self).forEach { mod ->
             val info = m?.optJSONObject(mod.key)
             val have = installedVersion(mod.pkg)
             val avail = info?.optLong("version")
+            val isSelf = mod.key == self.key
             list.addView(card(Color.parseColor("#161C25")).apply {
-                val recommended = (mod.key == "drive") == looksLikeCarUnit
-                addView(text(mod.name + if (recommended) "  ·  recommandé ici" else "", 22f, mod.color, bold = true))
-                addView(text(mod.text, 15f, Color.parseColor("#D5DCE5")))
+                val recommended = !isSelf && (mod.key == "drive") == looksLikeCarUnit
+                addView(text(mod.name + if (recommended) "  ·  recommandé ici" else "", if (isSelf) 18f else 22f, mod.color, bold = true))
+                addView(text(if (isSelf && selfUpdate) "Mets-la à jour en premier, puis rouvre-la." else mod.text, 15f, Color.parseColor("#D5DCE5")))
                 val state = when {
                     info == null -> "Pas encore disponible sur le serveur"
                     have == null -> "Non installée · ${mb(info.optLong("size"))}"
@@ -186,7 +192,7 @@ class MainActivity : Activity() {
                     else if (losesAuto) row.addView(button("Ouvrir Shizuku", mod.color) { openShizuku() })
                     else row.addView(button(if (have == null) "Installer" else "Mettre à jour", mod.color) { download(mod, info) })
                 }
-                if (have != null) row.addView(button("Ouvrir", Color.parseColor("#2A3442")) {
+                if (have != null && !isSelf) row.addView(button("Ouvrir", Color.parseColor("#2A3442")) {
                     packageManager.getLaunchIntentForPackage(mod.pkg)?.let { startActivity(it) }
                 })
                 addView(row)
@@ -365,7 +371,7 @@ class MainActivity : Activity() {
         }
         if (PlayMark.marked(this, GPS)) {
             prefs.edit().putBoolean(KEY_SHELL_KEEPS, autoViaShell).remove(KEY_NO_MARK).apply()
-            endAuto("Pilote installé ✔ · prêt pour Android Auto")
+            endAuto("Pilote installé ✔ · prêt pour Android Auto. Force l'arrêt d'Android Auto, puis rebranche le téléphone.")
             return
         }
         // Installé sans la marque : certains téléphones ne la gardent que par l'autre chemin, essayé une fois
@@ -405,8 +411,23 @@ class MainActivity : Activity() {
         orientation = LinearLayout.VERTICAL; setPadding(0, dp(12), 0, 0)
         val grey = Color.parseColor("#9FB0C3"); val green = Color.parseColor("#2ED573")
         fun spaced(v: View) = v.also { (it.layoutParams as? LinearLayout.LayoutParams)?.topMargin = dp(8); addView(it) }
-        if (marked) { addView(text("🚗 Android Auto : prêt ✔  Pilote s'y affiche.", 14f, green)); return@apply }
+        // Ce qu'Android a noté pour Pilote (utile pour comprendre un refus d'Android Auto).
+        fun details() { if (installed) PlayMark.source(context, mod.pkg).let { (initiating, installer) ->
+            addView(text("Origine notée par Android : installateur ${installer ?: "aucun"}, initiateur ${initiating ?: "aucun"} · Android ${Build.VERSION.RELEASE}, ${Build.MANUFACTURER} ${Build.MODEL}",
+                12f, Color.parseColor("#7F8EA0")).also { it.setPadding(0, dp(8), 0, 0) }) } }
+        if (marked) {
+            addView(text("🚗 Android Auto : prêt ✔  Pilote porte la marque « Play Store ».", 14f, green))
+            addView(text("Pilote n'apparaît pas dans la voiture ? Android Auto ne relit ses applis qu'après un arrêt : touche le bouton, puis « Forcer l'arrêt », et rebranche le téléphone. Vérifie aussi « Personnaliser le lanceur d'applications » dans ses réglages.",
+                14f, Color.parseColor("#D5DCE5")).also { it.setPadding(0, dp(6), 0, 0) })
+            spaced(button("Ouvrir la fiche d'Android Auto", Color.parseColor("#2A3442")) {
+                runCatching { startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${PlayMark.ANDROID_AUTO}"))) }
+                    .onFailure { status.text = "Android Auto n'est pas installé sur cet appareil." }
+            })
+            details()
+            return@apply
+        }
         addView(text(if (installed) "🚗 Android Auto : Pilote n'y apparaît pas encore." else "🚗 Android Auto : pour que Pilote s'y affiche, prépare-le avant d'installer.", 14f, grey))
+        details()
         if (!showAutoGuide) {
             spaced(button("Afficher Pilote dans Android Auto", Color.parseColor("#2A3442")) { showAutoGuide = true; render() })
             return@apply

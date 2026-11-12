@@ -27,28 +27,37 @@ import rikka.shizuku.Shizuku
 object PlayMark {
     const val VENDING = "com.android.vending"
     const val SHIZUKU = "moe.shizuku.privileged.api"
+    /** Installateur du système des téléphones Google (le seul initiateur qu'Android Auto accepte, avec le Play Store). */
+    const val GOOGLE_INSTALLER = "com.google.android.packageinstaller"
+    /** L'appli Android Auto du téléphone. */
+    const val ANDROID_AUTO = "com.google.android.projection.gearhead"
     private const val MIME = "application/vnd.android.package-archive"
     private val main = Handler(Looper.getMainLooper())
 
     /**
-     * Le contrôle qu'Android Auto applique à l'origine d'une appli (d'après UnknownAuto) : à partir d'Android 11,
-     * l'installateur doit être le Play Store, et l'initiateur le Play Store ou l'installateur du système, jamais adb.
+     * Le contrôle qu'Android Auto applique à l'origine d'une appli (analyse de son validateur, version 17.7 :
+     * github.com/AndreyPavlenko/Fermata/issues/846). À partir d'Android 11, il lit d'abord l'initiateur ; l'installateur
+     * noté ne compte que si l'initiateur est l'installateur de Google, et il doit alors être le Play Store.
+     * Plus strict que le contrôle d'UnknownAuto (qui accepte tout « packageinstaller »).
      */
     fun accepts(initiating: String?, installer: String?, sdk: Int): Boolean {
         if (sdk < 30) return installer == VENDING
-        if (initiating == null || installer == null || initiating == "com.android.shell") return false
-        return installer == VENDING && (initiating == VENDING || initiating.contains("packageinstaller"))
+        return initiating == VENDING || (initiating == GOOGLE_INSTALLER && installer == VENDING)
     }
 
-    /** L'appli [pkg] installée porte-t-elle la marque qu'Android Auto accepte ? */
-    fun marked(c: Context, pkg: String): Boolean = runCatching {
+    /** Origine de l'installation de [pkg] notée par Android : (initiateur, installateur) ; initiateur null avant Android 11. */
+    fun source(c: Context, pkg: String): Pair<String?, String?> = runCatching<Pair<String?, String?>> {
         if (Build.VERSION.SDK_INT >= 30) {
-            val s = c.packageManager.getInstallSourceInfo(pkg)
-            accepts(s.initiatingPackageName, s.installingPackageName, Build.VERSION.SDK_INT)
-        } else {
-            @Suppress("DEPRECATION") accepts(null, c.packageManager.getInstallerPackageName(pkg), Build.VERSION.SDK_INT)
-        }
-    }.getOrDefault(false)
+            val info = c.packageManager.getInstallSourceInfo(pkg)
+            Pair(info.initiatingPackageName, info.installingPackageName)
+        } else legacySource(c, pkg)
+    }.getOrDefault(Pair(null, null))
+
+    @Suppress("DEPRECATION")
+    private fun legacySource(c: Context, pkg: String): Pair<String?, String?> = Pair(null, c.packageManager.getInstallerPackageName(pkg))
+
+    /** L'appli [pkg] installée porte-t-elle la marque qu'Android Auto accepte ? */
+    fun marked(c: Context, pkg: String): Boolean = source(c, pkg).let { (initiating, installer) -> accepts(initiating, installer, Build.VERSION.SDK_INT) }
 
     private fun installed(c: Context, pkg: String) = runCatching { c.packageManager.getPackageInfo(pkg, 0) }.isSuccess
 
@@ -62,12 +71,11 @@ object PlayMark {
     // ---------- Installateur d'Android ----------
     /** Paquet de l'installateur du système (Google sur la plupart des téléphones). */
     fun installerPackage(c: Context): String =
-        listOf("com.google.android.packageinstaller", "com.android.packageinstaller").firstOrNull { installed(c, it) }
-            ?: "com.google.android.packageinstaller"
+        listOf(GOOGLE_INSTALLER, "com.android.packageinstaller").firstOrNull { installed(c, it) } ?: GOOGLE_INSTALLER
 
     /** L'URI de l'APK doit être lisible par l'installateur (le shell, lui, ne peut pas donner ce droit). */
     fun grantToInstallers(c: Context, uri: Uri) {
-        for (p in listOf("com.google.android.packageinstaller", "com.android.packageinstaller", VENDING)) {
+        for (p in listOf(GOOGLE_INSTALLER, "com.android.packageinstaller", VENDING)) {
             runCatching { c.grantUriPermission(p, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
         }
     }
