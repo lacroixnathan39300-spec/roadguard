@@ -21,6 +21,7 @@ jobs:
   apk:
     if: ${{ inputs.apk_run != '' }}
     runs-on: ubuntu-latest
+    permissions: { actions: read, contents: read }
     steps:
       - uses: actions/download-artifact@v4
         with: { pattern: "gps-apk-*", run-id: "${{ inputs.apk_run }}", github-token: "${{ github.token }}", path: apk }
