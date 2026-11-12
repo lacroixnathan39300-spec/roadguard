@@ -2,9 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <!-- Shizuku : installation de Pilote avec la marque « Play Store », pour Android Auto (voir PlayMark). -->
+    <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
     <queries>
         <package android:name="fr.roadguard.gps" />
         <package android:name="fr.roadguard.drive" />
+        <!-- Shizuku, et les paquets dont on relit le nom dans l'origine de l'installation de Pilote. -->
+        <package android:name="moe.shizuku.privileged.api" />
+        <package android:name="com.android.vending" />
+        <package android:name="com.google.android.packageinstaller" />
+        <package android:name="com.android.packageinstaller" />
     </queries>
     <application android:label="Pilote Suite" android:icon="@mipmap/ic_launcher" android:theme="@android:style/Theme.Material.NoActionBar"
         android:allowBackup="false" android:supportsRtl="true">
@@ -15,5 +22,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- Donne l'APK de Pilote à l'installateur d'Android (lecture seule, un seul fichier). -->
+        <provider android:name=".ApkProvider" android:authorities="fr.roadguard.suite.apk" android:exported="false"
+            android:grantUriPermissions="true" />
+        <!-- Client Shizuku : reçoit le lien vers Shizuku quand il tourne. -->
+        <provider android:name="rikka.shizuku.ShizukuProvider" android:authorities="${applicationId}.shizuku"
+            android:multiprocess="false" android:enabled="true" android:exported="true"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
+        <meta-data android:name="moe.shizuku.client.V3_SUPPORT" android:value="true" />
     </application>
 </manifest>

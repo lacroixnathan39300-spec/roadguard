@@ -188,3 +188,21 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
 - Filtre dans `AlertVoice` (`level`, `speak` = tout, `speakAlert`, `speakRadar`, `speakAlways`, `speakNamed(min)`) ;
   signalements de la communauté via `Community.sayReport` (contrôles avec les radars, le reste avec les alertes).
 - Activation / arrêt des radars dans le même panneau (consignes légales à accepter si pas encore fait).
+
+## Pilote dans Android Auto sans Play Store (12/11/2026)
+- Constat (doc Google + essai de Nathan) : le réglage « Sources inconnues » d'Android Auto ne couvre pas les applis de
+  navigation (bibliothèque voiture). Android Auto n'affiche Pilote que si Android a noté « installé par le Play Store »
+  (installateur `com.android.vending`, initiateur Play Store ou installateur du système, jamais `com.android.shell` :
+  `adb install -i` ne suffit donc pas à partir d'Android 11). L'APK, lui, est correct (vérifié sur le build 224).
+- Pilote Suite fait cette installation pour Pilote sur un téléphone (`PlayMark.kt`, `ShellService.java`,
+  `ApkProvider.java`, `IShellService.aidl`), méthode reprise d'UnknownAuto (MIT, `suite/LICENCES-TIERS.md`) :
+  l'installateur d'Android est ouvert avec la marque Play Store, par le shell prêté par l'appli Shizuku
+  (Android 15+ : `am start` ; Android 14 et avant : ouverture « pour résultat » depuis le service shell). Sans Shizuku,
+  ouverture par Suite elle-même (marque gardée seulement par certains Android 17, sinon installation normale).
+  Au retour, la marque est relue ; l'autre chemin est essayé une fois ; le chemin qui marche est retenu
+  (`shell_keeps_mark`), deux échecs aussi (`no_mark`).
+- Écran de Suite : état « Android Auto : prêt ✔ », guide Shizuku en 6 étapes, alerte si une mise à jour ferait perdre
+  la marque (Shizuku arrêté). Pilote marqué : sa mise à jour interne ouvre Pilote Suite (`AppUpdater.updateViaSuite`).
+- Limites : Shizuku à installer et associer une fois, à relancer après chaque redémarrage du téléphone ; une
+  confirmation dans la fenêtre d'Android reste nécessaire ; Google peut fermer ce contournement. Non testé sur un vrai
+  téléphone au moment de l'écriture. Pilote Suite ne se met pas à jour seule : réinstaller par le lien `/suite`.

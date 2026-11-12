@@ -107,6 +107,8 @@ fun BoxScope.UpdateBanner() {
         }
         if (progress == null) {
             BigButton("Installer", DriveColors.Accent) {
+                // Pilote affiché dans Android Auto : la mise à jour se fait dans Pilote Suite (elle garde cet affichage).
+                if (AppUpdater.updateViaSuite(context)) { progress = "Mise à jour dans Pilote Suite (elle garde Pilote dans Android Auto)."; return@BigButton }
                 progress = "En cours de téléchargement…"
                 bytes = 0L to r.size
                 scope.launch {
