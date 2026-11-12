@@ -126,6 +126,36 @@ object PlayMark {
      * Relie le service « shell » par Shizuku, y fait un appel, puis le relâche ; [done] reçoit le résultat sur le fil
      * principal (null si l'appel a échoué ou si le service n'a pas pu être relié).
      */
+    /**
+     * Lance une commande sous l'identité « shell » directement via Shizuku (Shizuku.newProcess), SANS notre propre
+     * service utilisateur. Important sur HyperOS/MIUI, qui bloque souvent le processus d'un service utilisateur
+     * (bindUserService) mais laisse passer newProcess. Rend la sortie (+ « [exit N] » si échec), ou null si Shizuku
+     * n'a pas pu lancer la commande. À appeler hors du fil principal (bloquant).
+     */
+    fun shizukuExec(cmd: Array<String>): String? {
+        return try {
+            if (!runCatching { Shizuku.pingBinder() }.getOrDefault(false)) return null
+            val m = Shizuku::class.java.getMethod("newProcess", Array<String>::class.java, Array<String>::class.java, String::class.java)
+            val proc = m.invoke(null, cmd, null, null) as Process
+            val out = proc.inputStream.bufferedReader().readText()
+            val err = proc.errorStream.bufferedReader().readText()
+            val code = proc.waitFor()
+            val text = (out + err).trim()
+            when {
+                code == 0 && text.isEmpty() -> "ok"
+                code == 0 -> text
+                else -> (if (text.isEmpty()) "" else "$text ") + "[exit $code]"
+            }
+        } catch (t: Throwable) {
+            null
+        }
+    }
+
+    /** Réécrit l'installateur noté de [pkg] vers le Play Store, par Shizuku (sans service utilisateur). */
+    fun setInstallerViaShizuku(pkg: String): String? =
+        shizukuExec(arrayOf("/system/bin/sh", "-c",
+            "pm set-installer $pkg $VENDING 2>&1 || cmd package set-installer $pkg $VENDING 2>&1"))
+
     fun withShell(c: Context, call: (IShellService) -> String?, done: (String?) -> Unit) {
         // Sécurité : si le service ne se relie pas (Shizuku arrêté, autorisation absente, processus qui ne démarre pas),
         // on ne reste pas bloqué — [done] est appelé une seule fois, avec null, au bout du délai.

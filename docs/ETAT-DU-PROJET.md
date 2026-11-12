@@ -219,3 +219,8 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
   en réflexion) appelé après l'installation, et bouton « Corriger l'étiquette Play Store » (fixMark) pour un Pilote déjà
   installé, sans réinstaller. Non root, mais toujours via Shizuku (pas viable pour les utilisateurs : distribution =
   test interne Play Store). Non testé sur l'appareil au moment de l'écriture.
+- Suite (12/11, Xiaomi 15T Pro HyperOS : « Shizuku n'a pas répondu ») : HyperOS/MIUI bloque souvent le processus d'un
+  service utilisateur Shizuku (bindUserService). La correction de l'étiquette passe maintenant par
+  `Shizuku.newProcess` (PlayMark.shizukuExec / setInstallerViaShizuku : `pm set-installer <pkg> com.android.vending`,
+  sinon `cmd package set-installer`), sans service utilisateur — supporté sur HyperOS. withShell (service utilisateur)
+  gardé pour l'ouverture de l'installateur. fixMark et verifyAuto réécrits sur ce chemin.

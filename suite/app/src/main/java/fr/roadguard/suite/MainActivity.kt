@@ -382,16 +382,19 @@ class MainActivity : Activity() {
             autoRetried = true
             status.text = "Dernière étape pour Android Auto : correction de l'étiquette Play Store…"
             render()
-            PlayMark.withShell(this, { it.setInstaller(GPS, PlayMark.VENDING) }) { out ->
-                if (!autoPending) return@withShell
-                if (PlayMark.marked(this, GPS)) {
-                    prefs.edit().putBoolean(KEY_SHELL_KEEPS, autoViaShell).remove(KEY_NO_MARK).apply()
-                    endAuto("Pilote installé ✔ · prêt pour Android Auto. Force l'arrêt d'Android Auto, puis rebranche le téléphone.")
-                } else {
-                    prefs.edit().putBoolean(KEY_NO_MARK, true).apply()
-                    endAuto("Pilote installé ✔, mais ce téléphone refuse l'étiquette Play Store" +
-                        (if (out != null && out != "ok") " ($out)" else "") +
-                        ". Sans elle, Android Auto ne l'affiche pas — seul le Play Store peut la poser ici.")
+            io.execute {
+                val out = PlayMark.setInstallerViaShizuku(GPS)
+                main.post {
+                    if (!autoPending) return@post
+                    if (PlayMark.marked(this, GPS)) {
+                        prefs.edit().putBoolean(KEY_SHELL_KEEPS, autoViaShell).remove(KEY_NO_MARK).apply()
+                        endAuto("Pilote installé ✔ · prêt pour Android Auto. Force l'arrêt d'Android Auto, puis rebranche le téléphone.")
+                    } else {
+                        prefs.edit().putBoolean(KEY_NO_MARK, true).apply()
+                        endAuto("Pilote installé ✔, mais ce téléphone refuse l'étiquette Play Store" +
+                            (if (out != null && out != "ok") " ($out)" else "") +
+                            ". Sans elle, Android Auto ne l'affiche pas — seul le Play Store peut la poser ici.")
+                    }
                 }
             }
             return
@@ -443,15 +446,18 @@ class MainActivity : Activity() {
     /** Corrige l'étiquette d'un Pilote déjà installé : réécrit l'installateur en Play Store, sans réinstaller. */
     private fun fixMark() {
         if (!PlayMark.shizukuReady()) { status.text = "Démarre Shizuku et autorise Pilote Suite d'abord."; return }
-        status.text = "Correction de l'étiquette Play Store…"
-        PlayMark.withShell(this, { it.setInstaller(GPS, PlayMark.VENDING) }) { out ->
-            status.text = when {
-                PlayMark.marked(this, GPS) -> { prefs.edit().remove(KEY_NO_MARK).apply()
-                    "Étiquette posée ✔ · force l'arrêt d'Android Auto, puis rebranche le téléphone." }
-                out == null -> "Shizuku n'a pas répondu. Vérifie qu'il est démarré et que Pilote Suite est dans ses applis autorisées, puis réessaie."
-                else -> "Ce téléphone a refusé l'étiquette ($out)."
+        status.text = "Correction de l'étiquette Play Store…"; render()
+        io.execute {
+            val out = PlayMark.setInstallerViaShizuku(GPS)
+            main.post {
+                status.text = when {
+                    PlayMark.marked(this, GPS) -> { prefs.edit().remove(KEY_NO_MARK).apply()
+                        "Étiquette posée ✔ · force l'arrêt d'Android Auto, puis rebranche le téléphone." }
+                    out == null -> "Shizuku n'a pas répondu. Vérifie qu'il est démarré et que Pilote Suite est dans ses applis autorisées, puis réessaie."
+                    else -> "Ce téléphone a refusé l'étiquette ($out)."
+                }
+                render()
             }
-            render()
         }
     }
 
