@@ -87,6 +87,7 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        PlayMark.init(this)
         window.statusBarColor = Color.parseColor("#0B0F15")
         val root = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(20), dp(28), dp(20), dp(20)); setBackgroundColor(Color.parseColor("#0B0F15")) }
         root.addView(text("Pilote Suite", 30f, Color.WHITE, bold = true))
@@ -391,9 +392,9 @@ class MainActivity : Activity() {
                         endAuto("Pilote installé ✔ · prêt pour Android Auto. Force l'arrêt d'Android Auto, puis rebranche le téléphone.")
                     } else {
                         prefs.edit().putBoolean(KEY_NO_MARK, true).apply()
-                        endAuto("Pilote installé ✔, mais ce téléphone refuse l'étiquette Play Store" +
-                            (if (out != null && out != "ok") " ($out)" else "") +
-                            ". Sans elle, Android Auto ne l'affiche pas — seul le Play Store peut la poser ici.")
+                        diag = "set-installer → $out"
+                        endAuto("Pilote installé ✔, mais ce téléphone refuse l'étiquette Play Store. " +
+                            "Touche « Diagnostic » pour le détail. Sans elle, Android Auto ne l'affiche pas.")
                     }
                 }
             }
@@ -450,11 +451,15 @@ class MainActivity : Activity() {
         io.execute {
             val out = PlayMark.setInstallerViaShizuku(GPS)
             main.post {
-                status.text = when {
-                    PlayMark.marked(this, GPS) -> { prefs.edit().remove(KEY_NO_MARK).apply()
-                        "Étiquette posée ✔ · force l'arrêt d'Android Auto, puis rebranche le téléphone." }
-                    out == null -> "Shizuku n'a pas répondu. Vérifie qu'il est démarré et que Pilote Suite est dans ses applis autorisées, puis réessaie."
-                    else -> "Ce téléphone a refusé l'étiquette ($out)."
+                if (PlayMark.marked(this, GPS)) {
+                    prefs.edit().remove(KEY_NO_MARK).apply()
+                    status.text = "Étiquette posée ✔ · force l'arrêt d'Android Auto, puis rebranche le téléphone."
+                    diag = null
+                } else {
+                    status.text = "Le téléphone n'a pas accepté l'étiquette. Détail ci-dessous (copie-le-moi) :"
+                    val (initiating, installer) = PlayMark.source(this, GPS)
+                    diag = "set-installer → $out\nAprès : installateur=$installer · initiateur=$initiating\n" +
+                        "Android ${Build.VERSION.RELEASE} · ${Build.MANUFACTURER} ${Build.MODEL}"
                 }
                 render()
             }

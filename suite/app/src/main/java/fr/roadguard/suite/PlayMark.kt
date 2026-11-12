@@ -147,14 +147,46 @@ object PlayMark {
                 else -> (if (text.isEmpty()) "" else "$text ") + "[exit $code]"
             }
         } catch (t: Throwable) {
-            null
+            "newProcess erreur: $t"
         }
     }
 
-    /** Réécrit l'installateur noté de [pkg] vers le Play Store, par Shizuku (sans service utilisateur). */
-    fun setInstallerViaShizuku(pkg: String): String? =
-        shizukuExec(arrayOf("/system/bin/sh", "-c",
-            "pm set-installer $pkg $VENDING 2>&1 || cmd package set-installer $pkg $VENDING 2>&1"))
+    /**
+     * Réécrit l'installateur noté de [pkg] vers le Play Store par Shizuku, sans service utilisateur (bloqué par
+     * HyperOS). Essaie deux voies et rend un compte rendu détaillé (jamais null) pour le diagnostic :
+     *  1) appel binder direct au gestionnaire de paquets via ShizukuBinderWrapper (ne lance aucun processus) ;
+     *  2) commande `pm set-installer` via Shizuku.newProcess.
+     */
+    fun setInstallerViaShizuku(pkg: String): String {
+        if (!runCatching { Shizuku.pingBinder() }.getOrDefault(false)) return "Shizuku non relié (pingBinder=false)"
+        val a = runCatching { setInstallerDirect(pkg) }.getOrElse { "binder exception: $it" }
+        if (marked2(pkg)) return "ok (binder)"
+        val b = shizukuExec(arrayOf("/system/bin/sh", "-c",
+            "pm set-installer $pkg $VENDING 2>&1 || cmd package set-installer $pkg $VENDING 2>&1")) ?: "newProcess: pas de réponse"
+        if (marked2(pkg)) return "ok (pm)"
+        return "$a | $b"
+    }
+
+    private var appCtx: Context? = null
+    fun init(c: Context) { appCtx = c.applicationContext }
+    private fun marked2(pkg: String): Boolean { val c = appCtx ?: return false; return marked(c, pkg) }
+
+    /** Appel binder direct (identité shell via Shizuku) à IPackageManager.setInstallerPackageName. Rend un compte rendu. */
+    private fun setInstallerDirect(pkg: String): String {
+        return try {
+            val binder = rikka.shizuku.SystemServiceHelper.getSystemService("package")
+                ?: return "service 'package' introuvable"
+            val wrapped = rikka.shizuku.ShizukuBinderWrapper(binder)
+            val pm = Class.forName("android.content.pm.IPackageManager\$Stub")
+                .getMethod("asInterface", IBinder::class.java).invoke(null, wrapped)
+            pm.javaClass.getMethod("setInstallerPackageName", String::class.java, String::class.java).invoke(pm, pkg, VENDING)
+            "binder ok"
+        } catch (e: java.lang.reflect.InvocationTargetException) {
+            "binder refusé: " + (e.cause?.toString() ?: e.toString())
+        } catch (t: Throwable) {
+            "binder erreur: $t"
+        }
+    }
 
     fun withShell(c: Context, call: (IShellService) -> String?, done: (String?) -> Unit) {
         // Sécurité : si le service ne se relie pas (Shizuku arrêté, autorisation absente, processus qui ne démarre pas),
