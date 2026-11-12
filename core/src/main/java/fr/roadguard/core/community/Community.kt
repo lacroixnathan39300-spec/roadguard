@@ -110,6 +110,11 @@ class Community(context: Context, private val scope: CoroutineScope, private val
     var ownRadarsOnly by mutableStateOf(false)
     /** Radar ou contrôle de la communauté montrable / annonçable ici. */
     private fun radarVisible(r: Report) = radarAlertsAllowed || (ownRadarsOnly && r.mine)
+    /** Radars signalés (mobiles et fixes) annonçables ici, à moins de 3 km : donnés au moteur d'alertes (bips d'approche). */
+    fun alertRadars(lat: Double, lon: Double): List<Report> = reports.filter {
+        (it.type == ReportType.MOBILE || it.type == ReportType.FIXED) && radarVisible(it) &&
+            Geo.distanceMeters(lat, lon, it.lat, it.lon) < 3_000
+    }
     /** Signalements à montrer sur la carte : sans radars ni contrôles quand ils ne sont pas permis. */
     val shownReports: List<Report> get() = if (radarAlertsAllowed) reports else reports.filter { !it.type.radarLike || radarVisible(it) }
     /** Portion de route (identifiant OpenStreetMap) et limitation lue sur la carte, fournies par la session. */
@@ -198,7 +203,8 @@ class Community(context: Context, private val scope: CoroutineScope, private val
             // Police et radar mobile : coupés avec les alertes radars (interrupteur, ou Suisse où c'est interdit).
             val radarLike = r.type == ReportType.POLICE || r.type == ReportType.MOBILE
             if (radarLike && !radarVisible(r)) continue
-            if (d < 1000 && ahead && !r.type.mapFix && announced.add(r.id) && r.type != ReportType.FIXED) {
+            // Radars signalés (mobiles et fixes) : annoncés par le moteur d'alertes, avec les bips d'approche.
+            if (d < 1000 && ahead && !r.type.mapFix && announced.add(r.id) && r.type != ReportType.FIXED && r.type != ReportType.MOBILE) {
                 val meters = ((d + 25) / 50).toInt() * 50
                 val where = if (d > 150) "à $meters mètres" else "tout près"
                 val msg = r.text

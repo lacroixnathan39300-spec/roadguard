@@ -45,4 +45,16 @@ class SpeedLimitsTest {
         assertNull(SpeedLimits.wayOf("""{"edges":[{"speed_limit":50}]}"""))
         assertNull(SpeedLimits.wayOf("""{"edges":[]}"""))
     }
+
+    @Test fun readsLimitAheadButWayOfTheCar() {
+        // Trace : 2 points de la voiture puis le point 50 m devant, déjà dans la zone à 50.
+        val json = """{"edges":[{"way_id":11,"speed_limit":80},{"way_id":22,"speed_limit":50}],
+            "matched_points":[{"type":"matched","edge_index":0},{"type":"matched","edge_index":0},{"type":"matched","edge_index":1}]}"""
+        assertEquals(50, SpeedLimits.parse(json))
+        assertEquals("11", SpeedLimits.wayOf(json, 1))
+        assertEquals("22", SpeedLimits.wayOf(json))
+        // Voiture non recalée : dernier tronçon.
+        assertEquals("22", SpeedLimits.wayOf("""{"edges":[{"way_id":22}],"matched_points":[{"type":"unmatched","edge_index":4294967295}]}""", 0))
+        assertTrue(SpeedLimits.request(listOf(LatLon(46.0, 5.0), LatLon(46.001, 5.0))).contains("matched.edge_index"))
+    }
 }

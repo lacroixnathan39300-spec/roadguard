@@ -35,6 +35,9 @@ class AlertEngine(private val index: RadarIndex) {
     /** Radars déjà franchis (plus annoncés pendant 10 min). */
     private val passedIds = HashMap<String, Long>()
 
+    /** Radars signalés par la communauté autour de soi : annoncés et bipés comme ceux des bases. */
+    @Volatile var extra: List<Radar> = emptyList()
+
     /** Tracé de l'itinéraire en cours (null sans guidage). */
     var route: List<fr.roadguard.core.nav.LatLon>? = null
         set(v) { if (v !== field) { field = v; cum = null; routeIdx = 0 } }
@@ -55,7 +58,8 @@ class AlertEngine(private val index: RadarIndex) {
         val onRoute = routeAlongFix(fix)
         val v = fix.speedKmh / 3.6
         val candidates = HashMap<String, Pair<Radar, Double>>()
-        for (r in index.near(fix.lat, fix.lon)) {
+        val signaled = extra
+        for (r in if (signaled.isEmpty()) index.near(fix.lat, fix.lon) else index.near(fix.lat, fix.lon) + signaled) {
             if (r.kind == RadarKind.OTHER || r.id in passedIds) continue
             val straight = Geo.distanceMeters(fix.lat, fix.lon, r.lat, r.lon)
             if (straight - lag > range + 200) continue

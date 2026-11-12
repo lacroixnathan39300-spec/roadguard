@@ -168,3 +168,12 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
 - Suisse, radars rallumés (bouton « Suisse ») : `Community.ownRadarsOnly` ; on peut signaler radar / police, envoyé
   `private: true` → colonne `reports.private`, rendu par le serveur à son auteur seul (`reportsNear`), jamais fusionné
   avec un signalement public. Les signalements publics de la communauté restent jamais montrés en Suisse.
+
+## Limitations 50 m en avance, bips pour les radars signalés (12/11/2026)
+- Limitations (pas les radars) : `SpeedLimits.current(trail, ahead)` envoie aussi le point 50 m devant (`AHEAD_M`,
+  le long de l'itinéraire s'il y en a un, sinon tout droit) ; la limite lue est celle du tronçon où l'on sera dans 50 m,
+  donc chaque changement (baisse comme hausse) est pris 50 m plus tôt. `lastWay` reste la route où roule la voiture
+  (corrections signalées), `aheadWay` celle de la limite lue (corrections appliquées en avance aussi).
+- Radars signalés (mobiles et fixes) : `Community.alertRadars` → `AlertEngine.extra` ; ils passent par le même moteur
+  que les radars des bases (annonce, bandeau, bips d'approche, compteur de radars franchis). La communauté ne les annonce
+  plus elle-même (pas de double annonce). Radar fixe signalé déjà connu des bases (< 100 m) : annoncé une seule fois.

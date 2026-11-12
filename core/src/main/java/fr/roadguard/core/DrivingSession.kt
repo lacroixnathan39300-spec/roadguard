@@ -421,6 +421,14 @@ class DrivingSession(
     /** Radars : alerte, bips, alarme et réprimandes pour une position (réelle, ou estimée dans un tunnel). */
     private fun radarStep(f: Fix) {
         alerts?.route = route?.points // radars comptés seulement sur le tracé pendant un guidage
+        // Radars signalés par la communauté (mobiles et fixes) : même alerte et mêmes bips d'approche que les radars des bases.
+        alerts?.extra = if (!settings.radarsOn || radarsBlockedHere) emptyList() else community.alertRadars(f.lat, f.lon).mapNotNull { r ->
+            val fixed = r.type == fr.roadguard.core.community.ReportType.FIXED
+            // Radar fixe déjà dans les bases : il est annoncé une seule fois, par la base.
+            if (fixed && community.knownRadarNear?.invoke(r.lat, r.lon) == true) null
+            else fr.roadguard.core.radar.Radar("c-${r.id}", r.lat, r.lon,
+                if (fixed) fr.roadguard.core.radar.RadarKind.FIXED else fr.roadguard.core.radar.RadarKind.MOBILE, "Signalé", null)
+        }
         val newAlert = alerts?.update(f)?.takeIf { settings.radarsOn && !radarsBlockedHere && it.radar.kind in settings.alertKinds }
         if (newAlert?.isNew == true) voice.announce(newAlert)
         // Une position isolée sans cap fiable ne doit pas faire clignoter le bandeau : on garde
@@ -520,13 +528,16 @@ class DrivingSession(
                 alert?.let { "${it.radar.id}@${it.distanceM.toInt()}m" } ?: "-", alerts != null))
         }
         limitTracker.add(f.lat, f.lon, f.timeMs, f.speedKmh, if (batterySaving) 8_000 else 3_000)?.let { trail ->
+            // Limitations prises 50 m en avance : on lit celle du point 50 m devant (le long de l'itinéraire s'il y en a un).
+            val ahead = if (f.bearing.isNaN()) null
+                else advance(f.lat, f.lon, f.bearing, SpeedLimits.AHEAD_M).let { (la, lo) -> fr.roadguard.core.nav.LatLon(la, lo) }
             if (!limitBusy) {
                 limitBusy = true
                 scope.launch {
                     try {
-                        SpeedLimits.current(trail)?.let { read ->
-                            // Limitation corrigée par la communauté sur cette portion de route : elle remplace celle de la carte.
-                            val fixed = community.limitFix(SpeedLimits.lastWay, f.lat, f.lon)
+                        SpeedLimits.current(trail, ahead)?.let { read ->
+                            // Limitation corrigée par la communauté sur la portion de route lue (50 m devant) : elle remplace celle de la carte.
+                            val fixed = community.limitFix(SpeedLimits.aheadWay, ahead?.lat ?: f.lat, ahead?.lon ?: f.lon)
                             mapLimit = read.takeIf { it > 0 }
                             onLimit(fixed ?: read)
                         }

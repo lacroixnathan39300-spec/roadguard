@@ -59,7 +59,7 @@ jobs:
           fi
           url=https://roadguard.roadguard-app.workers.dev
           if [ "${{ inputs.list }}" = "oui" ]; then
-            for q in "SELECT username, plan, admin, blocked, created_at, last_seen FROM users" "SELECT username, substr(device,1,6) AS dev, app, created_at, last_seen FROM sessions" "SELECT substr(device,1,6) AS dev, username, at FROM trials" "SELECT id, name, points, last_report_at FROM accounts ORDER BY last_report_at DESC LIMIT 10" "SELECT type, round(lat,3) AS lat, round(lon,3) AS lon, yes, no, status, created_at, expires_at, author_id FROM reports ORDER BY created_at DESC LIMIT 15" "SELECT at, app, version, substr(text,1,700) AS text FROM crashes ORDER BY at DESC LIMIT 6"; do
+            for q in "SELECT username, first_name, plan, admin, blocked, created_at, last_seen FROM users" "SELECT username, substr(device,1,6) AS dev, app, created_at, last_seen FROM sessions" "SELECT substr(device,1,6) AS dev, username, at FROM trials" "SELECT id, name, points, last_report_at FROM accounts ORDER BY last_report_at DESC LIMIT 10" "SELECT type, round(lat,3) AS lat, round(lon,3) AS lon, yes, no, status, created_at, expires_at, author_id FROM reports ORDER BY created_at DESC LIMIT 15" "SELECT at, app, version, substr(text,1,700) AS text FROM crashes ORDER BY at DESC LIMIT 6"; do
               npx wrangler d1 execute roadguard-eu --remote --json --command "$q" 2>/dev/null | python3 -c "import json,sys; [print(r) for r in json.load(sys.stdin)[0]['results']]; print('--')"
             done
             exit 0

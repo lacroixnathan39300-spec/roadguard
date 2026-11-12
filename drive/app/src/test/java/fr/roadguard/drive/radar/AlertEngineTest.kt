@@ -32,6 +32,16 @@ class AlertEngineTest {
         assertFalse(second!!.isNew)
     }
 
+    @Test fun signaledRadarAlertsLikeTheOthers() {
+        // Radar mobile signalé par la communauté : même alerte (et donc mêmes bips d'approche) qu'un radar des bases.
+        val engine = AlertEngine(RadarIndex(emptyList()))
+        engine.extra = listOf(radar("c-1", 46.005, kind = RadarKind.MOBILE))
+        val a = approach(engine, 46.0)
+        assertNotNull(a); assertEquals("c-1", a!!.radar.id); assertEquals(RadarKind.MOBILE, a.radar.kind)
+        engine.extra = emptyList()
+        assertNull(engine.update(fix(46.001, 4000)))
+    }
+
     @Test fun alertStopsAtTheRadarNotAfter() {
         val engine = AlertEngine(RadarIndex(listOf(radar("r", 46.002)))) // ~222 m devant
         assertNotNull(approach(engine, 46.0))

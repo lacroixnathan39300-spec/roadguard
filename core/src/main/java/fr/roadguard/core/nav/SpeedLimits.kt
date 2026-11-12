@@ -12,21 +12,45 @@ import org.json.JSONObject
 object SpeedLimits {
     private const val URL_TRACE = "https://valhalla1.openstreetmap.de/trace_attributes"
 
-    /** Portion de route (identifiant OpenStreetMap) de la dernière lecture : sert aux limitations corrigées par la communauté. */
+    /**
+     * Avance des limitations (pas des radars) : on lit la limite du tronçon situé 50 m devant la voiture,
+     * pour qu'un changement de limitation soit pris 50 m plus tôt qu'avant (demande de Nathan).
+     */
+    const val AHEAD_M = 50.0
+
+    /** Portion de route (identifiant OpenStreetMap) où roule la voiture : sert aux corrections de limitation signalées. */
     @Volatile var lastWay: String? = null
         private set
+    /** Portion de route 50 m devant (celle dont la limite est lue). */
+    @Volatile var aheadWay: String? = null
+        private set
 
-    /** Limite du tronçon où l'on roule ; 0 si ce tronçon n'a pas de limite connue ; null si la requête a échoué. */
-    suspend fun current(trail: List<LatLon>): Int? = withContext(Dispatchers.IO) {
+    /**
+     * Limite du tronçon où l'on sera dans 50 m ([ahead], point devant la voiture) ou, sans ce point, du tronçon où l'on roule ;
+     * 0 si ce tronçon n'a pas de limite connue ; null si la requête a échoué.
+     */
+    suspend fun current(trail: List<LatLon>, ahead: LatLon? = null): Int? = withContext(Dispatchers.IO) {
         if (trail.size < 2) return@withContext null
-        runCatching { val json = post(request(trail)); lastWay = wayOf(json); parse(json) }.getOrNull()
+        runCatching {
+            val json = post(request(if (ahead != null) trail + ahead else trail))
+            lastWay = wayOf(json, trail.size - 1)
+            aheadWay = wayOf(json)
+            parse(json)
+        }.getOrNull()
     }
 
-    /** Identifiant OpenStreetMap de la portion de route où l'on roule (dernier tronçon), ou null. */
-    fun wayOf(json: String): String? {
-        val edges = JSONObject(json).optJSONArray("edges") ?: return null
+    /**
+     * Identifiant OpenStreetMap de la portion de route où se trouve le point [index] de la trace (la voiture),
+     * ou du dernier tronçon (index -1, ou point non recalé sur une route) ; null si inconnu.
+     */
+    fun wayOf(json: String, index: Int = -1): String? {
+        val o = JSONObject(json)
+        val edges = o.optJSONArray("edges") ?: return null
         if (edges.length() == 0) return null
-        return edges.getJSONObject(edges.length() - 1).optLong("way_id", 0L).takeIf { it > 0 }?.toString()
+        val pts = o.optJSONArray("matched_points")
+        val ei = if (index >= 0 && pts != null && index < pts.length()) pts.optJSONObject(index)?.takeIf { it.optString("type") != "unmatched" }?.optLong("edge_index", -1L) ?: -1L else -1L
+        val e = edges.optJSONObject(if (ei in 0L until edges.length().toLong()) ei.toInt() else edges.length() - 1)
+        return e?.optLong("way_id", 0L)?.takeIf { it > 0 }?.toString()
     }
 
     fun request(trail: List<LatLon>): String {
@@ -36,7 +60,8 @@ object SpeedLimits {
             .put("shape", shape)
             .put("costing", "auto")
             .put("shape_match", "map_snap")
-            .put("filters", JSONObject().put("attributes", JSONArray().put("edge.speed_limit").put("edge.road_class").put("edge.way_id")).put("action", "include"))
+            .put("filters", JSONObject().put("attributes", JSONArray().put("edge.speed_limit").put("edge.road_class").put("edge.way_id")
+                .put("matched.type").put("matched.edge_index")).put("action", "include"))
             .toString()
     }
 
