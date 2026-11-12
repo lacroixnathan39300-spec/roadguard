@@ -408,10 +408,8 @@ class MainActivity : Activity() {
      */
     private fun runDiagnostic() {
         val (initiating, installer) = PlayMark.source(this, GPS)
-        val head = "Pilote ${installedVersion(GPS)} · installateur=$installer · initiateur=$initiating
-" +
-            "Android ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT}) · ${Build.MANUFACTURER} ${Build.MODEL}
-"
+        val head = "Pilote ${installedVersion(GPS)} · installateur=$installer · initiateur=$initiating\n" +
+            "Android ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT}) · ${Build.MANUFACTURER} ${Build.MODEL}\n"
         if (!PlayMark.shizukuReady()) {
             diag = head + "Shizuku n'est pas démarré : démarre-le pour lire aussi le verdict d'Android Auto."
             render(); return
