@@ -445,11 +445,11 @@ class MainActivity : Activity() {
         if (!PlayMark.shizukuReady()) { status.text = "Démarre Shizuku et autorise Pilote Suite d'abord."; return }
         status.text = "Correction de l'étiquette Play Store…"
         PlayMark.withShell(this, { it.setInstaller(GPS, PlayMark.VENDING) }) { out ->
-            if (PlayMark.marked(this, GPS)) {
-                prefs.edit().remove(KEY_NO_MARK).apply()
-                status.text = "Étiquette posée ✔ · force l'arrêt d'Android Auto, puis rebranche le téléphone."
-            } else {
-                status.text = "Ce téléphone a refusé l'étiquette" + (if (out != null && out != "ok") " ($out)" else "") + "."
+            status.text = when {
+                PlayMark.marked(this, GPS) -> { prefs.edit().remove(KEY_NO_MARK).apply()
+                    "Étiquette posée ✔ · force l'arrêt d'Android Auto, puis rebranche le téléphone." }
+                out == null -> "Shizuku n'a pas répondu. Vérifie qu'il est démarré et que Pilote Suite est dans ses applis autorisées, puis réessaie."
+                else -> "Ce téléphone a refusé l'étiquette ($out)."
             }
             render()
         }

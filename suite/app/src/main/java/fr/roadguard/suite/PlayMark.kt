@@ -127,6 +127,11 @@ object PlayMark {
      * principal (null si l'appel a échoué ou si le service n'a pas pu être relié).
      */
     fun withShell(c: Context, call: (IShellService) -> String?, done: (String?) -> Unit) {
+        // Sécurité : si le service ne se relie pas (Shizuku arrêté, autorisation absente, processus qui ne démarre pas),
+        // on ne reste pas bloqué — [done] est appelé une seule fois, avec null, au bout du délai.
+        val settled = java.util.concurrent.atomic.AtomicBoolean(false)
+        fun finish(out: String?) { if (settled.compareAndSet(false, true)) main.post { done(out) } }
+        if (!runCatching { Shizuku.pingBinder() }.getOrDefault(false)) { finish(null); return }
         val args = Shizuku.UserServiceArgs(ComponentName(c.packageName, ShellService::class.java.name))
             .daemon(false).processNameSuffix("shell").debuggable(false).version(1)
         val conn = object : ServiceConnection {
@@ -134,12 +139,13 @@ object PlayMark {
                 val self = this
                 Thread {
                     val out = runCatching { call(IShellService.Stub.asInterface(binder)) }.getOrNull()
-                    main.post { done(out) }
+                    finish(out)
                     runCatching { Shizuku.unbindUserService(args, self, true) }
                 }.start()
             }
             override fun onServiceDisconnected(name: ComponentName?) {}
         }
-        runCatching { Shizuku.bindUserService(args, conn) }.onFailure { main.post { done(null) } }
+        runCatching { Shizuku.bindUserService(args, conn) }.onFailure { finish(null) }
+        main.postDelayed({ finish(null) }, 12_000)
     }
 }
