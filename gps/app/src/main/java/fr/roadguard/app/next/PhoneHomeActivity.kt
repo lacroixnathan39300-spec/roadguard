@@ -363,7 +363,7 @@ private fun PhoneHome() {
                 val conv = fr.roadguard.core.community.Conversation
                 val why = conv.status
                 val label = when {
-                    conv.listening && why.isEmpty() -> "🎤 À l'écoute"
+                    conv.listening && why.isEmpty() -> if (conv.heard.isEmpty()) "🎤 À l'écoute" else "🎤 J'ai compris : « ${conv.heard.take(60)} »"
                     conv.listening -> "🎤 $why"
                     settings.conversationOn -> "🎤 Pas à l'écoute : " + why.ifEmpty { "démarrage…" }
                     else -> null

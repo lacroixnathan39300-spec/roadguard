@@ -35,6 +35,8 @@ object Conversation {
     var listening by androidx.compose.runtime.mutableStateOf(false)
     /** Pourquoi Pilote n'écoute pas (ou mal), en clair ; vide quand tout va bien. Affiché sur la carte. */
     var status by androidx.compose.runtime.mutableStateOf("")
+    /** Dernière phrase comprise par le micro, affichée sur la carte (pour voir si Pilote entend bien). */
+    var heard by androidx.compose.runtime.mutableStateOf("")
 
     // Anti-répétition : les dernières phrases dites (après remplissage des trous) ; on évite de les redire.
     private val recent = ArrayDeque<String>()

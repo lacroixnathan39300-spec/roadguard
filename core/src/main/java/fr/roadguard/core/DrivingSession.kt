@@ -442,6 +442,7 @@ class DrivingSession(
 
     /** Une phrase entendue : réponse en direct si possible, sinon phrase du pack, puis Pilote répond et se remet à écouter. */
     private fun onHeard(text: String) {
+        fr.roadguard.core.community.Conversation.heard = text
         // Genre de l'interlocuteur → le compagnon prend le genre opposé, et Pilote accorde ses mots (chéri/chérie…).
         val gender = settings.convGender
         fr.roadguard.core.community.Conversation.addressGender = gender
