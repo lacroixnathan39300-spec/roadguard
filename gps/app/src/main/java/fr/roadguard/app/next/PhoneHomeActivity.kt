@@ -167,7 +167,41 @@ private fun PhoneHome() {
     }
     val ask = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { hasLocation = it }
     val notifyAsk = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
-    LaunchedEffect(Unit) { if (!hasLocation) ask.launch(Manifest.permission.ACCESS_FINE_LOCATION) }
+    // Première ouverture : toutes les autorisations utiles sont demandées d'un coup (position, notifications, micro,
+    // Bluetooth, caméra, agenda, SMS), puis la position en arrière-plan (démarrage automatique en roulant) et
+    // l'affichage par-dessus les autres applis (bulle). Ensuite, chaque fonction redemande seulement ce qui lui manque.
+    var firstRunFlow by remember { mutableStateOf(false) }
+    fun askOverlay() {
+        if (!android.provider.Settings.canDrawOverlays(context)) runCatching {
+            android.widget.Toast.makeText(context, "Dernière étape : autorise Pilote à s'afficher par-dessus les autres applis (bulle vitesse et radars).", android.widget.Toast.LENGTH_LONG).show()
+            context.startActivity(android.content.Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                android.net.Uri.parse("package:${context.packageName}")).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
+        }
+        firstRunFlow = false
+    }
+    val askBackground = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { askOverlay() }
+    val askAll = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+        hasLocation = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        if (hasLocation && Build.VERSION.SDK_INT >= 29 && !AutoStart.hasBackgroundLocation(context)) askBackground.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        else askOverlay()
+    }
+    LaunchedEffect(Unit) {
+        val prefs = context.getSharedPreferences("account", android.content.Context.MODE_PRIVATE)
+        if (!prefs.getBoolean("perms_asked", false)) {
+            prefs.edit().putBoolean("perms_asked", true).apply()
+            val wanted = buildList {
+                add(Manifest.permission.ACCESS_FINE_LOCATION); add(Manifest.permission.ACCESS_COARSE_LOCATION)
+                if (Build.VERSION.SDK_INT >= 33) add(Manifest.permission.POST_NOTIFICATIONS)
+                add(Manifest.permission.RECORD_AUDIO)
+                if (Build.VERSION.SDK_INT >= 31) add(Manifest.permission.BLUETOOTH_CONNECT)
+                add(Manifest.permission.CAMERA); add(Manifest.permission.READ_CALENDAR); add(Manifest.permission.SEND_SMS)
+            }.filter { ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED }
+            firstRunFlow = true
+            if (wanted.isNotEmpty()) askAll.launch(wanted.toTypedArray())
+            else if (Build.VERSION.SDK_INT >= 29 && !AutoStart.hasBackgroundLocation(context)) askBackground.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            else askOverlay()
+        } else if (!hasLocation) ask.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+    }
 
     // Le cœur de conduite vit dans un service : il continue écran éteint ou dans une autre appli.
     var session by remember { mutableStateOf(DriveService.session) }
@@ -184,7 +218,8 @@ private fun PhoneHome() {
     }
     LaunchedEffect(hasLocation, restart) {
         if (!hasLocation) return@LaunchedEffect
-        if (Build.VERSION.SDK_INT >= 33) notifyAsk.launch(Manifest.permission.POST_NOTIFICATIONS)
+        // (Pendant la demande groupée de la première ouverture, les notifications sont déjà dans le lot.)
+        if (Build.VERSION.SDK_INT >= 33 && !firstRunFlow) notifyAsk.launch(Manifest.permission.POST_NOTIFICATIONS)
         DriveService.start(context)
         while (DriveService.session == null) delay(100)
         session = DriveService.session

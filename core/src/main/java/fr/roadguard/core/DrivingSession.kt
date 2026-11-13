@@ -401,7 +401,14 @@ class DrivingSession(
 
     private fun startEars() {
         ears?.start()
-        fr.roadguard.core.community.Conversation.listening = ears?.available() == true
+        val ok = ears?.active == true
+        fr.roadguard.core.community.Conversation.listening = ok
+        // Micro pas encore autorisé (ou reconnaissance vocale pas prête) : on réessaie tout seul toutes les 3 s,
+        // pour que l'écoute démarre dès que l'autorisation est donnée, sans avoir à couper/relancer le mode.
+        if (!ok && settings.conversationOn) scope.launch {
+            kotlinx.coroutines.delay(3000)
+            if (settings.conversationOn && !fr.roadguard.core.community.Conversation.listening) startEars()
+        }
     }
 
     private fun setConversation(on: Boolean) {

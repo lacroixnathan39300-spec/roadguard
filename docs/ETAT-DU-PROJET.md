@@ -213,3 +213,16 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
   homme / une femme » (`conv_gender`) fait que le compagnon prend le genre opposé (homme→amie/copine, femme→pote/copain)
   et que Pilote accorde ses mots d'adresse (chéri/chérie, mon beau/ma belle…) via `Conversation.genderize`, côté code,
   donc valable pour tout pack présent ou futur. Anciens réglages pote/amie/copine/copain migrés automatiquement.
+
+
+## 2026-11-13 — Carte fluide (animation maison) + autorisations à la première ouverture
+- Saccade de la flèche et de la carte : cause trouvée dans MapLibre (LocationAnimatorCoordinator) — son animation entre
+  deux points GPS utilise des ValueAnimator Android, donc elle saute d'un point à l'autre quand le téléphone coupe ou
+  réduit les animations (économiseur de batterie, « échelle d'animation » des options développeur). Désormais
+  `DriveMap` interpole lui-même position et cap à chaque image (`withFrameNanos`) et pousse chaque position à MapLibre
+  avec `trackingAnimationDurationMultiplier(0)` (application immédiate). Durée = intervalle GPS × 1,15, cap par le plus
+  court chemin, pas d'animation à l'arrêt, saut direct au-delà de 400 m.
+- Pilote (téléphone) : à la première ouverture, toutes les autorisations sont demandées d'un coup (position,
+  notifications, micro, Bluetooth, caméra, agenda, SMS), puis position en arrière-plan, puis affichage par-dessus les
+  autres applis (drapeau `perms_asked`). Le mode conversation réessaie le micro toutes les 3 s tant qu'il n'est pas
+  autorisé.

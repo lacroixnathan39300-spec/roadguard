@@ -298,18 +298,59 @@ fun DriveMap(
         }
     }
 
-    LaunchedEffect(position, styleVersion) {
-        val p = position ?: return@LaunchedEffect
-        val comp = holder.map?.locationComponent?.takeIf { it.isLocationComponentActivated } ?: return@LaunchedEffect
-        val loc = android.location.Location("roadguard").apply {
-            latitude = p.lat; longitude = p.lon
-            // Horloge actuelle : sinon le point peut être affiché « périmé » (gris) avec une horloge GPS décalée.
-            time = System.currentTimeMillis(); elapsedRealtimeNanos = android.os.SystemClock.elapsedRealtimeNanos()
-            accuracy = p.accuracyM.toFloat()
-            if (p.speedKmh > 0) speed = (p.speedKmh / 3.6).toFloat()
-            if (!p.bearing.isNaN()) bearing = p.bearing.toFloat()
+    // Fluidité : la flèche et la carte glissent d'un point GPS au suivant grâce à NOTRE animation, calculée à chaque
+    // image de l'écran. (L'animation intégrée de MapLibre dépend de l'« échelle d'animation » d'Android : avec
+    // l'économiseur de batterie ou les animations réduites, elle saute d'un point à l'autre, par à-coups.)
+    LaunchedEffect(styleVersion) {
+        holder.animating = holder.hasPos // style rechargé : on repose la position
+        while (true) {
+            if (!holder.animating) { kotlinx.coroutines.delay(16); continue }
+            androidx.compose.runtime.withFrameNanos {
+                val comp = holder.map?.locationComponent?.takeIf { it.isLocationComponentActivated } ?: return@withFrameNanos
+                val now = System.nanoTime()
+                val f = if (holder.animDuration <= 0L) 1.0 else ((now - holder.animStart).toDouble() / holder.animDuration).coerceIn(0.0, 1.0)
+                holder.curLat = holder.fromLat + (holder.toLat - holder.fromLat) * f
+                holder.curLon = holder.fromLon + (holder.toLon - holder.fromLon) * f
+                // Cap : par le plus court chemin (350° → 10° passe par 0°, pas par 180°).
+                val turn = ((holder.toBearing - holder.fromBearing + 540.0) % 360.0) - 180.0
+                holder.curBearing = (holder.fromBearing + turn * f + 360.0) % 360.0
+                val loc = android.location.Location("roadguard").apply {
+                    latitude = holder.curLat; longitude = holder.curLon
+                    // Horloge actuelle : sinon le point peut être affiché « périmé » (gris) avec une horloge GPS décalée.
+                    time = System.currentTimeMillis(); elapsedRealtimeNanos = android.os.SystemClock.elapsedRealtimeNanos()
+                    accuracy = holder.accuracy
+                    speed = holder.speed
+                    bearing = holder.curBearing.toFloat()
+                }
+                runCatching { comp.forceLocationUpdate(loc) }
+                if (f >= 1.0) holder.animating = false
+            }
         }
-        runCatching { comp.forceLocationUpdate(loc) }
+    }
+
+    LaunchedEffect(position) {
+        val p = position ?: return@LaunchedEffect
+        val now = System.nanoTime()
+        val bearing = if (!p.bearing.isNaN()) p.bearing else holder.curBearing
+        val jump = if (holder.hasPos) fr.roadguard.core.radar.Geo.distanceMeters(holder.curLat, holder.curLon, p.lat, p.lon) else 0.0
+        if (!holder.hasPos || jump > 400) {
+            // Première position, ou saut (GPS retrouvé après un tunnel…) : on s'y place directement.
+            holder.curLat = p.lat; holder.curLon = p.lon; holder.curBearing = bearing
+            holder.animDuration = 0L
+        } else {
+            // Durée = temps écoulé depuis le point précédent, un peu rallongée : la flèche est encore en mouvement
+            // quand le point suivant arrive, donc elle ne marque jamais d'arrêt entre deux points.
+            val since = (now - holder.lastFixAt).coerceIn(300_000_000L, 2_000_000_000L)
+            val turned = kotlin.math.abs(((bearing - holder.curBearing + 540.0) % 360.0) - 180.0)
+            // À l'arrêt (rien ne bouge) : une seule mise à jour, pas d'animation inutile (batterie).
+            holder.animDuration = if (jump < 0.3 && turned < 0.5) 0L else (since * 1.15).toLong()
+        }
+        holder.fromLat = holder.curLat; holder.fromLon = holder.curLon; holder.fromBearing = holder.curBearing
+        holder.toLat = p.lat; holder.toLon = p.lon; holder.toBearing = bearing
+        holder.accuracy = p.accuracyM.toFloat()
+        holder.speed = if (p.speedKmh > 0) (p.speedKmh / 3.6).toFloat() else 0f
+        holder.animStart = now; holder.lastFixAt = now
+        holder.hasPos = true; holder.animating = true
         // Trajet effacé derrière la voiture : on ne dessine que ce qui reste à parcourir.
         val r = route
         if (r != null && r.points.size >= 2) {
@@ -370,6 +411,14 @@ private class MapHolder {
     var lastBearing = 0.0
     var trimRoute: Route? = null
     var trimIndex = 0
+    // Animation maison de la position : d'où on part, où on va, depuis quand et en combien de temps (nanosecondes).
+    var hasPos = false
+    var animating = false
+    var fromLat = 0.0; var fromLon = 0.0; var fromBearing = 0.0
+    var toLat = 0.0; var toLon = 0.0; var toBearing = 0.0
+    var curLat = 0.0; var curLon = 0.0; var curBearing = 0.0
+    var animStart = 0L; var animDuration = 0L; var lastFixAt = 0L
+    var accuracy = 0f; var speed = 0f
 }
 
 @SuppressLint("MissingPermission")
@@ -387,6 +436,9 @@ private fun enableLocation(context: Context, map: MapLibreMap, style: Style, hol
                     .backgroundTintColor(android.graphics.Color.TRANSPARENT).bearingTintColor(android.graphics.Color.TRANSPARENT)
                     .accuracyAlpha(0f).elevation(0f).enableStaleState(false)
                     .trackingInitialMoveThreshold(0f).compassAnimationEnabled(false).accuracyAnimationEnabled(false)
+                    // Chaque position qu'on envoie (une par image) est appliquée tout de suite : c'est notre animation
+                    // qui fait le mouvement, pas celle de MapLibre (qui dépend des réglages d'animation d'Android).
+                    .trackingAnimationDurationMultiplier(0f)
                     .build()
             ).build()
     )
