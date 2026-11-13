@@ -165,7 +165,7 @@ class Community(context: Context, private val scope: CoroutineScope, private val
 
     private suspend fun refresh() {
         val f = here ?: return
-        val body = JSONObject().put("lat", f.lat).put("lon", f.lon).put("radius", 30000)
+        val body = JSONObject().put("lat", f.lat).put("lon", f.lon).put("radius", 15000)
             .put("speed", f.speedKmh.toInt()).apply { if (!f.bearing.isNaN()) put("heading", f.bearing.toInt()) }
         if (hasAccount) body.put("share", shareLocation)
         val o = withContext(Dispatchers.IO) { request("POST", "/v1/sync", body, auth = hasAccount) }
@@ -199,6 +199,9 @@ class Community(context: Context, private val scope: CoroutineScope, private val
         prompt?.let { if (f.timeMs - it.shownAt > 20_000) prompt = null }
         for (r in reports) {
             val d = Geo.distanceMeters(f.lat, f.lon, r.lat, r.lon)
+            // Rien ne se déclenche au-delà de 1 km (annonce < 1 km, vote < 120 m) : on saute les signalements lointains
+            // avant le calcul d'angle, pour ne pas faire de trigonométrie sur toute la liste à chaque seconde.
+            if (d > 1_200) continue
             // Devant et sur l'axe suivi (couloir étroit, pas un cône) : pas les signalements des routes voisines.
             val off = if (f.bearing.isNaN()) 180.0 else Geo.headingDelta(f.bearing, Geo.bearing(f.lat, f.lon, r.lat, r.lon))
             val ahead = off < 60 && d * kotlin.math.sin(Math.toRadians(off)) < 60 + 0.06 * d
