@@ -378,8 +378,30 @@ class DrivingSession(
     // ---------- Mode conversation ----------
     private var ears: fr.roadguard.core.community.ConversationEars? = null
 
+    // Mode « auto » : un seul personnage qui s'adapte. Niveau 1 = amical, 2 = amoureux, 3 = coquin. Il monte selon ce
+    // que dit le conducteur (tendresse, flirt…) et redescend tout seul après quelques échanges neutres, ou tout de
+    // suite s'il demande de se calmer. Pas besoin de changer de réglage : la relation évolue d'elle-même.
+    private var mood = 1
+    private var moodCalm = 0
+
+    private fun autoType(raw: String): String {
+        val t = fr.roadguard.core.community.Conversation.normalize(raw)
+        fun has(vararg w: String) = w.any { " $it " in t }
+        when {
+            has("arrete", "stop", "calme", "calme toi", "soft", "pas a l aise", "change de sujet", "on se calme",
+                "trop loin", "reste correct", "on arrete") -> { mood = 1; moodCalm = 0 }
+            has("coquin", "coquine", "sexy", "chaud", "chaude", "envie de toi", "tu me chauffes", "excite", "excitant",
+                "vilain", "vilaine", "cochon", "embrasse", "embrasse moi", "bisou", "caresse", "taquine") -> { mood = 3; moodCalm = 0 }
+            has("je t aime", "mon amour", "mon coeur", "cheri", "cherie", "tu me manques", "calin", "tendre", "tendresse",
+                "amoureux", "amoureuse", "bebe", "je t adore", "tu me plais", "je pense a toi") -> { mood = maxOf(mood, 2); moodCalm = 0 }
+            else -> { moodCalm++; if (moodCalm >= 6) { mood = maxOf(1, mood - 1); moodCalm = 0 } }
+        }
+        return when (mood) { 3 -> "coquin"; 2 -> "amoureux"; else -> "ami" }
+    }
+
     private fun setConversation(on: Boolean) {
         fr.roadguard.core.community.Conversation.resetContext()
+        mood = 1; moodCalm = 0
         if (!on) { ears?.stop(); return }
         if (ears == null) ears = fr.roadguard.core.community.ConversationEars(context) { heard -> onHeard(heard) }
         if (fr.roadguard.core.community.Conversation.loadCached(context)) ears?.start()
@@ -389,14 +411,15 @@ class DrivingSession(
         }
     }
 
-    fun stopConversation() { ears?.stop(); fr.roadguard.core.community.Conversation.resetContext() }
+    fun stopConversation() { ears?.stop(); fr.roadguard.core.community.Conversation.resetContext(); mood = 1; moodCalm = 0 }
 
     /** Une phrase entendue : réponse en direct si possible, sinon phrase du pack, puis Pilote répond et se remet à écouter. */
     private fun onHeard(text: String) {
         // Genre de l'interlocuteur → le compagnon prend le genre opposé, et Pilote accorde ses mots (chéri/chérie…).
         val gender = settings.convGender
         fr.roadguard.core.community.Conversation.addressGender = gender
-        val persona = when (settings.convPersona) {
+        val type = if (settings.convPersona == "auto") autoType(text) else settings.convPersona
+        val persona = when (type) {
             "ami" -> if (gender == "femme") "pote" else "amie"
             "amoureux" -> if (gender == "femme") "copain" else "copine"
             "coquin" -> "coquin"

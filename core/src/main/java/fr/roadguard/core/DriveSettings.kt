@@ -201,7 +201,7 @@ class DriveSettings(context: Context) {
     /** Personnage du mode conversation (normal, pote, amie, copine, copain, coquin). */
     // Personnalité choisie : le TYPE de relation (normal / ami / amoureux / coquin). Le genre du compagnon et l'accord
     // des mots (chéri/chérie…) découlent de convGender, pas de ce choix. (Anciens réglages pote/amie/copine/copain migrés.)
-    var convPersona by mutableStateOf(convTypeOf(prefs.getString("conv_persona", "normal"))); private set
+    var convPersona by mutableStateOf(convTypeOf(prefs.getString("conv_persona", "auto"))); private set
     fun changeConvPersona(v: String) { convPersona = v; put("conv_persona", v) }
     // Genre de l'interlocuteur (l'utilisateur) : "homme" ou "femme". Le compagnon prend le genre opposé et s'adresse
     // à l'utilisateur dans le bon genre.
@@ -209,6 +209,7 @@ class DriveSettings(context: Context) {
     fun changeConvGender(v: String) { convGender = v; put("conv_gender", v) }
     /** Ramène tout ancien ou nouveau nom de personnage au type de relation unifié. */
     private fun convTypeOf(v: String?): String = when (v) {
+        "auto" -> "auto"
         "pote", "amie", "ami" -> "ami"
         "copine", "copain", "amoureux" -> "amoureux"
         "coquin", "coquine" -> "coquin"

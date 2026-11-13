@@ -333,10 +333,12 @@ fun ConversationSettings(settings: DriveSettings) {
         Text("Le compagnon prend le genre opposé et s'adresse à toi dans le bon genre.", color = DriveColors.TextSecondary, fontSize = 13.sp)
         Text("Personnalité", color = DriveColors.TextSecondary, fontSize = 14.sp)
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            listOf("normal" to "🚗 Normal", "ami" to "😊 Ami·e", "amoureux" to "❤️ Amoureux·se", "coquin" to "😏 Coquin·e").forEach { (id, label) ->
+            listOf("auto" to "✨ Auto (s'adapte)", "normal" to "🚗 Normal", "ami" to "😊 Ami·e",
+                "amoureux" to "❤️ Amoureux·se", "coquin" to "😏 Coquin·e").forEach { (id, label) ->
                 BigButton(label, if (settings.convPersona == id) DriveColors.Accent else DriveColors.Panel) { settings.changeConvPersona(id) }
             }
         }
+        if (settings.convPersona == "auto") Text("En Auto, Pilote commence amical et devient plus tendre ou plus coquin selon ce que tu dis et le ton, puis redevient tranquille tout seul. Dis « calme-toi » pour revenir à l'amical.", color = DriveColors.TextSecondary, fontSize = 13.sp)
         BigButton("⬇ Mettre à jour le pack de phrases", DriveColors.Track) { downloadPack() }
     }
 }

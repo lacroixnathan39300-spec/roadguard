@@ -47,7 +47,7 @@ fun ConversationIntroScreen(onDone: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val settings = remember { DriveSettings(context) }
-    var persona by remember { mutableStateOf("ami") }
+    var persona by remember { mutableStateOf("auto") }
     var gender by remember { mutableStateOf(settings.convGender) }
     Box(Modifier.fillMaxSize().background(Color(0xE60B0F15)), contentAlignment = Alignment.Center) {
         Column(
@@ -66,10 +66,12 @@ fun ConversationIntroScreen(onDone: () -> Unit) {
             }
             Text("Son caractère (le compagnon prend le genre opposé au tien) :", color = DriveColors.TextSecondary, fontSize = 14.sp)
             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                listOf("normal" to "🚗 Normal", "ami" to "😊 Ami·e", "amoureux" to "❤️ Amoureux·se", "coquin" to "😏 Coquin·e").forEach { (id, label) ->
+                listOf("auto" to "✨ Auto (s'adapte)", "normal" to "🚗 Normal", "ami" to "😊 Ami·e",
+                    "amoureux" to "❤️ Amoureux·se", "coquin" to "😏 Coquin·e").forEach { (id, label) ->
                     BigButton(label, if (persona == id) DriveColors.Accent else DriveColors.Track) { persona = id }
                 }
             }
+            Text("Auto : amical au départ, puis plus tendre ou plus coquin selon ce que tu dis — il s'adapte tout seul.", color = DriveColors.TextSecondary, fontSize = 13.sp)
             Text("Ça utilise le micro en continu (un peu de batterie). Tu pourras le couper ou changer de personnage " +
                 "dans Réglages → Voix. Pour le hors-ligne, installe le français « hors connexion » dans Android.",
                 color = DriveColors.TextSecondary, fontSize = 13.sp)
