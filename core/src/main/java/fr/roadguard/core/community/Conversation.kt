@@ -1,6 +1,8 @@
 package fr.roadguard.core.community
 
 import android.content.Context
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import fr.roadguard.core.net.Net
 import org.json.JSONObject
 import java.io.File
@@ -27,6 +29,10 @@ object Conversation {
 
     @Volatile var pack: Pack? = null
         private set
+
+    // Vrai quand le mode conversation est lancé et que le micro est réellement en écoute (pour afficher l'indicateur
+    // 🎤 à l'écran de conduite). Mis à jour par la séance.
+    var listening by androidx.compose.runtime.mutableStateOf(false)
 
     // Anti-répétition : les dernières phrases dites (après remplissage des trous) ; on évite de les redire.
     private val recent = ArrayDeque<String>()
@@ -97,9 +103,10 @@ object Conversation {
      * Télécharge le pack depuis le serveur et le met en cache (à appeler en arrière-plan). Rend true si un pack
      * est disponible à la fin (téléchargé ou déjà en cache).
      */
-    fun download(context: Context, baseUrl: String): Boolean {
+    fun download(context: Context, baseUrl: String, onProgress: (Int) -> Unit = {}): Boolean {
         runCatching {
-            val r = Net.fetch("$baseUrl/v1/pack/conversation")
+            // Le pack peut être gros (quelques Mo) : téléchargement avec progression et délai plus large.
+            val r = Net.fetchWithProgress("$baseUrl/v1/pack/conversation") { onProgress(it) }
             if (r.code in 200..299) {
                 val text = r.text
                 val p = parse(text)

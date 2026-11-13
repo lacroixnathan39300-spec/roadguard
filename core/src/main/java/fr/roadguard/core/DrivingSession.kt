@@ -399,19 +399,28 @@ class DrivingSession(
         return when (mood) { 3 -> "coquin"; 2 -> "amoureux"; else -> "ami" }
     }
 
+    private fun startEars() {
+        ears?.start()
+        fr.roadguard.core.community.Conversation.listening = ears?.available() == true
+    }
+
     private fun setConversation(on: Boolean) {
         fr.roadguard.core.community.Conversation.resetContext()
         mood = 1; moodCalm = 0
-        if (!on) { ears?.stop(); return }
+        if (!on) { ears?.stop(); fr.roadguard.core.community.Conversation.listening = false; return }
         if (ears == null) ears = fr.roadguard.core.community.ConversationEars(context) { heard -> onHeard(heard) }
-        if (fr.roadguard.core.community.Conversation.loadCached(context)) ears?.start()
+        if (fr.roadguard.core.community.Conversation.loadCached(context)) startEars()
         else scope.launch(kotlinx.coroutines.Dispatchers.IO) {
             fr.roadguard.core.community.Conversation.download(context, community.baseUrl)
-            withContext(kotlinx.coroutines.Dispatchers.Main) { if (settings.conversationOn) ears?.start() }
+            withContext(kotlinx.coroutines.Dispatchers.Main) { if (settings.conversationOn) startEars() }
         }
     }
 
-    fun stopConversation() { ears?.stop(); fr.roadguard.core.community.Conversation.resetContext(); mood = 1; moodCalm = 0 }
+    fun stopConversation() {
+        ears?.stop()
+        fr.roadguard.core.community.Conversation.listening = false
+        fr.roadguard.core.community.Conversation.resetContext(); mood = 1; moodCalm = 0
+    }
 
     /** Une phrase entendue : réponse en direct si possible, sinon phrase du pack, puis Pilote répond et se remet à écouter. */
     private fun onHeard(text: String) {

@@ -67,7 +67,7 @@ object Net {
         }
         val c = URL(url).openConnection() as HttpURLConnection
         c.connectTimeout = 10_000
-        c.readTimeout = 30_000
+        c.readTimeout = 60_000
         c.setRequestProperty("User-Agent", USER_AGENT)
         try {
             val code = c.responseCode

@@ -49,6 +49,8 @@ fun ConversationIntroScreen(onDone: () -> Unit) {
     val settings = remember { DriveSettings(context) }
     var persona by remember { mutableStateOf("auto") }
     var gender by remember { mutableStateOf(settings.convGender) }
+    val askMic = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) {}
     Box(Modifier.fillMaxSize().background(Color(0xE60B0F15)), contentAlignment = Alignment.Center) {
         Column(
             Modifier.padding(20.dp).fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(DriveColors.Panel)
@@ -79,6 +81,8 @@ fun ConversationIntroScreen(onDone: () -> Unit) {
                 settings.changeConvGender(gender)
                 settings.changeConvPersona(persona)
                 settings.changeConversationOn(true)
+                if (context.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) != android.content.pm.PackageManager.PERMISSION_GRANTED)
+                    askMic.launch(android.Manifest.permission.RECORD_AUDIO)
                 scope.launch(Dispatchers.IO) { Conversation.download(context, Community.DEFAULT_URL) }
                 ConversationIntro.markSeen(context)
                 onDone()

@@ -312,8 +312,23 @@ private fun VoiceCategory(settings: DriveSettings, voice: fr.roadguard.core.rada
 fun ConversationSettings(settings: DriveSettings) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val scope = androidx.compose.runtime.rememberCoroutineScope()
-    fun downloadPack() = scope.launch(kotlinx.coroutines.Dispatchers.IO) {
-        fr.roadguard.core.community.Conversation.download(context, fr.roadguard.core.community.Community.DEFAULT_URL)
+    var micOk by androidx.compose.runtime.remember {
+        androidx.compose.runtime.mutableStateOf(context.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) == android.content.pm.PackageManager.PERMISSION_GRANTED)
+    }
+    val askMic = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { micOk = it }
+    var packStatus by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<String?>(null) }
+    fun downloadPack() {
+        packStatus = "⏳ Téléchargement du pack…"
+        scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            var total = 0
+            val ok = fr.roadguard.core.community.Conversation.download(context, fr.roadguard.core.community.Community.DEFAULT_URL) { n -> total += n }
+            val v = fr.roadguard.core.community.Conversation.cachedVersion(context)
+            withContext(kotlinx.coroutines.Dispatchers.Main) {
+                packStatus = if (ok) "✓ Pack installé (version $v, ${total / 1024} Ko)"
+                    else "⚠ Échec du téléchargement. Vérifie ta connexion et réessaie."
+            }
+        }
     }
     Section("Mode conversation")
     Text("Pilote écoute au micro : tu parles, il te répond, et la conversation continue. Il réagit aussi aux situations " +
@@ -322,9 +337,21 @@ fun ConversationSettings(settings: DriveSettings) {
         color = DriveColors.TextSecondary, fontSize = 14.sp)
     ToggleRow("Activer le mode conversation", settings.conversationOn) { on ->
         settings.changeConversationOn(on)
-        if (on) downloadPack()
+        if (on) {
+            if (!micOk) askMic.launch(android.Manifest.permission.RECORD_AUDIO)
+            downloadPack()
+        }
     }
     if (settings.conversationOn) {
+        // Le micro est indispensable : sans l'autorisation, le mode ne peut pas écouter.
+        if (!micOk) {
+            BigButton("🎤 Autoriser le micro (indispensable)", DriveColors.Accent) { askMic.launch(android.Manifest.permission.RECORD_AUDIO) }
+        } else if (!android.speech.SpeechRecognizer.isRecognitionAvailable(context)) {
+            Text("⚠ La reconnaissance vocale n'est pas disponible sur ce téléphone. Installe ou active « Speech Services by Google » " +
+                "(et le français « hors connexion ») pour que Pilote comprenne ce que tu dis.", color = Color(0xFFE0A030), fontSize = 13.sp)
+        } else {
+            Text("🎤 Micro prêt. En conduite, un indicateur 🎤 s'affiche en haut quand Pilote t'écoute.", color = DriveColors.TextSecondary, fontSize = 13.sp)
+        }
         Text("Je suis…", color = DriveColors.TextSecondary, fontSize = 14.sp)
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             BigButton("👨 un homme", if (settings.convGender == "homme") DriveColors.Accent else DriveColors.Panel) { settings.changeConvGender("homme") }
@@ -340,6 +367,7 @@ fun ConversationSettings(settings: DriveSettings) {
         }
         if (settings.convPersona == "auto") Text("En Auto, Pilote commence amical et devient plus tendre ou plus coquin selon ce que tu dis et le ton, puis redevient tranquille tout seul. Dis « calme-toi » pour revenir à l'amical.", color = DriveColors.TextSecondary, fontSize = 13.sp)
         BigButton("⬇ Mettre à jour le pack de phrases", DriveColors.Track) { downloadPack() }
+        packStatus?.let { Text(it, color = DriveColors.TextSecondary, fontSize = 13.sp) }
     }
 }
 

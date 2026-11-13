@@ -324,6 +324,10 @@ private fun PhoneHome() {
                     choices = s.alternatives, current = s.route, onChoose = s::chooseRoute, onDismissChoices = s::dismissAlternatives)
             }
             AlertBanners(s.alert, s.average)
+            if (fr.roadguard.core.community.Conversation.listening) {
+                Text("🎤 À l'écoute", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 6.dp).clip(RoundedCornerShape(14.dp)).background(Color(0xF0124A2E)).padding(horizontal = 14.dp, vertical = 6.dp))
+            }
             if (!s.navigating) BubbleSetupCard(settings)
             fr.roadguard.core.ui.TripSummaryCard(s, Modifier.padding(horizontal = 12.dp, vertical = 6.dp))
             if (incoming != null && System.currentTimeMillis() - incoming.at < 120_000) {
