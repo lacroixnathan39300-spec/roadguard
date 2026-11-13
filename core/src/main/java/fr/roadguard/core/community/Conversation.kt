@@ -32,6 +32,17 @@ object Conversation {
     private val recent = ArrayDeque<String>()
     private const val RECENT_MAX = 400
 
+    // Mémoire de conversation : Pilote retient « où on en est ». Quand un scénario s'ouvre (une histoire, un jeu, un
+    // rendez-vous imaginaire…), on garde le fil et on le fait avancer aux tours suivants au lieu de repartir sur une
+    // relance générique. Le fil s'efface tout seul après quelques tours sans qu'on y revienne.
+    private var thread: String? = null   // id de l'intention de scénario en cours
+    private var threadStep = 0           // progression dans ce scénario (ligne suivante à dire)
+    private var threadLife = 0           // tours restants avant d'oublier le fil
+    private const val THREAD_LIFE = 8    // un scénario tient ~8 échanges
+
+    /** Oublie le fil de conversation en cours (au démarrage/arrêt du mode, ou pour repartir à neuf). */
+    fun resetContext() { thread = null; threadStep = 0; threadLife = 0 }
+
     private fun file(context: Context) = File(context.applicationContext.filesDir, "conversation.json")
 
     /** Normalise un texte pour la comparaison : minuscules, sans accents ni ponctuation, espaces simples. */
@@ -132,11 +143,35 @@ object Conversation {
         val p = pack ?: return null
         val t = normalize(text)
         val intent = p.intents.firstOrNull { intent -> intent.keywords.any { it.isNotEmpty() && " $it " in t } } ?: return null
+        // Mémoire : si le conducteur lance (ou relance) un scénario, on retient le fil pour l'enchaîner ensuite ;
+        // toute autre intention reconnue laisse le fil vivre encore un peu puis s'effacer.
+        if (intent.id.startsWith("scenario_")) { thread = intent.id; threadStep = 1; threadLife = THREAD_LIFE }
+        else if (threadLife > 0) threadLife--
         return pick(intent.replies, persona)
     }
 
-    /** Relance (réaction + question) pour garder la conversation quand aucune intention précise ne correspond. */
-    fun continuerReply(persona: String): String? = pack?.let { pick(it.continuers, persona) }
+    /**
+     * Relance pour garder la conversation quand aucune intention précise ne correspond. Si un scénario est en cours,
+     * on le fait avancer (ligne suivante de l'histoire) au lieu d'une relance générique : c'est ce qui donne
+     * l'impression que Pilote « suit » la conversation sur plusieurs minutes.
+     */
+    fun continuerReply(persona: String): String? {
+        val p = pack ?: return null
+        val cur = thread
+        if (cur != null && threadLife > 0) {
+            threadLife--
+            if (threadLife == 0) thread = null
+            val intent = p.intents.firstOrNull { it.id == cur }
+            val list = intent?.replies?.get(persona)?.takeIf { it.isNotEmpty() }
+                ?: intent?.replies?.get("normal")?.takeIf { it.isNotEmpty() }
+            if (list != null) {
+                val line = render(list[threadStep % list.size]); threadStep++
+                noteSaid(line)
+                return line
+            }
+        }
+        return pick(p.continuers, persona)
+    }
 
     /** Phrase de secours quand rien n'est compris, pour le personnage. */
     fun fallbackReply(persona: String): String? = pack?.let { pick(it.fallback, persona) }

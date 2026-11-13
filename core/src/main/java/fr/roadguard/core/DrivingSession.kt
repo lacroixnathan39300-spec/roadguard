@@ -379,6 +379,7 @@ class DrivingSession(
     private var ears: fr.roadguard.core.community.ConversationEars? = null
 
     private fun setConversation(on: Boolean) {
+        fr.roadguard.core.community.Conversation.resetContext()
         if (!on) { ears?.stop(); return }
         if (ears == null) ears = fr.roadguard.core.community.ConversationEars(context) { heard -> onHeard(heard) }
         if (fr.roadguard.core.community.Conversation.loadCached(context)) ears?.start()
@@ -388,7 +389,7 @@ class DrivingSession(
         }
     }
 
-    fun stopConversation() { ears?.stop() }
+    fun stopConversation() { ears?.stop(); fr.roadguard.core.community.Conversation.resetContext() }
 
     /** Une phrase entendue : réponse en direct si possible, sinon phrase du pack, puis Pilote répond et se remet à écouter. */
     private fun onHeard(text: String) {
