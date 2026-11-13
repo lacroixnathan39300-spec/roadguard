@@ -453,11 +453,28 @@ class DrivingSession(
         // Si de la musique joue, le micro l'entend aussi : on ne répond alors qu'à une vraie question ou une phrase
         // reconnue, jamais à du bruit (pas de relance), pour ne pas bavarder par-dessus les paroles d'une chanson.
         val music = runCatching { (context.getSystemService(android.content.Context.AUDIO_SERVICE) as android.media.AudioManager).isMusicActive }.getOrDefault(false)
-        fr.roadguard.core.community.Conversation.familiar = settings.convFamiliar && persona != "normal"
-        val reply = dynamicReply(text)?.let { fr.roadguard.core.community.Conversation.polish(it) }
-            ?: fr.roadguard.core.community.Conversation.staticReply(text, persona)
-            ?: if (music) null else (fr.roadguard.core.community.Conversation.continuerReply(persona)
-                ?: fr.roadguard.core.community.Conversation.fallbackReply(persona))
+        val conv = fr.roadguard.core.community.Conversation
+        conv.familiar = settings.convFamiliar && persona != "normal"
+        // Mémoire (jamais pendant la musique : des paroles de chanson ne doivent pas être retenues comme des faits).
+        val mem = fr.roadguard.core.community.ConversationMemory
+        val memOn = settings.convMemory && !music
+        if (memOn) {
+            mem.load(context)
+            mem.seedName(runCatching { fr.roadguard.core.account.AccountManager.get(context).status?.firstName }.getOrNull())
+            mem.observe(text)
+            // Il retient quelque chose, répond à une question sur le conducteur, ou donne une réponse apprise.
+            mem.handle(text)?.let { r -> voice.converse(conv.polish(r)) { ears?.listen() }; return }
+        }
+        val live = dynamicReply(text)?.let { conv.polish(it) }
+        var reply = live ?: conv.staticReply(text, persona)?.let { if (memOn) mem.flavor(it, text, false) else it }
+        if (reply == null && !music) {
+            // Rien de précis reconnu : phrase dite souvent → Pilote demande quoi répondre ; sinon une relance, parfois
+            // personnelle (ses proches, ses goûts), avec les mots du conducteur.
+            reply = (if (memOn) mem.noteUnknown(text) else null)?.let { conv.polish(it) }
+                ?: (if (memOn && Math.random() < 0.25) mem.personal() else null)?.let { conv.polish(it) }
+                ?: conv.continuerReply(persona)?.let { if (memOn) mem.flavor(it, text, true) else it }
+                ?: conv.fallbackReply(persona)
+        }
         if (reply != null) voice.converse(reply) { ears?.listen() } else ears?.listen()
     }
 

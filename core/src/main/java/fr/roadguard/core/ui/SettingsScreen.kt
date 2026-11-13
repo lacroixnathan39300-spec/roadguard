@@ -367,6 +367,20 @@ fun ConversationSettings(settings: DriveSettings) {
         }
         if (settings.convPersona == "auto") Text("En Auto, Pilote commence amical et devient plus tendre ou plus coquin selon ce que tu dis et le ton, puis redevient tranquille tout seul. Dis « calme-toi » pour revenir à l'amical.", color = DriveColors.TextSecondary, fontSize = 13.sp)
         ToggleRow("Langage familier (« t'es », « y a », « ouais »…)", settings.convFamiliar, settings::changeConvFamiliar)
+        ToggleRow("Retenir ce que je dis de moi et mes mots (reste sur ce téléphone)", settings.convMemory, settings::changeConvMemory)
+        if (settings.convMemory) {
+            var showMemory by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+            var memoryLines by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(emptyList<String>()) }
+            val memory = fr.roadguard.core.community.ConversationMemory
+            BigButton(if (showMemory) "🧠 Masquer ce que Pilote sait de moi" else "🧠 Voir ce que Pilote sait de moi", DriveColors.Panel) {
+                memory.load(context); memoryLines = memory.summaryLines(); showMemory = !showMemory
+            }
+            if (showMemory) {
+                if (memoryLines.isEmpty()) Text("Rien pour l'instant. Dis par exemple « je m'appelle… », « mon oncle s'appelle… », « j'aime… », « retiens que… », ou « quand je dis X, réponds Y ».", color = DriveColors.TextSecondary, fontSize = 13.sp)
+                memoryLines.forEach { Text("• $it", color = Color.White, fontSize = 14.sp) }
+                if (memoryLines.isNotEmpty()) BigButton("🗑 Tout oublier", DriveColors.Track) { memory.clear(); memoryLines = emptyList() }
+            }
+        }
         BigButton("⬇ Mettre à jour le pack de phrases", DriveColors.Track) { downloadPack() }
         packStatus?.let { Text(it, color = DriveColors.TextSecondary, fontSize = 13.sp) }
     }

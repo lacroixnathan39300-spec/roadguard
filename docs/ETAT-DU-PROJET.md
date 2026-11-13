@@ -233,3 +233,10 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
   transforme les tournures écrites en français parlé (« tu es » → « t'es », « je n'ai pas » → « j'ai pas », « il y a » →
   « y a », « as-tu » → « t'as », « qu'en penses-tu » → « t'en penses quoi », « d'accord » → « ok »…) ; fait en code,
   donc valable pour tout pack. `polish` corrige aussi « de un / de une » → « d'un / d'une ».
+
+- Mémoire du mode conversation (`ConversationMemory`, fichier privé `conversation_memory.json` sur le téléphone, rien sur
+  le serveur ; réglage `conv_memory`, activé par défaut, coupée pendant la musique) : retient prénom, âge, ville, métier,
+  proches (« mon oncle s'appelle… »), préférés, goûts, notes (« retiens que… ») ; répond aux questions (« comment
+  s'appelle mon oncle », « qu'est-ce que tu sais sur moi ») ; apprend des réponses (« quand je dis X, réponds Y », et
+  demande quoi répondre à une phrase inconnue dite 3 fois) ; reprend les mots familiers du conducteur (mec, grave,
+  wesh…) et fait des relances personnelles. « Oublie tout » à la voix ou bouton dans Réglages → Voix.
