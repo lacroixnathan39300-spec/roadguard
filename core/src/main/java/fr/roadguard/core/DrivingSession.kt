@@ -393,7 +393,15 @@ class DrivingSession(
 
     /** Une phrase entendue : réponse en direct si possible, sinon phrase du pack, puis Pilote répond et se remet à écouter. */
     private fun onHeard(text: String) {
-        val persona = settings.convPersona
+        // Genre de l'interlocuteur → le compagnon prend le genre opposé, et Pilote accorde ses mots (chéri/chérie…).
+        val gender = settings.convGender
+        fr.roadguard.core.community.Conversation.addressGender = gender
+        val persona = when (settings.convPersona) {
+            "ami" -> if (gender == "femme") "pote" else "amie"
+            "amoureux" -> if (gender == "femme") "copain" else "copine"
+            "coquin" -> "coquin"
+            else -> "normal"
+        }
         // Si de la musique joue, le micro l'entend aussi : on ne répond alors qu'à une vraie question ou une phrase
         // reconnue, jamais à du bruit (pas de relance), pour ne pas bavarder par-dessus les paroles d'une chanson.
         val music = runCatching { (context.getSystemService(android.content.Context.AUDIO_SERVICE) as android.media.AudioManager).isMusicActive }.getOrDefault(false)

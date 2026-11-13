@@ -130,7 +130,8 @@ class DriveSettings(context: Context) {
         if (key == "swiss_mode") swissMode = p.getBoolean("swiss_mode", true) || !fr.roadguard.core.ui.Legal.swissConsented(appContext)
         // Mode conversation : une instance (réglages, écran d'accueil) le change, les autres (la séance) suivent.
         if (key == "conversation_on") conversationOn = p.getBoolean("conversation_on", false)
-        if (key == "conv_persona") convPersona = p.getString("conv_persona", "normal") ?: "normal"
+        if (key == "conv_persona") convPersona = convTypeOf(p.getString("conv_persona", "normal"))
+        if (key == "conv_gender") convGender = p.getString("conv_gender", "homme") ?: "homme"
     }
     init { prefs.registerOnSharedPreferenceChangeListener(radarsListener) }
     /**
@@ -198,8 +199,21 @@ class DriveSettings(context: Context) {
     var conversationOn by mutableStateOf(prefs.getBoolean("conversation_on", false)); private set
     fun changeConversationOn(v: Boolean) { conversationOn = v; put("conversation_on", v) }
     /** Personnage du mode conversation (normal, pote, amie, copine, copain, coquin). */
-    var convPersona by mutableStateOf(prefs.getString("conv_persona", "normal") ?: "normal"); private set
+    // Personnalité choisie : le TYPE de relation (normal / ami / amoureux / coquin). Le genre du compagnon et l'accord
+    // des mots (chéri/chérie…) découlent de convGender, pas de ce choix. (Anciens réglages pote/amie/copine/copain migrés.)
+    var convPersona by mutableStateOf(convTypeOf(prefs.getString("conv_persona", "normal"))); private set
     fun changeConvPersona(v: String) { convPersona = v; put("conv_persona", v) }
+    // Genre de l'interlocuteur (l'utilisateur) : "homme" ou "femme". Le compagnon prend le genre opposé et s'adresse
+    // à l'utilisateur dans le bon genre.
+    var convGender by mutableStateOf(prefs.getString("conv_gender", "homme") ?: "homme"); private set
+    fun changeConvGender(v: String) { convGender = v; put("conv_gender", v) }
+    /** Ramène tout ancien ou nouveau nom de personnage au type de relation unifié. */
+    private fun convTypeOf(v: String?): String = when (v) {
+        "pote", "amie", "ami" -> "ami"
+        "copine", "copain", "amoureux" -> "amoureux"
+        "coquin", "coquine" -> "coquin"
+        else -> "normal"
+    }
 
     private fun put(key: String, v: Any) = prefs.edit().apply {
         when (v) { is Boolean -> putBoolean(key, v); is Int -> putInt(key, v); is String -> putString(key, v); is Float -> putFloat(key, v) }

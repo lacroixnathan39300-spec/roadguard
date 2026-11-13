@@ -47,7 +47,8 @@ fun ConversationIntroScreen(onDone: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val settings = remember { DriveSettings(context) }
-    var persona by remember { mutableStateOf("pote") }
+    var persona by remember { mutableStateOf("ami") }
+    var gender by remember { mutableStateOf(settings.convGender) }
     Box(Modifier.fillMaxSize().background(Color(0xE60B0F15)), contentAlignment = Alignment.Center) {
         Column(
             Modifier.padding(20.dp).fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(DriveColors.Panel)
@@ -58,10 +59,14 @@ fun ConversationIntroScreen(onDone: () -> Unit) {
             Text("Pilote peut t'écouter au micro et te répondre : tu parles, il répond, et la discussion continue. " +
                 "Il réagit aussi aux situations (trajet, énervement…). Tout se passe hors ligne.",
                 color = Color.White, fontSize = 16.sp)
-            Text("Choisis son caractère :", color = DriveColors.TextSecondary, fontSize = 14.sp)
+            Text("Je suis…", color = DriveColors.TextSecondary, fontSize = 14.sp)
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                BigButton("👨 un homme", if (gender == "homme") DriveColors.Accent else DriveColors.Track) { gender = "homme" }
+                BigButton("👩 une femme", if (gender == "femme") DriveColors.Accent else DriveColors.Track) { gender = "femme" }
+            }
+            Text("Son caractère (le compagnon prend le genre opposé au tien) :", color = DriveColors.TextSecondary, fontSize = 14.sp)
             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                listOf("normal" to "🚗 Normal", "pote" to "😎 Un pote", "amie" to "😊 Une amie",
-                    "copine" to "❤️ Petite amie", "copain" to "❤️ Petit copain", "coquin" to "😏 Coquin").forEach { (id, label) ->
+                listOf("normal" to "🚗 Normal", "ami" to "😊 Ami·e", "amoureux" to "❤️ Amoureux·se", "coquin" to "😏 Coquin·e").forEach { (id, label) ->
                     BigButton(label, if (persona == id) DriveColors.Accent else DriveColors.Track) { persona = id }
                 }
             }
@@ -69,6 +74,7 @@ fun ConversationIntroScreen(onDone: () -> Unit) {
                 "dans Réglages → Voix. Pour le hors-ligne, installe le français « hors connexion » dans Android.",
                 color = DriveColors.TextSecondary, fontSize = 13.sp)
             BigButton("Activer et télécharger les phrases", DriveColors.Accent) {
+                settings.changeConvGender(gender)
                 settings.changeConvPersona(persona)
                 settings.changeConversationOn(true)
                 scope.launch(Dispatchers.IO) { Conversation.download(context, Community.DEFAULT_URL) }

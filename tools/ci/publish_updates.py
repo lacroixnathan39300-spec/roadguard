@@ -70,3 +70,24 @@ except Exception as e:
     print("Ménage incomplet :", e)
 call("PUT", values + "manifest", json.dumps(manifest).encode(), "application/json")
 print("Manifeste :", json.dumps(manifest))
+
+# Pack de conversation hors-ligne : déposé dans le même espace KV (trop gros pour le Worker). On ne le ré-envoie
+# que si sa version a changé, pour économiser les écritures KV.
+pack_path = os.path.join(os.path.dirname(__file__), "conversation.json")
+if os.path.isfile(pack_path):
+    pack_bytes = open(pack_path, "rb").read()
+    try:
+        pack_version = json.loads(pack_bytes.decode("utf-8")).get("version", 0)
+    except Exception:
+        pack_version = 0
+    try:
+        kv_meta = json.loads(call("GET", values + "conversation:meta"))
+    except Exception:
+        kv_meta = {}
+    if kv_meta.get("version") == pack_version and kv_meta.get("size") == len(pack_bytes):
+        print(f"Pack conversation v{pack_version} déjà à jour en KV, rien à faire.")
+    else:
+        call("PUT", values + "conversation", pack_bytes, "application/json")
+        call("PUT", values + "conversation:meta",
+             json.dumps({"version": pack_version, "size": len(pack_bytes)}).encode(), "application/json")
+        print(f"Pack conversation v{pack_version} déposé en KV ({len(pack_bytes)} octets).")

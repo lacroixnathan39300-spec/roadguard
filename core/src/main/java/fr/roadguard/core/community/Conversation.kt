@@ -43,6 +43,37 @@ object Conversation {
     /** Oublie le fil de conversation en cours (au démarrage/arrêt du mode, ou pour repartir à neuf). */
     fun resetContext() { thread = null; threadStep = 0; threadLife = 0 }
 
+    // Genre de l'interlocuteur (l'utilisateur) : "homme" ou "femme". On accorde les mots d'adresse en conséquence,
+    // quel que soit le pack (ça marche aussi pour les packs neutres ou futurs). Réglé par la séance avant chaque réponse.
+    @Volatile var addressGender: String = "homme"
+
+    // Paires masculin → féminin des mots par lesquels le compagnon s'adresse au conducteur. On force vers le genre
+    // de l'interlocuteur. L'article est inclus pour ne pas produire « mon chérie ».
+    private val genderPairs = listOf(
+        "mon chéri" to "ma chérie", "mon beau" to "ma belle", "mon grand" to "ma grande",
+        "mon coquin" to "ma coquine", "beau gosse" to "belle gosse",
+    )
+
+    private fun flipWord(s: String, from: String, to: String, blockAfterMonMa: Boolean = false): String {
+        val before = if (blockAfterMonMa) "(?<!mon )(?<!ma )" else ""
+        val rx = Regex(before + "(?<!\\p{L})" + Regex.escape(from) + "(?!\\p{L})", RegexOption.IGNORE_CASE)
+        return rx.replace(s) { m ->
+            if (m.value.firstOrNull()?.isUpperCase() == true) to.replaceFirstChar { it.uppercase() } else to
+        }
+    }
+
+    /** Accorde les mots d'adresse de [text] au genre de l'interlocuteur (chéri↔chérie, mon beau↔ma belle…). */
+    private fun genderize(text: String): String {
+        if ('é' !in text && 'e' !in text) return text
+        var s = text
+        val toFem = addressGender == "femme"
+        for ((masc, fem) in genderPairs) s = if (toFem) flipWord(s, masc, fem) else flipWord(s, fem, masc)
+        // « chéri » seul (sans mon/ma devant, déjà traités au-dessus).
+        s = if (toFem) flipWord(s, "chéri", "chérie", blockAfterMonMa = true)
+            else flipWord(s, "chérie", "chéri", blockAfterMonMa = true)
+        return s
+    }
+
     private fun file(context: Context) = File(context.applicationContext.filesDir, "conversation.json")
 
     /** Normalise un texte pour la comparaison : minuscules, sans accents ni ponctuation, espaces simples. */
@@ -109,11 +140,12 @@ object Conversation {
 
     /** Remplit les trous « {slot} » d'un modèle en piochant au hasard dans les listes du pack. */
     private fun render(template: String): String {
-        val slots = pack?.slots ?: return template
-        if ('{' !in template) return template
-        return Regex("\\{([a-z0-9_]+)\\}").replace(template) { m ->
-            slots[m.groupValues[1]]?.takeIf { it.isNotEmpty() }?.random() ?: m.value
-        }
+        val slots = pack?.slots
+        val filled = if (slots == null || '{' !in template) template
+            else Regex("\\{([a-z0-9_]+)\\}").replace(template) { m ->
+                slots[m.groupValues[1]]?.takeIf { it.isNotEmpty() }?.random() ?: m.value
+            }
+        return genderize(filled)
     }
 
     private fun noteSaid(s: String) {

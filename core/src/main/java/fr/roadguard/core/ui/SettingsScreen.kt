@@ -325,10 +325,15 @@ fun ConversationSettings(settings: DriveSettings) {
         if (on) downloadPack()
     }
     if (settings.conversationOn) {
-        Text("Personnage", color = DriveColors.TextSecondary, fontSize = 14.sp)
+        Text("Je suis…", color = DriveColors.TextSecondary, fontSize = 14.sp)
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            BigButton("👨 un homme", if (settings.convGender == "homme") DriveColors.Accent else DriveColors.Panel) { settings.changeConvGender("homme") }
+            BigButton("👩 une femme", if (settings.convGender == "femme") DriveColors.Accent else DriveColors.Panel) { settings.changeConvGender("femme") }
+        }
+        Text("Le compagnon prend le genre opposé et s'adresse à toi dans le bon genre.", color = DriveColors.TextSecondary, fontSize = 13.sp)
+        Text("Personnalité", color = DriveColors.TextSecondary, fontSize = 14.sp)
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            listOf("normal" to "🚗 Normal", "pote" to "😎 Un pote", "amie" to "😊 Une amie",
-                "copine" to "❤️ Petite amie", "copain" to "❤️ Petit copain", "coquin" to "😏 Coquin").forEach { (id, label) ->
+            listOf("normal" to "🚗 Normal", "ami" to "😊 Ami·e", "amoureux" to "❤️ Amoureux·se", "coquin" to "😏 Coquin·e").forEach { (id, label) ->
                 BigButton(label, if (settings.convPersona == id) DriveColors.Accent else DriveColors.Panel) { settings.changeConvPersona(id) }
             }
         }

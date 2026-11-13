@@ -203,3 +203,13 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
 - Réglages → Voix → « Mode conversation » (activer, personnage, mettre à jour le pack). Proposé une fois à la
   première connexion (`ConversationIntroScreen`). Réglage synchronisé entre instances via l'écouteur de préférences.
 - Format du pack documenté dans docs/PACK-CONVERSATION.md (à donner à une autre IA pour générer un gros pack).
+
+
+## 2026-11-13 — Pack conversation v9 + genre masculin/féminin
+- Pack unique « compagnon 365j » (v9, 504 situations) servi depuis Cloudflare KV (3,3 Mo, trop gros pour le Worker) :
+  déposé par `tools/ci/publish_updates.py` (clé `conversation`, re-déposé seulement si la version change),
+  route `GET /v1/pack/conversation` lit le KV. `convpack.ts` supprimé.
+- Personnalités unifiées : le menu propose le TYPE (Normal / Ami·e / Amoureux·se / Coquin·e). Un réglage « Je suis un
+  homme / une femme » (`conv_gender`) fait que le compagnon prend le genre opposé (homme→amie/copine, femme→pote/copain)
+  et que Pilote accorde ses mots d'adresse (chéri/chérie, mon beau/ma belle…) via `Conversation.genderize`, côté code,
+  donc valable pour tout pack présent ou futur. Anciens réglages pote/amie/copine/copain migrés automatiquement.
