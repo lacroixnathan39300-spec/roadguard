@@ -132,6 +132,7 @@ class DriveSettings(context: Context) {
         if (key == "conversation_on") conversationOn = p.getBoolean("conversation_on", false)
         if (key == "conv_persona") convPersona = convTypeOf(p.getString("conv_persona", "normal"))
         if (key == "conv_gender") convGender = p.getString("conv_gender", "homme") ?: "homme"
+        if (key == "conv_familiar") convFamiliar = p.getBoolean("conv_familiar", true)
     }
     init { prefs.registerOnSharedPreferenceChangeListener(radarsListener) }
     /**
@@ -207,6 +208,9 @@ class DriveSettings(context: Context) {
     // à l'utilisateur dans le bon genre.
     var convGender by mutableStateOf(prefs.getString("conv_gender", "homme") ?: "homme"); private set
     fun changeConvGender(v: String) { convGender = v; put("conv_gender", v) }
+    // Langage familier du compagnon (« t'es », « y a », « ouais »…) ; le personnage « normal » reste neutre.
+    var convFamiliar by mutableStateOf(prefs.getBoolean("conv_familiar", true)); private set
+    fun changeConvFamiliar(v: Boolean) { convFamiliar = v; put("conv_familiar", v) }
     /** Ramène tout ancien ou nouveau nom de personnage au type de relation unifié. */
     private fun convTypeOf(v: String?): String = when (v) {
         "auto" -> "auto"

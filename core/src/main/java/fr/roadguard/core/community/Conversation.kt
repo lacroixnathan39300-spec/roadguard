@@ -147,6 +147,61 @@ object Conversation {
         return m
     }
 
+    // Langage familier : on transforme les tournures « écrites » en français parlé (« tu es » → « t'es », « je n'ai
+    // pas » → « j'ai pas », « il y a » → « y a », « as-tu » → « t'as »…). Fait en code, donc valable pour tout pack.
+    // Réglé par la séance avant chaque réponse (jamais pour le personnage « normal »).
+    @Volatile var familiar = false
+
+    private const val AP = "['’]"                       // apostrophe droite ou typographique
+    private const val W0 = "(?<![\\p{L}\\p{N}])"        // début de mot
+    private const val W1 = "(?![\\p{L}\\p{N}])"         // fin de mot
+    // « ne … pas/plus/jamais/rien » : la négation doit suivre dans les quelques mots, sans ponctuation entre deux.
+    private const val NEG = "(?=(?:[^\\s.!?,;:]+ ){0,4}?(?:pas|plus|jamais|rien)$W1)"
+    private fun rule(p: String, r: (MatchResult) -> String): Pair<Regex, (MatchResult) -> String> = Regex(p, RegexOption.IGNORE_CASE) to r
+    private val familiarRules: List<Pair<Regex, (MatchResult) -> String>> = listOf(
+        rule("${W0}n${AP}est-ce pas$W1") { _ -> "hein" },
+        // Questions avec inversion → tournure parlée (« qu'en penses-tu » → « t'en penses quoi », « as-tu » → « tu as »).
+        rule("${W0}qu${AP}en (\\p{L}+)-tu$W1") { m -> "t'en ${m.groupValues[1].lowercase()} quoi" },
+        rule("${W0}que (\\p{L}+)-tu$W1") { m -> "tu ${m.groupValues[1].lowercase()} quoi" },
+        rule("$W0(\\p{L}+)-tu$W1") { m -> "tu ${m.groupValues[1].lowercase()}" },
+        // Négation sans « ne ».
+        rule("${W0}je n$AP$NEG") { _ -> "j'" },
+        rule("${W0}ce n${AP}est$W1(?= (?:pas|plus|jamais|rien)$W1)") { _ -> "c'est" },
+        rule("${W0}il n${AP}y a$W1") { _ -> "y a" },
+        rule("${W0}il y a$W1") { _ -> "y a" },
+        rule("$W0(?:ne |n$AP)$NEG") { _ -> "" },
+        rule("${W0}il faut$W1") { _ -> "faut" },
+        // « tu » devant une voyelle → « t' » (pas après un trait d'union, ni dans « tu ou moi »).
+        rule("(?<![-\\p{L}\\p{N}])tu (?=[aeiouyhéèêàâîôû])(?!ou$W1|et$W1|à$W1)") { _ -> "t'" },
+        // Vocabulaire.
+        rule("${W0}cela$W1") { _ -> "ça" },
+        rule("(^|[.!?…]\\s)oui$W1") { m -> m.groupValues[1] + "ouais" },
+        rule("${W0}quelque chose$W1") { _ -> "un truc" },
+        rule("${W0}travail$W1") { _ -> "boulot" },
+        rule("${W0}fatigué(e?s?)$W1") { m -> "crevé" + m.groupValues[1] },
+        rule("${W0}très$W1(?! bien$W1)") { _ -> "trop" },
+        rule("${W0}bonjour$W1") { _ -> "salut" },
+        rule("${W0}d${AP}accord(?=\\s*[,.!])") { _ -> "ok" },
+        rule("${W0}bien sûr(?=\\s*[,.!])") { _ -> "carrément" },
+    )
+    private val sentenceStart = Regex("(^|[.!?…]\\s+)(\\p{Ll})")
+
+    private fun familiarize(text: String): String {
+        var s = text
+        for ((regex, repl) in familiarRules) s = regex.replace(s, repl)
+        // Les remplacements sont en minuscules : on remet la majuscule en début de phrase.
+        return sentenceStart.replace(s) { it.groupValues[1] + it.groupValues[2].uppercase() }
+    }
+
+    // Petite correction de français des packs générés : « de un budget » → « d'un budget », « de une » → « d'une ».
+    private val elision = Regex("${W0}de (une?)$W1", RegexOption.IGNORE_CASE)
+
+    /** Corrige l'élision, met la phrase au genre de l'interlocuteur et, si demandé, en langage familier. */
+    fun polish(text: String): String {
+        val fixed = elision.replace(text) { (if (it.value.first() == 'D') "D'" else "d'") + it.groupValues[1] }
+        return genderize(fixed).let { if (familiar) familiarize(it) else it }
+    }
+
     /** Remplit les trous « {slot} » d'un modèle en piochant au hasard dans les listes du pack. */
     private fun render(template: String): String {
         val slots = pack?.slots
@@ -154,7 +209,7 @@ object Conversation {
             else Regex("\\{([a-z0-9_]+)\\}").replace(template) { m ->
                 slots[m.groupValues[1]]?.takeIf { it.isNotEmpty() }?.random() ?: m.value
             }
-        return genderize(filled)
+        return polish(filled)
     }
 
     private fun noteSaid(s: String) {

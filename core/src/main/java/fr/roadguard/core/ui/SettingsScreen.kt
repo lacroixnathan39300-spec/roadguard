@@ -366,6 +366,7 @@ fun ConversationSettings(settings: DriveSettings) {
             }
         }
         if (settings.convPersona == "auto") Text("En Auto, Pilote commence amical et devient plus tendre ou plus coquin selon ce que tu dis et le ton, puis redevient tranquille tout seul. Dis « calme-toi » pour revenir à l'amical.", color = DriveColors.TextSecondary, fontSize = 13.sp)
+        ToggleRow("Langage familier (« t'es », « y a », « ouais »…)", settings.convFamiliar, settings::changeConvFamiliar)
         BigButton("⬇ Mettre à jour le pack de phrases", DriveColors.Track) { downloadPack() }
         packStatus?.let { Text(it, color = DriveColors.TextSecondary, fontSize = 13.sp) }
     }

@@ -226,3 +226,10 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
   notifications, micro, Bluetooth, caméra, agenda, SMS), puis position en arrière-plan, puis affichage par-dessus les
   autres applis (drapeau `perms_asked`). Le mode conversation réessaie le micro toutes les 3 s tant qu'il n'est pas
   autorisé.
+
+- Mode conversation : bouton rond « 💬 Parler » sur la carte de Pilote (couper / activer sans passer par les réglages) ;
+  pastille en haut de la carte (verte = à l'écoute, orange = raison pour laquelle Pilote n'écoute pas).
+- Langage familier (`conv_familiar`, activé par défaut, jamais pour le personnage « normal ») : `Conversation.familiarize`
+  transforme les tournures écrites en français parlé (« tu es » → « t'es », « je n'ai pas » → « j'ai pas », « il y a » →
+  « y a », « as-tu » → « t'as », « qu'en penses-tu » → « t'en penses quoi », « d'accord » → « ok »…) ; fait en code,
+  donc valable pour tout pack. `polish` corrige aussi « de un / de une » → « d'un / d'une ».

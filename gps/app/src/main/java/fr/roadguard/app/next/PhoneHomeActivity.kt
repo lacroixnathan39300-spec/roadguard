@@ -452,6 +452,14 @@ private fun PhoneHome() {
                         android.widget.Toast.makeText(context, it, android.widget.Toast.LENGTH_SHORT).show()
                     }
                 })
+                // Mode conversation : coupé ou activé d'un appui, sans passer par les réglages.
+                fr.roadguard.core.ui.QuickToggle("💬", "Parler", settings.conversationOn, onToggle = {
+                    val on = !settings.conversationOn
+                    settings.changeConversationOn(on)
+                    if (on && ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
+                        notifyAsk.launch(Manifest.permission.RECORD_AUDIO)
+                    android.widget.Toast.makeText(context, if (on) "Mode conversation activé : Pilote t'écoute" else "Mode conversation coupé", android.widget.Toast.LENGTH_SHORT).show()
+                })
             }
             if (drowsy != null) {
                 // Petit voyant de l'anti-somnolence (vert : visage suivi ; orange : fatigue ou regard ailleurs).

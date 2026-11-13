@@ -453,7 +453,8 @@ class DrivingSession(
         // Si de la musique joue, le micro l'entend aussi : on ne répond alors qu'à une vraie question ou une phrase
         // reconnue, jamais à du bruit (pas de relance), pour ne pas bavarder par-dessus les paroles d'une chanson.
         val music = runCatching { (context.getSystemService(android.content.Context.AUDIO_SERVICE) as android.media.AudioManager).isMusicActive }.getOrDefault(false)
-        val reply = dynamicReply(text)
+        fr.roadguard.core.community.Conversation.familiar = settings.convFamiliar && persona != "normal"
+        val reply = dynamicReply(text)?.let { fr.roadguard.core.community.Conversation.polish(it) }
             ?: fr.roadguard.core.community.Conversation.staticReply(text, persona)
             ?: if (music) null else (fr.roadguard.core.community.Conversation.continuerReply(persona)
                 ?: fr.roadguard.core.community.Conversation.fallbackReply(persona))
