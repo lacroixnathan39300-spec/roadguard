@@ -68,7 +68,11 @@ class DriveService : Service() {
         s.sendEmergency = { phone, text -> sendSms(phone, text) }
         s.community.startConvoyLoop()
         startImpactSensor(s)
-        scope.launch {
+        // Traitement des positions GPS sur un fil d'arrière-plan (pas le fil d'affichage) : chaque seconde, le calcul
+        // des radars, limitations, trajet… ne bloque plus l'animation de la carte, qui glisse en douceur.
+        // Sûr : les opérations qui touchent l'écran (reconnaissance vocale, bulle, messages) se replacent elles-mêmes
+        // sur le fil d'affichage ; le reste n'écrit que des états observés par l'interface.
+        scope.launch(kotlinx.coroutines.Dispatchers.Default) {
             s.prepare()
             SpeedSource(this@DriveService).locations().collect { s.onLocation(it) }
         }
@@ -200,7 +204,10 @@ class DriveService : Service() {
          */
         fun appClosed(context: Context) {
             if (DriveSettings(context).keepRunning || session?.navigating == true) return
-            quit(context)
+            // Pilote fermé : la séance s'arrête, mais le démarrage automatique par la vitesse reste actif — dès que tu
+            // roules (≥ 20 km/h), Pilote se relance tout seul, même juste après fermeture (choix de Nathan). Seul le
+            // bouton « Quitter Pilote » le coupe vraiment jusqu'à réouverture.
+            instance?.stopSelf()
         }
 
         /** « Quitter Pilote » : tout s'arrête, guidage compris ; plus de démarrage automatique tant que Pilote n'est pas rouvert. */
