@@ -23,7 +23,7 @@ Dernière mise à jour : 5 novembre 2026, étape 2 (build 150+).
 - `diag.yml` (manuel) : liste ou supprime les comptes, teste création/connexion.
 
 ## Comptes
-- Premier compte créé = administrateur (`thepilot39`, Nathan).
+- Premier compte créé = administrateur.
 - Essai 1 mois (un seul par appareil), puis appli bloquée ; l'administrateur gère tout dans Réglages → Gérer les comptes.
 
 ## Fait

@@ -30,12 +30,15 @@ jobs:
         working-directory: menage
         env:
           RG_KEYS_PASSPHRASE: ${{ secrets.RG_KEYS_PASSPHRASE }}
+          KEYS_TGZ_ENC: ${{ secrets.KEYS_TGZ_ENC }}
+          CLOUDFLARE_ENV_ENC: ${{ secrets.CLOUDFLARE_ENV_ENC }}
           VERSION_CODE: ${{ github.run_number }}
         run: |
           chmod +x gradlew
           K="$RUNNER_TEMP/keys"
           if [ -n "$RG_KEYS_PASSPHRASE" ]; then
             mkdir -p "$K"
+            if [ ! -f ../keys/keys.tgz.enc ] && [ -n "$KEYS_TGZ_ENC" ]; then mkdir -p "$(dirname ../keys/keys.tgz.enc)"; printf '%s' "$KEYS_TGZ_ENC" | base64 -d > ../keys/keys.tgz.enc; fi
             openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in ../keys/keys.tgz.enc -pass env:RG_KEYS_PASSPHRASE | tar -xzf - -C "$K"
             set -a; . "$K/keys.env"; set +a
             # Signée avec la clé de l'appli téléphone, comme Pilote Suite.
@@ -59,8 +62,11 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
         env:
           RG_KEYS_PASSPHRASE: ${{ secrets.RG_KEYS_PASSPHRASE }}
+          KEYS_TGZ_ENC: ${{ secrets.KEYS_TGZ_ENC }}
+          CLOUDFLARE_ENV_ENC: ${{ secrets.CLOUDFLARE_ENV_ENC }}
         run: |
           [ -n "$RG_KEYS_PASSPHRASE" ] || exit 0
+          if [ ! -f keys/cloudflare.env.enc ] && [ -n "$CLOUDFLARE_ENV_ENC" ]; then mkdir -p "$(dirname keys/cloudflare.env.enc)"; printf '%s' "$CLOUDFLARE_ENV_ENC" | base64 -d > keys/cloudflare.env.enc; fi
           openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in keys/cloudflare.env.enc -pass env:RG_KEYS_PASSPHRASE > "$RUNNER_TEMP/cf.env"
           while IFS='=' read -r k v; do [ -n "$k" ] && echo "::add-mask::$v" && export "$k=$v"; done < "$RUNNER_TEMP/cf.env"
           rm -f "$RUNNER_TEMP/cf.env"

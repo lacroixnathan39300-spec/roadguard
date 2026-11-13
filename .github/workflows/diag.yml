@@ -25,7 +25,10 @@ jobs:
       - name: Accès Cloudflare
         env:
           RG_KEYS_PASSPHRASE: ${{ secrets.RG_KEYS_PASSPHRASE }}
+          KEYS_TGZ_ENC: ${{ secrets.KEYS_TGZ_ENC }}
+          CLOUDFLARE_ENV_ENC: ${{ secrets.CLOUDFLARE_ENV_ENC }}
         run: |
+          if [ ! -f ../keys/cloudflare.env.enc ] && [ -n "$CLOUDFLARE_ENV_ENC" ]; then mkdir -p "$(dirname ../keys/cloudflare.env.enc)"; printf '%s' "$CLOUDFLARE_ENV_ENC" | base64 -d > ../keys/cloudflare.env.enc; fi
           openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in ../keys/cloudflare.env.enc -pass env:RG_KEYS_PASSPHRASE > "$RUNNER_TEMP/cf.env"
           while IFS='=' read -r k v; do [ -n "$k" ] && echo "::add-mask::$v" && echo "$k=$v" >> "$GITHUB_ENV"; done < "$RUNNER_TEMP/cf.env"
           rm -f "$RUNNER_TEMP/cf.env"
