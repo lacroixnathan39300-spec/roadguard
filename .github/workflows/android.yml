@@ -137,6 +137,10 @@ jobs:
           git push -f "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" apk || echo "::warning::Branche apk non mise à jour (fichier trop gros) : les APK restent dans la version GitHub"
           # Une version GitHub par build ; on n'en garde que 2 (la plus récente et la précédente).
           gh release delete latest -R "$REPO" -y --cleanup-tag || true
+          # Passage en public : les anciennes versions (dont l'historique contenait les clés chiffrées) sont retirées
+          # et l'étiquette « graphs » est remise sur l'historique nettoyé.
+          for old in build-204 build-206 build-207 build-208 build-246 build-247; do gh release delete "$old" -R "$REPO" -y --cleanup-tag 2>/dev/null || gh api -X DELETE "repos/$REPO/git/refs/tags/$old" 2>/dev/null || true; done
+          gh api -X PATCH "repos/$REPO/git/refs/tags/graphs" -f sha="$GITHUB_SHA" -F force=true >/dev/null 2>&1 || true
           gh release create "build-$RUN" -R "$REPO" --title "ROADGUARD build $RUN" --notes "Compilation automatique de $SHA" *.apk SHA256SUMS.txt
           for tag in $(gh release list -R "$REPO" --limit 100 --json tagName -q '.[].tagName' | grep '^build-' | sort -t- -k2 -n -r | tail -n +3); do
             gh release delete "$tag" -R "$REPO" -y --cleanup-tag || true
