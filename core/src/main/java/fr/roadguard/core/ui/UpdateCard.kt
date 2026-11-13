@@ -69,8 +69,6 @@ fun UpdateCard(app: String) {
         when {
             progress != null -> DownloadProgress(progress ?: 0f, ((progress ?: 0f) * (r?.size ?: 0L)).toLong(), r?.size ?: 0L)
             r != null -> BigButton("Installer la version ${r.build} (${r.size / 1_000_000} Mo)", DriveColors.Accent) {
-                // Pilote affiché dans Android Auto : la mise à jour se fait dans Pilote Suite (elle garde cet affichage).
-                if (AppUpdater.updateViaSuite(context)) { status = "Mise à jour dans Pilote Suite (elle garde Pilote dans Android Auto)."; return@BigButton }
                 progress = 0f
                 scope.launch {
                     runCatching { AppUpdater.downloadAndInstall(context, r) { d, t -> progress = if (t > 0) d.toFloat() / t else 0f } }

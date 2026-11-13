@@ -43,22 +43,6 @@ object AppUpdater {
 
     fun file(context: Context) = File(context.cacheDir, "roadguard-update.apk")
 
-    /**
-     * Pilote installé « pour Android Auto » : Pilote Suite l'a fait noter comme venant du Play Store (seule façon
-     * qu'Android Auto l'affiche). Une mise à jour faite d'ici effacerait cette marque : elle passe donc par
-     * Pilote Suite. Rend true si Pilote Suite a été ouverte à la place.
-     */
-    fun updateViaSuite(context: Context): Boolean {
-        val pm = context.packageManager
-        val installer = runCatching {
-            if (android.os.Build.VERSION.SDK_INT >= 30) pm.getInstallSourceInfo(context.packageName).installingPackageName
-            else @Suppress("DEPRECATION") pm.getInstallerPackageName(context.packageName)
-        }.getOrNull()
-        if (installer != "com.android.vending") return false
-        val suite = pm.getLaunchIntentForPackage("fr.roadguard.suite") ?: return false
-        return runCatching { context.startActivity(suite.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }.isSuccess
-    }
-
     /** Télécharge et vérifie l'APK, puis ouvre l'installation Android. */
     suspend fun downloadAndInstall(context: Context, rel: AppRelease, onProgress: (Long, Long) -> Unit) = withContext(Dispatchers.IO) {
         val out = file(context)

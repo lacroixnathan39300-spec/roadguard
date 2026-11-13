@@ -26,7 +26,6 @@ import android.widget.ProgressBar
 import android.widget.ScrollView
 import android.widget.TextView
 import org.json.JSONObject
-import rikka.shizuku.Shizuku
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
@@ -56,30 +55,11 @@ class MainActivity : Activity() {
     private var barPct: TextView? = null
     private var barText: TextView? = null
 
-    // Pilote « pour Android Auto » : installation par l'installateur d'Android, marquée Play Store (voir PlayMark).
-    private val prefs by lazy { getSharedPreferences("suite", MODE_PRIVATE) }
-    /** Fenêtre d'installation d'Android ouverte pour Pilote : on vérifie la marque au retour. */
-    private var autoPending = false
-    private var autoSawPause = false
-    private var autoViaShell = false
-    private var autoRetried = false
-    private var autoBefore = 0L
-    private var autoAttempt = 0
-    private var showAutoGuide = false
-    /** Résultat du bouton « Diagnostic Android Auto » (origine notée par Android et verdict d'Android Auto). */
-    private var diag: String? = null
-    private val binderReceived = Shizuku.OnBinderReceivedListener { main.post { render() } }
-    private val binderDead = Shizuku.OnBinderDeadListener { main.post { render() } }
-    private val permissionResult = Shizuku.OnRequestPermissionResultListener { _, _ -> main.post { render() } }
-
     private data class Module(val key: String, val pkg: String, val name: String, val text: String, val color: Int)
     private val modules = listOf(
         Module("gps", "fr.roadguard.gps", "Pilote", "GPS, radars, trafic et communauté sur le téléphone.", Color.parseColor("#1E88FF")),
         Module("drive", "fr.roadguard.drive", "Pilote Drive", "L'appli pour l'autoradio : accueil, carte, radars, musique.", Color.parseColor("#E53935")),
     )
-
-    /** Pilote Suite elle-même : elle se met à jour comme les autres (plus besoin de la réinstaller par son lien). */
-    private val self = Module("suite", "fr.roadguard.suite", "Pilote Suite", "Cette appli : elle installe et met à jour les autres.", Color.parseColor("#8E9BAE"))
 
     /** Autoradio : écran en paysage pas plus haut que 600 px (ex. 1024×600). */
     private val looksLikeCarUnit: Boolean
@@ -87,7 +67,6 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        PlayMark.init(this)
         window.statusBarColor = Color.parseColor("#0B0F15")
         val root = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(20), dp(28), dp(20), dp(20)); setBackgroundColor(Color.parseColor("#0B0F15")) }
         root.addView(text("Pilote Suite", 30f, Color.WHITE, bold = true))
@@ -98,36 +77,10 @@ class MainActivity : Activity() {
         root.addView(list)
         setContentView(ScrollView(this).apply { addView(root); setBackgroundColor(Color.parseColor("#0B0F15")) })
         handleInstallResult(intent)
-        // Shizuku (installation de Pilote pour Android Auto) : l'écran suit son état (démarré, autorisé).
-        runCatching {
-            Shizuku.addBinderReceivedListenerSticky(binderReceived)
-            Shizuku.addBinderDeadListener(binderDead)
-            Shizuku.addRequestPermissionResultListener(permissionResult)
-        }
         load()
     }
 
-    override fun onDestroy() {
-        runCatching {
-            Shizuku.removeBinderReceivedListener(binderReceived)
-            Shizuku.removeBinderDeadListener(binderDead)
-            Shizuku.removeRequestPermissionResultListener(permissionResult)
-        }
-        super.onDestroy()
-    }
-
-    override fun onPause() { super.onPause(); if (autoPending) autoSawPause = true }
-
-    override fun onResume() {
-        super.onResume()
-        // Retour de la fenêtre d'installation d'Android : on laisse Android enregistrer, puis on vérifie la marque.
-        if (autoPending && autoSawPause) {
-            autoSawPause = false
-            val attempt = autoAttempt
-            main.postDelayed({ if (attempt == autoAttempt) verifyAuto() }, 800)
-        }
-        render()
-    }
+    override fun onResume() { super.onResume(); render() }
 
     override fun onNewIntent(intent: Intent) { super.onNewIntent(intent); handleInstallResult(intent) }
 
@@ -158,17 +111,14 @@ class MainActivity : Activity() {
             })
         }
         val m = manifest
-        // Pilote Suite à mettre à jour : sa carte passe en premier (les nouveautés d'installation sont dedans).
-        val selfUpdate = (m?.optJSONObject(self.key)?.optLong("version") ?: 0L) > (installedVersion(self.pkg) ?: Long.MAX_VALUE)
-        (if (selfUpdate) listOf(self) + modules else modules + self).forEach { mod ->
+        modules.forEach { mod ->
             val info = m?.optJSONObject(mod.key)
             val have = installedVersion(mod.pkg)
             val avail = info?.optLong("version")
-            val isSelf = mod.key == self.key
             list.addView(card(Color.parseColor("#161C25")).apply {
-                val recommended = !isSelf && (mod.key == "drive") == looksLikeCarUnit
-                addView(text(mod.name + if (recommended) "  ·  recommandé ici" else "", if (isSelf) 18f else 22f, mod.color, bold = true))
-                addView(text(if (isSelf && selfUpdate) "Mets-la à jour en premier, puis rouvre-la." else mod.text, 15f, Color.parseColor("#D5DCE5")))
+                val recommended = (mod.key == "drive") == looksLikeCarUnit
+                addView(text(mod.name + if (recommended) "  ·  recommandé ici" else "", 22f, mod.color, bold = true))
+                addView(text(mod.text, 15f, Color.parseColor("#D5DCE5")))
                 val state = when {
                     info == null -> "Pas encore disponible sur le serveur"
                     have == null -> "Non installée · ${mb(info.optLong("size"))}"
@@ -176,51 +126,35 @@ class MainActivity : Activity() {
                     else -> "À jour"
                 }
                 // Installation terminée pendant qu'on était dans la fenêtre d'Android : on referme la barre.
-                if (active == mod.key && phase == 2 && !autoPending && have != null && avail != null && have >= avail) finishDownload()
+                if (active == mod.key && phase == 2 && have != null && avail != null && have >= avail) finishDownload()
                 if (active == mod.key) { addView(progressSection(mod)); return@apply }
                 addView(text(state, 14f, Color.parseColor("#9FB0C3")))
-                // Pilote sur un téléphone : installation « pour Android Auto » (marque Play Store) quand Shizuku est prêt.
-                val auto = mod.key == "gps" && !looksLikeCarUnit
-                val marked = auto && have != null && PlayMark.marked(context, mod.pkg)
-                val update = info != null && (have == null || (avail != null && avail > have))
-                // Pilote est dans Android Auto mais Shizuku ne tourne pas : cette mise à jour l'en retirerait.
-                val losesAuto = update && marked && prefs.getBoolean(KEY_SHELL_KEEPS, true) && !PlayMark.shizukuReady()
-                if (losesAuto && active == null) {
-                    addView(text("⚠ Shizuku n'est pas démarré : mettre à jour maintenant retirerait Pilote d'Android Auto. Démarre Shizuku, puis reviens ici.",
-                        14f, Color.parseColor("#FFB74D")).also { it.setPadding(0, dp(8), 0, 0) })
-                }
                 val row = LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL; setPadding(0, dp(8), 0, 0) }
-                if (update && info != null) {
-                    if (active != null) row.addView(text("Attends la fin du téléchargement en cours…", 14f, Color.parseColor("#9FB0C3")))
-                    else if (losesAuto) row.addView(button("Ouvrir Shizuku", mod.color) { openShizuku() })
-                    else row.addView(button(if (have == null) "Installer" else "Mettre à jour", mod.color) { download(mod, info) })
+                if (info != null && (have == null || (avail != null && avail > have))) {
+                    if (active == null) row.addView(button(if (have == null) "Installer" else "Mettre à jour", mod.color) { download(mod, info) })
+                    else row.addView(text("Attends la fin du téléchargement en cours…", 14f, Color.parseColor("#9FB0C3")))
                 }
-                if (have != null && !isSelf) row.addView(button("Ouvrir", Color.parseColor("#2A3442")) {
+                if (have != null) row.addView(button("Ouvrir", Color.parseColor("#2A3442")) {
                     packageManager.getLaunchIntentForPackage(mod.pkg)?.let { startActivity(it) }
                 })
                 addView(row)
-                if (losesAuto && active == null && info != null) addView(button("Mettre à jour sans Android Auto", Color.parseColor("#2A3442")) { download(mod, info) }
-                    .also { (it.layoutParams as LinearLayout.LayoutParams).topMargin = dp(8) })
-                if (auto && info != null) addView(autoSection(mod, info, have != null, marked))
             })
         }
         list.addView(text("Android peut afficher « appli inconnue » (Play Protect) : touche « Installer quand même ». Les applis sont signées par Nathan Lacroix ; les mises à jour gardent tes réglages.",
             13f, Color.parseColor("#7F8EA0")).also { it.setPadding(0, dp(14), 0, 0) })
     }
 
-    private fun download(mod: Module, info: JSONObject, markAuto: Boolean = false) {
+    private fun download(mod: Module, info: JSONObject) {
         if (!packageManager.canRequestPackageInstalls()) { render(); return }
         if (active != null) return
         val build = info.optInt("build"); val chunks = info.optInt("chunks"); val sha = info.optString("sha256")
-        // Installation normale, sauf si on a explicitement demandé la marque Play Store (bouton « pour Android Auto »).
-        val auto = markAuto && mod.key == "gps" && !looksLikeCarUnit
         active = mod.key; phase = 0; doneBytes = 0; totalBytes = info.optLong("size")
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) // pas de mise en veille pendant le téléchargement
         status.text = "${mod.name} : en cours de téléchargement…"
         render()
         io.execute {
             try {
-                val file = if (auto) File(cacheDir, ApkProvider.NAME) else File(cacheDir, "${mod.key}-$build.apk")
+                val file = File(cacheDir, "${mod.key}-$build.apk")
                 val digest = MessageDigest.getInstance("SHA-256")
                 var lastUi = 0L
                 file.outputStream().use { out ->
@@ -249,7 +183,7 @@ class MainActivity : Activity() {
                 val got = digest.digest().joinToString("") { "%02x".format(it) }
                 if (sha.isNotBlank() && got != sha) throw IllegalStateException("fichier abîmé, réessaie")
                 main.post { phase = 2; status.text = "${mod.name} : installation…"; render() }
-                if (auto) main.post { startAutoInstall() } else install(file)
+                install(file)
             } catch (e: Exception) {
                 main.post { finishDownload(); status.text = "${mod.name} : échec (${e.message})"; render() }
             }
@@ -313,247 +247,6 @@ class MainActivity : Activity() {
         apk.delete()
     }
 
-    // ---------- Pilote pour Android Auto : installation marquée « Play Store » ----------
-
-    private fun lastUpdate(pkg: String): Long = runCatching { packageManager.getPackageInfo(pkg, 0).lastUpdateTime }.getOrDefault(0L)
-
-    /** APK de Pilote prêt (cache/install.apk) : ouvre l'installateur d'Android, par Shizuku s'il est prêt. */
-    private fun startAutoInstall() {
-        autoRetried = false
-        autoBefore = lastUpdate(GPS)
-        launchAuto(shell = PlayMark.shizukuReady() && prefs.getBoolean(KEY_SHELL_KEEPS, true))
-    }
-
-    private fun launchAuto(shell: Boolean) {
-        autoPending = true; autoSawPause = false; autoViaShell = shell
-        val attempt = ++autoAttempt
-        val uri = ApkProvider.uri()
-        PlayMark.grantToInstallers(this, uri)
-        if (!shell) { launchAsApp(uri); return }
-        val installer = PlayMark.installerPackage(this)
-        var answered = false
-        // Shizuku n'a pas pu ouvrir l'installateur : ouverture normale (Pilote s'installe quand même).
-        val fallback = { if (attempt == autoAttempt && autoPending && !autoSawPause) launchAsApp(uri) }
-        if (Build.VERSION.SDK_INT <= 34) {
-            // Android 14 et avant : le shell ouvre l'installateur avec Pilote Suite comme destinataire du résultat.
-            val intent = PlayMark.shellIntent(uri, installer)
-            val token = window.attributes.token
-            PlayMark.withShell(this, { it.startForResult(intent, token, REQ_AUTO) }) { out -> answered = true; if (out != "ok") fallback() }
-        } else {
-            PlayMark.withShell(this, { it.run(PlayMark.shellCommand(uri, installer)) }) { out ->
-                answered = true
-                if (out == null || out.contains("Error") || out.contains("[exit ")) fallback()
-            }
-        }
-        // Shizuku ne répond pas (arrêté entre-temps) : on n'attend pas indéfiniment.
-        main.postDelayed({ if (!answered) fallback() }, 15_000)
-    }
-
-    /** Installation ouverte par Pilote Suite elle-même (marque demandée, gardée seulement par certains téléphones). */
-    private fun launchAsApp(uri: Uri) {
-        autoViaShell = false
-        @Suppress("DEPRECATION")
-        val ok = runCatching { startActivityForResult(PlayMark.appIntent(uri, GPS), REQ_AUTO) }.isSuccess
-        if (ok) return
-        // Dernier recours : l'installation classique (sans marque).
-        autoPending = false
-        val file = File(cacheDir, ApkProvider.NAME)
-        io.execute {
-            runCatching { install(file) }.onFailure { e -> main.post { finishDownload(); status.text = "Pilote : échec (${e.message})"; render() } }
-        }
-    }
-
-    /** Au retour de l'installateur : Pilote est-il installé, et avec la marque qu'Android Auto accepte ? */
-    private fun verifyAuto() {
-        if (!autoPending) return
-        val now = lastUpdate(GPS)
-        if (now == 0L || now == autoBefore) {
-            endAuto(if (autoRetried) "Pilote est installé, mais pas encore visible dans Android Auto." else "Pilote : installation annulée ou refusée.",
-                installed = false)
-            return
-        }
-        if (PlayMark.marked(this, GPS)) {
-            prefs.edit().putBoolean(KEY_SHELL_KEEPS, autoViaShell).remove(KEY_NO_MARK).apply()
-            endAuto("Pilote installé ✔ · prêt pour Android Auto. Force l'arrêt d'Android Auto, puis rebranche le téléphone.")
-            return
-        }
-        // Installé, mais l'installateur noté n'est pas le Play Store (cas courant : la fenêtre d'Android ignore
-        // l'étiquette demandée). L'initiateur, lui, est bon. On réécrit juste l'installateur via Shizuku (shell).
-        if (!autoRetried && PlayMark.shizukuReady()) {
-            autoRetried = true
-            status.text = "Dernière étape pour Android Auto : correction de l'étiquette Play Store…"
-            render()
-            io.execute {
-                val out = PlayMark.setInstallerViaShizuku(GPS)
-                main.post {
-                    if (!autoPending) return@post
-                    if (PlayMark.marked(this, GPS)) {
-                        prefs.edit().putBoolean(KEY_SHELL_KEEPS, autoViaShell).remove(KEY_NO_MARK).apply()
-                        endAuto("Pilote installé ✔ · prêt pour Android Auto. Force l'arrêt d'Android Auto, puis rebranche le téléphone.")
-                    } else {
-                        prefs.edit().putBoolean(KEY_NO_MARK, true).apply()
-                        diag = "set-installer → $out"
-                        endAuto("Pilote installé ✔, mais ce téléphone refuse l'étiquette Play Store. " +
-                            "Touche « Diagnostic » pour le détail. Sans elle, Android Auto ne l'affiche pas.")
-                    }
-                }
-            }
-            return
-        }
-        prefs.edit().putBoolean(KEY_NO_MARK, true).apply()
-        endAuto(if (PlayMark.shizukuReady()) "Pilote installé ✔ · ce téléphone n'a pas gardé la marque pour Android Auto."
-            else "Pilote installé ✔ · démarre Shizuku pour l'activer dans Android Auto.")
-    }
-
-    private fun endAuto(message: String, installed: Boolean = true) {
-        autoPending = false
-        autoAttempt++
-        // Annulé : le fichier reste (l'installateur peut encore être ouvert) ; il sera remplacé au prochain téléchargement.
-        if (installed) File(cacheDir, ApkProvider.NAME).delete()
-        finishDownload()
-        status.text = message
-        render()
-    }
-
-    /**
-     * Pourquoi Android Auto n'affiche pas Pilote : l'origine de l'installation notée par Android et, si Shizuku tourne,
-     * les lignes du validateur d'Android Auto dans le journal du téléphone (« Package DENIED; raison [paquet] »).
-     * Pour un verdict frais : forcer l'arrêt d'Android Auto, ouvrir « Personnaliser le lanceur », puis lancer ceci.
-     */
-    private fun runDiagnostic() {
-        val (initiating, installer) = PlayMark.source(this, GPS)
-        val head = "Pilote ${installedVersion(GPS)} · installateur=$installer · initiateur=$initiating\n" +
-            "Android ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT}) · ${Build.MANUFACTURER} ${Build.MODEL}\n"
-        if (!PlayMark.shizukuReady()) {
-            diag = head + "Shizuku n'est pas démarré : démarre-le pour lire aussi le verdict d'Android Auto."
-            render(); return
-        }
-        diag = head + "Lecture en cours…"
-        render()
-        val script = """
-            dumpsys package fr.roadguard.gps | grep -E 'installerPackageName|initiatingPackageName|originatingPackageName|updateOwnerPackageName|packageSource' | head -n 8
-            echo '--- Android Auto'
-            dumpsys package com.google.android.projection.gearhead | grep -m 1 versionName
-            echo '--- verdict (journal)'
-            logcat -d -v brief | grep -E 'CAR\.VALIDATOR|Validator' | grep -i -E 'roadguard|DENIED|not connected' | tail -n 25
-            true
-        """.trimIndent()
-        PlayMark.withShell(this, { it.run(arrayOf("/system/bin/sh", "-c", script)) }) { out ->
-            diag = head + (out?.trim()?.ifEmpty { null } ?: "Shizuku n'a pas répondu : relance-le.")
-            render()
-        }
-    }
-
-    /** Corrige l'étiquette d'un Pilote déjà installé : réécrit l'installateur en Play Store, sans réinstaller. */
-    private fun fixMark() {
-        if (!PlayMark.shizukuReady()) { status.text = "Démarre Shizuku et autorise Pilote Suite d'abord."; return }
-        status.text = "Correction de l'étiquette Play Store…"; render()
-        io.execute {
-            val out = PlayMark.setInstallerViaShizuku(GPS)
-            main.post {
-                if (PlayMark.marked(this, GPS)) {
-                    prefs.edit().remove(KEY_NO_MARK).apply()
-                    status.text = "Étiquette posée ✔ · force l'arrêt d'Android Auto, puis rebranche le téléphone."
-                    diag = null
-                } else {
-                    status.text = "Le téléphone n'a pas accepté l'étiquette. Détail ci-dessous (copie-le-moi) :"
-                    val (initiating, installer) = PlayMark.source(this, GPS)
-                    diag = "set-installer → $out\nAprès : installateur=$installer · initiateur=$initiating\n" +
-                        "Android ${Build.VERSION.RELEASE} · ${Build.MANUFACTURER} ${Build.MODEL}"
-                }
-                render()
-            }
-        }
-    }
-
-    private fun openShizuku() {
-        val launch = packageManager.getLaunchIntentForPackage(PlayMark.SHIZUKU)
-        if (launch != null) { startActivity(launch); return }
-        runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=${PlayMark.SHIZUKU}"))) }
-            .onFailure { runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=${PlayMark.SHIZUKU}"))) } }
-    }
-
-    /** Sous la carte de Pilote : état d'Android Auto, et le guide pour l'activer (Shizuku). */
-    private fun autoSection(mod: Module, info: JSONObject, installed: Boolean, marked: Boolean) = LinearLayout(this).apply {
-        orientation = LinearLayout.VERTICAL; setPadding(0, dp(12), 0, 0)
-        val grey = Color.parseColor("#9FB0C3"); val green = Color.parseColor("#2ED573")
-        fun spaced(v: View) = v.also { (it.layoutParams as? LinearLayout.LayoutParams)?.topMargin = dp(8); addView(it) }
-        // Ce qu'Android a noté pour Pilote (utile pour comprendre un refus d'Android Auto).
-        fun details() { if (installed) PlayMark.source(context, mod.pkg).let { (initiating, installer) ->
-            addView(text("Origine notée par Android : installateur ${installer ?: "aucun"}, initiateur ${initiating ?: "aucun"} · Android ${Build.VERSION.RELEASE}, ${Build.MANUFACTURER} ${Build.MODEL}",
-                12f, Color.parseColor("#7F8EA0")).also { it.setPadding(0, dp(8), 0, 0) }) } }
-        // Diagnostic : ce qu'Android a noté et, avec Shizuku, le verdict écrit par Android Auto dans le journal du téléphone.
-        fun diagnostic() {
-            if (!installed) return
-            spaced(button("Diagnostic Android Auto", Color.parseColor("#2A3442")) { runDiagnostic() })
-            diag?.let { d ->
-                addView(TextView(context).apply {
-                    text = d; textSize = 11f; setTextColor(Color.parseColor("#C7D2DE")); typeface = Typeface.MONOSPACE
-                    setTextIsSelectable(true); setPadding(0, dp(8), 0, 0)
-                })
-                spaced(button("Copier", Color.parseColor("#2A3442")) {
-                    (getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager)
-                        .setPrimaryClip(android.content.ClipData.newPlainText("Diagnostic Android Auto", d))
-                    status.text = "Diagnostic copié."
-                })
-            }
-        }
-        if (marked) {
-            addView(text("🚗 Android Auto : prêt ✔  Pilote porte la marque « Play Store ».", 14f, green))
-            addView(text("Pilote n'apparaît pas dans la voiture ? Android Auto ne relit ses applis qu'après un arrêt : touche le bouton, puis « Forcer l'arrêt », et rebranche le téléphone. Vérifie aussi « Personnaliser le lanceur d'applications » dans ses réglages.",
-                14f, Color.parseColor("#D5DCE5")).also { it.setPadding(0, dp(6), 0, 0) })
-            spaced(button("Ouvrir la fiche d'Android Auto", Color.parseColor("#2A3442")) {
-                runCatching { startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${PlayMark.ANDROID_AUTO}"))) }
-                    .onFailure { status.text = "Android Auto n'est pas installé sur cet appareil." }
-            })
-            details()
-            diagnostic()
-            return@apply
-        }
-        addView(text(if (installed) "🚗 Android Auto : Pilote n'y apparaît pas encore." else "🚗 Android Auto : pour que Pilote s'y affiche, prépare-le avant d'installer.", 14f, grey))
-        // Pilote déjà installé avec le bon initiateur : il suffit de corriger l'installateur, sans réinstaller.
-        if (installed) {
-            val (initiating, _) = PlayMark.source(context, mod.pkg)
-            if (initiating == PlayMark.VENDING || initiating == PlayMark.GOOGLE_INSTALLER) {
-                addView(text("Il ne manque que l'étiquette « Play Store » sur l'installateur. Shizuku peut la poser sans réinstaller Pilote.",
-                    14f, Color.parseColor("#D5DCE5")).also { it.setPadding(0, dp(8), 0, 0) })
-                spaced(button(if (PlayMark.shizukuReady()) "Corriger l'étiquette Play Store" else "Démarrer Shizuku puis corriger",
-                    if (PlayMark.shizukuReady()) mod.color else Color.parseColor("#3A4654")) {
-                    if (PlayMark.shizukuReady()) fixMark() else openShizuku()
-                })
-            }
-        }
-        details()
-        diagnostic()
-        if (!showAutoGuide) {
-            spaced(button("Afficher Pilote dans Android Auto", Color.parseColor("#2A3442")) { showAutoGuide = true; render() })
-            return@apply
-        }
-        val inst = PlayMark.shizukuInstalled(context); val running = PlayMark.shizukuRunning(); val ready = running && PlayMark.shizukuGranted()
-        fun step(n: Int, t: String, done: Boolean) = addView(text((if (done) "✔ " else "$n. ") + t, 14f, if (done) green else Color.WHITE).also { it.setPadding(0, dp(8), 0, 0) })
-        addView(text("Android Auto n'affiche un GPS que s'il le croit installé par le Play Store. Pilote Suite sait faire cette installation spéciale avec l'appli gratuite Shizuku. À préparer une seule fois :",
-            14f, Color.parseColor("#D5DCE5")).also { it.setPadding(0, dp(8), 0, 0) })
-        step(1, "Installe l'appli Shizuku.", inst)
-        if (!inst) spaced(button("Installer Shizuku", mod.color) { openShizuku() })
-        step(2, "Active les options pour les développeurs : Paramètres → À propos du téléphone → touche 7 fois « Numéro de build ».", running)
-        step(3, "Connecte le téléphone au Wi-Fi. Ouvre Shizuku et lance l'association (débogage sans fil). Puis Paramètres → Options pour les développeurs → Débogage sans fil → « Associer l'appareil avec un code », et tape ce code dans la notification de Shizuku.", running)
-        step(4, "Dans Shizuku, touche « Démarrer ».", running)
-        if (inst && !running) spaced(button("Ouvrir Shizuku", mod.color) { openShizuku() })
-        step(5, "Autorise Pilote Suite à utiliser Shizuku.", ready)
-        if (running && !ready) spaced(button("Autoriser Pilote Suite", mod.color) {
-            runCatching { Shizuku.requestPermission(REQ_SHIZUKU) }.onFailure { status.text = "Shizuku ne répond pas : relance-le." }
-        })
-        step(6, if (installed) "Réinstalle Pilote (tes réglages sont gardés)." else "Installe Pilote.", false)
-        if (active == null) spaced(button(if (installed) "Réinstaller Pilote pour Android Auto" else "Installer Pilote pour Android Auto",
-            if (ready) mod.color else Color.parseColor("#3A4654")) {
-            if (PlayMark.shizukuReady()) { prefs.edit().remove(KEY_NO_MARK).apply(); download(mod, info, markAuto = true) }
-            else status.text = "Termine d'abord les étapes 1 à 5 (Shizuku démarré et Pilote Suite autorisée)."
-        })
-        addView(text("Après un redémarrage du téléphone, rallume le débogage sans fil et relance Shizuku avant de mettre Pilote à jour. " +
-            "Méthode du projet libre UnknownAuto (licence MIT). Google peut la bloquer à tout moment.", 12f, Color.parseColor("#7F8EA0")).also { it.setPadding(0, dp(10), 0, 0) })
-        spaced(button("Fermer", Color.parseColor("#2A3442")) { showAutoGuide = false; render() })
-    }
-
     private fun handleInstallResult(intent: Intent?) {
         if (intent?.action != ACTION_STATUS) return
         when (intent.getIntExtra(PackageInstaller.EXTRA_STATUS, -999)) {
@@ -609,14 +302,5 @@ class MainActivity : Activity() {
         setOnClickListener { onClick() }
     }
 
-    companion object {
-        private const val ACTION_STATUS = "fr.roadguard.suite.INSTALL_STATUS"
-        private const val GPS = "fr.roadguard.gps"
-        private const val REQ_AUTO = 41
-        private const val REQ_SHIZUKU = 42
-        /** Sur ce téléphone, la marque est gardée quand c'est le shell (Shizuku) qui ouvre l'installateur (cas courant). */
-        private const val KEY_SHELL_KEEPS = "shell_keeps_mark"
-        /** Les deux chemins ont échoué sur ce téléphone : on ne redemande plus une deuxième confirmation à chaque mise à jour. */
-        private const val KEY_NO_MARK = "no_mark"
-    }
+    companion object { private const val ACTION_STATUS = "fr.roadguard.suite.INSTALL_STATUS" }
 }

@@ -13,44 +13,9 @@ on:
       reset_pass:
         description: "Mot de passe provisoire (jamais écrit dans le dépôt)"
         default: ""
-      apk_app:
-        description: "Appli à contrôler (gps, suite, drive)"
-        default: "gps"
-      apk_run:
-        description: "Contrôle de l'APK Pilote d'une compilation (numéro du run Android) : Android Auto déclaré ?"
-        default: ""
 
 jobs:
-  apk:
-    if: ${{ inputs.apk_run != '' }}
-    runs-on: ubuntu-latest
-    permissions: { actions: read, contents: read }
-    steps:
-      - uses: actions/download-artifact@v4
-        with: { pattern: "${{ inputs.apk_app }}-apk-*", run-id: "${{ inputs.apk_run }}", github-token: "${{ github.token }}", path: apk }
-      - name: Manifeste de l'APK
-        run: |
-          aapt2=$(ls $ANDROID_HOME/build-tools/*/aapt2 | tail -1)
-          find apk -name '*.apk' | while read -r f; do
-            echo "== $f"
-            $aapt2 dump badging "$f" | grep -E "^package|sdkVersion|targetSdk" | head -4
-            $aapt2 dump xmltree --file AndroidManifest.xml "$f" > m.txt
-            grep -n -i -E "car|automotive" m.txt || echo "AUCUNE déclaration Android Auto"
-            grep -n -B3 -A14 "RoadguardCarService" m.txt | head -60 || true
-            unzip -l "$f" | grep -i -E "automotive_app_desc|res/xml" | head -20
-            $aapt2 dump xmltree --file res/xml/automotive_app_desc.xml "$f" || true
-            echo "-- descripteur Android Auto (chemin réel dans l'APK)"
-            $aapt2 dump resources "$f" | grep -A2 "xml/automotive_app_desc" | head -4 || true
-            p=$($aapt2 dump resources "$f" | grep -A2 "xml/automotive_app_desc" | grep -o '(file) [^ ]*' | head -1 | cut -d' ' -f2)
-            [ -n "$p" ] && $aapt2 dump xmltree --file "$p" "$f" || true
-            grep -n -A3 "com.google.android.gms.car.application" m.txt | head -6 || true
-            grep -n -i -E "debuggable|testOnly|uses-sdk|minSdkVersion" m.txt | head -6 || true
-            echo "-- fournisseurs et classes Shizuku"
-            grep -n -i -E "provider|shizuku" m.txt | head -20 || true
-            for d in $(unzip -Z1 "$f" | grep -E '^classes[0-9]*\.dex$'); do unzip -p "$f" "$d" | strings | grep -E "fr/roadguard/suite/(ShellService|IShellService|ApkProvider|PlayMark)|rikka/shizuku/ShizukuProvider;" | sort -u | head -12; done
-          done
   diag:
-    if: ${{ inputs.apk_run == '' }}
     runs-on: ubuntu-latest
     defaults:
       run:
