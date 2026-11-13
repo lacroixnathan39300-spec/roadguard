@@ -33,6 +33,8 @@ object Conversation {
     // Vrai quand le mode conversation est lancé et que le micro est réellement en écoute (pour afficher l'indicateur
     // 🎤 à l'écran de conduite). Mis à jour par la séance.
     var listening by androidx.compose.runtime.mutableStateOf(false)
+    /** Pourquoi Pilote n'écoute pas (ou mal), en clair ; vide quand tout va bien. Affiché sur la carte. */
+    var status by androidx.compose.runtime.mutableStateOf("")
 
     // Anti-répétition : les dernières phrases dites (après remplissage des trous) ; on évite de les redire.
     private val recent = ArrayDeque<String>()

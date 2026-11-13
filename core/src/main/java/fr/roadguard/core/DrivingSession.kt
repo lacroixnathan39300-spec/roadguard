@@ -403,6 +403,11 @@ class DrivingSession(
         ears?.start()
         val ok = ears?.active == true
         fr.roadguard.core.community.Conversation.listening = ok
+        fr.roadguard.core.community.Conversation.status = when {
+            ok -> ""
+            context.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) != android.content.pm.PackageManager.PERMISSION_GRANTED -> "micro non autorisé"
+            else -> "reconnaissance vocale indisponible sur ce téléphone"
+        }
         // Micro pas encore autorisé (ou reconnaissance vocale pas prête) : on réessaie tout seul toutes les 3 s,
         // pour que l'écoute démarre dès que l'autorisation est donnée, sans avoir à couper/relancer le mode.
         if (!ok && settings.conversationOn) scope.launch {
@@ -414,12 +419,16 @@ class DrivingSession(
     private fun setConversation(on: Boolean) {
         fr.roadguard.core.community.Conversation.resetContext()
         mood = 1; moodCalm = 0
-        if (!on) { ears?.stop(); fr.roadguard.core.community.Conversation.listening = false; return }
+        if (!on) { ears?.stop(); fr.roadguard.core.community.Conversation.listening = false; fr.roadguard.core.community.Conversation.status = ""; return }
         if (ears == null) ears = fr.roadguard.core.community.ConversationEars(context) { heard -> onHeard(heard) }
         if (fr.roadguard.core.community.Conversation.loadCached(context)) startEars()
         else scope.launch(kotlinx.coroutines.Dispatchers.IO) {
-            fr.roadguard.core.community.Conversation.download(context, community.baseUrl)
-            withContext(kotlinx.coroutines.Dispatchers.Main) { if (settings.conversationOn) startEars() }
+            fr.roadguard.core.community.Conversation.status = "téléchargement des phrases…"
+            val got = fr.roadguard.core.community.Conversation.download(context, community.baseUrl)
+            withContext(kotlinx.coroutines.Dispatchers.Main) {
+                if (!settings.conversationOn) return@withContext
+                if (got) startEars() else fr.roadguard.core.community.Conversation.status = "phrases non téléchargées (connexion ?)"
+            }
         }
     }
 
