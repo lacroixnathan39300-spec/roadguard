@@ -324,7 +324,7 @@ fun ConversationSettings(settings: DriveSettings) {
             var total = 0
             val ok = fr.roadguard.core.community.Conversation.download(context, fr.roadguard.core.community.Community.DEFAULT_URL) { n -> total += n }
             val v = fr.roadguard.core.community.Conversation.cachedVersion(context)
-            withContext(kotlinx.coroutines.Dispatchers.Main) {
+            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
                 packStatus = if (ok) "✓ Pack installé (version $v, ${total / 1024} Ko)"
                     else "⚠ Échec du téléchargement. Vérifie ta connexion et réessaie."
             }
