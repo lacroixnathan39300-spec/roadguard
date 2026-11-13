@@ -89,6 +89,9 @@ object Conversation {
         " " + Normalizer.normalize(text.lowercase().replace('’', '\''), Normalizer.Form.NFD)
             .replace(Regex("\\p{M}+"), "").replace(Regex("[^a-z0-9' ]+"), " ").replace(Regex(" +"), " ").trim() + " "
 
+    /** Comme [normalize], apostrophes remplacées par des espaces (« j'ai » → « j ai ») : forme de comparaison des mots-clés. */
+    fun squash(text: String): String = normalize(text).replace('\'', ' ').replace(Regex(" +"), " ")
+
     /** Charge le pack depuis le cache local (immédiat). Rend true si un pack est disponible. */
     fun loadCached(context: Context): Boolean {
         if (pack != null) return true
@@ -129,7 +132,8 @@ object Conversation {
         val intents = ArrayList<Intent>(intentsArr.length())
         for (i in 0 until intentsArr.length()) {
             val io = intentsArr.getJSONObject(i)
-            val kw = io.getJSONArray("kw").let { a -> List(a.length()) { normalize(a.getString(it)).trim() } }
+            // Apostrophes ramenées à des espaces : « j'ai » et « j ai » (les deux écritures existent dans les packs) se valent.
+            val kw = io.getJSONArray("kw").let { a -> List(a.length()) { squash(a.getString(it)).trim() } }
             val replies = repliesOf(io.getJSONObject("r"))
             intents.add(Intent(io.getString("id"), kw, replies))
         }
@@ -231,19 +235,64 @@ object Conversation {
         return chosen
     }
 
+    // Racine approximative d'un mot (sans accents) : « énervé », « énerver », « énerves » → « enerv ». Sert à reconnaître
+    // un mot-clé même conjugué ou au pluriel.
+    private val stemSuffixes = listOf("issements", "issement", "ements", "ement", "ations", "ation", "aient", "erais", "erait",
+        "eront", "erons", "erez", "erai", "eras", "era", "ions", "ais", "ait", "ant", "ent", "ees", "ee", "es", "er", "ez", "e", "s", "x")
+    private fun stem(w: String): String {
+        if (w.length < 5) return w
+        val suffix = stemSuffixes.firstOrNull { w.endsWith(it) && w.length - it.length >= 4 } ?: return w
+        return w.dropLast(suffix.length)
+    }
+
     /**
      * Cherche une phrase préparée qui répond à [text] pour le [persona] donné. Rend null si aucune intention du pack
      * ne correspond (la séance de conduite a déjà tenté les réponses « vivantes » avant d'arriver ici).
+     *
+     * Toutes les intentions sont notées et la meilleure l'emporte : une expression de plusieurs mots (« tu me manques »)
+     * bat un mot seul, un mot exact bat un mot seulement proche (conjugué, pluriel). [strongOnly] : ne garde que les
+     * correspondances sûres (expression de plusieurs mots, ou phrase très courte), pour laisser la reformulation
+     * répondre aux phrases plus longues où un mot-clé isolé tomberait à côté.
      */
-    fun staticReply(text: String, persona: String): String? {
+    fun staticReply(text: String, persona: String, strongOnly: Boolean = false): String? {
         val p = pack ?: return null
-        val t = normalize(text)
-        val intent = p.intents.firstOrNull { intent -> intent.keywords.any { it.isNotEmpty() && " $it " in t } } ?: return null
-        // Mémoire : si le conducteur lance (ou relance) un scénario, on retient le fil pour l'enchaîner ensuite ;
-        // toute autre intention reconnue laisse le fil vivre encore un peu puis s'effacer.
-        if (intent.id.startsWith("scenario_")) { thread = intent.id; threadStep = 1; threadLife = THREAD_LIFE }
-        else if (threadLife > 0) threadLife--
-        return pick(intent.replies, persona)
+        val t = squash(text)
+        val words = t.trim().split(' ')
+        val stems = words.mapTo(HashSet()) { stem(it) }
+        val scored = ArrayList<Pair<Int, Intent>>()
+        for (intent in p.intents) {
+            var score = 0
+            for (k in intent.keywords) {
+                if (k.isEmpty()) continue
+                if (" $k " in t) score = maxOf(score, (k.count { it == ' ' } + 1) * 100 + k.length)
+                else if (' ' !in k && k.length >= 5 && stem(k) in stems) score = maxOf(score, 50 + k.length)
+            }
+            if (score > 0 && !(strongOnly && score < 200 && words.size > 3)) scored.add(score to intent)
+        }
+        // Tri stable : à score égal, l'ordre du pack est gardé.
+        scored.sortByDescending { it.first }
+        for ((_, intent) in scored) {
+            // Intention sans réplique pour ce personnage (ni pour « normal ») : on passe à la suivante.
+            if (intent.replies[persona].isNullOrEmpty() && intent.replies["normal"].isNullOrEmpty()) continue
+            // Mémoire : si le conducteur lance (ou relance) un scénario, on retient le fil pour l'enchaîner ensuite ;
+            // toute autre intention reconnue laisse le fil vivre encore un peu puis s'effacer.
+            if (intent.id.startsWith("scenario_")) { thread = intent.id; threadStep = 1; threadLife = THREAD_LIFE }
+            else if (threadLife > 0) threadLife--
+            return pick(intent.replies, persona)
+        }
+        return null
+    }
+
+    /**
+     * Choisit, parmi des phrases fabriquées par le code (reformulation, sécurité…), une qui n'a pas été dite
+     * récemment, et la met au genre de l'interlocuteur et au langage familier.
+     */
+    fun fresh(options: List<String>): String? {
+        if (options.isEmpty()) return null
+        val polished = options.map { polish(it) }
+        val chosen = polished.filter { it !in recent }.randomOrNull() ?: polished.random()
+        noteSaid(chosen)
+        return chosen
     }
 
     /**

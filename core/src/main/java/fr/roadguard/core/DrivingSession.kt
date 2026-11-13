@@ -383,9 +383,11 @@ class DrivingSession(
     // suite s'il demande de se calmer. Pas besoin de changer de réglage : la relation évolue d'elle-même.
     private var mood = 1
     private var moodCalm = 0
+    /** La dernière réplique de Pilote était une question : un « oui / non / bof » du conducteur y répond. */
+    private var lastWasQuestion = false
 
     private fun autoType(raw: String): String {
-        val t = fr.roadguard.core.community.Conversation.normalize(raw)
+        val t = fr.roadguard.core.community.Conversation.squash(raw)
         fun has(vararg w: String) = w.any { " $it " in t }
         when {
             has("arrete", "stop", "calme", "calme toi", "soft", "pas a l aise", "change de sujet", "on se calme",
@@ -418,7 +420,7 @@ class DrivingSession(
 
     private fun setConversation(on: Boolean) {
         fr.roadguard.core.community.Conversation.resetContext()
-        mood = 1; moodCalm = 0
+        mood = 1; moodCalm = 0; lastWasQuestion = false
         if (!on) { ears?.stop(); fr.roadguard.core.community.Conversation.listening = false; fr.roadguard.core.community.Conversation.status = ""; return }
         if (ears == null) ears = fr.roadguard.core.community.ConversationEars(context) { heard -> onHeard(heard) }
         if (fr.roadguard.core.community.Conversation.loadCached(context)) startEars()
@@ -455,6 +457,13 @@ class DrivingSession(
         val music = runCatching { (context.getSystemService(android.content.Context.AUDIO_SERVICE) as android.media.AudioManager).isMusicActive }.getOrDefault(false)
         val conv = fr.roadguard.core.community.Conversation
         conv.familiar = settings.convFamiliar && persona != "normal"
+        val brain = fr.roadguard.core.community.ConversationBrain
+        val n = conv.normalize(text).trim()
+        fun say(r: String) { lastWasQuestion = r.trimEnd().endsWith("?"); voice.converse(r) { ears?.listen() } }
+        // Sécurité d'abord (fatigue, alcool, détresse) : une vraie réponse, quel que soit le personnage.
+        if (!music) brain.safety(n)?.let { conv.fresh(it) }?.let { say(it); return }
+        // Réponses « vivantes » : données du trajet, puis date, calcul, pile ou face…
+        (dynamicReply(text) ?: if (music) null else brain.quick(text))?.let { say(conv.polish(it)); return }
         // Mémoire (jamais pendant la musique : des paroles de chanson ne doivent pas être retenues comme des faits).
         val mem = fr.roadguard.core.community.ConversationMemory
         val memOn = settings.convMemory && !music
@@ -463,18 +472,26 @@ class DrivingSession(
             mem.seedName(runCatching { fr.roadguard.core.account.AccountManager.get(context).status?.firstName }.getOrNull())
             mem.observe(text)
             // Il retient quelque chose, répond à une question sur le conducteur, ou donne une réponse apprise.
-            mem.handle(text)?.let { r -> voice.converse(conv.polish(r)) { ears?.listen() }; return }
+            mem.handle(text)?.let { say(conv.polish(it)); return }
         }
-        val live = dynamicReply(text)?.let { conv.polish(it) }
-        var reply = live ?: conv.staticReply(text, persona)?.let { if (memOn) mem.flavor(it, text, false) else it }
-        if (reply == null && !music) {
-            // Rien de précis reconnu : phrase dite souvent → Pilote demande quoi répondre ; sinon une relance, parfois
-            // personnelle (ses proches, ses goûts), avec les mots du conducteur.
-            reply = (if (memOn) mem.noteUnknown(text) else null)?.let { conv.polish(it) }
+        fun flavored(r: String, continuer: Boolean) = if (memOn) mem.flavor(r, text, continuer) else r
+        val reply: String? = if (music) {
+            // Musique : seulement une phrase reconnue du pack, jamais de relance par-dessus une chanson.
+            conv.staticReply(text, persona)
+        } else {
+            // 1. « oui / non / bof » en réponse à une question de Pilote ; 2. phrase du pack reconnue à coup sûr ;
+            // 3. reformulation de ce qu'il vient de dire ; 4. phrase du pack sur un mot-clé ; 5. relances.
+            (if (lastWasQuestion) brain.followUp(n)?.let { conv.fresh(it) } else null)
+                ?: conv.staticReply(text, persona, strongOnly = true)?.let { flavored(it, false) }
+                ?: brain.reflect(text)?.let { conv.fresh(it) }
+                ?: conv.staticReply(text, persona)?.let { flavored(it, false) }
+                ?: (if (memOn) mem.noteUnknown(text) else null)?.let { conv.polish(it) }
                 ?: (if (memOn && Math.random() < 0.25) mem.personal() else null)?.let { conv.polish(it) }
-                ?: conv.continuerReply(persona)?.let { if (memOn) mem.flavor(it, text, true) else it }
+                ?: brain.reflect(text, lastResort = true)?.let { conv.fresh(it) }
+                ?: conv.continuerReply(persona)?.let { flavored(it, true) }
                 ?: conv.fallbackReply(persona)
         }
+        lastWasQuestion = reply?.trimEnd()?.endsWith("?") == true
         if (reply != null) voice.converse(reply) { ears?.listen() } else ears?.listen()
     }
 
