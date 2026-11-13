@@ -158,6 +158,7 @@ class DrivingSession(
     private var overSince = 0L
     private val overEpisodes = ArrayDeque<Long>()
     private var lastScold = 0L
+    private var lastExtraAt = 0L // dernier recalcul des radars signalés (throttle anti-saccade)
     @Volatile private var limitBusy = false
 
     /**
@@ -423,13 +424,19 @@ class DrivingSession(
     /** Radars : alerte, bips, alarme et réprimandes pour une position (réelle, ou estimée dans un tunnel). */
     private fun radarStep(f: Fix) {
         alerts?.route = route?.points // radars comptés seulement sur le tracé pendant un guidage
-        // Radars signalés par la communauté (mobiles et fixes) : même alerte et mêmes bips d'approche que les radars des bases.
-        alerts?.extra = if (!settings.radarsOn || radarsBlockedHere) emptyList() else community.alertRadars(f.lat, f.lon).mapNotNull { r ->
-            val fixed = r.type == fr.roadguard.core.community.ReportType.FIXED
-            // Radar fixe déjà dans les bases : il est annoncé une seule fois, par la base.
-            if (fixed && community.knownRadarNear?.invoke(r.lat, r.lon) == true) null
-            else fr.roadguard.core.radar.Radar("c-${r.id}", r.lat, r.lon,
-                if (fixed) fr.roadguard.core.radar.RadarKind.FIXED else fr.roadguard.core.radar.RadarKind.MOBILE, "Signalé", null)
+        // Radars signalés par la communauté : recalculés au plus toutes les 2 s (les radars ne bougent pas), pour ne
+        // pas reparcourir tous les signalements et créer des objets à chaque point GPS — ce qui faisait saccader la carte.
+        if (!settings.radarsOn || radarsBlockedHere) {
+            alerts?.extra = emptyList(); lastExtraAt = 0L
+        } else if (f.timeMs - lastExtraAt >= 2_000) {
+            lastExtraAt = f.timeMs
+            alerts?.extra = community.alertRadars(f.lat, f.lon).mapNotNull { r ->
+                val fixed = r.type == fr.roadguard.core.community.ReportType.FIXED
+                // Radar fixe déjà dans les bases : il est annoncé une seule fois, par la base.
+                if (fixed && community.knownRadarNear?.invoke(r.lat, r.lon) == true) null
+                else fr.roadguard.core.radar.Radar("c-${r.id}", r.lat, r.lon,
+                    if (fixed) fr.roadguard.core.radar.RadarKind.FIXED else fr.roadguard.core.radar.RadarKind.MOBILE, "Signalé", null)
+            }
         }
         val newAlert = alerts?.update(f)?.takeIf { settings.radarsOn && !radarsBlockedHere && it.radar.kind in settings.alertKinds }
         if (newAlert?.isNew == true) voice.announce(newAlert)
