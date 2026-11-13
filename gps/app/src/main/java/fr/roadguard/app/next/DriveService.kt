@@ -180,6 +180,7 @@ class DriveService : Service() {
         bubbleView?.hide()
         sensorListener?.let { getSystemService(android.hardware.SensorManager::class.java)?.unregisterListener(it) }
         session?.endTrip()
+        session?.stopConversation()
         PiloteWidget.update(this, null)
         session = null
         scope.cancel()

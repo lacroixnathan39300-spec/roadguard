@@ -128,6 +128,9 @@ class DriveSettings(context: Context) {
     private val radarsListener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { p, key ->
         if (key == "radars_on") radarsOn = p.getBoolean("radars_on", false) && fr.roadguard.core.ui.Legal.radarConsented(appContext)
         if (key == "swiss_mode") swissMode = p.getBoolean("swiss_mode", true) || !fr.roadguard.core.ui.Legal.swissConsented(appContext)
+        // Mode conversation : une instance (réglages, écran d'accueil) le change, les autres (la séance) suivent.
+        if (key == "conversation_on") conversationOn = p.getBoolean("conversation_on", false)
+        if (key == "conv_persona") convPersona = p.getString("conv_persona", "normal") ?: "normal"
     }
     init { prefs.registerOnSharedPreferenceChangeListener(radarsListener) }
     /**
@@ -191,6 +194,13 @@ class DriveSettings(context: Context) {
 
 
     // ---------- Sécurité et pratique (lot du 06/11) ----------
+    /** Mode conversation : micro qui écoute en continu et Pilote qui répond avec des phrases du pack. */
+    var conversationOn by mutableStateOf(prefs.getBoolean("conversation_on", false)); private set
+    fun changeConversationOn(v: Boolean) { conversationOn = v; put("conversation_on", v) }
+    /** Personnage du mode conversation (normal, pote, amie, copine, copain, coquin). */
+    var convPersona by mutableStateOf(prefs.getString("conv_persona", "normal") ?: "normal"); private set
+    fun changeConvPersona(v: String) { convPersona = v; put("conv_persona", v) }
+
     private fun put(key: String, v: Any) = prefs.edit().apply {
         when (v) { is Boolean -> putBoolean(key, v); is Int -> putInt(key, v); is String -> putString(key, v); is Float -> putFloat(key, v) }
     }.apply()

@@ -25,6 +25,7 @@ import fr.roadguard.core.radar.RadarRepository
 import fr.roadguard.core.ui.DayNight
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Cœur de conduite ROADGUARD, identique sur le téléphone et sur l'autoradio :
@@ -370,6 +371,65 @@ class DrivingSession(
         community.knownRadarNear = { lat, lon -> index.near(lat, lon).any { fr.roadguard.core.radar.Geo.distanceMeters(lat, lon, it.lat, it.lon) < 100 } }
         alerts = AlertEngine(index)
         averages = AverageSpeedTracker(index)
+        // Mode conversation : suit le réglage (démarre/arrête le micro).
+        scope.launch { androidx.compose.runtime.snapshotFlow { settings.conversationOn }.collect { setConversation(it) } }
+    }
+
+    // ---------- Mode conversation ----------
+    private var ears: fr.roadguard.core.community.ConversationEars? = null
+
+    private fun setConversation(on: Boolean) {
+        if (!on) { ears?.stop(); return }
+        if (ears == null) ears = fr.roadguard.core.community.ConversationEars(context) { heard -> onHeard(heard) }
+        if (fr.roadguard.core.community.Conversation.loadCached(context)) ears?.start()
+        else scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            fr.roadguard.core.community.Conversation.download(context, community.baseUrl)
+            withContext(kotlinx.coroutines.Dispatchers.Main) { if (settings.conversationOn) ears?.start() }
+        }
+    }
+
+    fun stopConversation() { ears?.stop() }
+
+    /** Une phrase entendue : réponse en direct si possible, sinon phrase du pack, puis Pilote répond et se remet à écouter. */
+    private fun onHeard(text: String) {
+        val persona = settings.convPersona
+        // Si de la musique joue, le micro l'entend aussi : on ne répond alors qu'à une vraie question ou une phrase
+        // reconnue, jamais à du bruit (pas de relance), pour ne pas bavarder par-dessus les paroles d'une chanson.
+        val music = runCatching { (context.getSystemService(android.content.Context.AUDIO_SERVICE) as android.media.AudioManager).isMusicActive }.getOrDefault(false)
+        val reply = dynamicReply(text)
+            ?: fr.roadguard.core.community.Conversation.staticReply(text, persona)
+            ?: if (music) null else (fr.roadguard.core.community.Conversation.continuerReply(persona)
+                ?: fr.roadguard.core.community.Conversation.fallbackReply(persona))
+        if (reply != null) voice.converse(reply) { ears?.listen() } else ears?.listen()
+    }
+
+    /** Réponses « vivantes » (données du trajet) par mots-clés ; null si la question n'en est pas une. */
+    private fun dynamicReply(text: String): String? {
+        val t = fr.roadguard.core.community.Conversation.normalize(text)
+        fun has(vararg words: String) = words.any { " $it " in t || t.trim() == it }
+        val kmh = here?.speedKmh?.toInt() ?: 0
+        return when {
+            has("ma vitesse", "quelle vitesse", "je roule a combien", "je vais a combien", "combien je roule") ->
+                if (kmh > 0) "Tu roules à $kmh kilomètres heure." else "Tu es à l'arrêt."
+            has("la limitation", "limite ici", "limite a combien", "c'est limite a combien", "quelle limitation") ->
+                speedLimit?.let { "Ici c'est limité à $it." } ?: "Je ne connais pas la limitation à cet endroit."
+            has("quelle heure", "il est quelle heure", "l'heure") ->
+                "Il est " + java.text.SimpleDateFormat("H'h'mm", java.util.Locale.FRANCE).format(java.util.Date()) + "."
+            has("prochain radar", "un radar", "y a un radar", "des radars", "radar devant") -> alert?.let { a ->
+                "Radar à ${if (a.distanceM >= 1000) "%.1f kilomètres".format(java.util.Locale.FRANCE, a.distanceM / 1000.0) else "${a.distanceM} mètres"}."
+            } ?: "Aucun radar en vue pour l'instant."
+            has("on arrive quand", "il reste combien de temps", "encore combien de temps", "combien de temps", "on arrive bientot", "c'est encore loin", "encore loin") ->
+                guidanceState?.let { g ->
+                    if (g.remainingS > 60) "Il reste environ ${Math.round(g.remainingS / 60.0)} minutes." else "On arrive, c'est tout près."
+                } ?: "Aucun trajet en cours. Lance un guidage et je te dirai."
+            has("il reste combien de kilometres", "encore combien de route", "combien de kilometres", "encore combien de kilometres") ->
+                guidanceState?.let { g ->
+                    if (g.remainingM >= 1000) "Il reste %.0f kilomètres.".format(java.util.Locale.FRANCE, g.remainingM / 1000.0) else "Il reste ${g.remainingM} mètres."
+                } ?: "Aucun trajet en cours."
+            has("on est ou", "ou je suis", "ou on est", "quelle ville", "quelle route") ->
+                localInfo.address?.takeIf { it.isNotBlank() }?.let { "On est vers $it." } ?: "Je ne sais pas trop où on est là."
+            else -> null
+        }
     }
 
     private var radarVersion = -1

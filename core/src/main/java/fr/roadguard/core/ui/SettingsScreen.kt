@@ -3,6 +3,7 @@ package fr.roadguard.core.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -302,6 +303,36 @@ private fun VoiceCategory(settings: DriveSettings, voice: fr.roadguard.core.rada
                 settings.changeDriverFemale(f); voice.pack.feminine = f; voice.preview { limitChanged(80) }
             }
         }
+    }
+    ConversationSettings(settings)
+}
+
+/** Réglages du mode conversation : activation, personnage, pack de phrases. */
+@Composable
+fun ConversationSettings(settings: DriveSettings) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    fun downloadPack() = scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+        fr.roadguard.core.community.Conversation.download(context, fr.roadguard.core.community.Community.DEFAULT_URL)
+    }
+    Section("Mode conversation")
+    Text("Pilote écoute au micro : tu parles, il te répond, et la conversation continue. Il réagit aussi aux situations " +
+        "(trajet, énervement…). Choisis un personnage. Ça utilise le micro en continu (un peu de batterie). " +
+        "Hors ligne, installe le français « hors connexion » dans Android (réglages Google → Voix).",
+        color = DriveColors.TextSecondary, fontSize = 14.sp)
+    ToggleRow("Activer le mode conversation", settings.conversationOn) { on ->
+        settings.changeConversationOn(on)
+        if (on) downloadPack()
+    }
+    if (settings.conversationOn) {
+        Text("Personnage", color = DriveColors.TextSecondary, fontSize = 14.sp)
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            listOf("normal" to "🚗 Normal", "pote" to "😎 Un pote", "amie" to "😊 Une amie",
+                "copine" to "❤️ Petite amie", "copain" to "❤️ Petit copain", "coquin" to "😏 Coquin").forEach { (id, label) ->
+                BigButton(label, if (settings.convPersona == id) DriveColors.Accent else DriveColors.Panel) { settings.changeConvPersona(id) }
+            }
+        }
+        BigButton("⬇ Mettre à jour le pack de phrases", DriveColors.Track) { downloadPack() }
     }
 }
 

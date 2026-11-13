@@ -188,3 +188,18 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
 - Filtre dans `AlertVoice` (`level`, `speak` = tout, `speakAlert`, `speakRadar`, `speakAlways`, `speakNamed(min)`) ;
   signalements de la communauté via `Community.sayReport` (contrôles avec les radars, le reste avec les alertes).
 - Activation / arrêt des radars dans le même panneau (consignes légales à accepter si pas encore fait).
+
+## Mode conversation hors-ligne (13/11/2026)
+- Nouveau mode : micro qui écoute en continu (`ConversationEars`, SpeechRecognizer en boucle, `EXTRA_PREFER_OFFLINE`),
+  Pilote répond par la voix et se remet à écouter. Hors ligne (reconnaissance = français « hors connexion » Android).
+- Pack téléchargeable depuis le serveur (`/v1/pack/conversation`, `server/src/convpack.ts`), mis en cache
+  (`Conversation`), lu par la voix choisie. Personnages : normal, pote, amie, copine, copain, coquin (réglage
+  `conv_persona`). Variété : modèles à trous `{slot}` + anti-répétition (400 dernières phrases) + `continuers`
+  (relances réaction+question) pour tenir une conversation de plusieurs minutes.
+- Réponses « en direct » (vitesse, limitation, heure, prochain radar, temps/distance restants, « on est où »)
+  fabriquées par `DrivingSession.dynamicReply` à partir des données réelles ; le pack ne gère que les phrases.
+- Musique en cours (`AudioManager.isMusicActive`) : Pilote ne répond qu'aux vraies questions/phrases reconnues,
+  pas de relance sur du bruit (ne bavarde pas par-dessus les paroles).
+- Réglages → Voix → « Mode conversation » (activer, personnage, mettre à jour le pack). Proposé une fois à la
+  première connexion (`ConversationIntroScreen`). Réglage synchronisé entre instances via l'écouteur de préférences.
+- Format du pack documenté dans docs/PACK-CONVERSATION.md (à donner à une autre IA pour générer un gros pack).

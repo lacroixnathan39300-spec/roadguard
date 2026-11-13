@@ -1,0 +1,143 @@
+package fr.roadguard.core.community
+
+import android.content.Context
+import fr.roadguard.core.net.Net
+import org.json.JSONObject
+import java.io.File
+import java.text.Normalizer
+
+/**
+ * Mode conversation hors-ligne : le pack de phrases (personnages + répliques) est téléchargé depuis le serveur,
+ * gardé en mémoire sur le téléphone, et lu par la voix choisie. La compréhension se fait par mots-clés, sans
+ * Internet. Les réponses « vivantes » (temps de trajet, vitesse, prochain radar…) sont fabriquées par la séance
+ * de conduite ; ici on ne gère que les phrases préparées du pack.
+ */
+object Conversation {
+
+    /** Une intention reconnue : des mots-clés déclencheurs et des répliques par personnage. */
+    class Intent(val id: String, val keywords: List<String>, val replies: Map<String, List<String>>)
+    class Pack(
+        val version: Int, val personas: List<String>, val intents: List<Intent>,
+        val fallback: Map<String, List<String>>,
+        /** Listes de morceaux interchangeables : une réplique « {salut} {surnom} » pioche dans slots["salut"], etc. */
+        val slots: Map<String, List<String>>,
+        /** Relances : réactions + questions ouvertes dites quand rien de précis n'est reconnu, pour garder la conversation. */
+        val continuers: Map<String, List<String>>,
+    )
+
+    @Volatile var pack: Pack? = null
+        private set
+
+    // Anti-répétition : les dernières phrases dites (après remplissage des trous) ; on évite de les redire.
+    private val recent = ArrayDeque<String>()
+    private const val RECENT_MAX = 400
+
+    private fun file(context: Context) = File(context.applicationContext.filesDir, "conversation.json")
+
+    /** Normalise un texte pour la comparaison : minuscules, sans accents ni ponctuation, espaces simples. */
+    fun normalize(text: String): String =
+        " " + Normalizer.normalize(text.lowercase().replace('’', '\''), Normalizer.Form.NFD)
+            .replace(Regex("\\p{M}+"), "").replace(Regex("[^a-z0-9' ]+"), " ").replace(Regex(" +"), " ").trim() + " "
+
+    /** Charge le pack depuis le cache local (immédiat). Rend true si un pack est disponible. */
+    fun loadCached(context: Context): Boolean {
+        if (pack != null) return true
+        val f = file(context)
+        if (!f.exists()) return false
+        return runCatching { pack = parse(f.readText()); pack != null }.getOrDefault(false)
+    }
+
+    /** Version du pack en cache (0 si aucun). */
+    fun cachedVersion(context: Context): Int = pack?.version
+        ?: runCatching { JSONObject(file(context).readText()).optInt("version") }.getOrDefault(0)
+
+    /**
+     * Télécharge le pack depuis le serveur et le met en cache (à appeler en arrière-plan). Rend true si un pack
+     * est disponible à la fin (téléchargé ou déjà en cache).
+     */
+    fun download(context: Context, baseUrl: String): Boolean {
+        runCatching {
+            val r = Net.fetch("$baseUrl/v1/pack/conversation")
+            if (r.code in 200..299) {
+                val text = r.text
+                val p = parse(text)
+                if (p != null) {
+                    file(context).writeText(text)
+                    pack = p
+                    return true
+                }
+            }
+        }
+        return loadCached(context)
+    }
+
+    private fun parse(text: String): Pack? = runCatching {
+        val o = JSONObject(text)
+        val personas = o.optJSONArray("personas")?.let { a -> List(a.length()) { a.getString(it) } } ?: listOf("normal")
+        val intentsArr = o.getJSONArray("intents")
+        val intents = ArrayList<Intent>(intentsArr.length())
+        for (i in 0 until intentsArr.length()) {
+            val io = intentsArr.getJSONObject(i)
+            val kw = io.getJSONArray("kw").let { a -> List(a.length()) { normalize(a.getString(it)).trim() } }
+            val replies = repliesOf(io.getJSONObject("r"))
+            intents.add(Intent(io.getString("id"), kw, replies))
+        }
+        val slots = o.optJSONObject("slots")?.let { repliesOf(it) } ?: emptyMap()
+        val continuers = o.optJSONObject("continuers")?.let { repliesOf(it) } ?: emptyMap()
+        Pack(o.optInt("version"), personas, intents, repliesOf(o.getJSONObject("fallback")), slots, continuers)
+    }.getOrNull()
+
+    private fun repliesOf(o: JSONObject): Map<String, List<String>> {
+        val m = HashMap<String, List<String>>()
+        for (key in o.keys()) {
+            val a = o.getJSONArray(key)
+            m[key] = List(a.length()) { a.getString(it) }
+        }
+        return m
+    }
+
+    /** Remplit les trous « {slot} » d'un modèle en piochant au hasard dans les listes du pack. */
+    private fun render(template: String): String {
+        val slots = pack?.slots ?: return template
+        if ('{' !in template) return template
+        return Regex("\\{([a-z0-9_]+)\\}").replace(template) { m ->
+            slots[m.groupValues[1]]?.takeIf { it.isNotEmpty() }?.random() ?: m.value
+        }
+    }
+
+    private fun noteSaid(s: String) {
+        recent.addLast(s)
+        while (recent.size > RECENT_MAX) recent.removeFirst()
+    }
+
+    /**
+     * Une réplique du groupe, pour le personnage demandé (secours sur « normal »), trous remplis, en évitant de
+     * répéter une phrase dite récemment (jusqu'à épuisement du stock de combinaisons).
+     */
+    private fun pick(replies: Map<String, List<String>>, persona: String): String? {
+        val list = replies[persona]?.takeIf { it.isNotEmpty() } ?: replies["normal"]?.takeIf { it.isNotEmpty() } ?: return null
+        var chosen = render(list.random())
+        // Plusieurs essais : avec les modèles à trous, on tombe presque toujours sur une phrase inédite.
+        var tries = 0
+        while (chosen in recent && tries < 8) { chosen = render(list.random()); tries++ }
+        noteSaid(chosen)
+        return chosen
+    }
+
+    /**
+     * Cherche une phrase préparée qui répond à [text] pour le [persona] donné. Rend null si aucune intention du pack
+     * ne correspond (la séance de conduite a déjà tenté les réponses « vivantes » avant d'arriver ici).
+     */
+    fun staticReply(text: String, persona: String): String? {
+        val p = pack ?: return null
+        val t = normalize(text)
+        val intent = p.intents.firstOrNull { intent -> intent.keywords.any { it.isNotEmpty() && " $it " in t } } ?: return null
+        return pick(intent.replies, persona)
+    }
+
+    /** Relance (réaction + question) pour garder la conversation quand aucune intention précise ne correspond. */
+    fun continuerReply(persona: String): String? = pack?.let { pick(it.continuers, persona) }
+
+    /** Phrase de secours quand rien n'est compris, pour le personnage. */
+    fun fallbackReply(persona: String): String? = pack?.let { pick(it.fallback, persona) }
+}
