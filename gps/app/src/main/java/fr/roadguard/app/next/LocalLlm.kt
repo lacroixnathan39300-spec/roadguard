@@ -38,7 +38,7 @@ object LocalLlm : LlmEngine {
             val options = LlmInference.LlmInferenceOptions.builder()
                 .setModelPath(f.absolutePath)
                 .setMaxTokens(900)
-                .setMaxTopK(40)
+                .setTopK(40)
                 .build()
             llm = LlmInference.createFromOptions(ctx.applicationContext, options)
             Llm.installed = true
