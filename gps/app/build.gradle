@@ -178,3 +178,5 @@ tasks.register('verifyBundledRadarDependencies') {
 afterEvaluate {
     tasks.matching { it.name == 'preBuild' }.configureEach { dependsOn tasks.named('verifyBundledRadarDependencies') }
 }
+
+// publication build signé nouvelle clé (2026-11-14)
