@@ -129,12 +129,6 @@ class DriveSettings(context: Context) {
         if (key == "radars_on") radarsOn = p.getBoolean("radars_on", false) && fr.roadguard.core.ui.Legal.radarConsented(appContext)
         if (key == "swiss_mode") swissMode = p.getBoolean("swiss_mode", true) || !fr.roadguard.core.ui.Legal.swissConsented(appContext)
         // Mode conversation : une instance (réglages, écran d'accueil) le change, les autres (la séance) suivent.
-        if (key == "conversation_on") conversationOn = p.getBoolean("conversation_on", false)
-        if (key == "conv_persona") convPersona = convTypeOf(p.getString("conv_persona", "normal"))
-        if (key == "conv_gender") convGender = p.getString("conv_gender", "homme") ?: "homme"
-        if (key == "conv_familiar") convFamiliar = p.getBoolean("conv_familiar", true)
-        if (key == "conv_memory") convMemory = p.getBoolean("conv_memory", true)
-        if (key == "conv_ai") convAi = p.getBoolean("conv_ai", false)
     }
     init { prefs.registerOnSharedPreferenceChangeListener(radarsListener) }
     /**
@@ -196,37 +190,6 @@ class DriveSettings(context: Context) {
         prefs.edit().putStringSet("alert_kinds", alertKinds.map { it.name }.toSet()).apply()
     }
 
-
-    // ---------- Sécurité et pratique (lot du 06/11) ----------
-    /** Mode conversation : micro qui écoute en continu et Pilote qui répond avec des phrases du pack. */
-    var conversationOn by mutableStateOf(prefs.getBoolean("conversation_on", false)); private set
-    fun changeConversationOn(v: Boolean) { conversationOn = v; put("conversation_on", v) }
-    /** Personnage du mode conversation (normal, pote, amie, copine, copain, coquin). */
-    // Personnalité choisie : le TYPE de relation (normal / ami / amoureux / coquin). Le genre du compagnon et l'accord
-    // des mots (chéri/chérie…) découlent de convGender, pas de ce choix. (Anciens réglages pote/amie/copine/copain migrés.)
-    var convPersona by mutableStateOf(convTypeOf(prefs.getString("conv_persona", "auto"))); private set
-    fun changeConvPersona(v: String) { convPersona = v; put("conv_persona", v) }
-    // Genre de l'interlocuteur (l'utilisateur) : "homme" ou "femme". Le compagnon prend le genre opposé et s'adresse
-    // à l'utilisateur dans le bon genre.
-    var convGender by mutableStateOf(prefs.getString("conv_gender", "homme") ?: "homme"); private set
-    fun changeConvGender(v: String) { convGender = v; put("conv_gender", v) }
-    // Langage familier du compagnon (« t'es », « y a », « ouais »…) ; le personnage « normal » reste neutre.
-    var convFamiliar by mutableStateOf(prefs.getBoolean("conv_familiar", true)); private set
-    fun changeConvFamiliar(v: Boolean) { convFamiliar = v; put("conv_familiar", v) }
-    // Mémoire du compagnon : il retient ce que le conducteur dit de lui et son vocabulaire (fichier privé du téléphone).
-    var convMemory by mutableStateOf(prefs.getBoolean("conv_memory", true)); private set
-    fun changeConvMemory(v: Boolean) { convMemory = v; put("conv_memory", v) }
-    // IA avancée hors ligne (modèle sur le téléphone). Désactivée par défaut : gros téléchargement, à activer soi-même.
-    var convAi by mutableStateOf(prefs.getBoolean("conv_ai", false)); private set
-    fun changeConvAi(v: Boolean) { convAi = v; put("conv_ai", v) }
-    /** Ramène tout ancien ou nouveau nom de personnage au type de relation unifié. */
-    private fun convTypeOf(v: String?): String = when (v) {
-        "auto" -> "auto"
-        "pote", "amie", "ami" -> "ami"
-        "copine", "copain", "amoureux" -> "amoureux"
-        "coquin", "coquine" -> "coquin"
-        else -> "normal"
-    }
 
     private fun put(key: String, v: Any) = prefs.edit().apply {
         when (v) { is Boolean -> putBoolean(key, v); is Int -> putInt(key, v); is String -> putString(key, v); is Float -> putFloat(key, v) }

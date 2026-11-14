@@ -846,15 +846,6 @@ export default {
         return new Response(data, { headers: { "content-type": "application/octet-stream", "cache-control": "max-age=86400", ...CORS } });
       }
       if (req.method === "GET" && (path === "/confidentialite" || path === "/privacy")) return privacyPage();
-      // Pack de conversation hors-ligne (personnages + répliques), déposé en KV par la compilation (trop gros pour
-      // le Worker) et téléchargé/mis en cache par les applis.
-      if (req.method === "GET" && path === "/v1/pack/conversation") {
-        const body = await env.APPS?.get("conversation", { type: "stream" });
-        if (!body) return new Response("{}", { headers: { "content-type": "application/json; charset=utf-8", ...CORS } });
-        return new Response(body, {
-          headers: { "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=3600", ...CORS },
-        });
-      }
       if (req.method === "GET" && (path === "/conditions" || path === "/terms")) return termsPage();
       if (req.method === "POST" && path === "/v1/legal/accept") return legalAccept(req, env);
       const sp = /^\/(?:s|share)\/([0-9a-f]{20})$/.exec(path);

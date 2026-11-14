@@ -359,19 +359,6 @@ private fun PhoneHome() {
                     choices = s.alternatives, current = s.route, onChoose = s::chooseRoute, onDismissChoices = s::dismissAlternatives)
             }
             AlertBanners(s.alert, s.average)
-            run {
-                val conv = fr.roadguard.core.community.Conversation
-                val why = conv.status
-                val label = when {
-                    conv.listening && why.isEmpty() -> if (conv.heard.isEmpty()) "🎤 À l'écoute" else "🎤 J'ai compris : « ${conv.heard.take(60)} »"
-                    conv.listening -> "🎤 $why"
-                    settings.conversationOn -> "🎤 Pas à l'écoute : " + why.ifEmpty { "démarrage…" }
-                    else -> null
-                }
-                if (label != null) Text(label, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 6.dp).clip(RoundedCornerShape(14.dp))
-                        .background(if (conv.listening && why.isEmpty()) Color(0xF0124A2E) else Color(0xF0B26A00)).padding(horizontal = 14.dp, vertical = 6.dp))
-            }
             if (!s.navigating) BubbleSetupCard(settings)
             fr.roadguard.core.ui.TripSummaryCard(s, Modifier.padding(horizontal = 12.dp, vertical = 6.dp))
             if (incoming != null && System.currentTimeMillis() - incoming.at < 120_000) {
@@ -453,14 +440,6 @@ private fun PhoneHome() {
                     }
                 })
             }
-            // Mode conversation : toujours visible, coupé ou activé d'un appui, sans passer par les réglages.
-            fr.roadguard.core.ui.QuickToggle("💬", if (settings.conversationOn) "Discussion" else "Parler", settings.conversationOn, onToggle = {
-                val on = !settings.conversationOn
-                settings.changeConversationOn(on)
-                if (on && ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
-                    notifyAsk.launch(Manifest.permission.RECORD_AUDIO)
-                android.widget.Toast.makeText(context, if (on) "Discussion activée : Pilote t'écoute" else "Discussion coupée", android.widget.Toast.LENGTH_SHORT).show()
-            })
             if (drowsy != null) {
                 // Petit voyant de l'anti-somnolence (vert : visage suivi ; orange : fatigue ou regard ailleurs).
                 Text(if (drowsy == Alertness.AWAKE) "👁" else if (drowsy == Alertness.SEARCHING) "👁…" else "😴", fontSize = 22.sp,

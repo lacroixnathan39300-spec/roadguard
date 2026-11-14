@@ -35,10 +35,6 @@ class DriveService : Service() {
 
     override fun onCreate() {
         super.onCreate(); instance = this
-        // IA hors ligne : on branche le moteur et on charge le modèle s'il est déjà téléchargé.
-        fr.roadguard.core.community.Llm.engine = LocalLlm
-        fr.roadguard.core.community.Llm.installHook = { ctx -> LocalLlm.install(ctx) }
-        Thread { LocalLlm.load(applicationContext) }.start()
     }
 
     /** Pilote balayé des applis récentes : même règle que la fermeture par le bouton retour. */
@@ -186,7 +182,6 @@ class DriveService : Service() {
         bubbleView?.hide()
         sensorListener?.let { getSystemService(android.hardware.SensorManager::class.java)?.unregisterListener(it) }
         session?.endTrip()
-        session?.stopConversation()
         PiloteWidget.update(this, null)
         session = null
         scope.cancel()

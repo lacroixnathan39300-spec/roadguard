@@ -499,21 +499,6 @@ class AlertVoice(context: Context) : TextToSpeech.OnInitListener {
         say(text, id)
     }
 
-    /**
-     * Mode conversation : dit la réponse (quel que soit le niveau du bouton son, car c'est une interaction voulue),
-     * puis appelle [then] pour réécouter. Sécurité : [then] est appelé même si la voix ne démarre pas, pour ne pas
-     * bloquer l'écoute.
-     */
-    fun converse(text: String, then: () -> Unit) {
-        if (!ttsReady || text.isBlank()) { beeper.postDelayed(then, 300); return }
-        val id = "rg-conv-${System.nanoTime()}"
-        afterSpeech[id] = then
-        beeper.postDelayed({ afterSpeech.remove(id)?.invoke() }, text.length * 90L + 3000L)
-        speaking++
-        duck()
-        tts.speak(withName(text, 0.0), TextToSpeech.QUEUE_ADD, null, id)
-    }
-
     fun release() {
         if (clipsLazy.isInitialized()) runCatching { clips.release() } // sans créer le lecteur juste pour le fermer
         proximityM = null
