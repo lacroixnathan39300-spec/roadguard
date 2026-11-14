@@ -420,7 +420,7 @@ class DrivingSession(
 
     private fun setConversation(on: Boolean) {
         fr.roadguard.core.community.Conversation.resetContext()
-        mood = 1; moodCalm = 0; lastWasQuestion = false
+        mood = 1; moodCalm = 0; lastWasQuestion = false; aiHistory.clear()
         if (!on) { ears?.stop(); fr.roadguard.core.community.Conversation.listening = false; fr.roadguard.core.community.Conversation.status = ""; return }
         if (ears == null) ears = fr.roadguard.core.community.ConversationEars(context) { heard -> onHeard(heard) }
         if (fr.roadguard.core.community.Conversation.loadCached(context)) startEars()
@@ -441,6 +441,36 @@ class DrivingSession(
     }
 
     /** Une phrase entendue : réponse en direct si possible, sinon phrase du pack, puis Pilote répond et se remet à écouter. */
+    // Fil de la conversation donné à l'IA (rôle, texte) : garde le contexte des derniers échanges.
+    private val aiHistory = ArrayDeque<Pair<String, String>>()
+
+    private fun personaDesc(type: String, gender: String): String {
+        val you = if (gender == "femme") "une femme" else "un homme"
+        val role = when (type) {
+            "ami" -> "Tu es un pote proche du conducteur, décontracté et chaleureux."
+            "amoureux" -> "Tu es l'amoureux ou l'amoureuse du conducteur, tendre et affectueux, avec de petits mots doux."
+            "coquin" -> "Tu es une présence taquine et charmeuse, joueuse, jamais vulgaire ni explicite."
+            else -> "Tu es un copilote GPS amical et serviable."
+        }
+        return "$role Tu tutoies le conducteur, qui est $you."
+    }
+
+    private fun aiReply(text: String, type: String, gender: String): String? {
+        val eng = fr.roadguard.core.community.Llm.engine ?: return null
+        val sb = StringBuilder()
+        sb.append("Tu es Pilote, le copilote vocal d'un GPS, en voiture, et tu parles en français. ")
+        sb.append(personaDesc(type, gender)).append(' ')
+        sb.append("Réponds en UNE ou DEUX phrases courtes, naturelles, comme à l'oral ; pas de listes ni de mise en forme. ")
+        sb.append("Sécurité avant tout : n'encourage jamais à rouler vite, à boire au volant ou à continuer malgré la fatigue ; ")
+        sb.append("si le conducteur est fatigué ou a bu, dis-lui gentiment de s'arrêter.")
+        if (settings.convMemory) {
+            val facts = runCatching { fr.roadguard.core.community.ConversationMemory.summaryLines() }.getOrDefault(emptyList())
+            if (facts.isNotEmpty()) sb.append(" Ce que tu sais du conducteur : ").append(facts.take(12).joinToString(" "))
+        }
+        val msgs = ArrayList(aiHistory); msgs.add("user" to text)
+        return runCatching { eng.reply(sb.toString(), msgs) }.getOrNull()?.trim()?.ifBlank { null }
+    }
+
     private fun onHeard(text: String) {
         fr.roadguard.core.community.Conversation.heard = text
         // Genre de l'interlocuteur → le compagnon prend le genre opposé, et Pilote accorde ses mots (chéri/chérie…).
@@ -476,6 +506,15 @@ class DrivingSession(
             mem.handle(text)?.let { say(conv.polish(it)); return }
         }
         fun flavored(r: String, continuer: Boolean) = if (memOn) mem.flavor(r, text, continuer) else r
+        // IA avancée (hors ligne) : si le modèle est installé et prêt, c'est lui qui mène la conversation (hors
+        // musique). En cas d'échec ou s'il n'est pas prêt, on retombe sur les réponses du pack ci-dessous.
+        if (!music && settings.convAi && fr.roadguard.core.community.Llm.ready()) {
+            aiReply(text, type, gender)?.let {
+                aiHistory.add("user" to text); aiHistory.add("assistant" to it)
+                while (aiHistory.size > 8) aiHistory.removeFirst()
+                say(it); return
+            }
+        }
         val reply: String? = if (music) {
             // Musique : seulement une phrase reconnue du pack, jamais de relance par-dessus une chanson.
             conv.staticReply(text, persona)

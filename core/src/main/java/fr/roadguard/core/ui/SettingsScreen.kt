@@ -368,6 +368,13 @@ fun ConversationSettings(settings: DriveSettings) {
         if (settings.convPersona == "auto") Text("En Auto, Pilote commence amical et devient plus tendre ou plus coquin selon ce que tu dis et le ton, puis redevient tranquille tout seul. Dis « calme-toi » pour revenir à l'amical.", color = DriveColors.TextSecondary, fontSize = 13.sp)
         ToggleRow("Langage familier (« t'es », « y a », « ouais »…)", settings.convFamiliar, settings::changeConvFamiliar)
         ToggleRow("Retenir ce que je dis de moi et mes mots (reste sur ce téléphone)", settings.convMemory, settings::changeConvMemory)
+        ToggleRow("IA avancée hors ligne (comprend vraiment ; ~1 Go à télécharger une fois)", settings.convAi, settings::changeConvAi)
+        if (settings.convAi) {
+            val llm = fr.roadguard.core.community.Llm
+            if (!llm.installed) BigButton("⬇ Installer l'IA (en Wi-Fi)", DriveColors.Accent) { llm.install(context) }
+            if (llm.status.isNotEmpty()) Text(llm.status, color = Color.White, fontSize = 13.sp)
+            Text("Le modèle tourne sur ton téléphone, sans réseau. Le premier téléchargement est long ; ensuite ça marche partout, hors ligne. Il réfléchit 2 à 5 s avant de répondre.", color = DriveColors.TextSecondary, fontSize = 13.sp)
+        }
         if (settings.convMemory) {
             var showMemory by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
             var memoryLines by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(emptyList<String>()) }

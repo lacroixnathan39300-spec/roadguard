@@ -134,6 +134,7 @@ class DriveSettings(context: Context) {
         if (key == "conv_gender") convGender = p.getString("conv_gender", "homme") ?: "homme"
         if (key == "conv_familiar") convFamiliar = p.getBoolean("conv_familiar", true)
         if (key == "conv_memory") convMemory = p.getBoolean("conv_memory", true)
+        if (key == "conv_ai") convAi = p.getBoolean("conv_ai", false)
     }
     init { prefs.registerOnSharedPreferenceChangeListener(radarsListener) }
     /**
@@ -215,6 +216,9 @@ class DriveSettings(context: Context) {
     // Mémoire du compagnon : il retient ce que le conducteur dit de lui et son vocabulaire (fichier privé du téléphone).
     var convMemory by mutableStateOf(prefs.getBoolean("conv_memory", true)); private set
     fun changeConvMemory(v: Boolean) { convMemory = v; put("conv_memory", v) }
+    // IA avancée hors ligne (modèle sur le téléphone). Désactivée par défaut : gros téléchargement, à activer soi-même.
+    var convAi by mutableStateOf(prefs.getBoolean("conv_ai", false)); private set
+    fun changeConvAi(v: Boolean) { convAi = v; put("conv_ai", v) }
     /** Ramène tout ancien ou nouveau nom de personnage au type de relation unifié. */
     private fun convTypeOf(v: String?): String = when (v) {
         "auto" -> "auto"

@@ -33,7 +33,13 @@ class DriveService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    override fun onCreate() { super.onCreate(); instance = this }
+    override fun onCreate() {
+        super.onCreate(); instance = this
+        // IA hors ligne : on branche le moteur et on charge le modèle s'il est déjà téléchargé.
+        fr.roadguard.core.community.Llm.engine = LocalLlm
+        fr.roadguard.core.community.Llm.installHook = { ctx -> LocalLlm.install(ctx) }
+        Thread { LocalLlm.load(applicationContext) }.start()
+    }
 
     /** Pilote balayé des applis récentes : même règle que la fermeture par le bouton retour. */
     override fun onTaskRemoved(rootIntent: Intent?) {
