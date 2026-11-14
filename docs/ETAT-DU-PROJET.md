@@ -240,3 +240,5 @@ bouchons détectés automatiquement, messages 💬 de 24 h, tutoriel au premier 
   s'appelle mon oncle », « qu'est-ce que tu sais sur moi ») ; apprend des réponses (« quand je dis X, réponds Y », et
   demande quoi répondre à une phrase inconnue dite 3 fois) ; reprend les mots familiers du conducteur (mec, grave,
   wesh…) et fait des relances personnelles. « Oublie tout » à la voix ou bouton dans Réglages → Voix.
+
+<!-- build signé avec la nouvelle clé : 2026-11-14 -->
